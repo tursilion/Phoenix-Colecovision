@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <report-views version="2.0" >
  <header>
-  <DateModified>2018-07-31T14:59:17</DateModified>
+  <DateModified>2018-08-15T13:20:30</DateModified>
   <ModuleName>cvuno3_top</ModuleName>
   <SummaryTimeStamp>Unknown</SummaryTimeStamp>
   <SavedFilePath>C:/Users/bburney/Desktop/cvgs/git/synth/CollectorvisionFPGA/iseconfig/cvuno3_top.xreport</SavedFilePath>
-  <ImplementationReportsDirectory>C:/Users/bburney/Desktop/cvgs/git/synth/CollectorvisionFPGA</ImplementationReportsDirectory>
+  <ImplementationReportsDirectory>C:/Users/bburney/Desktop/cvgs/git/synth/CollectorvisionFPGA\</ImplementationReportsDirectory>
   <DateInitialized>2018-07-31T14:55:51</DateInitialized>
   <EnableMessageFiltering>true</EnableMessageFiltering>
  </header>

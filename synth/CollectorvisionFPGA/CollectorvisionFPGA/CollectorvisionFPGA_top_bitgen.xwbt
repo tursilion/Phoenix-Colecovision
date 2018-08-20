@@ -1,0 +1,8 @@
+INTSTYLE=ise
+INFILE=C:\Users\bburney\Desktop\cvgs\git\synth\CollectorvisionFPGA\CollectorvisionFPGA\CollectorvisionFPGA_top.ncd
+OUTFILE=C:\Users\bburney\Desktop\cvgs\git\synth\CollectorvisionFPGA\CollectorvisionFPGA\CollectorvisionFPGA_top.bit
+FAMILY=Spartan6
+PART=xc6slx16-2csg324
+WORKINGDIR=C:\Users\bburney\Desktop\cvgs\git\synth\CollectorvisionFPGA\CollectorvisionFPGA
+LICENSE=WebPack
+USER_INFO=211280118_0_0_070

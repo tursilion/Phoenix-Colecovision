@@ -1,0 +1,2 @@
+xst -intstyle ise -filter "C:/cvuno3/colecofpga-master/synth/cvuno3/iseconfig/filter.filter" -ifn "C:/cvuno3/colecofpga-master/synth/cvuno3/cvuno_top.xst" -ofn "C:/cvuno3/colecofpga-master/synth/cvuno3/cvuno_top.syr" 
+xst -intstyle ise -filter "C:/cvuno3/colecofpga-master/synth/cvuno3/iseconfig/filter.filter" -ifn "C:/cvuno3/colecofpga-master/synth/cvuno3/cvuno_top.xst" -ofn "C:/cvuno3/colecofpga-master/synth/cvuno3/cvuno_top.syr" 

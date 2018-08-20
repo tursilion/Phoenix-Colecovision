@@ -47,7 +47,7 @@ use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
 use work.vdp18_col_pack.all;
 
-entity cvuno3_top is
+entity CollectorvisionFPGA_top is
 	port (
 		-- Clocks
 		clock_50_i			: in    std_logic;
@@ -99,7 +99,10 @@ entity cvuno3_top is
 		joy2_p6_i			: in    std_logic;
 		joy2_p7_i			: in    std_logic;
 		joy2_p9_i			: in    std_logic;
-
+		snesjoy_clock_o	: out   std_logic								:= '1';
+		snesjoy_latch_o	: out   std_logic								:= '1';
+		snesjoy_data_i		: in    std_logic;
+		
 		-- Audio
 		dac_l_o				: out   std_logic								:= '0';
 		dac_r_o				: out   std_logic								:= '0';
@@ -128,12 +131,14 @@ entity cvuno3_top is
 		cart_en_E0_n_o		: out   std_logic								:= '1';
 
 		-- LED
-		led_o					: out   std_logic								:= '0';
+--		led_o					: out   std_logic								:= '0';
 		led2_o				: out   std_logic								:= '0'
 	);
 end entity;
 
-architecture behavior of cvuno3_top is
+use work.cv_keys_pack.all;
+
+architecture behavior of CollectorvisionFPGA_top is
 
 	-- Clocks
 	signal clock_master_s	: std_logic;
@@ -150,7 +155,9 @@ architecture behavior of cvuno3_top is
 	signal por_s				: std_logic;
 	signal por_n_s				: std_logic;
 	signal reset_s				: std_logic;
-
+	signal soft_reset_s		: std_logic;
+	signal core_reload_s		: std_logic;
+	
 	-- Internal BIOS
 	signal bios_addr_s		: std_logic_vector(12 downto 0);		-- 8K
 	signal d_from_bios_s		: std_logic_vector( 7 downto 0);
@@ -201,6 +208,11 @@ architecture behavior of cvuno3_top is
 	signal tdms_p_s			: std_logic_vector( 3 downto 0);
 	signal tdms_n_s			: std_logic_vector( 3 downto 0);
 
+	-- Keyboard
+	signal ps2_keys_s			: std_logic_vector(15 downto 0);
+	signal ps2_joy_s			: std_logic_vector(15 downto 0);
+	signal homekey_s			: std_logic;
+	
 	-- Controller
 	signal ctrl_p1_s			: std_logic_vector( 2 downto 1);
 	signal ctrl_p2_s			: std_logic_vector( 2 downto 1);
@@ -212,6 +224,20 @@ architecture behavior of cvuno3_top is
 	signal ctrl_p8_s			: std_logic_vector( 2 downto 1);
 	signal ctrl_p9_s			: std_logic_vector( 2 downto 1);
 
+	-- SNES
+	signal but_a_s				: std_logic_vector( 0 downto 0);
+	signal but_b_s				: std_logic_vector( 0 downto 0);
+	signal but_x_s				: std_logic_vector( 0 downto 0);
+	signal but_y_s				: std_logic_vector( 0 downto 0);
+	signal but_start_s		: std_logic_vector( 0 downto 0);
+	signal but_sel_s			: std_logic_vector( 0 downto 0);
+	signal but_tl_s			: std_logic_vector( 0 downto 0);
+	signal but_tr_s			: std_logic_vector( 0 downto 0);
+	signal but_up_s			: std_logic_vector( 0 downto 0);
+	signal but_down_s			: std_logic_vector( 0 downto 0);
+	signal but_left_s			: std_logic_vector( 0 downto 0);
+	signal but_right_s		: std_logic_vector( 0 downto 0);
+	
 	-- SD
 	signal sd_cs_n_s			: std_logic;
 
@@ -355,6 +381,21 @@ begin
 		dac_o		=> audio_dac_s
 	);
 
+	-- PS/2 keyboard interface
+	ps2if_inst : entity work.colecoKeyboard
+	port map (
+		clk				=> clock_master_s,
+		reset				=> reset_s,
+		-- inputs from PS/2 port
+		ps2_clk			=> ps2_clk_io,
+		ps2_data			=> ps2_data_io,
+		-- user outputs
+		keys				=> ps2_keys_s,
+		joy				=> ps2_joy_s,
+		core_reload_o	=> core_reload_s,
+		home_o			=> homekey_s
+	);
+	
 	-- Glue logic
 	process(clock_master_s)
 	begin
@@ -372,7 +413,7 @@ begin
 	dac_l_o		<= audio_dac_s;
 	dac_r_o		<= audio_dac_s;
 	sd_cs_n_o	<= sd_cs_n_s;
-	cart_dir_o	<= '0';
+	cart_dir_o	<= '1';
 
 	-- Memory
 	bios_addr_s	<= ram_addr_s(12 downto 0);
@@ -381,18 +422,221 @@ begin
 
 	d_to_cv_s	<= d_from_bios_s when bios_ce_s = '1'		else d_from_ram_s;
 	
+	
+	
+	-----------------------------------------------------------------------------
+	-- SNES Gamepad (TODO: implement NTT)
+	-----------------------------------------------------------------------------
+	snespads_b : entity work.snespad
+	generic map (
+		num_pads_g			=> 1,
+		reset_level_g		=> 0,
+		button_level_g		=> 0,
+		clocks_per_6us_g	=> 128					-- 6us = 128 ciclos de 21.477MHz
+	)
+	port map (
+		clk_i					=> clock_master_s,
+		reset_i				=> por_n_s,
+		pad_clk_o			=> snesjoy_clock_o,
+		pad_latch_o			=> snesjoy_latch_o,
+		pad_data_i(0)		=> snesjoy_data_i,
+		but_a_o				=> but_a_s,
+		but_b_o				=> but_b_s,
+		but_x_o				=> but_x_s,
+		but_y_o				=> but_y_s,
+		but_start_o			=> but_start_s,
+		but_sel_o			=> but_sel_s,
+		but_tl_o				=> but_tl_s,
+		but_tr_o				=> but_tr_s,
+		but_up_o				=> but_up_s,
+		but_down_o			=> but_down_s,
+		but_left_o			=> but_left_s,
+		but_right_o			=> but_right_s
+	);
+
+-- Controller
+	-----------------------------------------------------------------------------
+	-- Process pad_ctrl
+	--
+	-- Purpose:
+	--   Maps the gamepad signals to the controller buses of the console.
+	--
+	pad_ctrl: process (ctrl_p5_s, ctrl_p8_s, ps2_keys_s, ps2_joy_s,
+							but_a_s, but_b_s,	but_up_s, but_down_s, but_left_s, but_right_s,
+							but_x_s, but_y_s,	but_sel_s, but_start_s,	but_tl_s, but_tr_s
+	)
+		variable key_v   : natural range cv_keys_t'range;
+		variable fire1_v : std_logic;
+		variable fire2_v : std_logic;
+	begin
+		-- quadrature device not implemented
+		--ctrl_p7_s          <= "11";
+		--ctrl_p9_s          <= "11";
+
+		--------------------------------------------------------------------
+		-- soft reset to get to cart menu : use ps2 ESC key in keys(8)
+		--if ps2_keys_s(8) = '1' then
+		--	soft_reset_s <= '1';
+		--else
+		--	soft_reset_s <= '0';
+		--end if;
+		------------------------------------------------------------------------
+
+		-- Joy 1
+		if ctrl_p5_s(1) = '0' and ctrl_p8_s(1) = '1' then
+			-- keys and right button enabled --------------------------------------
+			-- keys not fully implemented
+
+			key_v := cv_key_none_c;
+
+			-- PS/2 Keyboard
+			if ps2_keys_s(13) = '1' then
+				-- KEY 1
+				key_v := cv_key_1_c;
+			elsif ps2_keys_s(7) = '1' then
+				-- KEY 2
+				key_v := cv_key_2_c;
+			elsif ps2_keys_s(12) = '1' then
+				-- KEY 3
+				key_v := cv_key_3_c;
+			elsif ps2_keys_s(2) = '1' then
+				-- KEY 4
+				key_v := cv_key_4_c;
+			elsif ps2_keys_s(3) = '1' then
+				-- KEY 5
+				key_v := cv_key_5_c;	
+			elsif ps2_keys_s(14) = '1' then
+				-- KEY 6
+				key_v := cv_key_6_c;
+			elsif ps2_keys_s(5) = '1' then
+				-- KEY 7
+				key_v := cv_key_7_c;				
+			elsif ps2_keys_s(1) = '1' then
+				-- KEY 8
+				key_v := cv_key_8_c;				
+			elsif ps2_keys_s(11) = '1' then
+				-- KEY 9
+				key_v := cv_key_9_c;
+			elsif ps2_keys_s(10) = '1' then
+				-- KEY 0
+				key_v := cv_key_0_c;
+			elsif ps2_keys_s(6) = '1' then
+				-- KEY *
+				key_v := cv_key_asterisk_c;
+			elsif ps2_keys_s(9) = '1' then
+				-- KEY #
+				key_v := cv_key_number_c;
+			end if;
+
+			-- SNES joypad (TODO: implement NTT)
+			if but_tl_s(0) = '0' then				-- TL button pressed, numbers 1 at 6
+				if    but_y_s(0) = '0' then
+					-- KEY 1
+					key_v := cv_key_1_c;
+				elsif but_x_s(0) = '0' then
+					-- KEY 2
+					key_v := cv_key_2_c;
+				elsif but_b_s(0) = '0' then
+					-- KEY 3
+					key_v := cv_key_3_c;
+				elsif but_a_s(0) = '0' then
+					-- KEY 4
+					key_v := cv_key_4_c;
+				elsif but_sel_s(0) = '0' then
+					-- KEY 5
+					key_v := cv_key_5_c;
+				elsif but_start_s(0) = '0' then
+					-- KEY 6
+					key_v := cv_key_6_c;
+				end if;
+			elsif but_tr_s(0) = '0' then			-- TR button pressed, 7 at 0, * and #
+				if    but_y_s(0) = '0' then
+					-- KEY 7
+					key_v := cv_key_7_c;
+				elsif but_x_s(0) = '0' then
+					-- KEY 8
+					key_v := cv_key_8_c;
+				elsif but_b_s(0) = '0' then
+					-- KEY 9
+					key_v := cv_key_9_c;
+				elsif but_a_s(0) = '0' then
+					-- KEY 0
+					key_v := cv_key_0_c;
+				elsif but_sel_s(0) = '0' then
+					-- KEY *
+					key_v := cv_key_asterisk_c;
+				elsif but_start_s(0) = '0' then
+					-- KEY #
+					key_v := cv_key_number_c;
+				end if;
+			end if;
+
+			ctrl_p1_s(1) <= cv_keys_c(key_v)(1);
+			ctrl_p2_s(1) <= cv_keys_c(key_v)(2);
+			ctrl_p3_s(1) <= cv_keys_c(key_v)(3);
+			ctrl_p4_s(1) <= cv_keys_c(key_v)(4);
+
+			if but_tl_s(0) = '1' and but_tr_s(0) = '1' then		-- fire 2 only if the TL and TR buttons are not pressed
+				fire2_v := but_a_s(0) and but_x_s(0);
+			else
+				fire2_v := '1';
+			end if;
+
+			ctrl_p6_s(1) <= not ps2_keys_s(0) and fire2_v and joy1_p6_i; -- button right (fire 2)
+
+		elsif ctrl_p5_s(1) = '1' and ctrl_p8_s(1) = '0' then
+			-- joystick and left button enabled -----------------------------------
+			ctrl_p1_s(1) <= not ps2_joy_s(0) and but_up_s(0) and joy1_p1_i;		-- up
+			ctrl_p2_s(1) <= not ps2_joy_s(1) and but_down_s(0) and joy1_p2_i;	-- down
+			ctrl_p3_s(1) <= not ps2_joy_s(2) and but_left_s(0) and joy1_p3_i;	-- left
+			ctrl_p4_s(1) <= not ps2_joy_s(3) and but_right_s(0) and joy1_p4_i;	-- right
+
+			if but_tl_s(0) = '1' and but_tr_s(0) = '1' then		-- fire 1 only if the TL and TR buttons are not pressed
+				fire1_v := but_b_s(0) and but_y_s(0) and joy1_p6_i;
+			else
+				fire1_v := '1';
+			end if;
+
+			ctrl_p6_s(1) <= not ps2_joy_s(4) and fire1_v;	-- button left (fire 1)
+		else
+			-- nothing active -----------------------------------------------------
+			ctrl_p1_s(1)	<= joy1_p1_i;
+			ctrl_p2_s(1)	<= joy1_p2_i;
+			ctrl_p3_s(1)	<= joy1_p3_i;
+			ctrl_p4_s(1)	<= joy1_p4_i;
+			ctrl_p6_s(1)	<= joy1_p6_i;
+			--ctrl_p7_s(1)	<= joy1_p7_i;
+		end if;
+
+		-- Joy2
+		-- nothing active -----------------------------------------------------
+		ctrl_p1_s(2) <= joy2_p1_i;
+		ctrl_p2_s(2) <= joy2_p2_i;
+		ctrl_p3_s(2) <= joy2_p3_i;
+		ctrl_p4_s(2) <= joy2_p4_i;
+		ctrl_p6_s(2) <= joy2_p6_i;
+		--ctrl_p7_s(2) <= joy2_p7_i;
+
+	end process pad_ctrl;
+
+
 	-- Controller
-	ctrl_p1_s	<= joy2_p1_i & joy1_p1_i;
-	ctrl_p2_s	<= joy2_p2_i & joy1_p2_i;
-	ctrl_p3_s	<= joy2_p3_i & joy1_p3_i;
-	ctrl_p4_s	<= joy2_p4_i & joy1_p4_i;
-	ctrl_p6_s	<= joy2_p6_i & joy1_p6_i;
+	ctrl_p1_s(2) <= joy2_p1_i; 
+	ctrl_p2_s(2) <= joy2_p2_i; 
+	ctrl_p3_s(2) <= joy2_p3_i; 
+	ctrl_p4_s(2) <= joy2_p4_i; 
+	ctrl_p6_s(2) <= joy2_p6_i; 
+--	ctrl_p7_s(2) <= joy2_p7_i; 
+--	ctrl_p1_s	<= joy2_p1_i & joy1_p1_i;
+--	ctrl_p2_s	<= joy2_p2_i & joy1_p2_i;
+--	ctrl_p3_s	<= joy2_p3_i & joy1_p3_i;
+--	ctrl_p4_s	<= joy2_p4_i & joy1_p4_i;
+--	ctrl_p6_s	<= joy2_p6_i & joy1_p6_i;
 	ctrl_p7_s	<= joy2_p7_i & joy1_p7_i;
 	ctrl_p9_s	<= joy2_p9_i & joy1_p9_i;
 	joy_p5_o		<= ctrl_p5_s(1);
 	joy_p8_o		<= ctrl_p8_s(1);
-
-
+	
 	-----------------------------------------------------------------------------
 	-- VGA/RGB Output
 	-----------------------------------------------------------------------------
@@ -488,7 +732,7 @@ begin
 		I_CLK_PIXEL		=> clock_vga_s,
 		I_R				=> vga_r_s & vga_r_s,
 		I_G				=> vga_g_s & vga_g_s,
-		I_B				=> vga_b_s & vga_b_s,
+		I_B				=> vga_b_s & vga_g_s,
 		I_BLANK			=> vga_blank_s,
 		I_HSYNC			=> vga_hsync_n_s,
 		I_VSYNC			=> vga_vsync_n_s,
@@ -515,7 +759,7 @@ begin
 	);
 
 	-- LED
-	led_o		<= not sd_cs_n_s;
+--	led_o		<= not sd_cs_n_s;
 	led2_o	<= '0';
 
 end architecture;
