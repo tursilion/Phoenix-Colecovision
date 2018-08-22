@@ -246,11 +246,11 @@ Parsing architecture <rtl> of entity <dac>.
 Parsing VHDL file "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" into library work
 Parsing entity <CollectorvisionFPGA_top>.
 Parsing architecture <behavior> of entity <collectorvisionfpga_top>.
-WARNING:HDLCompiler:946 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 351: Actual for formal port porta0_addr_i is neither a static name nor a globally static expression
-WARNING:HDLCompiler:946 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 358: Actual for formal port porta1_addr_i is neither a static name nor a globally static expression
-WARNING:HDLCompiler:946 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 733: Actual for formal port i_r is neither a static name nor a globally static expression
-WARNING:HDLCompiler:946 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 734: Actual for formal port i_g is neither a static name nor a globally static expression
-WARNING:HDLCompiler:946 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 735: Actual for formal port i_b is neither a static name nor a globally static expression
+WARNING:HDLCompiler:946 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 365: Actual for formal port porta0_addr_i is neither a static name nor a globally static expression
+WARNING:HDLCompiler:946 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 372: Actual for formal port porta1_addr_i is neither a static name nor a globally static expression
+WARNING:HDLCompiler:946 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 813: Actual for formal port i_r is neither a static name nor a globally static expression
+WARNING:HDLCompiler:946 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 814: Actual for formal port i_g is neither a static name nor a globally static expression
+WARNING:HDLCompiler:946 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 815: Actual for formal port i_b is neither a static name nor a globally static expression
 
 =========================================================================
 *                            HDL Elaboration                            *
@@ -335,27 +335,29 @@ Elaborating entity <ps2kbd> (architecture <rtl>) from library <work>.
 Elaborating entity <snespad> (architecture <struct>) with generics from library <work>.
 
 Elaborating entity <snespad_ctrl> (architecture <rtl>) with generics from library <work>.
-INFO:HDLCompiler:679 - "C:\Users\bburney\Desktop\cvgs\COMPARE\colecofpga-master\src\peripheral\snespad\snespad_pack-p.vhd" Line 85. Case statement is complete. others clause is never selected
+INFO:HDLCompiler:679 - "C:\Users\bburney\Desktop\cvgs\COMPARE\colecofpga-master\src\peripheral\snespad\snespad_pack-p.vhd" Line 105. Case statement is complete. others clause is never selected
 INFO:HDLCompiler:679 - "C:\Users\bburney\Desktop\cvgs\COMPARE\colecofpga-master\src\peripheral\snespad\snespad_ctrl.vhd" Line 194. Case statement is complete. others clause is never selected
 
 Elaborating entity <snespad_pad> (architecture <rtl>) with generics from library <work>.
-INFO:HDLCompiler:679 - "C:\Users\bburney\Desktop\cvgs\COMPARE\colecofpga-master\src\peripheral\snespad\snespad_pack-p.vhd" Line 85. Case statement is complete. others clause is never selected
-WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 585: joy1_p6_i should be on the sensitivity list of the process
-WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 589: joy1_p1_i should be on the sensitivity list of the process
-WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 590: joy1_p2_i should be on the sensitivity list of the process
-WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 591: joy1_p3_i should be on the sensitivity list of the process
-WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 592: joy1_p4_i should be on the sensitivity list of the process
-WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 595: joy1_p6_i should be on the sensitivity list of the process
-WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 603: joy1_p1_i should be on the sensitivity list of the process
-WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 604: joy1_p2_i should be on the sensitivity list of the process
-WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 605: joy1_p3_i should be on the sensitivity list of the process
-WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 606: joy1_p4_i should be on the sensitivity list of the process
-WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 607: joy1_p6_i should be on the sensitivity list of the process
-WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 613: joy2_p1_i should be on the sensitivity list of the process
-WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 614: joy2_p2_i should be on the sensitivity list of the process
-WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 615: joy2_p3_i should be on the sensitivity list of the process
-WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 616: joy2_p4_i should be on the sensitivity list of the process
-WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 617: joy2_p6_i should be on the sensitivity list of the process
+INFO:HDLCompiler:679 - "C:\Users\bburney\Desktop\cvgs\COMPARE\colecofpga-master\src\peripheral\snespad\snespad_pack-p.vhd" Line 105. Case statement is complete. others clause is never selected
+WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 660: joy1_p6_i should be on the sensitivity list of the process
+WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 665: joy1_p6_i should be on the sensitivity list of the process
+WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 669: joy1_p1_i should be on the sensitivity list of the process
+WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 670: joy1_p2_i should be on the sensitivity list of the process
+WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 671: joy1_p3_i should be on the sensitivity list of the process
+WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 672: joy1_p4_i should be on the sensitivity list of the process
+WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 675: joy1_p6_i should be on the sensitivity list of the process
+WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 683: joy1_p1_i should be on the sensitivity list of the process
+WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 684: joy1_p2_i should be on the sensitivity list of the process
+WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 685: joy1_p3_i should be on the sensitivity list of the process
+WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 686: joy1_p4_i should be on the sensitivity list of the process
+WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 687: joy1_p6_i should be on the sensitivity list of the process
+WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 693: joy2_p1_i should be on the sensitivity list of the process
+WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 694: joy2_p2_i should be on the sensitivity list of the process
+WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 695: joy2_p3_i should be on the sensitivity list of the process
+WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 696: joy2_p4_i should be on the sensitivity list of the process
+WARNING:HDLCompiler:92 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 697: joy2_p6_i should be on the sensitivity list of the process
+WARNING:HDLCompiler:1127 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" Line 494: Assignment to soft_reset_s ignored, since the identifier is never used
 
 Elaborating entity <vga> (architecture <rtl>) from library <work>.
 
@@ -391,17 +393,19 @@ Elaborating entity <hdmi_out_xilinx> (architecture <Behavioral>) from library <w
 Synthesizing Unit <CollectorvisionFPGA_top>.
     Related source file is "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd".
 WARNING:Xst:647 - Input <flash_miso_i> is never used. This port will be preserved and left unconnected if it belongs to a top-level block or it belongs to a sub-block and the hierarchy of this sub-block is preserved.
-INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 268: Output port <audio_o> of the instance <vg> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 268: Output port <rgb_r_o> of the instance <vg> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 268: Output port <rgb_g_o> of the instance <vg> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 268: Output port <rgb_b_o> of the instance <vg> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 268: Output port <D_cpu_addr> of the instance <vg> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 268: Output port <hsync_n_o> of the instance <vg> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 268: Output port <vsync_n_o> of the instance <vg> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 268: Output port <comp_sync_n_o> of the instance <vg> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 347: Output port <sram_ce_n_o> of the instance <sram> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 385: Output port <core_reload_o> of the instance <ps2if_inst> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 385: Output port <home_o> of the instance <ps2if_inst> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 282: Output port <audio_o> of the instance <vg> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 282: Output port <rgb_r_o> of the instance <vg> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 282: Output port <rgb_g_o> of the instance <vg> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 282: Output port <rgb_b_o> of the instance <vg> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 282: Output port <D_cpu_addr> of the instance <vg> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 282: Output port <hsync_n_o> of the instance <vg> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 282: Output port <vsync_n_o> of the instance <vg> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 282: Output port <comp_sync_n_o> of the instance <vg> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 361: Output port <sram_ce_n_o> of the instance <sram> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 399: Output port <core_reload_o> of the instance <ps2if_inst> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 399: Output port <home_o> of the instance <ps2if_inst> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 444: Output port <but_clear_o> of the instance <snespads_b> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\git\src\syn-CollectorvisionFPGA\CollectorvisionFPGA_top.vhd" line 444: Output port <but_equal_o> of the instance <snespads_b> is unconnected or connected to loadless signal.
 WARNING:Xst:2935 - Signal 'sram_addr_o<20:19>', unconnected in block 'CollectorvisionFPGA_top', is tied to its initial value (00).
 WARNING:Xst:2935 - Signal 'flash_cs_n_o', unconnected in block 'CollectorvisionFPGA_top', is tied to its initial value (1).
 WARNING:Xst:2935 - Signal 'flash_sclk_o', unconnected in block 'CollectorvisionFPGA_top', is tied to its initial value (0).
@@ -416,7 +420,7 @@ WARNING:Xst:2935 - Signal 'pal_clk_en_o', unconnected in block 'CollectorvisionF
     Found 8-bit register for signal <por_cnt_s>.
     Found 8-bit adder for signal <audio_s> created at line 1253.
     Found 8-bit subtractor for signal <GND_7_o_GND_7_o_sub_2_OUT<7:0>> created at line 1308.
-    Found 16x24-bit Read Only RAM for signal <_n0288>
+    Found 16x24-bit Read Only RAM for signal <_n0322>
     Summary:
 	inferred   1 RAM(s).
 	inferred   2 Adder/Subtractor(s).
@@ -1078,7 +1082,7 @@ Synthesizing Unit <snespad_ctrl>.
         clocks_per_6us_g = 128
     Found 1-bit register for signal <pad_clk_q>.
     Found 1-bit register for signal <pad_latch_q>.
-    Found 4-bit register for signal <num_buttons_read_q>.
+    Found 5-bit register for signal <num_buttons_read_q>.
     Found 8-bit register for signal <clocks_per_6us_q>.
     Found 2-bit register for signal <state_q>.
     Found finite state machine <FSM_1> for signal <state_q>.
@@ -1096,10 +1100,10 @@ Synthesizing Unit <snespad_ctrl>.
     | Implementation     | LUT                                            |
     -----------------------------------------------------------------------
     Found 8-bit adder for signal <clocks_per_6us_q[7]_GND_97_o_add_2_OUT> created at line 132.
-    Found 4-bit subtractor for signal <GND_97_o_GND_97_o_sub_6_OUT<3:0>> created at line 139.
+    Found 5-bit subtractor for signal <GND_97_o_GND_97_o_sub_6_OUT<4:0>> created at line 139.
     Summary:
 	inferred   2 Adder/Subtractor(s).
-	inferred  14 D-type flip-flop(s).
+	inferred  15 D-type flip-flop(s).
 	inferred   2 Multiplexer(s).
 	inferred   1 Finite State Machine(s).
 Unit <snespad_ctrl> synthesized.
@@ -1108,10 +1112,10 @@ Synthesizing Unit <snespad_pad>.
     Related source file is "C:\Users\bburney\Desktop\cvgs\COMPARE\colecofpga-master\src\peripheral\snespad\snespad_pad.vhd".
         reset_level_g = 0
         button_level_g = 0
-    Found 12-bit register for signal <shift_buttons_q>.
-    Found 12-bit register for signal <buttons_q>.
+    Found 32-bit register for signal <shift_buttons_q>.
+    Found 32-bit register for signal <buttons_q>.
     Summary:
-	inferred  24 D-type flip-flop(s).
+	inferred  64 D-type flip-flop(s).
 Unit <snespad_pad> synthesized.
 
 Synthesizing Unit <vga>.
@@ -1131,16 +1135,16 @@ INFO:Xst:3210 - "C:\Users\bburney\Desktop\cvgs\COMPARE\colecofpga-master\src\vid
     Found 17-bit adder for signal <rd_result_v> created at line 119.
     Found 8x9-bit multiplier for signal <n0104> created at line 118.
     Found 8x9-bit multiplier for signal <n0107> created at line 119.
-    Found 9-bit comparator greater for signal <I_HCNT[8]_PWR_75_o_LessThan_32_o> created at line 124
-    Found 8-bit comparator greater for signal <I_VCNT[7]_PWR_75_o_LessThan_33_o> created at line 124
-    Found 10-bit comparator greater for signal <PWR_75_o_hcnt[9]_LessThan_34_o> created at line 127
+    Found 9-bit comparator greater for signal <I_HCNT[8]_PWR_76_o_LessThan_32_o> created at line 124
+    Found 8-bit comparator greater for signal <I_VCNT[7]_PWR_76_o_LessThan_33_o> created at line 124
+    Found 10-bit comparator greater for signal <PWR_76_o_hcnt[9]_LessThan_34_o> created at line 127
     Found 10-bit comparator greater for signal <GND_102_o_vcnt[9]_LessThan_35_o> created at line 127
     Found 10-bit comparator greater for signal <GND_102_o_hcnt[9]_LessThan_36_o> created at line 128
-    Found 10-bit comparator greater for signal <hcnt[9]_PWR_75_o_LessThan_37_o> created at line 128
+    Found 10-bit comparator greater for signal <hcnt[9]_PWR_76_o_LessThan_37_o> created at line 128
     Found 10-bit comparator greater for signal <GND_102_o_vcnt[9]_LessThan_38_o> created at line 128
     Found 10-bit comparator greater for signal <vcnt[9]_GND_102_o_LessThan_39_o> created at line 128
     Found 10-bit comparator lessequal for signal <n0045> created at line 130
-    Found 10-bit comparator greater for signal <PWR_75_o_hcnt[9]_LessThan_41_o> created at line 130
+    Found 10-bit comparator greater for signal <PWR_76_o_hcnt[9]_LessThan_41_o> created at line 130
     Found 10-bit comparator lessequal for signal <n0049> created at line 131
     Found 10-bit comparator greater for signal <GND_102_o_vcnt[9]_LessThan_43_o> created at line 131
     Summary:
@@ -1184,7 +1188,7 @@ Synthesizing Unit <hdmi>.
     | Inputs             | 7                                              |
     | Outputs            | 7                                              |
     | Clock              | I_CLK_PIXEL (rising_edge)                      |
-    | Reset              | prevBlank_I_BLANK_AND_444_o (positive)         |
+    | Reset              | prevBlank_I_BLANK_AND_445_o (positive)         |
     | Reset type         | synchronous                                    |
     | Reset State        | controldata                                    |
     | Power Up State     | videodata                                      |
@@ -1269,9 +1273,9 @@ Synthesizing Unit <hdmidataencoder>.
     Found 16-bit comparator greater for signal <n0000> created at line 207
     Found 16-bit comparator greater for signal <counterX[15]_GND_108_o_LessThan_89_o> created at line 207
     Found 17-bit comparator greater for signal <n0006> created at line 208
-    Found 8-bit comparator lessequal for signal <channelStatusIdx[7]_PWR_80_o_LessThan_27_o> created at line 215
-    Found 5-bit comparator greater for signal <dataOffset[4]_PWR_80_o_LessThan_91_o> created at line 142
-    Found 5-bit comparator greater for signal <dataOffset[4]_PWR_80_o_LessThan_109_o> created at line 146
+    Found 8-bit comparator lessequal for signal <channelStatusIdx[7]_PWR_81_o_LessThan_27_o> created at line 215
+    Found 5-bit comparator greater for signal <dataOffset[4]_PWR_81_o_LessThan_91_o> created at line 142
+    Found 5-bit comparator greater for signal <dataOffset[4]_PWR_81_o_LessThan_109_o> created at line 146
     Found 1-bit comparator equal for signal <n0202> created at line 271
     Found 17-bit comparator greater for signal <n0204> created at line 159
     Summary:
@@ -1462,8 +1466,9 @@ Macro Statistics
  37-bit adder                                          : 4
  4-bit adder                                           : 53
  4-bit addsub                                          : 3
- 4-bit subtractor                                      : 8
+ 4-bit subtractor                                      : 7
  5-bit adder                                           : 4
+ 5-bit subtractor                                      : 1
  6-bit adder                                           : 2
  7-bit adder                                           : 1
  7-bit subtractor                                      : 1
@@ -1475,7 +1480,6 @@ Macro Statistics
  1-bit register                                        : 106
  10-bit register                                       : 19
  11-bit register                                       : 2
- 12-bit register                                       : 2
  14-bit register                                       : 1
  16-bit register                                       : 15
  17-bit register                                       : 2
@@ -1485,10 +1489,10 @@ Macro Statistics
  24-bit register                                       : 2
  26-bit register                                       : 2
  3-bit register                                        : 10
- 32-bit register                                       : 2
- 4-bit register                                        : 25
+ 32-bit register                                       : 4
+ 4-bit register                                        : 24
  40-bit register                                       : 11
- 5-bit register                                        : 9
+ 5-bit register                                        : 10
  7-bit register                                        : 1
  8-bit register                                        : 49
  9-bit register                                        : 5
@@ -1520,7 +1524,7 @@ Macro Statistics
  9-bit comparator greater                              : 4
  9-bit comparator lessequal                            : 1
 # Multiplexers                                         : 2504
- 1-bit 2-to-1 multiplexer                              : 1817
+ 1-bit 2-to-1 multiplexer                              : 1797
  1-bit 3-to-1 multiplexer                              : 12
  1-bit 8-to-1 multiplexer                              : 1
  10-bit 2-to-1 multiplexer                             : 36
@@ -1539,9 +1543,9 @@ Macro Statistics
  3-bit 2-to-1 multiplexer                              : 138
  3-bit 3-to-1 multiplexer                              : 3
  32-bit 2-to-1 multiplexer                             : 3
- 4-bit 2-to-1 multiplexer                              : 218
+ 4-bit 2-to-1 multiplexer                              : 237
  4-bit 3-to-1 multiplexer                              : 4
- 5-bit 2-to-1 multiplexer                              : 7
+ 5-bit 2-to-1 multiplexer                              : 8
  5-bit 4-to-1 multiplexer                              : 1
  56-bit 2-to-1 multiplexer                             : 4
  7-bit 2-to-1 multiplexer                              : 2
@@ -1648,10 +1652,17 @@ WARNING:Xst:2677 - Node <joy_14> of sequential type is unconnected in block <ps2
 WARNING:Xst:2677 - Node <joy_15> of sequential type is unconnected in block <ps2if_inst>.
 WARNING:Xst:2677 - Node <keys_4> of sequential type is unconnected in block <ps2if_inst>.
 WARNING:Xst:2677 - Node <keys_15> of sequential type is unconnected in block <ps2if_inst>.
+WARNING:Xst:2677 - Node <buttons_q_0> of sequential type is unconnected in block <pads[0].pad_b>.
+WARNING:Xst:2677 - Node <buttons_q_1> of sequential type is unconnected in block <pads[0].pad_b>.
+WARNING:Xst:2677 - Node <buttons_q_2> of sequential type is unconnected in block <pads[0].pad_b>.
+WARNING:Xst:2677 - Node <buttons_q_16> of sequential type is unconnected in block <pads[0].pad_b>.
+WARNING:Xst:2677 - Node <buttons_q_17> of sequential type is unconnected in block <pads[0].pad_b>.
+WARNING:Xst:2677 - Node <buttons_q_18> of sequential type is unconnected in block <pads[0].pad_b>.
+WARNING:Xst:2677 - Node <buttons_q_19> of sequential type is unconnected in block <pads[0].pad_b>.
 
 Synthesizing (advanced) Unit <CollectorvisionFPGA_top>.
 The following registers are absorbed into counter <por_cnt_s>: 1 register on signal <por_cnt_s>.
-INFO:Xst:3218 - HDL ADVISOR - The RAM <Mram__n0288> will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
+INFO:Xst:3218 - HDL ADVISOR - The RAM <Mram__n0322> will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
     -----------------------------------------------------------------------
     | ram_type           | Distributed                         |          |
     -----------------------------------------------------------------------
@@ -1974,6 +1985,11 @@ WARNING:Xst:2677 - Node <ctrl_reg_q_0_2> of sequential type is unconnected in bl
 WARNING:Xst:2677 - Node <ctrl_reg_q_0_1> of sequential type is unconnected in block <vdp18_cpuio>.
 WARNING:Xst:2677 - Node <ctrl_reg_q_0_0> of sequential type is unconnected in block <vdp18_cpuio>.
 WARNING:Xst:2677 - Node <ctrl_reg_q_1_5> of sequential type is unconnected in block <vdp18_cpuio>.
+WARNING:Xst:2677 - Node <buttons_q_1> of sequential type is unconnected in block <snespad_pad>.
+WARNING:Xst:2677 - Node <buttons_q_16> of sequential type is unconnected in block <snespad_pad>.
+WARNING:Xst:2677 - Node <buttons_q_17> of sequential type is unconnected in block <snespad_pad>.
+WARNING:Xst:2677 - Node <buttons_q_18> of sequential type is unconnected in block <snespad_pad>.
+WARNING:Xst:2677 - Node <buttons_q_19> of sequential type is unconnected in block <snespad_pad>.
 
 =========================================================================
 Advanced HDL Synthesis Report
@@ -2023,8 +2039,9 @@ Macro Statistics
  2-bit down counter                                    : 1
  2-bit up counter                                      : 2
  3-bit up counter                                      : 2
- 4-bit down counter                                    : 2
+ 4-bit down counter                                    : 1
  4-bit up counter                                      : 1
+ 5-bit down counter                                    : 1
  5-bit up counter                                      : 3
  7-bit down counter                                    : 1
  8-bit down counter                                    : 1
@@ -2034,8 +2051,8 @@ Macro Statistics
  10-bit up accumulator                                 : 1
  26-bit up accumulator                                 : 2
  4-bit updown loadable accumulator                     : 3
-# Registers                                            : 2040
- Flip-Flops                                            : 2040
+# Registers                                            : 2075
+ Flip-Flops                                            : 2075
 # Comparators                                          : 91
  1-bit comparator equal                                : 1
  10-bit comparator greater                             : 8
@@ -2064,7 +2081,7 @@ Macro Statistics
  9-bit comparator greater                              : 4
  9-bit comparator lessequal                            : 1
 # Multiplexers                                         : 2812
- 1-bit 2-to-1 multiplexer                              : 2160
+ 1-bit 2-to-1 multiplexer                              : 2140
  1-bit 3-to-1 multiplexer                              : 12
  1-bit 8-to-1 multiplexer                              : 1
  10-bit 2-to-1 multiplexer                             : 33
@@ -2082,7 +2099,7 @@ Macro Statistics
  3-bit 2-to-1 multiplexer                              : 137
  3-bit 3-to-1 multiplexer                              : 3
  32-bit 2-to-1 multiplexer                             : 3
- 4-bit 2-to-1 multiplexer                              : 210
+ 4-bit 2-to-1 multiplexer                              : 230
  4-bit 3-to-1 multiplexer                              : 4
  5-bit 2-to-1 multiplexer                              : 5
  5-bit 4-to-1 multiplexer                              : 1
@@ -2365,8 +2382,10 @@ WARNING:Xst:3002 - This design contains one or more registers/latches that are d
   Please refer to http://www.xilinx.com search string "Spartan6 asynchronous set/reset" for more details.
 
   List of register instances with asynchronous set or reset and opposite initialization value:
-    num_buttons_read_q_1 in unit <snespad_ctrl>
+    num_buttons_read_q_4 in unit <snespad_ctrl>
     num_buttons_read_q_3 in unit <snespad_ctrl>
+    num_buttons_read_q_2 in unit <snespad_ctrl>
+    num_buttons_read_q_1 in unit <snespad_ctrl>
     num_buttons_read_q_0 in unit <snespad_ctrl>
     Cnt_31 in unit <ps2kbd>
 
@@ -2487,6 +2506,8 @@ WARNING:Xst:2677 - Node <ps2if_inst/alt_s> of sequential type is unconnected in 
 WARNING:Xst:2677 - Node <ps2if_inst/home_s> of sequential type is unconnected in block <CollectorvisionFPGA_top>.
 WARNING:Xst:2677 - Node <ps2if_inst/ctrl_s> of sequential type is unconnected in block <CollectorvisionFPGA_top>.
 WARNING:Xst:2677 - Node <ps2if_inst/core_reload_o> of sequential type is unconnected in block <CollectorvisionFPGA_top>.
+WARNING:Xst:2677 - Node <snespads_b/pads[0].pad_b/buttons_q_2> of sequential type is unconnected in block <CollectorvisionFPGA_top>.
+WARNING:Xst:2677 - Node <snespads_b/pads[0].pad_b/buttons_q_0> of sequential type is unconnected in block <CollectorvisionFPGA_top>.
 WARNING:Xst:1293 - FF/Latch <snespads_b/ctrl_b/clocks_per_6us_q_7> has a constant value of 0 in block <CollectorvisionFPGA_top>. This FF/Latch will be trimmed during the optimization process.
 INFO:Xst:2261 - The FF/Latch <hdmi/dataenc/prevHSync> in Unit <CollectorvisionFPGA_top> is equivalent to the following FF/Latch, which will be removed : <hdmi/delay_line/q_pipe_0_15> 
 INFO:Xst:2261 - The FF/Latch <vga/hcnt_0> in Unit <CollectorvisionFPGA_top> is equivalent to the following FF/Latch, which will be removed : <vga/h_0> 
@@ -2518,8 +2539,8 @@ INFO:Xst:3203 - The FF/Latch <audioout/SigmaLatch_q_9> in Unit <CollectorvisionF
 
 Mapping all equations...
 Building and optimizing final netlist ...
-Found area constraint ratio of 100 (+ 5) on block CollectorvisionFPGA_top, actual ratio is 59.
-WARNING:Xst:1426 - The value init of the FF/Latch snespads_b/ctrl_b/num_buttons_read_q_1_LD hinder the constant cleaning in the block CollectorvisionFPGA_top.
+Found area constraint ratio of 100 (+ 5) on block CollectorvisionFPGA_top, actual ratio is 60.
+WARNING:Xst:1426 - The value init of the FF/Latch snespads_b/ctrl_b/num_buttons_read_q_4_LD hinder the constant cleaning in the block CollectorvisionFPGA_top.
    You should achieve better results by setting this init to 1.
 WARNING:Xst:1426 - The value init of the FF/Latch ps2if_inst/ps2kbd_inst/Cnt_31_LD hinder the constant cleaning in the block CollectorvisionFPGA_top.
    You should achieve better results by setting this init to 0.
@@ -2541,6 +2562,8 @@ FlipFlop hdmi/dataenc/audioLAvgSum_23 has been replicated 5 time(s)
 Final Macro Processing ...
 
 Processing Unit <CollectorvisionFPGA_top> :
+	Found 5-bit shift register for signal <snespads_b/pads[0].pad_b/shift_buttons_q_20>.
+	Found 4-bit shift register for signal <snespads_b/pads[0].pad_b/shift_buttons_q_3>.
 	Found 3-bit shift register for signal <hdmi/dataenc/bchCode_0_29>.
 	Found 2-bit shift register for signal <hdmi/dataenc/bchCode_0_28>.
 	Found 3-bit shift register for signal <hdmi/dataenc/bchCode_0_21>.
@@ -2584,13 +2607,15 @@ Unit <CollectorvisionFPGA_top> processed.
 Final Register Report
 
 Macro Statistics
-# Registers                                            : 1643
- Flip-Flops                                            : 1643
-# Shift Registers                                      : 37
+# Registers                                            : 1670
+ Flip-Flops                                            : 1670
+# Shift Registers                                      : 39
  10-bit shift register                                 : 3
  11-bit shift register                                 : 25
  2-bit shift register                                  : 4
  3-bit shift register                                  : 4
+ 4-bit shift register                                  : 1
+ 5-bit shift register                                  : 1
  6-bit shift register                                  : 1
 
 =========================================================================
@@ -2614,28 +2639,28 @@ Top Level Output File Name         : CollectorvisionFPGA_top.ngc
 
 Primitive and Black Box Usage:
 ------------------------------
-# BELS                             : 6230
+# BELS                             : 6270
 #      GND                         : 1
 #      INV                         : 65
 #      LUT1                        : 176
-#      LUT2                        : 209
-#      LUT3                        : 484
-#      LUT4                        : 638
-#      LUT5                        : 1033
-#      LUT6                        : 2013
+#      LUT2                        : 188
+#      LUT3                        : 491
+#      LUT4                        : 654
+#      LUT5                        : 1043
+#      LUT6                        : 2035
 #      MUXCY                       : 812
-#      MUXF7                       : 75
+#      MUXF7                       : 81
 #      VCC                         : 1
 #      XORCY                       : 723
-# FlipFlops/Latches                : 1686
+# FlipFlops/Latches                : 1721
 #      FD                          : 214
 #      FDC                         : 133
-#      FDCE                        : 506
+#      FDCE                        : 505
 #      FDCE_1                      : 3
-#      FDE                         : 513
+#      FDE                         : 517
 #      FDE_1                       : 8
 #      FDP                         : 11
-#      FDPE                        : 140
+#      FDPE                        : 172
 #      FDPE_1                      : 2
 #      FDR                         : 90
 #      FDRE                        : 58
@@ -2646,8 +2671,8 @@ Primitive and Black Box Usage:
 #      RAM16X1D                    : 20
 #      RAM32M                      : 2
 #      RAMB16BWER                  : 24
-# Shift Registers                  : 37
-#      SRLC16E                     : 37
+# Shift Registers                  : 39
+#      SRLC16E                     : 39
 # Clock Buffers                    : 7
 #      BUFG                        : 7
 # IO Buffers                       : 114
@@ -2668,18 +2693,18 @@ Selected Device : 6slx16csg324-2
 
 
 Slice Logic Utilization: 
- Number of Slice Registers:            1685  out of  18224     9%  
- Number of Slice LUTs:                 4703  out of   9112    51%  
-    Number used as Logic:              4618  out of   9112    50%  
-    Number used as Memory:               85  out of   2176     3%  
+ Number of Slice Registers:            1720  out of  18224     9%  
+ Number of Slice LUTs:                 4739  out of   9112    52%  
+    Number used as Logic:              4652  out of   9112    51%  
+    Number used as Memory:               87  out of   2176     3%  
        Number used as RAM:               48
-       Number used as SRL:               37
+       Number used as SRL:               39
 
 Slice Logic Distribution: 
- Number of LUT Flip Flop pairs used:   5053
-   Number with an unused Flip Flop:    3368  out of   5053    66%  
-   Number with an unused LUT:           350  out of   5053     6%  
-   Number of fully used LUT-FF pairs:  1335  out of   5053    26%  
+ Number of LUT Flip Flop pairs used:   5120
+   Number with an unused Flip Flop:    3400  out of   5120    66%  
+   Number with an unused LUT:           381  out of   5120     7%  
+   Number of fully used LUT-FF pairs:  1339  out of   5120    26%  
    Number of unique control sets:       159
 
 IO Utilization: 
@@ -2715,14 +2740,14 @@ Clock Information:
 --------------------------------------------+---------------------------------------------------+-------+
 Clock Signal                                | Clock buffer(FF name)                             | Load  |
 --------------------------------------------+---------------------------------------------------+-------+
-pll_1/pll_base_inst/CLKOUT0                 | BUFG                                              | 883   |
+pll_1/pll_base_inst/CLKOUT0                 | BUFG                                              | 920   |
 pll_1/pll_base_inst/CLKOUT2                 | BUFG                                              | 739   |
 pll_1/pll_base_inst/CLKOUT1                 | BUFG                                              | 99    |
 clock_3m_en_s(clks/Mmux_clock_3m_en_s11:O)  | BUFG(*)(vg/sd/counter_s_3)                        | 23    |
 pll_1/pll_base_inst/CLKOUT3                 | BUFG                                              | 40    |
 pll_1/pll_base_inst/CLKOUT4                 | BUFG                                              | 4     |
 ps2if_inst/ps2kbd_inst/Rst_n_inv(reset_s1:O)| NONE(*)(ps2if_inst/ps2kbd_inst/Cnt_31_LD)         | 1     |
-por_n_s_inv(por_n_s_inv1:O)                 | NONE(*)(snespads_b/ctrl_b/num_buttons_read_q_1_LD)| 1     |
+por_n_s_inv(por_n_s_inv1:O)                 | NONE(*)(snespads_b/ctrl_b/num_buttons_read_q_4_LD)| 1     |
 --------------------------------------------+---------------------------------------------------+-------+
 (*) These 3 clock signal(s) are generated by combinatorial logic,
 and XST is not able to identify which are the primary clock signals.
@@ -2738,8 +2763,8 @@ Timing Summary:
 Speed Grade: -2
 
    Minimum period: 89.972ns (Maximum Frequency: 11.115MHz)
-   Minimum input arrival time before clock: 7.041ns
-   Maximum output required time after clock: 7.644ns
+   Minimum input arrival time before clock: 9.396ns
+   Maximum output required time after clock: 7.418ns
    Maximum combinational path delay: No path found
 
 Timing Details:
@@ -2748,36 +2773,42 @@ All values displayed in nanoseconds (ns)
 
 =========================================================================
 Timing constraint: Default period analysis for Clock 'pll_1/pll_base_inst/CLKOUT0'
-  Clock period: 25.515ns (frequency: 39.193MHz)
-  Total number of paths / destination ports: 2134171 / 2939
+  Clock period: 31.280ns (frequency: 31.969MHz)
+  Total number of paths / destination ports: 2134437 / 3043
 -------------------------------------------------------------------------
-Delay:               12.757ns (Levels of Logic = 7)
-  Source:            vg/cpu/u0/IR_2 (FF)
-  Destination:       vg/cpu/rd_s (FF)
+Delay:               15.640ns (Levels of Logic = 13)
+  Source:            ps2if_inst/keys_1 (FF)
+  Destination:       vg/cpu/data_r_3 (FF)
   Source Clock:      pll_1/pll_base_inst/CLKOUT0 rising
   Destination Clock: pll_1/pll_base_inst/CLKOUT0 falling
 
-  Data Path: vg/cpu/u0/IR_2 to vg/cpu/rd_s
+  Data Path: ps2if_inst/keys_1 to vg/cpu/data_r_3
                                 Gate     Net
     Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
     ----------------------------------------  ------------
-     FDCE:C->Q           116   0.525   2.486  vg/cpu/u0/IR_2 (vg/cpu/u0/IR_2)
-     LUT3:I0->O           22   0.235   1.764  vg/cpu/u0/mcode/_n3582<7>11 (vg/cpu/u0/mcode/_n3582<7>1)
-     LUT6:I1->O           16   0.254   1.458  vg/cpu/u0/mcode/_n11424<7>1 (vg/cpu/u0/mcode/_n11424)
-     LUT6:I2->O            4   0.254   1.032  vg/cpu/u0/mcode/_n1498<7>1 (vg/cpu/u0/mcode/_n1498)
-     LUT3:I0->O            1   0.235   0.682  vg/cpu/u0/mcode/Mmux_NoRead12_SW0 (N1022)
-     LUT6:I5->O            1   0.254   0.910  vg/cpu/u0/mcode/Mmux_NoRead12 (vg/cpu/u0/mcode/Mmux_NoRead11)
-     LUT6:I3->O            3   0.235   1.196  vg/cpu/u0/mcode/Mmux_NoRead15 (vg/cpu/noread_s)
-     LUT6:I1->O            1   0.254   0.681  vg/cpu/_n0167_inv (vg/cpu/_n0167_inv)
-     FDCE_1:CE                 0.302          vg/cpu/rd_s
+     FDC:C->Q              5   0.525   1.296  ps2if_inst/keys_1 (ps2if_inst/keys_1)
+     LUT6:I0->O            1   0.254   0.910  ps2_keys_s<13>11 (ps2_keys_s<13>1)
+     LUT6:I3->O            2   0.235   0.726  ps2_keys_s<13>12 (ps2_keys_s<13>11)
+     LUT2:I1->O            1   0.254   1.112  ps2_keys_s<13>13 (ps2_keys_s<13>_mmx_out1)
+     LUT6:I1->O            1   0.254   0.958  Mmux_PWR_7_o_PWR_7_o_mux_50_OUT<0>32 (Mmux_PWR_7_o_PWR_7_o_mux_50_OUT<0>31)
+     LUT6:I2->O            1   0.254   0.958  Mmux_PWR_7_o_PWR_7_o_mux_50_OUT<0>34 (Mmux_PWR_7_o_PWR_7_o_mux_50_OUT<0>32)
+     LUT6:I2->O            1   0.254   0.790  Mmux_PWR_7_o_PWR_7_o_mux_50_OUT<0>35 (Mmux_PWR_7_o_PWR_7_o_mux_50_OUT<0>33)
+     LUT6:I4->O            1   0.250   0.910  Mmux_PWR_7_o_PWR_7_o_mux_50_OUT<0>37 (Mmux_PWR_7_o_PWR_7_o_mux_50_OUT<0>35)
+     LUT6:I3->O            4   0.235   0.912  Mmux_PWR_7_o_PWR_7_o_mux_50_OUT<0>38 (PWR_7_o_PWR_7_o_mux_50_OUT<0>)
+     LUT4:I2->O            1   0.250   0.682  vg/Mmux_d_to_cpu_s122 (vg/Mmux_d_to_cpu_s121)
+     LUT5:I4->O            1   0.254   0.910  vg/Mmux_d_to_cpu_s123 (vg/Mmux_d_to_cpu_s122)
+     LUT6:I3->O            1   0.235   0.958  vg/Mmux_d_to_cpu_s124 (vg/Mmux_d_to_cpu_s123)
+     LUT6:I2->O            1   0.254   0.682  vg/Mmux_d_to_cpu_s127 (vg/Mmux_d_to_cpu_s127)
+     LUT6:I5->O            2   0.254   0.000  vg/Mmux_d_to_cpu_s129 (vg/d_to_cpu_s<3>)
+     FDE_1:D                   0.074          vg/cpu/data_r_3
     ----------------------------------------
-    Total                     12.757ns (2.548ns logic, 10.209ns route)
-                                       (20.0% logic, 80.0% route)
+    Total                     15.640ns (3.836ns logic, 11.804ns route)
+                                       (24.5% logic, 75.5% route)
 
 =========================================================================
 Timing constraint: Default period analysis for Clock 'pll_1/pll_base_inst/CLKOUT2'
   Clock period: 89.972ns (frequency: 11.115MHz)
-  Total number of paths / destination ports: 3097506564524320700000000000000000000 / 1549
+  Total number of paths / destination ports: 3097506564524320100000000000000000000 / 1549
 -------------------------------------------------------------------------
 Delay:               89.972ns (Levels of Logic = 129)
   Source:            hdmi/dataenc/audioAvgCnt_1_1 (FF)
@@ -2790,63 +2821,63 @@ Delay:               89.972ns (Levels of Logic = 129)
     Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
     ----------------------------------------  ------------
      FD:C->Q               6   0.525   1.306  hdmi/dataenc/audioAvgCnt_1_1 (hdmi/dataenc/audioAvgCnt_1_1)
-     LUT6:I1->O            5   0.254   0.841  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/o<25>12_SW2 (N595)
-     LUT6:I5->O            8   0.254   0.944  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_GND_109_o_MUX_9955_o1171 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[25]_GND_109_o_MUX_9930_o)
+     LUT6:I1->O            5   0.254   0.841  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/o<25>12_SW2 (N577)
+     LUT6:I5->O            8   0.254   0.944  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_GND_109_o_MUX_9943_o1171 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[25]_GND_109_o_MUX_9918_o)
      LUT6:I5->O           10   0.254   1.008  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/o<23>2 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/o<23>)
-     LUT3:I2->O            3   0.254   0.766  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_GND_109_o_MUX_10023_o1151 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[23]_GND_109_o_MUX_10000_o)
+     LUT3:I2->O            3   0.254   0.766  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_GND_109_o_MUX_10011_o1151 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[23]_GND_109_o_MUX_9988_o)
      LUT6:I5->O            8   0.254   0.944  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Madd_GND_109_o_b[10]_add_9_OUT_Madd_Madd_cy<24>11 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Madd_GND_109_o_b[10]_add_9_OUT_Madd_Madd_cy<24>)
-     LUT5:I4->O           12   0.254   1.069  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_GND_109_o_MUX_10089_o1171 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[25]_GND_109_o_MUX_10064_o)
+     LUT5:I4->O           12   0.254   1.069  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_GND_109_o_MUX_10077_o1171 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[25]_GND_109_o_MUX_10052_o)
      LUT6:I5->O            8   0.254   0.944  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/o<21>2 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/o<21>)
-     LUT5:I4->O            2   0.254   0.954  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/o<20>24_SW0 (N538)
+     LUT5:I4->O            2   0.254   0.954  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/o<20>24_SW0 (N520)
      LUT6:I3->O           16   0.235   1.182  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/o<20>24 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/o<20>)
-     LUT3:I2->O            2   0.254   0.954  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_GND_109_o_MUX_10215_o1151 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[23]_GND_109_o_MUX_10192_o)
+     LUT3:I2->O            2   0.254   0.954  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_GND_109_o_MUX_10203_o1151 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[23]_GND_109_o_MUX_10180_o)
      LUT4:I1->O            1   0.235   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<19>_lut<2> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<19>_lut<2>)
      MUXCY:S->O            1   0.215   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<19>_cy<2> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<19>_cy<2>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<19>_cy<3> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<19>_cy<3>)
      MUXCY:CI->O          22   0.235   1.334  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<19>_cy<4> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/o<19>)
-     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_GND_109_o_MUX_10275_o1131 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[21]_GND_109_o_MUX_10254_o)
+     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_GND_109_o_MUX_10263_o1131 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[21]_GND_109_o_MUX_10242_o)
      LUT4:I0->O            0   0.254   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<18>_lutdi1 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<18>_lutdi1)
      MUXCY:DI->O           1   0.181   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<18>_cy<1> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<18>_cy<1>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<18>_cy<2> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<18>_cy<2>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<18>_cy<3> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<18>_cy<3>)
      MUXCY:CI->O          26   0.235   1.420  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<18>_cy<4> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/o<18>)
-     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_GND_109_o_MUX_10333_o1121 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[20]_GND_109_o_MUX_10313_o)
+     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_GND_109_o_MUX_10321_o1121 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[20]_GND_109_o_MUX_10301_o)
      LUT4:I0->O            0   0.254   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<17>_lutdi1 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<17>_lutdi1)
      MUXCY:DI->O           1   0.181   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<17>_cy<1> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<17>_cy<1>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<17>_cy<2> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<17>_cy<2>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<17>_cy<3> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<17>_cy<3>)
      MUXCY:CI->O          28   0.235   1.453  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<17>_cy<4> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/o<17>)
-     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_GND_109_o_MUX_10389_o1101 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[19]_GND_109_o_MUX_10370_o)
+     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_GND_109_o_MUX_10377_o1101 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[19]_GND_109_o_MUX_10358_o)
      LUT4:I0->O            0   0.254   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<16>_lutdi1 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<16>_lutdi1)
      MUXCY:DI->O           1   0.181   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<16>_cy<1> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<16>_cy<1>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<16>_cy<2> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<16>_cy<2>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<16>_cy<3> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<16>_cy<3>)
      MUXCY:CI->O          32   0.235   1.520  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<16>_cy<4> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/o<16>)
-     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_GND_109_o_MUX_10443_o191 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[18]_GND_109_o_MUX_10425_o)
+     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_GND_109_o_MUX_10431_o191 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[18]_GND_109_o_MUX_10413_o)
      LUT4:I0->O            0   0.254   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<15>_lutdi1 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<15>_lutdi1)
      MUXCY:DI->O           1   0.181   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<15>_cy<1> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<15>_cy<1>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<15>_cy<2> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<15>_cy<2>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<15>_cy<3> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<15>_cy<3>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<15>_cy<4> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<15>_cy<4>)
      MUXCY:CI->O          36   0.262   1.587  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<15>_cy<5> (hdmi/dataenc/n0317<15>)
-     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10495_o181 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[17]_a[25]_MUX_10478_o)
+     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10483_o181 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[17]_a[25]_MUX_10466_o)
      LUT4:I0->O            0   0.254   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<14>_lutdi1 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<14>_lutdi1)
      MUXCY:DI->O           1   0.181   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<14>_cy<1> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<14>_cy<1>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<14>_cy<2> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<14>_cy<2>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<14>_cy<3> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<14>_cy<3>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<14>_cy<4> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<14>_cy<4>)
      MUXCY:CI->O          41   0.262   1.671  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<14>_cy<5> (hdmi/dataenc/n0317<14>)
-     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10521_o171 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[16]_a[25]_MUX_10505_o)
+     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10509_o171 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[16]_a[25]_MUX_10493_o)
      LUT4:I0->O            0   0.254   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<13>_lutdi1 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<13>_lutdi1)
      MUXCY:DI->O           1   0.181   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<13>_cy<1> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<13>_cy<1>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<13>_cy<2> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<13>_cy<2>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<13>_cy<3> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<13>_cy<3>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<13>_cy<4> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<13>_cy<4>)
      MUXCY:CI->O          43   0.262   1.704  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<13>_cy<5> (hdmi/dataenc/n0317<13>)
-     LUT5:I4->O            5   0.254   1.271  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10547_o1151 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[23]_a[25]_MUX_10524_o)
+     LUT5:I4->O            5   0.254   1.271  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10535_o1151 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[23]_a[25]_MUX_10512_o)
      LUT5:I0->O            1   0.254   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<12>_lut<5> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<12>_lut<5>)
      MUXCY:S->O           50   0.454   1.821  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<12>_cy<5> (hdmi/dataenc/n0317<12>)
-     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10573_o151 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[14]_a[25]_MUX_10559_o)
+     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10561_o151 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[14]_a[25]_MUX_10547_o)
      LUT4:I0->O            0   0.254   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<11>_lutdi1 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<11>_lutdi1)
      MUXCY:DI->O           1   0.181   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<11>_cy<1> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<11>_cy<1>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<11>_cy<2> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<11>_cy<2>)
@@ -2854,11 +2885,11 @@ Delay:               89.972ns (Levels of Logic = 129)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<11>_cy<4> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<11>_cy<4>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<11>_cy<5> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<11>_cy<5>)
      MUXCY:CI->O          48   0.262   1.788  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<11>_cy<6> (hdmi/dataenc/n0317<11>)
-     LUT5:I4->O            5   0.254   1.271  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10599_o1131 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[21]_a[25]_MUX_10578_o)
+     LUT5:I4->O            5   0.254   1.271  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10587_o1131 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[21]_a[25]_MUX_10566_o)
      LUT5:I0->O            1   0.254   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<10>_lut<5> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<10>_lut<5>)
      MUXCY:S->O            1   0.215   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<10>_cy<5> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<10>_cy<5>)
      MUXCY:CI->O          55   0.262   1.860  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<10>_cy<6> (hdmi/dataenc/n0317<10>)
-     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10625_o131 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[12]_a[25]_MUX_10613_o)
+     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10613_o131 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[12]_a[25]_MUX_10601_o)
      LUT4:I0->O            0   0.254   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<9>_lutdi1 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<9>_lutdi1)
      MUXCY:DI->O           1   0.181   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<9>_cy<1> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<9>_cy<1>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<9>_cy<2> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<9>_cy<2>)
@@ -2866,11 +2897,11 @@ Delay:               89.972ns (Levels of Logic = 129)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<9>_cy<4> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<9>_cy<4>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<9>_cy<5> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<9>_cy<5>)
      MUXCY:CI->O          56   0.262   1.868  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<9>_cy<6> (hdmi/dataenc/n0317<9>)
-     LUT5:I4->O            5   0.254   1.271  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10651_o1101 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[19]_a[25]_MUX_10632_o)
+     LUT5:I4->O            5   0.254   1.271  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10639_o1101 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[19]_a[25]_MUX_10620_o)
      LUT5:I0->O            1   0.254   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<8>_lut<5> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<8>_lut<5>)
      MUXCY:S->O            1   0.215   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<8>_cy<5> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<8>_cy<5>)
      MUXCY:CI->O          62   0.262   1.914  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<8>_cy<6> (hdmi/dataenc/n0317<8>)
-     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10677_o111 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[10]_a[25]_MUX_10667_o)
+     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10665_o111 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[10]_a[25]_MUX_10655_o)
      LUT4:I0->O            0   0.254   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<7>_lutdi1 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<7>_lutdi1)
      MUXCY:DI->O           1   0.181   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<7>_cy<1> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<7>_cy<1>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<7>_cy<2> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<7>_cy<2>)
@@ -2878,12 +2909,12 @@ Delay:               89.972ns (Levels of Logic = 129)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<7>_cy<4> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<7>_cy<4>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<7>_cy<5> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<7>_cy<5>)
      MUXCY:CI->O          65   0.262   1.937  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<7>_cy<6> (hdmi/dataenc/n0317<7>)
-     LUT5:I4->O            5   0.254   1.271  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10703_o181 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[17]_a[25]_MUX_10686_o)
+     LUT5:I4->O            5   0.254   1.271  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10691_o181 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[17]_a[25]_MUX_10674_o)
      LUT5:I0->O            1   0.254   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<6>_lut<5> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<6>_lut<5>)
      MUXCY:S->O            1   0.215   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<6>_cy<5> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<6>_cy<5>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<6>_cy<6> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<6>_cy<6>)
      MUXCY:CI->O          67   0.262   1.953  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<6>_cy<7> (hdmi/dataenc/n0317<6>)
-     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10729_o1241 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[8]_a[25]_MUX_10721_o)
+     LUT5:I4->O            6   0.254   1.152  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10717_o1241 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[8]_a[25]_MUX_10709_o)
      LUT4:I0->O            0   0.254   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<5>_lutdi1 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<5>_lutdi1)
      MUXCY:DI->O           1   0.181   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<5>_cy<1> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<5>_cy<1>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<5>_cy<2> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<5>_cy<2>)
@@ -2892,12 +2923,12 @@ Delay:               89.972ns (Levels of Logic = 129)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<5>_cy<5> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<5>_cy<5>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<5>_cy<6> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<5>_cy<6>)
      MUXCY:CI->O          72   0.262   1.992  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<5>_cy<7> (hdmi/dataenc/n0317<5>)
-     LUT5:I4->O            5   0.254   1.271  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10755_o161 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[15]_a[25]_MUX_10740_o)
+     LUT5:I4->O            5   0.254   1.271  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10743_o161 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[15]_a[25]_MUX_10728_o)
      LUT5:I0->O            1   0.254   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<4>_lut<5> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<4>_lut<5>)
      MUXCY:S->O            1   0.215   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<4>_cy<5> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<4>_cy<5>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<4>_cy<6> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<4>_cy<6>)
      MUXCY:CI->O          73   0.262   1.999  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<4>_cy<7> (hdmi/dataenc/n0317<4>)
-     LUT5:I4->O            4   0.254   1.234  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10781_o151 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[14]_a[25]_MUX_10767_o)
+     LUT5:I4->O            4   0.254   1.234  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mmux_a[0]_a[25]_MUX_10769_o151 (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/a[14]_a[25]_MUX_10755_o)
      LUT5:I0->O            1   0.254   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<3>_lut<5> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<3>_lut<5>)
      MUXCY:S->O            1   0.215   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<3>_cy<5> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<3>_cy<5>)
      MUXCY:CI->O           1   0.023   0.000  hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<3>_cy<6> (hdmi/dataenc/audioLAvgSum[25]_audioAvgCnt[10]_div_49/Mcompar_o<3>_cy<6>)
@@ -2926,27 +2957,28 @@ Delay:               89.972ns (Levels of Logic = 129)
 
 =========================================================================
 Timing constraint: Default period analysis for Clock 'pll_1/pll_base_inst/CLKOUT1'
-  Clock period: 7.096ns (frequency: 140.928MHz)
-  Total number of paths / destination ports: 525 / 123
+  Clock period: 7.194ns (frequency: 138.996MHz)
+  Total number of paths / destination ports: 594 / 123
 -------------------------------------------------------------------------
-Delay:               7.096ns (Levels of Logic = 3)
+Delay:               7.194ns (Levels of Logic = 4)
   Source:            sram/p0_ce_v (FF)
-  Destination:       sram/porta1_data_o_7 (FF)
+  Destination:       sram/sram_data_io_7 (FF)
   Source Clock:      pll_1/pll_base_inst/CLKOUT1 rising
   Destination Clock: pll_1/pll_base_inst/CLKOUT1 rising
 
-  Data Path: sram/p0_ce_v to sram/porta1_data_o_7
+  Data Path: sram/p0_ce_v to sram/sram_data_io_7
                                 Gate     Net
     Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
     ----------------------------------------  ------------
-     FDR:C->Q              1   0.525   1.137  sram/p0_ce_v (sram/p0_ce_v)
-     LUT6:I0->O           55   0.254   1.968  sram/GND_71_o_p0_ce_v[0]_equal_1_o<0>1 (sram/GND_71_o_p0_ce_v[0]_equal_1_o)
-     LUT2:I0->O           10   0.250   1.463  sram/Mmux_p0_req_v_PWR_53_o_MUX_9243_o11 (sram/p0_req_v_PWR_53_o_MUX_9243_o)
-     LUT6:I0->O            8   0.254   0.943  sram/_n0231_inv1 (sram/_n0231_inv)
-     FDE:CE                    0.302          sram/porta1_data_o_0
+     FDR:C->Q              1   0.525   1.112  sram/p0_ce_v (sram/p0_ce_v)
+     LUT6:I1->O           69   0.254   2.196  sram/GND_71_o_p0_ce_v[0]_equal_1_o<0>2 (sram/GND_71_o_p0_ce_v[0]_equal_1_o)
+     LUT3:I0->O            8   0.235   1.399  sram/Mmux_n016815 (sram/Mmux_n016815)
+     LUT6:I0->O            1   0.254   0.910  sram/Mmux_n01681_SW0 (N16)
+     LUT6:I3->O            1   0.235   0.000  sram/Mmux_n01681 (sram/n0168<0>)
+     FD:D                      0.074          sram/sram_data_io_0
     ----------------------------------------
-    Total                      7.096ns (1.585ns logic, 5.511ns route)
-                                       (22.3% logic, 77.7% route)
+    Total                      7.194ns (1.577ns logic, 5.617ns route)
+                                       (21.9% logic, 78.1% route)
 
 =========================================================================
 Timing constraint: Default period analysis for Clock 'clock_3m_en_s'
@@ -2997,31 +3029,34 @@ Delay:               2.912ns (Levels of Logic = 1)
 Timing constraint: Default OFFSET IN BEFORE for Clock 'pll_1/pll_base_inst/CLKOUT0'
   Total number of paths / destination ports: 259 / 231
 -------------------------------------------------------------------------
-Offset:              7.041ns (Levels of Logic = 6)
-  Source:            sd_cd_n_i (PAD)
-  Destination:       vg/cpu/u0/IR_0 (FF)
+Offset:              9.396ns (Levels of Logic = 9)
+  Source:            joy1_p6_i (PAD)
+  Destination:       vg/cpu/u0/IR_6 (FF)
   Destination Clock: pll_1/pll_base_inst/CLKOUT0 rising
 
-  Data Path: sd_cd_n_i to vg/cpu/u0/IR_0
+  Data Path: joy1_p6_i to vg/cpu/u0/IR_6
                                 Gate     Net
     Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
     ----------------------------------------  ------------
-     IBUF:I->O             1   1.328   0.958  sd_cd_n_i_IBUF (sd_cd_n_i_IBUF)
-     LUT6:I2->O            1   0.254   0.682  vg/Mmux_d_to_cpu_s36 (vg/Mmux_d_to_cpu_s35)
-     LUT4:I3->O            1   0.254   0.682  vg/Mmux_d_to_cpu_s37 (vg/Mmux_d_to_cpu_s36)
-     LUT6:I5->O            1   0.254   0.910  vg/Mmux_d_to_cpu_s38 (vg/Mmux_d_to_cpu_s37)
-     LUT6:I3->O            2   0.235   1.156  vg/Mmux_d_to_cpu_s310 (vg/d_to_cpu_s<0>)
-     LUT5:I0->O            1   0.254   0.000  vg/cpu/u0/Mmux__n099911 (vg/cpu/u0/_n0999<0>)
-     FDCE:D                    0.074          vg/cpu/u0/IR_0
+     IBUF:I->O             2   1.328   1.002  joy1_p6_i_IBUF (joy1_p6_i_IBUF)
+     LUT5:I1->O            1   0.254   0.000  vg/Mmux_d_to_cpu_s212_F (N1058)
+     MUXF7:I0->O           1   0.163   0.958  vg/Mmux_d_to_cpu_s212 (vg/Mmux_d_to_cpu_s211)
+     LUT6:I2->O            1   0.254   0.682  vg/Mmux_d_to_cpu_s214 (vg/Mmux_d_to_cpu_s213)
+     LUT6:I5->O            1   0.254   0.682  vg/Mmux_d_to_cpu_s217_SW0 (N982)
+     LUT6:I5->O            1   0.254   0.910  vg/Mmux_d_to_cpu_s217 (vg/Mmux_d_to_cpu_s216)
+     LUT6:I3->O            1   0.235   0.682  vg/Mmux_d_to_cpu_s218 (vg/Mmux_d_to_cpu_s217)
+     LUT6:I5->O            2   0.254   1.156  vg/Mmux_d_to_cpu_s2110 (vg/d_to_cpu_s<6>)
+     LUT5:I0->O            1   0.254   0.000  vg/cpu/u0/Mmux__n099971 (vg/cpu/u0/_n0999<6>)
+     FDCE:D                    0.074          vg/cpu/u0/IR_6
     ----------------------------------------
-    Total                      7.041ns (2.653ns logic, 4.388ns route)
-                                       (37.7% logic, 62.3% route)
+    Total                      9.396ns (3.324ns logic, 6.072ns route)
+                                       (35.4% logic, 64.6% route)
 
 =========================================================================
 Timing constraint: Default OFFSET IN BEFORE for Clock 'pll_1/pll_base_inst/CLKOUT1'
   Total number of paths / destination ports: 24 / 24
 -------------------------------------------------------------------------
-Offset:              2.422ns (Levels of Logic = 2)
+Offset:              3.776ns (Levels of Logic = 3)
   Source:            sram_data_io<7> (PAD)
   Destination:       sram/sram_data_io_7 (FF)
   Destination Clock: pll_1/pll_base_inst/CLKOUT1 rising
@@ -3030,12 +3065,13 @@ Offset:              2.422ns (Levels of Logic = 2)
                                 Gate     Net
     Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
     ----------------------------------------  ------------
-     IOBUF:IO->O           3   1.328   0.766  sram_data_io_7_IOBUF (N520)
-     LUT6:I5->O            1   0.254   0.000  sram/Mmux_n016881 (sram/n0168<7>)
+     IOBUF:IO->O           3   1.328   0.994  sram_data_io_7_IOBUF (N502)
+     LUT6:I3->O            1   0.235   0.910  sram/Mmux_n01688_SW0 (N30)
+     LUT6:I3->O            1   0.235   0.000  sram/Mmux_n01688 (sram/n0168<7>)
      FD:D                      0.074          sram/sram_data_io_7
     ----------------------------------------
-    Total                      2.422ns (1.656ns logic, 0.766ns route)
-                                       (68.4% logic, 31.6% route)
+    Total                      3.776ns (1.872ns logic, 1.904ns route)
+                                       (49.6% logic, 50.4% route)
 
 =========================================================================
 Timing constraint: Default OFFSET IN BEFORE for Clock 'clock_3m_en_s'
@@ -3099,9 +3135,9 @@ Offset:              7.195ns (Levels of Logic = 2)
 
 =========================================================================
 Timing constraint: Default OFFSET OUT AFTER for Clock 'pll_1/pll_base_inst/CLKOUT0'
-  Total number of paths / destination ports: 67 / 26
+  Total number of paths / destination ports: 59 / 26
 -------------------------------------------------------------------------
-Offset:              7.644ns (Levels of Logic = 3)
+Offset:              7.418ns (Levels of Logic = 3)
   Source:            vg/cpu/req_inhibit_s (FF)
   Destination:       cart_en_80_n_o (PAD)
   Source Clock:      pll_1/pll_base_inst/CLKOUT0 rising
@@ -3110,13 +3146,13 @@ Offset:              7.644ns (Levels of Logic = 3)
                                 Gate     Net
     Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
     ----------------------------------------  ------------
-     FDCE:C->Q            27   0.525   1.436  vg/cpu/req_inhibit_s (vg/cpu/req_inhibit_s)
-     LUT4:I3->O           14   0.254   1.582  vg/mem_access_s1 (vg/mem_access_s)
-     LUT6:I0->O            1   0.254   0.681  vg/Mmux_cart_en_e0_n_o11 (cart_en_E0_n_o_OBUF)
-     OBUF:I->O                 2.912          cart_en_E0_n_o_OBUF (cart_en_E0_n_o)
+     FDCE:C->Q            35   0.525   1.798  vg/cpu/req_inhibit_s (vg/cpu/req_inhibit_s)
+     LUT6:I3->O            4   0.235   1.032  vg/Mmux_cart_en_80_n_o121 (vg/Mmux_cart_en_80_n_o12)
+     LUT3:I0->O            1   0.235   0.681  vg/Mmux_cart_en_80_n_o11 (cart_en_80_n_o_OBUF)
+     OBUF:I->O                 2.912          cart_en_80_n_o_OBUF (cart_en_80_n_o)
     ----------------------------------------
-    Total                      7.644ns (3.945ns logic, 3.699ns route)
-                                       (51.6% logic, 48.4% route)
+    Total                      7.418ns (3.907ns logic, 3.511ns route)
+                                       (52.7% logic, 47.3% route)
 
 =========================================================================
 Timing constraint: Default OFFSET OUT AFTER for Clock 'clock_3m_en_s'
@@ -3148,7 +3184,7 @@ Clock to Setup on destination clock clock_3m_en_s
 Source Clock               |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
 ---------------------------+---------+---------+---------+---------+
 clock_3m_en_s              |    3.813|         |         |         |
-pll_1/pll_base_inst/CLKOUT0|    7.998|    6.226|         |         |
+pll_1/pll_base_inst/CLKOUT0|    7.586|    7.603|         |         |
 ---------------------------+---------+---------+---------+---------+
 
 Clock to Setup on destination clock pll_1/pll_base_inst/CLKOUT0
@@ -3156,11 +3192,11 @@ Clock to Setup on destination clock pll_1/pll_base_inst/CLKOUT0
                                 | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
 Source Clock                    |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
 --------------------------------+---------+---------+---------+---------+
-clock_3m_en_s                   |    6.066|         |    5.148|         |
-pll_1/pll_base_inst/CLKOUT0     |   20.807|   10.392|   12.757|         |
-pll_1/pll_base_inst/CLKOUT1     |   10.253|         |    2.724|         |
-por_n_s_inv                     |         |    3.318|         |         |
-ps2if_inst/ps2kbd_inst/Rst_n_inv|         |    5.166|         |         |
+clock_3m_en_s                   |    6.401|         |    4.991|         |
+pll_1/pll_base_inst/CLKOUT0     |   20.307|   12.524|   15.640|         |
+pll_1/pll_base_inst/CLKOUT1     |   10.320|         |    4.113|         |
+por_n_s_inv                     |         |    4.219|         |         |
+ps2if_inst/ps2kbd_inst/Rst_n_inv|         |    5.012|         |         |
 --------------------------------+---------+---------+---------+---------+
 
 Clock to Setup on destination clock pll_1/pll_base_inst/CLKOUT1
@@ -3168,8 +3204,8 @@ Clock to Setup on destination clock pll_1/pll_base_inst/CLKOUT1
                            | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
 Source Clock               |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
 ---------------------------+---------+---------+---------+---------+
-pll_1/pll_base_inst/CLKOUT0|   18.873|   11.863|         |         |
-pll_1/pll_base_inst/CLKOUT1|    7.096|         |         |         |
+pll_1/pll_base_inst/CLKOUT0|   18.193|   14.156|         |         |
+pll_1/pll_base_inst/CLKOUT1|    7.194|         |         |         |
 ---------------------------+---------+---------+---------+---------+
 
 Clock to Setup on destination clock pll_1/pll_base_inst/CLKOUT2
@@ -3201,14 +3237,14 @@ pll_1/pll_base_inst/CLKOUT3|    1.250|         |         |         |
 =========================================================================
 
 
-Total REAL time to Xst completion: 49.00 secs
-Total CPU time to Xst completion: 48.16 secs
+Total REAL time to Xst completion: 47.00 secs
+Total CPU time to Xst completion: 46.49 secs
  
 --> 
 
-Total memory usage is 356284 kilobytes
+Total memory usage is 362940 kilobytes
 
 Number of errors   :    0 (   0 filtered)
-Number of warnings :  264 (   0 filtered)
-Number of infos    :  205 (   0 filtered)
+Number of warnings :  280 (   0 filtered)
+Number of infos    :  207 (   0 filtered)
 

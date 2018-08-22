@@ -13,49 +13,49 @@ Target Device  : xc6slx16
 Target Package : csg324
 Target Speed   : -2
 Mapper Version : spartan6 -- $Revision: 1.55 $
-Mapped Date    : Mon Aug 20 16:49:57 2018
+Mapped Date    : Wed Aug 22 14:57:10 2018
 
 Design Summary
 --------------
 Number of errors:      0
 Number of warnings:   21
 Slice Logic Utilization:
-  Number of Slice Registers:                 1,687 out of  18,224    9%
-    Number used as Flip Flops:               1,679
+  Number of Slice Registers:                 1,722 out of  18,224    9%
+    Number used as Flip Flops:               1,714
     Number used as Latches:                      2
     Number used as Latch-thrus:                  0
     Number used as AND/OR logics:                6
-  Number of Slice LUTs:                      4,127 out of   9,112   45%
-    Number used as logic:                    4,047 out of   9,112   44%
-      Number using O6 output only:           3,127
-      Number using O5 output only:             164
-      Number using O5 and O6:                  756
+  Number of Slice LUTs:                      4,185 out of   9,112   45%
+    Number used as logic:                    4,100 out of   9,112   44%
+      Number using O6 output only:           3,197
+      Number using O5 output only:             166
+      Number using O5 and O6:                  737
       Number used as ROM:                        0
-    Number used as Memory:                      57 out of   2,176    2%
+    Number used as Memory:                      59 out of   2,176    2%
       Number used as Dual Port RAM:             32
         Number using O6 output only:             8
         Number using O5 output only:             0
         Number using O5 and O6:                 24
       Number used as Single Port RAM:            0
-      Number used as Shift Register:            25
-        Number using O6 output only:            13
+      Number used as Shift Register:            27
+        Number using O6 output only:            15
         Number using O5 output only:             0
         Number using O5 and O6:                 12
-    Number used exclusively as route-thrus:     23
-      Number with same-slice register load:      9
+    Number used exclusively as route-thrus:     26
+      Number with same-slice register load:     12
       Number with same-slice carry load:        14
       Number with other load:                    0
 
 Slice Logic Distribution:
-  Number of occupied Slices:                 1,316 out of   2,278   57%
+  Number of occupied Slices:                 1,335 out of   2,278   58%
   Number of MUXCYs used:                       972 out of   4,556   21%
-  Number of LUT Flip Flop pairs used:        4,243
-    Number with an unused Flip Flop:         2,659 out of   4,243   62%
-    Number with an unused LUT:                 116 out of   4,243    2%
-    Number of fully used LUT-FF pairs:       1,468 out of   4,243   34%
+  Number of LUT Flip Flop pairs used:        4,300
+    Number with an unused Flip Flop:         2,685 out of   4,300   62%
+    Number with an unused LUT:                 115 out of   4,300    2%
+    Number of fully used LUT-FF pairs:       1,500 out of   4,300   34%
     Number of unique control sets:             161
     Number of slice register sites lost
-      to control set restrictions:             682 out of  18,224    3%
+      to control set restrictions:             693 out of  18,224    3%
 
   A LUT Flip Flop pair for this architecture represents one LUT paired with
   one Flip Flop within a slice.  A control set is a unique combination of
@@ -101,11 +101,11 @@ Specific Feature Utilization:
   Number of STARTUPs:                            0 out of       1    0%
   Number of SUSPEND_SYNCs:                       0 out of       1    0%
 
-Average Fanout of Non-Clock Nets:                4.62
+Average Fanout of Non-Clock Nets:                4.65
 
-Peak Memory Usage:  431 MB
-Total REAL time to MAP completion:  50 secs 
-Total CPU time to MAP completion:   50 secs 
+Peak Memory Usage:  427 MB
+Total REAL time to MAP completion:  56 secs 
+Total CPU time to MAP completion:   55 secs 
 
 Table of Contents
 -----------------
@@ -145,9 +145,9 @@ WARNING:PhysDesignRules:372 - Gated clock. Clock net
 WARNING:PhysDesignRules:372 - Gated clock. Clock net por_n_s_inv is sourced by a
    combinatorial pin. This is not good design practice. Use the CE pin to
    control the loading of data into the flip-flop.
-WARNING:PhysDesignRules:367 - The signal <vg/cpu/u0/Regs/Mram_RegsH11_RAMD_D1_O>
-   is incomplete. The signal does not drive any load pins in the design.
 WARNING:PhysDesignRules:367 - The signal <vg/cpu/u0/Regs/Mram_RegsL11_RAMD_D1_O>
+   is incomplete. The signal does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal <vg/cpu/u0/Regs/Mram_RegsH11_RAMD_D1_O>
    is incomplete. The signal does not drive any load pins in the design.
 WARNING:PhysDesignRules:2212 - Async clocking for BRAM (comp
    vga/frbuff/Mram_ram_q10) port(s) with READ_FIRST mode has certain
@@ -355,7 +355,7 @@ Asterisk (*) preceding a constraint indicates it was not met.
 * TS_pll_1_clkout2 = PERIOD TIMEGRP "pll_1_ | SETUP       |    -2.075ns|    81.500ns|      71|      109082
   clkout2" TS_clock_50_i / 0.5 HIGH 50%     | HOLD        |     0.098ns|            |       0|           0
 ----------------------------------------------------------------------------------------------------------
-* TS_pll_1_clkout1 = PERIOD TIMEGRP "pll_1_ | SETUP       |    18.558ns|     4.442ns|       0|           0
+* TS_pll_1_clkout1 = PERIOD TIMEGRP "pll_1_ | SETUP       |    18.817ns|     4.183ns|       0|           0
   clkout1" TS_clock_50_i / 0.869565217 HIGH | HOLD        |    -0.028ns|            |       1|          28
    50%                                      |             |            |            |        |            
 ----------------------------------------------------------------------------------------------------------
@@ -373,7 +373,7 @@ Asterisk (*) preceding a constraint indicates it was not met.
   TS_clock_hdmi_s = PERIOD TIMEGRP "clock_h | MINPERIOD   |     5.751ns|     2.249ns|       0|           0
   dmi_s" 8 ns HIGH 50%                      |             |            |            |        |            
 ----------------------------------------------------------------------------------------------------------
-  TS_pll_1_clkout0 = PERIOD TIMEGRP "pll_1_ | SETUP       |    19.869ns|     6.494ns|       0|           0
+  TS_pll_1_clkout0 = PERIOD TIMEGRP "pll_1_ | SETUP       |    18.957ns|     8.084ns|       0|           0
   clkout0" TS_clock_50_i / 0.434782609 HIGH | HOLD        |     0.002ns|            |       0|           0
    50%                                      |             |            |            |        |            
 ----------------------------------------------------------------------------------------------------------
@@ -392,8 +392,8 @@ Asterisk (*) preceding a constraint indicates it was not met.
   LY                                        |             |            |            |        |            
 ----------------------------------------------------------------------------------------------------------
   TS_TO_snespads_bctrl_bnum_buttons_read_q_ | MAXDELAY    |    45.566ns|     0.994ns|       0|           0
-  1_LD = MAXDELAY TO TIMEGRP "TO_snespads_b |             |            |            |        |            
-  ctrl_bnum_buttons_read_q_1_LD" TS_clock_m |             |            |            |        |            
+  4_LD = MAXDELAY TO TIMEGRP "TO_snespads_b |             |            |            |        |            
+  ctrl_bnum_buttons_read_q_4_LD" TS_clock_m |             |            |            |        |            
   aster_s DATAPATHONLY                      |             |            |            |        |            
 ----------------------------------------------------------------------------------------------------------
 
@@ -410,8 +410,8 @@ Derived Constraints for TS_clock_50_i
 +-------------------------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+
 |TS_clock_50_i                  |     20.000ns|      5.000ns|     40.750ns|            0|           72|            0|3097506564524323700000000000000000000|
 | TS_pll_1_clkout3              |      8.000ns|      2.666ns|          N/A|            0|            0|          236|            0|
-| TS_pll_1_clkout1              |     23.000ns|      4.442ns|          N/A|            1|            0|       135502|            0|
-| TS_pll_1_clkout0              |     46.000ns|      6.494ns|          N/A|            0|            0|      2829781|            0|
+| TS_pll_1_clkout1              |     23.000ns|      4.183ns|          N/A|            1|            0|       136332|            0|
+| TS_pll_1_clkout0              |     46.000ns|      8.084ns|          N/A|            0|            0|      2830046|            0|
 | TS_pll_1_clkout4              |      8.000ns|      2.666ns|          N/A|            0|            0|            0|            0|
 | TS_pll_1_clkout2              |     40.000ns|     81.500ns|          N/A|           71|            0|3097506564524323700000000000000000000|            0|
 +-------------------------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+
@@ -426,7 +426,7 @@ Derived Constraints for TS_clock_master_s
 | TS_TO_ps2if_instps2kbd_instCnt|     46.560ns|      1.816ns|          N/A|            0|            0|            9|            0|
 | _31_LD                        |             |             |             |             |             |             |             |
 | TS_TO_snespads_bctrl_bnum_butt|     46.560ns|      0.994ns|          N/A|            0|            0|            8|            0|
-| ons_read_q_1_LD               |             |             |             |             |             |             |             |
+| ons_read_q_4_LD               |             |             |             |             |             |             |             |
 +-------------------------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+
 
 2 constraints not met.

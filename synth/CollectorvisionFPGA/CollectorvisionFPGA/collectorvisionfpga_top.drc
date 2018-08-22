@@ -1,7 +1,7 @@
 Release 14.7 Drc P.20131013 (nt)
 Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
 
-Mon Aug 20 16:53:40 2018
+Wed Aug 22 15:17:45 2018
 
 drc -z CollectorvisionFPGA_top.ncd CollectorvisionFPGA_top.pcf
 
@@ -12,9 +12,9 @@ WARNING:PhysDesignRules:372 - Gated clock. Clock net
 WARNING:PhysDesignRules:372 - Gated clock. Clock net por_n_s_inv is sourced by a
    combinatorial pin. This is not good design practice. Use the CE pin to
    control the loading of data into the flip-flop.
-WARNING:PhysDesignRules:367 - The signal <vg/cpu/u0/Regs/Mram_RegsH11_RAMD_D1_O>
-   is incomplete. The signal does not drive any load pins in the design.
 WARNING:PhysDesignRules:367 - The signal <vg/cpu/u0/Regs/Mram_RegsL11_RAMD_D1_O>
+   is incomplete. The signal does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal <vg/cpu/u0/Regs/Mram_RegsH11_RAMD_D1_O>
    is incomplete. The signal does not drive any load pins in the design.
 WARNING:PhysDesignRules:2212 - Async clocking for BRAM (comp
    vga/frbuff/Mram_ram_q10) port(s) with READ_FIRST mode has certain

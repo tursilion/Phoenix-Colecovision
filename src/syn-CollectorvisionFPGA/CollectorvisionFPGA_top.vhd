@@ -237,7 +237,21 @@ architecture behavior of CollectorvisionFPGA_top is
 	signal but_down_s			: std_logic_vector( 0 downto 0);
 	signal but_left_s			: std_logic_vector( 0 downto 0);
 	signal but_right_s		: std_logic_vector( 0 downto 0);
-	
+	signal but_0_s         	: std_logic_vector( 0 downto 0);
+   signal but_1_s        	: std_logic_vector( 0 downto 0);
+   signal but_2_s         	: std_logic_vector( 0 downto 0);
+   signal but_3_s         	: std_logic_vector( 0 downto 0);
+   signal but_4_s         	: std_logic_vector( 0 downto 0);
+   signal but_5_s         	: std_logic_vector( 0 downto 0);
+   signal but_6_s         	: std_logic_vector( 0 downto 0);
+   signal but_7_s         	: std_logic_vector( 0 downto 0);
+   signal but_8_s         	: std_logic_vector( 0 downto 0);
+   signal but_9_s         	: std_logic_vector( 0 downto 0);
+   signal but_star_s      	: std_logic_vector( 0 downto 0);
+   signal but_num_s       	: std_logic_vector( 0 downto 0);
+   signal but_dot_s       	: std_logic_vector( 0 downto 0);
+   signal but_clear_s     	: std_logic_vector( 0 downto 0);
+   signal but_equal_s      : std_logic_vector( 0 downto 0);
 	-- SD
 	signal sd_cs_n_s			: std_logic;
 
@@ -451,7 +465,23 @@ begin
 		but_up_o				=> but_up_s,
 		but_down_o			=> but_down_s,
 		but_left_o			=> but_left_s,
-		but_right_o			=> but_right_s
+		but_right_o			=> but_right_s,
+		but_0_o           => but_0_s,
+      but_1_o           => but_1_s,
+      but_2_o           => but_2_s,
+      but_3_o           => but_3_s,
+      but_4_o         	=> but_4_s,
+      but_5_o         	=> but_5_s,
+      but_6_o         	=> but_6_s,
+      but_7_o         	=> but_7_s,
+      but_8_o         	=> but_8_s,
+      but_9_o         	=> but_9_s,
+      but_star_o      	=> but_star_s,
+      but_num_o       	=> but_num_s,
+      but_dot_o       	=> but_dot_s,
+      but_clear_o     	=> but_clear_s,
+      but_equal_o     	=> but_equal_s
+		
 	);
 
 -- Controller
@@ -463,7 +493,9 @@ begin
 	--
 	pad_ctrl: process (ctrl_p5_s, ctrl_p8_s, ps2_keys_s, ps2_joy_s,
 							but_a_s, but_b_s,	but_up_s, but_down_s, but_left_s, but_right_s,
-							but_x_s, but_y_s,	but_sel_s, but_start_s,	but_tl_s, but_tr_s
+							but_x_s, but_y_s,	but_sel_s, but_start_s,	but_tl_s, but_tr_s, but_0_s,
+							but_1_s, but_2_s, but_3_s, but_4_s, but_5_s, but_6_s, but_7_s, but_8_s, 
+							but_9_s, but_star_s, but_num_s, but_dot_s, but_clear_s, but_equal_s 
 	)
 		variable key_v   : natural range cv_keys_t'range;
 		variable fire1_v : std_logic;
@@ -475,11 +507,11 @@ begin
 
 		--------------------------------------------------------------------
 		-- soft reset to get to cart menu : use ps2 ESC key in keys(8)
-		--if ps2_keys_s(8) = '1' then
-		--	soft_reset_s <= '1';
-		--else
-		--	soft_reset_s <= '0';
-		--end if;
+		if ps2_keys_s(8) = '1' then
+			soft_reset_s <= '1';
+		else
+			soft_reset_s <= '0';
+		end if;
 		------------------------------------------------------------------------
 
 		-- Joy 1
@@ -570,14 +602,62 @@ begin
 					key_v := cv_key_number_c;
 				end if;
 			end if;
-
+			-- NTT data
+			if    but_1_s(0) = '0' then
+				-- KEY 1
+				key_v := cv_key_1_c;
+			elsif but_2_s(0) = '0' then
+				-- KEY 2
+				key_v := cv_key_2_c;
+			elsif but_3_s(0) = '0' then
+				-- KEY 3
+				key_v := cv_key_3_c;
+			elsif but_4_s(0) = '0' then
+				-- KEY 4
+				key_v := cv_key_4_c;
+			elsif but_5_s(0) = '0' then
+				-- KEY 5
+				key_v := cv_key_5_c;
+			elsif but_6_s(0) = '0' then
+				-- KEY 6
+				key_v := cv_key_6_c;
+			elsif but_7_s(0) = '0' then
+				-- KEY 7
+				key_v := cv_key_7_c;
+			elsif but_8_s(0) = '0' then
+				-- KEY 8
+				key_v := cv_key_8_c;
+			elsif but_9_s(0) = '0' then
+				-- KEY 9
+				key_v := cv_key_9_c;
+			elsif but_0_s(0) = '0' then
+				-- KEY 0
+				key_v := cv_key_0_c;
+			elsif but_star_s(0) = '0' then
+				-- KEY star
+				key_v := cv_key_asterisk_c;
+			elsif but_num_s(0) = '0' then
+				-- KEY #
+				key_v := cv_key_number_c;
+			end if;	
+			
+			if but_tl_s(0) = '1' and but_tr_s(0) = '1' then
+				if but_y_s(0) = '0' then
+					--KEY F3
+					key_v := cv_key_f3_c;
+				elsif but_x_s(0) = '0' then
+					--KEY F4
+					key_v := cv_key_f4_c;
+				end if;
+			end if;
+			
 			ctrl_p1_s(1) <= cv_keys_c(key_v)(1);
 			ctrl_p2_s(1) <= cv_keys_c(key_v)(2);
 			ctrl_p3_s(1) <= cv_keys_c(key_v)(3);
 			ctrl_p4_s(1) <= cv_keys_c(key_v)(4);
 
 			if but_tl_s(0) = '1' and but_tr_s(0) = '1' then		-- fire 2 only if the TL and TR buttons are not pressed
-				fire2_v := but_a_s(0) and but_x_s(0);
+				fire2_v := but_a_s(0) and joy1_p6_i;
 			else
 				fire2_v := '1';
 			end if;
@@ -586,13 +666,13 @@ begin
 
 		elsif ctrl_p5_s(1) = '1' and ctrl_p8_s(1) = '0' then
 			-- joystick and left button enabled -----------------------------------
-			ctrl_p1_s(1) <= not ps2_joy_s(0) and but_up_s(0) and joy1_p1_i;		-- up
+			ctrl_p1_s(1) <= not ps2_joy_s(0) and but_up_s(0) and but_dot_s(0) and joy1_p1_i;		-- up
 			ctrl_p2_s(1) <= not ps2_joy_s(1) and but_down_s(0) and joy1_p2_i;	-- down
 			ctrl_p3_s(1) <= not ps2_joy_s(2) and but_left_s(0) and joy1_p3_i;	-- left
 			ctrl_p4_s(1) <= not ps2_joy_s(3) and but_right_s(0) and joy1_p4_i;	-- right
 
 			if but_tl_s(0) = '1' and but_tr_s(0) = '1' then		-- fire 1 only if the TL and TR buttons are not pressed
-				fire1_v := but_b_s(0) and but_y_s(0) and joy1_p6_i;
+				fire1_v := but_b_s(0) and joy1_p6_i;
 			else
 				fire1_v := '1';
 			end if;

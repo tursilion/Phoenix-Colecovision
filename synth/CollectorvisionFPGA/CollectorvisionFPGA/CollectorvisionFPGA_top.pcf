@@ -1,5 +1,5 @@
 //! **************************************************************************
-// Written by: Map P.20131013 on Mon Aug 20 16:50:46 2018
+// Written by: Map P.20131013 on Wed Aug 22 14:58:04 2018
 //! **************************************************************************
 
 SCHEMATIC START;
@@ -701,6 +701,22 @@ TIMEGRP clock_master_s = BEL "vg/cfg_page_r_0" BEL "vg/cfg_page_r_1" BEL
         "ps2if_inst/ps2kbd_inst/PS2_Clk_r_1" BEL
         "ps2if_inst/ps2kbd_inst/PS2_Clk_r_0" BEL
         "ps2if_inst/ps2kbd_inst/RX_Release" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_31" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_30" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_29" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_28" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_27" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_26" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_25" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_24" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_23" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_22" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_21" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_20" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_15" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_14" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_13" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_12" BEL
         "snespads_b/pads[0].pad_b/buttons_q_11" BEL
         "snespads_b/pads[0].pad_b/buttons_q_10" BEL
         "snespads_b/pads[0].pad_b/buttons_q_9" BEL
@@ -710,9 +726,21 @@ TIMEGRP clock_master_s = BEL "vg/cfg_page_r_0" BEL "vg/cfg_page_r_1" BEL
         "snespads_b/pads[0].pad_b/buttons_q_5" BEL
         "snespads_b/pads[0].pad_b/buttons_q_4" BEL
         "snespads_b/pads[0].pad_b/buttons_q_3" BEL
-        "snespads_b/pads[0].pad_b/buttons_q_2" BEL
-        "snespads_b/pads[0].pad_b/buttons_q_1" BEL
-        "snespads_b/pads[0].pad_b/buttons_q_0" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_31" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_30" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_29" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_28" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_27" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_26" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_25" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_24" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_23" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_22" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_21" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_15" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_14" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_13" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_12" BEL
         "snespads_b/pads[0].pad_b/shift_buttons_q_11" BEL
         "snespads_b/pads[0].pad_b/shift_buttons_q_10" BEL
         "snespads_b/pads[0].pad_b/shift_buttons_q_9" BEL
@@ -721,11 +749,6 @@ TIMEGRP clock_master_s = BEL "vg/cfg_page_r_0" BEL "vg/cfg_page_r_1" BEL
         "snespads_b/pads[0].pad_b/shift_buttons_q_6" BEL
         "snespads_b/pads[0].pad_b/shift_buttons_q_5" BEL
         "snespads_b/pads[0].pad_b/shift_buttons_q_4" BEL
-        "snespads_b/pads[0].pad_b/shift_buttons_q_3" BEL
-        "snespads_b/pads[0].pad_b/shift_buttons_q_2" BEL
-        "snespads_b/pads[0].pad_b/shift_buttons_q_1" BEL
-        "snespads_b/pads[0].pad_b/shift_buttons_q_0" BEL
-        "snespads_b/ctrl_b/num_buttons_read_q_2" BEL
         "snespads_b/ctrl_b/state_q_FSM_FFd1" BEL
         "snespads_b/ctrl_b/state_q_FSM_FFd2" BEL
         "snespads_b/ctrl_b/clocks_per_6us_q_6" BEL
@@ -740,10 +763,14 @@ TIMEGRP clock_master_s = BEL "vg/cfg_page_r_0" BEL "vg/cfg_page_r_1" BEL
         BEL "clks/clk2_cnt_q_0" BEL "clks/clock_5m_en_s" BEL
         "clks/clock_vdp_en_s" BEL "ps2if_inst/ps2kbd_inst/Cnt_31_C_31" BEL
         "ps2if_inst/ps2kbd_inst/Cnt_31_P_31" BEL
-        "snespads_b/ctrl_b/num_buttons_read_q_1_C_1" BEL
-        "snespads_b/ctrl_b/num_buttons_read_q_1_P_1" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_4_C_4" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_4_P_4" BEL
         "snespads_b/ctrl_b/num_buttons_read_q_3_C_3" BEL
         "snespads_b/ctrl_b/num_buttons_read_q_3_P_3" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_2_C_2" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_2_P_2" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_1_C_1" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_1_P_1" BEL
         "snespads_b/ctrl_b/num_buttons_read_q_0_C_0" BEL
         "snespads_b/ctrl_b/num_buttons_read_q_0_P_0" PIN
         "bios/Mram_ram_q1_pins<26>" PIN "bios/Mram_ram_q1_pins<27>" PIN
@@ -770,6 +797,14 @@ TIMEGRP clock_master_s = BEL "vg/cfg_page_r_0" BEL "vg/cfg_page_r_1" BEL
         "vg/lr/Mram_addr[12]_PWR_26_o_wide_mux_0_OUT3_pins<13>" PIN
         "vg/lr/Mram_addr[12]_PWR_26_o_wide_mux_0_OUT2_pins<13>" PIN
         "vg/lr/Mram_addr[12]_PWR_26_o_wide_mux_0_OUT1_pins<13>" BEL
+        "snespads_b/pads[0].pad_b/Mshreg_shift_buttons_q_20" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_201" BEL
+        "snespads_b/pads[0].pad_b/Mshreg_shift_buttons_q_3" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_311" BEL
+        "por_n_s_inv_shift1" BEL "por_n_s_inv_shift2" BEL "por_n_s_inv_shift3"
+        BEL "por_n_s_inv_shift4" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_3" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_20" BEL
         "vg/cpu/u0/Regs/Mram_RegsH1/DP" BEL "vg/cpu/u0/Regs/Mram_RegsH1/SP"
         BEL "vg/cpu/u0/Regs/Mram_RegsH121/DP" BEL
         "vg/cpu/u0/Regs/Mram_RegsH121/SP" BEL
@@ -1343,6 +1378,22 @@ TIMEGRP pll_1_clkout0 = BEL "vg/cfg_page_r_0" BEL "vg/cfg_page_r_1" BEL
         "ps2if_inst/ps2kbd_inst/PS2_Clk_r_1" BEL
         "ps2if_inst/ps2kbd_inst/PS2_Clk_r_0" BEL
         "ps2if_inst/ps2kbd_inst/RX_Release" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_31" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_30" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_29" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_28" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_27" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_26" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_25" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_24" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_23" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_22" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_21" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_20" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_15" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_14" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_13" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_12" BEL
         "snespads_b/pads[0].pad_b/buttons_q_11" BEL
         "snespads_b/pads[0].pad_b/buttons_q_10" BEL
         "snespads_b/pads[0].pad_b/buttons_q_9" BEL
@@ -1352,9 +1403,21 @@ TIMEGRP pll_1_clkout0 = BEL "vg/cfg_page_r_0" BEL "vg/cfg_page_r_1" BEL
         "snespads_b/pads[0].pad_b/buttons_q_5" BEL
         "snespads_b/pads[0].pad_b/buttons_q_4" BEL
         "snespads_b/pads[0].pad_b/buttons_q_3" BEL
-        "snespads_b/pads[0].pad_b/buttons_q_2" BEL
-        "snespads_b/pads[0].pad_b/buttons_q_1" BEL
-        "snespads_b/pads[0].pad_b/buttons_q_0" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_31" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_30" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_29" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_28" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_27" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_26" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_25" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_24" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_23" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_22" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_21" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_15" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_14" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_13" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_12" BEL
         "snespads_b/pads[0].pad_b/shift_buttons_q_11" BEL
         "snespads_b/pads[0].pad_b/shift_buttons_q_10" BEL
         "snespads_b/pads[0].pad_b/shift_buttons_q_9" BEL
@@ -1363,11 +1426,6 @@ TIMEGRP pll_1_clkout0 = BEL "vg/cfg_page_r_0" BEL "vg/cfg_page_r_1" BEL
         "snespads_b/pads[0].pad_b/shift_buttons_q_6" BEL
         "snespads_b/pads[0].pad_b/shift_buttons_q_5" BEL
         "snespads_b/pads[0].pad_b/shift_buttons_q_4" BEL
-        "snespads_b/pads[0].pad_b/shift_buttons_q_3" BEL
-        "snespads_b/pads[0].pad_b/shift_buttons_q_2" BEL
-        "snespads_b/pads[0].pad_b/shift_buttons_q_1" BEL
-        "snespads_b/pads[0].pad_b/shift_buttons_q_0" BEL
-        "snespads_b/ctrl_b/num_buttons_read_q_2" BEL
         "snespads_b/ctrl_b/state_q_FSM_FFd1" BEL
         "snespads_b/ctrl_b/state_q_FSM_FFd2" BEL
         "snespads_b/ctrl_b/clocks_per_6us_q_6" BEL
@@ -1382,10 +1440,14 @@ TIMEGRP pll_1_clkout0 = BEL "vg/cfg_page_r_0" BEL "vg/cfg_page_r_1" BEL
         BEL "clks/clk2_cnt_q_0" BEL "clks/clock_5m_en_s" BEL
         "clks/clock_vdp_en_s" BEL "ps2if_inst/ps2kbd_inst/Cnt_31_C_31" BEL
         "ps2if_inst/ps2kbd_inst/Cnt_31_P_31" BEL
-        "snespads_b/ctrl_b/num_buttons_read_q_1_C_1" BEL
-        "snespads_b/ctrl_b/num_buttons_read_q_1_P_1" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_4_C_4" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_4_P_4" BEL
         "snespads_b/ctrl_b/num_buttons_read_q_3_C_3" BEL
         "snespads_b/ctrl_b/num_buttons_read_q_3_P_3" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_2_C_2" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_2_P_2" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_1_C_1" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_1_P_1" BEL
         "snespads_b/ctrl_b/num_buttons_read_q_0_C_0" BEL
         "snespads_b/ctrl_b/num_buttons_read_q_0_P_0" PIN
         "bios/Mram_ram_q1_pins<26>" PIN "bios/Mram_ram_q1_pins<27>" PIN
@@ -1412,6 +1474,14 @@ TIMEGRP pll_1_clkout0 = BEL "vg/cfg_page_r_0" BEL "vg/cfg_page_r_1" BEL
         "vg/lr/Mram_addr[12]_PWR_26_o_wide_mux_0_OUT3_pins<13>" PIN
         "vg/lr/Mram_addr[12]_PWR_26_o_wide_mux_0_OUT2_pins<13>" PIN
         "vg/lr/Mram_addr[12]_PWR_26_o_wide_mux_0_OUT1_pins<13>" BEL
+        "snespads_b/pads[0].pad_b/Mshreg_shift_buttons_q_20" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_201" BEL
+        "snespads_b/pads[0].pad_b/Mshreg_shift_buttons_q_3" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_311" BEL
+        "por_n_s_inv_shift1" BEL "por_n_s_inv_shift2" BEL "por_n_s_inv_shift3"
+        BEL "por_n_s_inv_shift4" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_3" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_20" BEL
         "vg/cpu/u0/Regs/Mram_RegsH1/DP" BEL "vg/cpu/u0/Regs/Mram_RegsH1/SP"
         BEL "vg/cpu/u0/Regs/Mram_RegsH121/DP" BEL
         "vg/cpu/u0/Regs/Mram_RegsH121/SP" BEL
@@ -1944,49 +2014,48 @@ TIMEGRP clock_vga_s = BEL "vga_r_s_0" BEL "vga_r_s_1" BEL "vga_r_s_2" BEL
         "vga/frbuff/Mram_ram_q3_pins<29>" PIN
         "vga/frbuff/Mram_ram_q2_pins<29>" PIN
         "vga/frbuff/Mram_ram_q1_pins<29>" BEL
-        "hdmi/dataenc/Mshreg_bchCode_0_21" BEL "hdmi/dataenc/bchCode_0_21" BEL
         "hdmi/dataenc/Mshreg_bchCode_0_29" BEL "hdmi/dataenc/bchCode_0_29" BEL
         "hdmi/dataenc/Mshreg_bchCode_0_28" BEL "hdmi/dataenc/bchCode_0_28" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_21" BEL "hdmi/dataenc/bchCode_0_21" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_12" BEL "hdmi/dataenc/bchCode_0_12" BEL
         "hdmi/dataenc/Mshreg_bchCode_0_20" BEL "hdmi/dataenc/bchCode_0_20" BEL
         "hdmi/dataenc/Mshreg_bchCode_0_13" BEL "hdmi/dataenc/bchCode_0_13" BEL
-        "hdmi/dataenc/Mshreg_bchCode_0_4" BEL "hdmi/dataenc/bchCode_0_4" BEL
-        "hdmi/dataenc/Mshreg_bchCode_0_12" BEL "hdmi/dataenc/bchCode_0_12" BEL
         "hdmi/dataenc/Mshreg_bchCode_0_5" BEL "hdmi/dataenc/bchCode_0_5" BEL
-        "hdmi/dataenc/Mshreg_bchHdr_5" BEL "hdmi/dataenc/bchHdr_5" BEL
-        "hdmi/delay_line/Mshreg_q_pipe_10_35" BEL
-        "hdmi/delay_line/q_pipe_10_35" BEL
-        "hdmi/delay_line/Mshreg_q_pipe_10_32" BEL
-        "hdmi/delay_line/q_pipe_10_32" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_4" BEL "hdmi/dataenc/bchCode_0_4" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_34" BEL
-        "hdmi/delay_line/q_pipe_10_34" BEL
+        "hdmi/delay_line/q_pipe_10_34" BEL "hdmi/dataenc/Mshreg_bchHdr_5" BEL
+        "hdmi/dataenc/bchHdr_5" BEL "hdmi/delay_line/Mshreg_q_pipe_10_35" BEL
+        "hdmi/delay_line/q_pipe_10_35" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_33" BEL
         "hdmi/delay_line/q_pipe_10_33" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_32" BEL
+        "hdmi/delay_line/q_pipe_10_32" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_21" BEL
+        "hdmi/delay_line/q_pipe_10_21" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_23" BEL
         "hdmi/delay_line/q_pipe_10_23" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_22" BEL
         "hdmi/delay_line/q_pipe_10_22" BEL
-        "hdmi/delay_line/Mshreg_q_pipe_10_21" BEL
-        "hdmi/delay_line/q_pipe_10_21" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_20" BEL
         "hdmi/delay_line/q_pipe_10_20" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_19" BEL
         "hdmi/delay_line/q_pipe_10_19" BEL
-        "hdmi/delay_line/Mshreg_q_pipe_10_18" BEL
-        "hdmi/delay_line/q_pipe_10_18" BEL
-        "hdmi/delay_line/Mshreg_q_pipe_10_15" BEL
-        "hdmi/delay_line/q_pipe_10_15" BEL
-        "hdmi/delay_line/Mshreg_q_pipe_10_17" BEL
-        "hdmi/delay_line/q_pipe_10_17" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_16" BEL
         "hdmi/delay_line/q_pipe_10_16" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_18" BEL
+        "hdmi/delay_line/q_pipe_10_18" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_17" BEL
+        "hdmi/delay_line/q_pipe_10_17" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_15" BEL
+        "hdmi/delay_line/q_pipe_10_15" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_14" BEL
         "hdmi/delay_line/q_pipe_10_14" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_11" BEL
+        "hdmi/delay_line/q_pipe_10_11" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_13" BEL
         "hdmi/delay_line/q_pipe_10_13" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_12" BEL
         "hdmi/delay_line/q_pipe_10_12" BEL
-        "hdmi/delay_line/Mshreg_q_pipe_10_11" BEL
-        "hdmi/delay_line/q_pipe_10_11" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_10" BEL
         "hdmi/delay_line/q_pipe_10_10" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_9" BEL "hdmi/delay_line/q_pipe_10_9"
@@ -2459,49 +2528,48 @@ TIMEGRP pll_1_clkout2 = BEL "vga_r_s_0" BEL "vga_r_s_1" BEL "vga_r_s_2" BEL
         "vga/frbuff/Mram_ram_q3_pins<29>" PIN
         "vga/frbuff/Mram_ram_q2_pins<29>" PIN
         "vga/frbuff/Mram_ram_q1_pins<29>" BEL
-        "hdmi/dataenc/Mshreg_bchCode_0_21" BEL "hdmi/dataenc/bchCode_0_21" BEL
         "hdmi/dataenc/Mshreg_bchCode_0_29" BEL "hdmi/dataenc/bchCode_0_29" BEL
         "hdmi/dataenc/Mshreg_bchCode_0_28" BEL "hdmi/dataenc/bchCode_0_28" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_21" BEL "hdmi/dataenc/bchCode_0_21" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_12" BEL "hdmi/dataenc/bchCode_0_12" BEL
         "hdmi/dataenc/Mshreg_bchCode_0_20" BEL "hdmi/dataenc/bchCode_0_20" BEL
         "hdmi/dataenc/Mshreg_bchCode_0_13" BEL "hdmi/dataenc/bchCode_0_13" BEL
-        "hdmi/dataenc/Mshreg_bchCode_0_4" BEL "hdmi/dataenc/bchCode_0_4" BEL
-        "hdmi/dataenc/Mshreg_bchCode_0_12" BEL "hdmi/dataenc/bchCode_0_12" BEL
         "hdmi/dataenc/Mshreg_bchCode_0_5" BEL "hdmi/dataenc/bchCode_0_5" BEL
-        "hdmi/dataenc/Mshreg_bchHdr_5" BEL "hdmi/dataenc/bchHdr_5" BEL
-        "hdmi/delay_line/Mshreg_q_pipe_10_35" BEL
-        "hdmi/delay_line/q_pipe_10_35" BEL
-        "hdmi/delay_line/Mshreg_q_pipe_10_32" BEL
-        "hdmi/delay_line/q_pipe_10_32" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_4" BEL "hdmi/dataenc/bchCode_0_4" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_34" BEL
-        "hdmi/delay_line/q_pipe_10_34" BEL
+        "hdmi/delay_line/q_pipe_10_34" BEL "hdmi/dataenc/Mshreg_bchHdr_5" BEL
+        "hdmi/dataenc/bchHdr_5" BEL "hdmi/delay_line/Mshreg_q_pipe_10_35" BEL
+        "hdmi/delay_line/q_pipe_10_35" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_33" BEL
         "hdmi/delay_line/q_pipe_10_33" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_32" BEL
+        "hdmi/delay_line/q_pipe_10_32" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_21" BEL
+        "hdmi/delay_line/q_pipe_10_21" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_23" BEL
         "hdmi/delay_line/q_pipe_10_23" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_22" BEL
         "hdmi/delay_line/q_pipe_10_22" BEL
-        "hdmi/delay_line/Mshreg_q_pipe_10_21" BEL
-        "hdmi/delay_line/q_pipe_10_21" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_20" BEL
         "hdmi/delay_line/q_pipe_10_20" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_19" BEL
         "hdmi/delay_line/q_pipe_10_19" BEL
-        "hdmi/delay_line/Mshreg_q_pipe_10_18" BEL
-        "hdmi/delay_line/q_pipe_10_18" BEL
-        "hdmi/delay_line/Mshreg_q_pipe_10_15" BEL
-        "hdmi/delay_line/q_pipe_10_15" BEL
-        "hdmi/delay_line/Mshreg_q_pipe_10_17" BEL
-        "hdmi/delay_line/q_pipe_10_17" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_16" BEL
         "hdmi/delay_line/q_pipe_10_16" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_18" BEL
+        "hdmi/delay_line/q_pipe_10_18" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_17" BEL
+        "hdmi/delay_line/q_pipe_10_17" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_15" BEL
+        "hdmi/delay_line/q_pipe_10_15" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_14" BEL
         "hdmi/delay_line/q_pipe_10_14" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_11" BEL
+        "hdmi/delay_line/q_pipe_10_11" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_13" BEL
         "hdmi/delay_line/q_pipe_10_13" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_12" BEL
         "hdmi/delay_line/q_pipe_10_12" BEL
-        "hdmi/delay_line/Mshreg_q_pipe_10_11" BEL
-        "hdmi/delay_line/q_pipe_10_11" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_10" BEL
         "hdmi/delay_line/q_pipe_10_10" BEL
         "hdmi/delay_line/Mshreg_q_pipe_10_9" BEL "hdmi/delay_line/q_pipe_10_9"
@@ -2642,8 +2710,8 @@ TIMEGRP clock_hdmi_s = BEL "hdmio/mod5_2" BEL "hdmio/mod5_1" BEL
         PIN "hdmio/g1[3].to_serial_pins<1>";
 TIMEGRP TO_ps2if_instps2kbd_instCnt_31_LD = BEL
         "ps2if_inst/ps2kbd_inst/Cnt_31_LD";
-TIMEGRP TO_snespads_bctrl_bnum_buttons_read_q_1_LD = BEL
-        "snespads_b/ctrl_b/num_buttons_read_q_1_LD";
+TIMEGRP TO_snespads_bctrl_bnum_buttons_read_q_4_LD = BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_4_LD";
 PIN SP6_BUFIO2_INSERT_PLL1_ML_BUFIO2_0_pins<0> = BEL
         "SP6_BUFIO2_INSERT_PLL1_ML_BUFIO2_0" PINNAME DIVCLK;
 PIN pll_1/pll_base_inst/PLL_ADV_pins<2> = BEL "pll_1/pll_base_inst/PLL_ADV"
@@ -2667,8 +2735,8 @@ TS_pll_1_clkout2 = PERIOD TIMEGRP "pll_1_clkout2" TS_clock_50_i / 0.5 HIGH
         50%;
 TS_TO_ps2if_instps2kbd_instCnt_31_LD = MAXDELAY TO TIMEGRP
         "TO_ps2if_instps2kbd_instCnt_31_LD" TS_clock_master_s DATAPATHONLY;
-TS_TO_snespads_bctrl_bnum_buttons_read_q_1_LD = MAXDELAY TO TIMEGRP
-        "TO_snespads_bctrl_bnum_buttons_read_q_1_LD" TS_clock_master_s
+TS_TO_snespads_bctrl_bnum_buttons_read_q_4_LD = MAXDELAY TO TIMEGRP
+        "TO_snespads_bctrl_bnum_buttons_read_q_4_LD" TS_clock_master_s
         DATAPATHONLY;
 SCHEMATIC END;
 

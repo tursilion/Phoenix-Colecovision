@@ -1,7 +1,7 @@
 Release 14.7 par P.20131013 (nt)
 Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
 
-DTHOMPSON-3620::  Mon Aug 20 16:51:46 2018
+DTHOMPSON-3620::  Wed Aug 22 15:16:22 2018
 
 par -filter
 C:/Users/bburney/Desktop/cvgs/git/synth/CollectorvisionFPGA/CollectorvisionFPGA/
@@ -25,39 +25,39 @@ Device speed data version:  "PRODUCTION 1.23 2013-10-13".
 Device Utilization Summary:
 
 Slice Logic Utilization:
-  Number of Slice Registers:                 1,687 out of  18,224    9%
-    Number used as Flip Flops:               1,679
+  Number of Slice Registers:                 1,722 out of  18,224    9%
+    Number used as Flip Flops:               1,714
     Number used as Latches:                      2
     Number used as Latch-thrus:                  0
     Number used as AND/OR logics:                6
-  Number of Slice LUTs:                      4,127 out of   9,112   45%
-    Number used as logic:                    4,047 out of   9,112   44%
-      Number using O6 output only:           3,127
-      Number using O5 output only:             164
-      Number using O5 and O6:                  756
+  Number of Slice LUTs:                      4,185 out of   9,112   45%
+    Number used as logic:                    4,100 out of   9,112   44%
+      Number using O6 output only:           3,197
+      Number using O5 output only:             166
+      Number using O5 and O6:                  737
       Number used as ROM:                        0
-    Number used as Memory:                      57 out of   2,176    2%
+    Number used as Memory:                      59 out of   2,176    2%
       Number used as Dual Port RAM:             32
         Number using O6 output only:             8
         Number using O5 output only:             0
         Number using O5 and O6:                 24
       Number used as Single Port RAM:            0
-      Number used as Shift Register:            25
-        Number using O6 output only:            13
+      Number used as Shift Register:            27
+        Number using O6 output only:            15
         Number using O5 output only:             0
         Number using O5 and O6:                 12
-    Number used exclusively as route-thrus:     23
-      Number with same-slice register load:      9
+    Number used exclusively as route-thrus:     26
+      Number with same-slice register load:     12
       Number with same-slice carry load:        14
       Number with other load:                    0
 
 Slice Logic Distribution:
-  Number of occupied Slices:                 1,316 out of   2,278   57%
+  Number of occupied Slices:                 1,335 out of   2,278   58%
   Number of MUXCYs used:                       972 out of   4,556   21%
-  Number of LUT Flip Flop pairs used:        4,243
-    Number with an unused Flip Flop:         2,659 out of   4,243   62%
-    Number with an unused LUT:                 116 out of   4,243    2%
-    Number of fully used LUT-FF pairs:       1,468 out of   4,243   34%
+  Number of LUT Flip Flop pairs used:        4,300
+    Number with an unused Flip Flop:         2,685 out of   4,300   62%
+    Number with an unused LUT:                 115 out of   4,300    2%
+    Number of fully used LUT-FF pairs:       1,500 out of   4,300   34%
     Number of slice register sites lost
       to control set restrictions:               0 out of  18,224    0%
 
@@ -115,34 +115,34 @@ Finished initial Timing Analysis.  REAL time: 5 secs
 WARNING:Par:288 - The signal joy1_p9_i_IBUF has no load.  PAR will not attempt to route this signal.
 WARNING:Par:288 - The signal joy2_p9_i_IBUF has no load.  PAR will not attempt to route this signal.
 WARNING:Par:288 - The signal flash_miso_i_IBUF has no load.  PAR will not attempt to route this signal.
-WARNING:Par:288 - The signal vg/cpu/u0/Regs/Mram_RegsH11_RAMD_D1_O has no load.  PAR will not attempt to route this signal.
 WARNING:Par:288 - The signal vg/cpu/u0/Regs/Mram_RegsL11_RAMD_D1_O has no load.  PAR will not attempt to route this signal.
+WARNING:Par:288 - The signal vg/cpu/u0/Regs/Mram_RegsH11_RAMD_D1_O has no load.  PAR will not attempt to route this signal.
 Starting Router
 
 
-Phase  1  : 25069 unrouted;      REAL time: 5 secs 
+Phase  1  : 25436 unrouted;      REAL time: 5 secs 
 
-Phase  2  : 22764 unrouted;      REAL time: 6 secs 
+Phase  2  : 23109 unrouted;      REAL time: 6 secs 
 
-Phase  3  : 9945 unrouted;      REAL time: 12 secs 
+Phase  3  : 9929 unrouted;      REAL time: 12 secs 
 
-Phase  4  : 10627 unrouted; (Setup:2081334, Hold:21, Component Switching Limit:0)     REAL time: 17 secs 
+Phase  4  : 10735 unrouted; (Setup:2068360, Hold:149, Component Switching Limit:0)     REAL time: 17 secs 
 
 Updating file: CollectorvisionFPGA_top.ncd with current fully routed design.
 
-Phase  5  : 0 unrouted; (Setup:2339950, Hold:21, Component Switching Limit:0)     REAL time: 47 secs 
+Phase  5  : 0 unrouted; (Setup:2382092, Hold:82, Component Switching Limit:0)     REAL time: 49 secs 
 
-Phase  6  : 0 unrouted; (Setup:2339950, Hold:21, Component Switching Limit:0)     REAL time: 1 mins 3 secs 
+Phase  6  : 0 unrouted; (Setup:2368415, Hold:82, Component Switching Limit:0)     REAL time: 1 mins 1 secs 
 
-Phase  7  : 0 unrouted; (Setup:2339950, Hold:21, Component Switching Limit:0)     REAL time: 1 mins 4 secs 
+Phase  7  : 0 unrouted; (Setup:2368415, Hold:82, Component Switching Limit:0)     REAL time: 1 mins 1 secs 
 
-Phase  8  : 0 unrouted; (Setup:2339950, Hold:21, Component Switching Limit:0)     REAL time: 1 mins 4 secs 
+Phase  8  : 0 unrouted; (Setup:2368415, Hold:82, Component Switching Limit:0)     REAL time: 1 mins 1 secs 
 
-Phase  9  : 0 unrouted; (Setup:2339950, Hold:0, Component Switching Limit:0)     REAL time: 1 mins 4 secs 
+Phase  9  : 0 unrouted; (Setup:2368415, Hold:0, Component Switching Limit:0)     REAL time: 1 mins 2 secs 
 
-Phase 10  : 0 unrouted; (Setup:2311322, Hold:0, Component Switching Limit:0)     REAL time: 1 mins 5 secs 
-Total REAL time to Router completion: 1 mins 5 secs 
-Total CPU time to Router completion: 1 mins 6 secs 
+Phase 10  : 0 unrouted; (Setup:2339176, Hold:0, Component Switching Limit:0)     REAL time: 1 mins 3 secs 
+Total REAL time to Router completion: 1 mins 3 secs 
+Total CPU time to Router completion: 1 mins 4 secs 
 
 Partition Implementation Status
 -------------------------------
@@ -160,22 +160,22 @@ Generating Clock Report
 +---------------------+--------------+------+------+------------+-------------+
 |        Clock Net    |   Resource   |Locked|Fanout|Net Skew(ns)|Max Delay(ns)|
 +---------------------+--------------+------+------+------------+-------------+
-|      clock_master_s | BUFGMUX_X2Y10| No   |  356 |  0.067     |  1.139      |
+|      clock_master_s | BUFGMUX_X2Y10| No   |  374 |  0.065     |  1.138      |
 +---------------------+--------------+------+------+------------+-------------+
-|         clock_mem_s | BUFGMUX_X2Y12| No   |   41 |  0.033     |  1.132      |
+|         clock_mem_s | BUFGMUX_X2Y12| No   |   36 |  0.046     |  1.126      |
 +---------------------+--------------+------+------+------------+-------------+
-|         clock_vga_s |  BUFGMUX_X2Y1| No   |  244 |  0.061     |  1.134      |
+|         clock_vga_s |  BUFGMUX_X2Y1| No   |  259 |  0.064     |  1.136      |
 +---------------------+--------------+------+------+------------+-------------+
-|        clock_hdmi_s |  BUFGMUX_X2Y4| No   |   15 |  0.665     |  1.752      |
+|        clock_hdmi_s |  BUFGMUX_X2Y4| No   |   15 |  0.673     |  1.752      |
 +---------------------+--------------+------+------+------------+-------------+
 |      clock_hdmi_n_s |  BUFGMUX_X2Y2| No   |    4 |  0.032     |  1.690      |
 +---------------------+--------------+------+------+------------+-------------+
-|  clock_3m_en_s_BUFG | BUFGMUX_X3Y13| No   |   10 |  0.601     |  1.690      |
+|  clock_3m_en_s_BUFG | BUFGMUX_X3Y13| No   |   10 |  0.602     |  1.690      |
 +---------------------+--------------+------+------+------------+-------------+
 |ps2if_inst/ps2kbd_in |              |      |      |            |             |
-|        st/Rst_n_inv |         Local|      |   88 |  0.000     |  3.359      |
+|        st/Rst_n_inv |         Local|      |   86 |  0.000     |  2.470      |
 +---------------------+--------------+------+------+------------+-------------+
-|         por_n_s_inv |         Local|      |  135 |  0.000     |  1.559      |
+|         por_n_s_inv |         Local|      |  151 |  0.000     |  1.542      |
 +---------------------+--------------+------+------+------------+-------------+
 
 * Net Skew is the difference between the minimum and maximum routing
@@ -186,7 +186,7 @@ the minimum and maximum path delays which includes logic delays.
 * The fanout is the number of component pins not the individual BEL loads,
 for example SLICE loads not FF loads.
 
-Timing Score: 2311322 (Setup: 2311322, Hold: 0, Component Switching Limit: 0)
+Timing Score: 2339176 (Setup: 2339176, Hold: 0, Component Switching Limit: 0)
 
 WARNING:Par:468 - Your design did not meet timing.  The following are some suggestions to assist you to meet timing in your design.
 
@@ -213,12 +213,12 @@ Asterisk (*) preceding a constraint indicates it was not met.
   Constraint                                |    Check    | Worst Case |  Best Case | Timing |   Timing   
                                             |             |    Slack   | Achievable | Errors |    Score   
 ----------------------------------------------------------------------------------------------------------
-* TS_pll_1_clkout2 = PERIOD TIMEGRP "pll_1_ | SETUP       |   -30.752ns|   210.280ns|     194|     2311322
-  clkout2" TS_clock_50_i / 0.5 HIGH         | HOLD        |     0.414ns|            |       0|           0
+* TS_pll_1_clkout2 = PERIOD TIMEGRP "pll_1_ | SETUP       |   -32.124ns|   212.860ns|     196|     2339176
+  clkout2" TS_clock_50_i / 0.5 HIGH         | HOLD        |     0.371ns|            |       0|           0
    50%                                      |             |            |            |        |            
 ----------------------------------------------------------------------------------------------------------
-  TS_pll_1_clkout3 = PERIOD TIMEGRP "pll_1_ | SETUP       |     3.900ns|     4.100ns|       0|           0
-  clkout3" TS_clock_50_i / 2.5 HIGH         | HOLD        |     0.163ns|            |       0|           0
+  TS_pll_1_clkout3 = PERIOD TIMEGRP "pll_1_ | SETUP       |     3.800ns|     4.200ns|       0|           0
+  clkout3" TS_clock_50_i / 2.5 HIGH         | HOLD        |     0.067ns|            |       0|           0
    50%                                      |             |            |            |        |            
 ----------------------------------------------------------------------------------------------------------
   TS_clock_50_i = PERIOD TIMEGRP "clock_50_ | MINLOWPULSE |    15.000ns|     5.000ns|       0|           0
@@ -231,12 +231,12 @@ Asterisk (*) preceding a constraint indicates it was not met.
   TS_clock_hdmi_s = PERIOD TIMEGRP "clock_h | MINPERIOD   |     5.751ns|     2.249ns|       0|           0
   dmi_s" 8 ns HIGH 50%                      |             |            |            |        |            
 ----------------------------------------------------------------------------------------------------------
-  TS_pll_1_clkout1 = PERIOD TIMEGRP "pll_1_ | SETUP       |     9.714ns|    13.286ns|       0|           0
-  clkout1" TS_clock_50_i / 0.869565217      | HOLD        |     0.223ns|            |       0|           0
+  TS_pll_1_clkout1 = PERIOD TIMEGRP "pll_1_ | SETUP       |    10.979ns|    12.021ns|       0|           0
+  clkout1" TS_clock_50_i / 0.869565217      | HOLD        |     0.177ns|            |       0|           0
       HIGH 50%                              |             |            |            |        |            
 ----------------------------------------------------------------------------------------------------------
-  TS_pll_1_clkout0 = PERIOD TIMEGRP "pll_1_ | SETUP       |    12.709ns|    20.580ns|       0|           0
-  clkout0" TS_clock_50_i / 0.434782609      | HOLD        |     0.264ns|            |       0|           0
+  TS_pll_1_clkout0 = PERIOD TIMEGRP "pll_1_ | SETUP       |    12.044ns|    21.910ns|       0|           0
+  clkout0" TS_clock_50_i / 0.434782609      | HOLD        |     0.136ns|            |       0|           0
       HIGH 50%                              |             |            |            |        |            
 ----------------------------------------------------------------------------------------------------------
   TS_clock_mem_s = PERIOD TIMEGRP "clock_me | MINPERIOD   |    22.800ns|     0.480ns|       0|           0
@@ -245,7 +245,7 @@ Asterisk (*) preceding a constraint indicates it was not met.
   TS_clock_vga_s = PERIOD TIMEGRP "clock_vg | MINPERIOD   |    36.430ns|     3.570ns|       0|           0
   a_s" 40 ns HIGH 50%                       |             |            |            |        |            
 ----------------------------------------------------------------------------------------------------------
-  TS_TO_ps2if_instps2kbd_instCnt_31_LD = MA | MAXDELAY    |    37.973ns|     8.587ns|       0|           0
+  TS_TO_ps2if_instps2kbd_instCnt_31_LD = MA | MAXDELAY    |    38.927ns|     7.633ns|       0|           0
   XDELAY TO TIMEGRP         "TO_ps2if_instp |             |            |            |        |            
   s2kbd_instCnt_31_LD" TS_clock_master_s DA |             |            |            |        |            
   TAPATHONLY                                |             |            |            |        |            
@@ -253,9 +253,9 @@ Asterisk (*) preceding a constraint indicates it was not met.
   TS_clock_master_s = PERIOD TIMEGRP "clock | MINPERIOD   |    42.990ns|     3.570ns|       0|           0
   _master_s" 46.56 ns HIGH 50%              |             |            |            |        |            
 ----------------------------------------------------------------------------------------------------------
-  TS_TO_snespads_bctrl_bnum_buttons_read_q_ | MAXDELAY    |    43.272ns|     3.288ns|       0|           0
-  1_LD = MAXDELAY TO TIMEGRP         "TO_sn |             |            |            |        |            
-  espads_bctrl_bnum_buttons_read_q_1_LD" TS |             |            |            |        |            
+  TS_TO_snespads_bctrl_bnum_buttons_read_q_ | MAXDELAY    |    43.043ns|     3.517ns|       0|           0
+  4_LD = MAXDELAY TO TIMEGRP         "TO_sn |             |            |            |        |            
+  espads_bctrl_bnum_buttons_read_q_4_LD" TS |             |            |            |        |            
   _clock_master_s         DATAPATHONLY      |             |            |            |        |            
 ----------------------------------------------------------------------------------------------------------
 
@@ -270,14 +270,14 @@ Derived Constraints for TS_clock_50_i
 |           Constraint          | Requirement |-------------+-------------|-------------+-------------|-------------+-------------|
 |                               |             |   Direct    | Derivative  |   Direct    | Derivative  |   Direct    | Derivative  |
 +-------------------------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+
-|TS_clock_50_i                  |     20.000ns|      5.000ns|    105.140ns|            0|          194|           
-0|3097506564524318400000000000000000000|
-| TS_pll_1_clkout3              |      8.000ns|      4.100ns|          N/A|            0|            0|          236|            0|
-| TS_pll_1_clkout1              |     23.000ns|     13.286ns|          N/A|            0|            0|       135502|            0|
-| TS_pll_1_clkout0              |     46.000ns|     20.580ns|          N/A|            0|            0|      2829781|            0|
+|TS_clock_50_i                  |     20.000ns|      5.000ns|    106.430ns|            0|          196|           
+0|3097506564524323700000000000000000000|
+| TS_pll_1_clkout3              |      8.000ns|      4.200ns|          N/A|            0|            0|          236|            0|
+| TS_pll_1_clkout1              |     23.000ns|     12.021ns|          N/A|            0|            0|       136332|            0|
+| TS_pll_1_clkout0              |     46.000ns|     21.910ns|          N/A|            0|            0|      2830046|            0|
 | TS_pll_1_clkout4              |      8.000ns|      2.666ns|          N/A|            0|            0|            0|            0|
-| TS_pll_1_clkout2              |     40.000ns|    210.280ns|          N/A|          194|           
-0|3097506564524318400000000000000000000|            0|
+| TS_pll_1_clkout2              |     40.000ns|    212.860ns|          N/A|          196|           
+0|3097506564524323700000000000000000000|            0|
 +-------------------------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+
 
 Derived Constraints for TS_clock_master_s
@@ -286,11 +286,11 @@ Derived Constraints for TS_clock_master_s
 |           Constraint          | Requirement |-------------+-------------|-------------+-------------|-------------+-------------|
 |                               |             |   Direct    | Derivative  |   Direct    | Derivative  |   Direct    | Derivative  |
 +-------------------------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+
-|TS_clock_master_s              |     46.560ns|      3.570ns|      8.587ns|            0|            0|            0|           17|
-| TS_TO_ps2if_instps2kbd_instCnt|     46.560ns|      8.587ns|          N/A|            0|            0|            9|            0|
+|TS_clock_master_s              |     46.560ns|      3.570ns|      7.633ns|            0|            0|            0|           17|
+| TS_TO_ps2if_instps2kbd_instCnt|     46.560ns|      7.633ns|          N/A|            0|            0|            9|            0|
 | _31_LD                        |             |             |             |             |             |             |             |
-| TS_TO_snespads_bctrl_bnum_butt|     46.560ns|      3.288ns|          N/A|            0|            0|            8|            0|
-| ons_read_q_1_LD               |             |             |             |             |             |             |             |
+| TS_TO_snespads_bctrl_bnum_butt|     46.560ns|      3.517ns|          N/A|            0|            0|            8|            0|
+| ons_read_q_4_LD               |             |             |             |             |             |             |             |
 +-------------------------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+
 
 1 constraint not met.
@@ -302,14 +302,14 @@ All signals are completely routed.
 
 WARNING:Par:283 - There are 5 loadless signals in this design. This design will cause Bitgen to issue DRC warnings.
 
-Total REAL time to PAR completion: 1 mins 6 secs 
-Total CPU time to PAR completion: 1 mins 7 secs 
+Total REAL time to PAR completion: 1 mins 4 secs 
+Total CPU time to PAR completion: 1 mins 5 secs 
 
-Peak Memory Usage:  383 MB
+Peak Memory Usage:  385 MB
 
 Placer: Placement generated during map.
 Routing: Completed - No errors found.
-Timing: Completed - 194 errors found.
+Timing: Completed - 196 errors found.
 
 Number of error messages: 0
 Number of warning messages: 8
