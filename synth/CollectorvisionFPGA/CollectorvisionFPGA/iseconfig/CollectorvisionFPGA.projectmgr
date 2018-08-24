@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!--This is an ISE project configuration file.-->
 <!--It holds project specific layout data for the projectmgr plugin.-->
 <!--Copyright (c) 1995-2009 Xilinx, Inc.  All rights reserved.-->
@@ -7,7 +7,25 @@
    <ItemView engineview="SynthesisOnly" guiview="Source" compilemode="AutoCompile" >
       <ClosedNodes>
          <ClosedNodesVersion>2</ClosedNodesVersion>
-         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/hdmi - hdmi - rtl</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/ps2if_inst - colecoKeyboard - SYN</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/snespads_b - snespad - struct</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/snespads_b - snespad - struct/pad_b - snespad_pad - rtl</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/vg - colecovision - Behavior/cpu - T80a - rtl</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/vg - colecovision - Behavior/psg_b - sn76489_top - struct</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/vg - colecovision - Behavior/psg_b - sn76489_top - struct/tone2_b - sn76489_tone - rtl</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/vg - colecovision - Behavior/psg_b - sn76489_top - struct/tone3_b - sn76489_tone - rtl</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/vg - colecovision - Behavior/vdp18_b - vdp18_core - struct/addr_mux_b - vdp18_addr_mux - rtl</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/vg - colecovision - Behavior/vdp18_b - vdp18_core - struct/col_mux_b - vdp18_col_mux - rtl</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/vg - colecovision - Behavior/vdp18_b - vdp18_core - struct/cpu_io_b - vdp18_cpuio - rtl</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/vg - colecovision - Behavior/vdp18_b - vdp18_core - struct/ctrl_b - vdp18_ctrl - rtl/vdp18_pack</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/vg - colecovision - Behavior/vdp18_b - vdp18_core - struct/hor_vert_b - vdp18_hor_vert - rtl</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/vg - colecovision - Behavior/vdp18_b - vdp18_core - struct/hor_vert_b - vdp18_hor_vert - rtl/vdp18_pack</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/vg - colecovision - Behavior/vdp18_b - vdp18_core - struct/pattern_b - vdp18_pattern - rtl</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/vg - colecovision - Behavior/vdp18_b - vdp18_core - struct/sprite_b - vdp18_sprite - rtl</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/vg - colecovision - Behavior/vdp18_b - vdp18_core - struct/vdp18_comp_pack/vdp18_pack</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/vg - colecovision - Behavior/vdp18_b - vdp18_core - struct/vdp18_pack</ClosedNode>
+         <ClosedNode>/CollectorvisionFPGA_top - behavior C:|Users|bburney|Desktop|cvgs|git|src|syn-CollectorvisionFPGA|CollectorvisionFPGA_top.vhd/vga - vga - rtl</ClosedNode>
       </ClosedNodes>
       <SelectedItems>
          <SelectedItem>CollectorvisionFPGA_top - behavior (C:/Users/bburney/Desktop/cvgs/git/src/syn-CollectorvisionFPGA/CollectorvisionFPGA_top.vhd)</SelectedItem>
@@ -30,13 +48,13 @@
          <ClosedNode>User Constraints</ClosedNode>
       </ClosedNodes>
       <SelectedItems>
-         <SelectedItem>Generate Programming File</SelectedItem>
+         <SelectedItem></SelectedItem>
       </SelectedItems>
       <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
       <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
-      <ViewHeaderState orientation="horizontal" >000000ff000000000000000100000001000000000000000000000000000000000000000000000001dc000000010000000100000000000000000000000064ffffffff000000810000000000000001000001dc0000000100000000</ViewHeaderState>
+      <ViewHeaderState orientation="horizontal" >000000ff0000000000000001000000010000000000000000000000000000000000000000000000033f000000010000000100000000000000000000000064ffffffff0000008100000000000000010000033f0000000100000000</ViewHeaderState>
       <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
-      <CurrentItem>Generate Programming File</CurrentItem>
+      <CurrentItem></CurrentItem>
    </ItemView>
    <ItemView guiview="File" >
       <ClosedNodes>
@@ -47,7 +65,7 @@
       <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
       <ViewHeaderState orientation="horizontal" >000000ff000000000000000100000000000000000100000000000000000000000000000000000004d2000000040101000100000000000000000000000064ffffffff000000810000000000000004000002320000000100000000000000d70000000100000000000000660000000100000000000001630000000100000000</ViewHeaderState>
       <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
-      <CurrentItem>C:\Users\bburney\Desktop\cvgs\COMPARE\colecofpga-master\src\audio\dac.vhd</CurrentItem>
+      <CurrentItem></CurrentItem>
    </ItemView>
    <ItemView guiview="Library" >
       <ClosedNodes>
@@ -61,6 +79,101 @@
       <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
       <CurrentItem>work</CurrentItem>
    </ItemView>
-   <SourceProcessView>000000ff00000000000000020000011b0000011b01000000050100000002</SourceProcessView>
+   <SourceProcessView>000000ff0000000000000002000001450000000001000000050100000002</SourceProcessView>
    <CurrentView>Implementation</CurrentView>
+   <ItemView engineview="SynthesisOnly" sourcetype="DESUT_XCO" guiview="Process" >
+      <ClosedNodes>
+         <ClosedNodesVersion>1</ClosedNodesVersion>
+         <ClosedNode>CORE Generator</ClosedNode>
+      </ClosedNodes>
+      <SelectedItems>
+         <SelectedItem></SelectedItem>
+      </SelectedItems>
+      <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
+      <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
+      <ViewHeaderState orientation="horizontal" >000000ff00000000000000010000000100000000000000000000000000000000000000000000000395000000010000000100000000000000000000000064ffffffff000000810000000000000001000003950000000100000000</ViewHeaderState>
+      <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
+      <CurrentItem></CurrentItem>
+   </ItemView>
+   <ItemView engineview="SynthesisOnly" guiview="Source" compilemode="ManualCompile" >
+      <ClosedNodes>
+         <ClosedNodesVersion>2</ClosedNodesVersion>
+      </ClosedNodes>
+      <SelectedItems>
+         <SelectedItem>C:\Users\bburney\Desktop\cvgs\COMPARE\colecofpga-master\src\video\vdp18\vdp18_pattern.vhd (C:/Users/bburney/Desktop/cvgs/COMPARE/colecofpga-master/src/video/vdp18/vdp18_pattern.vhd)</SelectedItem>
+      </SelectedItems>
+      <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
+      <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
+      <ViewHeaderState orientation="horizontal" >000000ff0000000000000001000000010000000000000000000000000000000000000000000000033b000000020000000000000000000000000000000064ffffffff000000810000000000000002000002aa0000000100000000000000910000000100000000</ViewHeaderState>
+      <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
+      <CurrentItem>C:\Users\bburney\Desktop\cvgs\COMPARE\colecofpga-master\src\video\vdp18\vdp18_pattern.vhd (C:/Users/bburney/Desktop/cvgs/COMPARE/colecofpga-master/src/video/vdp18/vdp18_pattern.vhd)</CurrentItem>
+   </ItemView>
+   <ItemView engineview="SynthesisOnly" sourcetype="" guiview="Process" >
+      <ClosedNodes>
+         <ClosedNodesVersion>1</ClosedNodesVersion>
+         <ClosedNode>Design Utilities</ClosedNode>
+      </ClosedNodes>
+      <SelectedItems>
+         <SelectedItem></SelectedItem>
+      </SelectedItems>
+      <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
+      <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
+      <ViewHeaderState orientation="horizontal" >000000ff00000000000000010000000100000000000000000000000000000000000000000000000350000000010000000100000000000000000000000064ffffffff000000810000000000000001000003500000000100000000</ViewHeaderState>
+      <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
+      <CurrentItem></CurrentItem>
+   </ItemView>
+   <ItemView engineview="SynthesisOnly" sourcetype="DESUT_VHDL_PACKAGE_DECL" guiview="Process" >
+      <ClosedNodes>
+         <ClosedNodesVersion>1</ClosedNodesVersion>
+      </ClosedNodes>
+      <SelectedItems>
+         <SelectedItem></SelectedItem>
+      </SelectedItems>
+      <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
+      <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
+      <ViewHeaderState orientation="horizontal" >000000ff00000000000000010000000100000000000000000000000000000000000000000000000350000000010000000100000000000000000000000064ffffffff000000810000000000000001000003500000000100000000</ViewHeaderState>
+      <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
+      <CurrentItem></CurrentItem>
+   </ItemView>
+   <ItemView engineview="SynthesisOnly" sourcetype="DESUT_UCF" guiview="Process" >
+      <ClosedNodes>
+         <ClosedNodesVersion>1</ClosedNodesVersion>
+         <ClosedNode>User Constraints</ClosedNode>
+      </ClosedNodes>
+      <SelectedItems>
+         <SelectedItem></SelectedItem>
+      </SelectedItems>
+      <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
+      <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
+      <ViewHeaderState orientation="horizontal" >000000ff00000000000000010000000100000000000000000000000000000000000000000000000350000000010000000100000000000000000000000064ffffffff000000810000000000000001000003500000000100000000</ViewHeaderState>
+      <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
+      <CurrentItem></CurrentItem>
+   </ItemView>
+   <ItemView engineview="SynthesisOnly" sourcetype="DESUT_VHDL_PACKAGE_BODY" guiview="Process" >
+      <ClosedNodes>
+         <ClosedNodesVersion>1</ClosedNodesVersion>
+      </ClosedNodes>
+      <SelectedItems>
+         <SelectedItem></SelectedItem>
+      </SelectedItems>
+      <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
+      <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
+      <ViewHeaderState orientation="horizontal" >000000ff00000000000000010000000100000000000000000000000000000000000000000000000350000000010000000100000000000000000000000064ffffffff000000810000000000000001000003500000000100000000</ViewHeaderState>
+      <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
+      <CurrentItem></CurrentItem>
+   </ItemView>
+   <ItemView engineview="SynthesisOnly" sourcetype="DESUT_VERILOG" guiview="Process" >
+      <ClosedNodes>
+         <ClosedNodesVersion>1</ClosedNodesVersion>
+         <ClosedNode>Design Utilities</ClosedNode>
+      </ClosedNodes>
+      <SelectedItems>
+         <SelectedItem></SelectedItem>
+      </SelectedItems>
+      <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
+      <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
+      <ViewHeaderState orientation="horizontal" >000000ff0000000000000001000000010000000000000000000000000000000000000000000000033f000000010000000100000000000000000000000064ffffffff0000008100000000000000010000033f0000000100000000</ViewHeaderState>
+      <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
+      <CurrentItem></CurrentItem>
+   </ItemView>
 </Project>

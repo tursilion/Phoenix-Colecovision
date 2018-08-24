@@ -53,6 +53,7 @@ entity colecovision is
 		clk_en_10m7_i	: in  std_logic;
 		clk_en_5m37_i	: in  std_logic;
 		clk_en_3m58_i	: in  std_logic;
+		clk_en_1m79_i	: in  std_logic;
 		reset_i			: in  std_logic;			-- Reset, tbem acionado quando por_n_i for 0
 		por_n_i			: in  std_logic;			-- Power-on Reset
 		-- Controller Interface ---------------------------------------------------
@@ -151,6 +152,7 @@ architecture Behavior of colecovision is
 	signal cfg_page_r			: std_logic_vector(7 downto 0);
 
 	-- BIOS
+	signal bios_ram_cs_s		: std_logic;
 	signal loader_ce_s		: std_logic;
 	signal d_from_loader_s	: std_logic_vector( 7 downto 0);
 	signal loader_q			: std_logic;
@@ -161,7 +163,10 @@ architecture Behavior of colecovision is
 
 	-- RAM
 	signal ram_ce_s			: std_logic;
-
+	signal bios_ram_bs_s		: std_logic									:='1';
+	signal exp_ram_bs_s		: std_logic;
+	signal exp_ram_cs_s		: std_logic;
+	
 	-- VDP18 signal
 	signal d_from_vdp_s		: std_logic_vector( 7 downto 0);
 	signal vdp_r_n_s			: std_logic;
@@ -169,6 +174,17 @@ architecture Behavior of colecovision is
 
 	-- SN76489 signal
 	signal audio_s				: signed(7 downto 0);
+
+	signal AUDIO_WSG			: unsigned(7 downto 0);
+	signal AUDIO_EX			: signed(7 downto 0);
+	signal AUDIO_SUM			: signed(8 downto 0);
+
+	signal d_from_wsg_s		: std_logic_vector(7 downto 0);
+
+	signal WSG_CS           : std_logic;
+	signal WSG_BDIR         : std_logic;
+	signal WSG_BC1          : std_logic;
+
 	signal psg_ready_s      : std_logic;
 	signal psg_we_n_s			: std_logic;
 
@@ -185,6 +201,7 @@ architecture Behavior of colecovision is
 	signal spi_rd_s			: std_logic;
 
 	-- Cartridge
+	signal d_from_cart_s		: std_logic_vector( 7 downto 0);
 	signal ext_cart_en_q		: std_logic;
 	signal cart_en_80_n_s	: std_logic;
 	signal cart_en_a0_n_s	: std_logic;
@@ -285,15 +302,38 @@ begin
 		aout_o		=> audio_s
 	);
 
-	audio_o			<= std_logic_vector(audio_s);
-	audio_signed_o	<= audio_s;
+	--audio_o			<= std_logic_vector(audio_s);
+	--audio_signed_o	<= audio_s;
 
+	AUDIO_EX       <= signed(AUDIO_WSG - 128);
+	AUDIO_SUM      <= (audio_s(7) & audio_s) + (AUDIO_EX(7) & AUDIO_EX);
+
+	audio_o			<= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
+	audio_signed_o	<= AUDIO_SUM(8 downto 1);
+
+	-----------------------------------------------------------------------------
+	-- SEX 7289 "COURTNEY" Wavetable Sound Generator
+	-----------------------------------------------------------------------------
+	WSG : ENTITY work.SEX7289
+	port map
+	(
+		 CLK				=> clock_i      ,
+		 CLKENA			=> clk_en_3m58_i, -- WARNING
+		nRESET			=> reset_n_s    ,
+		 BDIR				=> WSG_BDIR     ,
+		 BC1				=> WSG_BC1      ,
+		 DAI				=> d_from_cpu_s ,
+		 DAO				=> d_from_wsg_s ,
+
+		 DIGITAL_MIX	=> AUDIO_WSG
+	)
+	;
 	-----------------------------------------------------------------------------
 	-- Controller ports
 	-----------------------------------------------------------------------------
 	ctrl_b : entity work.cv_ctrl
 	port map (
-		clock_i					=> clock_i,
+		clock_i				=> clock_i,
 		clk_en_3m58_i		=> clk_en_3m58_i,
 		reset_n_i			=> reset_n_s,
 		ctrl_en_key_n_i	=> ctrl_en_key_n_s,
@@ -378,14 +418,14 @@ begin
 	ram_addr_o		<=
 	--  1111111
 	--  6543210
-		"0000"    & cpu_addr_s(12 downto 0)	when bios_ce_s = '1'															else
---		"0001"    & cpu_addr_s(12 downto 0)	when ram_ce_s = '1'															else	-- 8K linear RAM
-		"0001"    & cpu_addr_s(12 downto 0)	when ram_ce_s = '1'	and multcart_q = '1'								else	-- 8K linear RAM
-		"0001100" & cpu_addr_s( 9 downto 0)	when ram_ce_s = '1'	and multcart_q = '0'								else	-- 1K mirrored RAM
-		"01"      & cpu_addr_s(14 downto 0)	when cart_ce_s = '1' and loader_q = '1'								else
-		"01"      & cpu_addr_s(14 downto 0)	when cart_ce_s = '1' and multcart_q = '1' and cart_oe_s = '1'	else
-		"10"      & cpu_addr_s(14 downto 0)	when cart_ce_s = '1' and multcart_q = '1' and cart_we_s = '1'	else
-		"10"      & cpu_addr_s(14 downto 0)	when cart_ce_s = '1' and multcart_q = '0'								else
+		"0000"    & cpu_addr_s(12 downto 0)	when bios_ce_s = '1'											else	-- 0000-1FFF
+--		"0001"    & cpu_addr_s(12 downto 0)	when ram_ce_s = '1'	and multcart_q = '1'	and exp_ram_bs_s = '0'		   else	-- 8K linear RAM
+		"00"      & cpu_addr_s(14 downto 0)	when ram_ce_s = '1'																		else	-- 24K linear RAM
+--		"0001100" & cpu_addr_s( 9 downto 0)	when ram_ce_s = '1'	and multcart_q = '0' and exp_ram_bs_s = '0'		   else	-- 1K mirrored RAM
+		"01"      & cpu_addr_s(14 downto 0)	when cart_ce_s = '1' and loader_q = '1'											else
+		"01"      & cpu_addr_s(14 downto 0)	when cart_ce_s = '1' and multcart_q = '1' and cart_oe_s = '1'				else
+		"10"      & cpu_addr_s(14 downto 0)	when cart_ce_s = '1' and multcart_q = '1' and cart_we_s = '1'				else
+		"10"      & cpu_addr_s(14 downto 0)	when cart_ce_s = '1' and multcart_q = '0'											else
 		(others => '0');
 
 	ram_data_o		<= d_from_cpu_s;
@@ -407,26 +447,31 @@ begin
 	io_write_s		<= '1'	when iorq_n_s = '0' and m1_n_s = '1' and wr_n_s = '0'		else '0';
 
 	-- memory
-	bios_ce_s		<= '1'	when mem_access_s = '1' and cpu_addr_s(15 downto 13) = "000"		else '0';	-- BIOS         => 0000 to 1FFF
-	ram_ce_s			<= '1'	when mem_access_s = '1' and cpu_addr_s(15 downto 13) = "011"		else '0';	-- RAM          => 6000 to 7FFF
+	bios_ce_s		<= '1'	when mem_access_s = '1' and cpu_addr_s(15 downto 13) = "000" and bios_ram_bs_s = '1'	else '0';	-- BIOS         => 0000 to 1FFF
+	ram_ce_s			<= '1'	when mem_access_s = '1' and (cpu_addr_s(15 downto 14) = "01" or cpu_addr_s(15 downto 13) = "001" or (cpu_addr_s(15 downto 13) = "000" and bios_ram_bs_s = '0'))		else '0';	-- RAM          => 6000 to 7FFF
 	cart_en_80_n_s	<= '0'	when mem_access_s = '1' and cpu_addr_s(15 downto 13) = "100"		else '1';	-- Cartridge 80 => 8000 to 9FFF
 	cart_en_a0_n_s	<= '0'	when mem_access_s = '1' and cpu_addr_s(15 downto 13) = "101"		else '1';	-- Cartridge A0 => A000 to BFFF
 	cart_en_c0_n_s	<= '0'	when mem_access_s = '1' and cpu_addr_s(15 downto 13) = "110"		else '1';	-- Cartridge C0 => C000 to DFFF
 	cart_en_e0_n_s	<= '0'	when mem_access_s = '1' and cpu_addr_s(15 downto 13) = "111"		else '1';	-- Cartridge E0 => E000 to FFFF
 
 	-- I/O
-	spi_cs_s				<= '1'	when io_access_s = '1' and cpu_addr_s(7 downto 1) = "0101000"	else '0';	-- SPI (R/W)          => 50 to 51
-	cfg_port_cs_s		<= '1'	when io_write_s = '1'  and cpu_addr_s(7 downto 0) = X"52"		else '0';	-- Config Port        => 52
-	machine_id_cs_s	<= '1'	when io_read_s = '1'   and cpu_addr_s(7 downto 0) = X"53"		else '0';	-- Machine ID read    => 53
+	spi_cs_s				<= '1'	when io_access_s = '1' and cpu_addr_s(7 downto 1) = "0101011"	else '0';	-- SPI (R/W)          => 56 to 57
+--	exp_ram_cs_s		<= '1'   when io_write_s = '1'  and cpu_addr_s(7 downto 0) = X"53" 		else '0';	-- SGM 24k ram enable => 53
 	cfg_page_cs_s		<= '1'	when io_access_s = '1' and cpu_addr_s(7 downto 0) = X"54"		else '0';	-- Page port          => 54
+	cfg_port_cs_s		<= '1'	when io_write_s = '1'  and cpu_addr_s(7 downto 0) = X"55"		else '0';	-- Config Port        => 55
+	machine_id_cs_s	<= '1'	when io_read_s = '1'   and cpu_addr_s(7 downto 0) = X"58"		else '0';	-- Machine ID read    => 58
+	bios_ram_cs_s		<= '1'   when io_write_s = '1'  and cpu_addr_s(7 downto 0) = X"7F" 		else '0';	-- SGM BIOS ram bankswitch => 7F
 	ctrl_en_key_n_s	<= '0'	when io_write_s = '1'  and cpu_addr_s(7 downto 5) = "100"		else '1';	-- Controller key set => 80 to 9F
 	vdp_w_n_s			<= '0'	when io_write_s = '1'  and cpu_addr_s(7 downto 5) = "101"		else '1';	-- VDP write          => A0 to BF
 	vdp_r_n_s			<= '0'	when io_read_s = '1'   and cpu_addr_s(7 downto 5) = "101"		else '1';	-- VDP read           => A0 to BF
 	ctrl_en_joy_n_s	<= '0'	when io_write_s = '1'  and cpu_addr_s(7 downto 5) = "110"		else '1';	-- Controller joy set => C0 to DF
 	psg_we_n_s			<= '0'	when io_write_s = '1'  and cpu_addr_s(7 downto 5) = "111"		else '1';	-- PSG write          => E0 to FF
+	WSG_CS				<= '1'	when io_access_s = '1' and cpu_addr_s(7 downto 2) = "010100"	else '0';	-- WSG (R/W)          => 60 to 63
+	WSG_BDIR				<= '1'	when WSG_CS = '1'		  and io_write_s = '1'							else '0';	-- WSG write          => 60 to 61
+	WSG_BC1				<= '1'	when WSG_CS = '1'  	  and cpu_addr_s(0) = '0'						else '0';	-- WSG write          => 60/62
 	ctrl_r_n_s			<= '0'	when io_read_s = '1'   and cpu_addr_s(7 downto 5) = "111"		else '1';	-- Controller read    => E0 to FF
 
-	-- Write I/O port 52
+	-- Write I/O port 55
 	process (por_n_i, reset_i, clock_i)
 	begin
 		if por_n_i = '0' then
@@ -440,6 +485,30 @@ begin
 				ext_cart_en_q	<= d_from_cpu_s(2);
 				multcart_q <= d_from_cpu_s(1);
 				loader_q	  <= d_from_cpu_s(0);
+			end if;
+		end if;
+	end process;
+	
+	-- Write I/O port 53
+	--process (por_n_i, reset_i, clock_i)
+	--begin
+	--	if por_n_i = '0' then
+	--		exp_ram_bs_s	<= '0';
+	--	elsif rising_edge(clock_i) then
+	--		if clk_en_3m58_i = '1' and exp_ram_cs_s = '1' then
+	--			exp_ram_bs_s	<= d_from_cpu_s(0);
+	--		end if;
+	--	end if;
+	--end process;
+	
+	-- Write I/O port 7F
+	process (por_n_i, reset_i, clock_i)
+	begin
+		if por_n_i = '0' then
+			bios_ram_bs_s	<= '1';
+		elsif rising_edge(clock_i) then
+			if clk_en_3m58_i = '1' and bios_ram_cs_s = '1' then
+				bios_ram_bs_s	<= d_from_cpu_s(1);
 			end if;
 		end if;
 	end process;
@@ -467,6 +536,7 @@ begin
 						d_from_vdp_s					when vdp_r_n_s = '0'			else
 						d_from_ctrl_s					when ctrl_r_n_s = '0'		else
 						d_from_spi_s					when spi_cs_s = '1'			else
+						d_from_wsg_s					when WSG_CS = '1'				else
 						machine_id_c					when machine_id_cs_s = '1'	else
 						cfg_page_r						when cfg_page_cs_s = '1'	else
 						(others => '1');

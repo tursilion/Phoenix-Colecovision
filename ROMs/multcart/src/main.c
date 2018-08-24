@@ -4,7 +4,7 @@
 #include "coleco.h"
 #include "pff.h"
 
-__sfr __at 0x53 MACHINE_ID;
+__sfr __at 0x58 MACHINE_ID;
 __sfr __at 0x54 CFG_PAGE;
 //extern const sound_t *snd_table;
 
@@ -176,7 +176,7 @@ LOAD:
 	*cp++=0x3e;		// LD A, 0
 	*cp++=0x00;
 	*cp++=0xd3;		// OUT (0x52), A
-	*cp++=0x52;
+	*cp++=0x55;
 	*cp++=0xc3;		// JP 0
 	*cp++=0x00;
 	*cp++=0x00;

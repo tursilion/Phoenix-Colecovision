@@ -26,7 +26,9 @@ package cv_keys_pack is
   constant cv_key_asterisk_c : natural := 10;
   constant cv_key_number_c   : natural := 11;
   constant cv_key_none_c     : natural := 12;
-  constant cv_key_last_c     : natural := cv_key_none_c;
+  constant cv_key_f3_c		  : natural := 13;
+  constant cv_key_f4_c		  : natural := 14;
+  constant cv_key_last_c     : natural := cv_key_f4_c;
 
   subtype  cv_key_t is std_logic_vector(1 to 4);
   type     cv_keys_t is array (natural range 0 to cv_key_last_c)
@@ -53,7 +55,9 @@ package cv_keys_pack is
     cv_key_9_c        => "1011",		-- B
     cv_key_asterisk_c => "1010",		-- A
     cv_key_number_c   => "0101",		-- 5
-    cv_key_none_c     => "1111"		-- F    falta 0, 2, 4,
+    cv_key_f3_c		 => "0010",		-- 2
+	 cv_key_f4_c		 => "0100",		-- 4
+	 cv_key_none_c     => "1111"		-- F    falta 0, 2, 4,
   );
 
 end;

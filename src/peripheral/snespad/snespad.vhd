@@ -81,7 +81,22 @@ entity snespad is
     but_up_o         : out std_logic_vector(num_pads_g-1 downto 0);
     but_down_o       : out std_logic_vector(num_pads_g-1 downto 0);
     but_left_o       : out std_logic_vector(num_pads_g-1 downto 0);
-    but_right_o      : out std_logic_vector(num_pads_g-1 downto 0)
+    but_right_o      : out std_logic_vector(num_pads_g-1 downto 0);
+    but_0_o         	: out std_logic_vector(num_pads_g-1 downto 0);
+    but_1_o         : out std_logic_vector(num_pads_g-1 downto 0);
+    but_2_o         	: out std_logic_vector(num_pads_g-1 downto 0);
+    but_3_o         	: out std_logic_vector(num_pads_g-1 downto 0);
+    but_4_o         	: out std_logic_vector(num_pads_g-1 downto 0);
+    but_5_o         	: out std_logic_vector(num_pads_g-1 downto 0);
+    but_6_o         	: out std_logic_vector(num_pads_g-1 downto 0);
+    but_7_o         	: out std_logic_vector(num_pads_g-1 downto 0);
+    but_8_o         	: out std_logic_vector(num_pads_g-1 downto 0);
+    but_9_o         	: out std_logic_vector(num_pads_g-1 downto 0);
+    but_star_o      	: out std_logic_vector(num_pads_g-1 downto 0);
+    but_num_o       	: out std_logic_vector(num_pads_g-1 downto 0);
+    but_dot_o       	: out std_logic_vector(num_pads_g-1 downto 0);
+    but_clear_o     	: out std_logic_vector(num_pads_g-1 downto 0);
+    but_equal_o      : out std_logic_vector(num_pads_g-1 downto 0)
   );
 
 end snespad;
@@ -128,7 +143,22 @@ architecture struct of snespad is
       but_up_o        : out std_logic;
       but_down_o      : out std_logic;
       but_left_o      : out std_logic;
-      but_right_o     : out std_logic
+      but_right_o     : out std_logic;
+		but_0_o         : out std_logic;
+      but_1_o         : out std_logic;
+      but_2_o         : out std_logic;
+      but_3_o         : out std_logic;
+      but_4_o         : out std_logic;
+      but_5_o         : out std_logic;
+      but_6_o         : out std_logic;
+      but_7_o         : out std_logic;
+      but_8_o         : out std_logic;
+      but_9_o         : out std_logic;
+      but_star_o      : out std_logic;
+      but_num_o       : out std_logic;
+      but_dot_o       : out std_logic;
+      but_clear_o     : out std_logic;
+      but_equal_o     : out std_logic
     );
   end component snespad_pad;
 
@@ -179,7 +209,22 @@ begin
         but_up_o        => but_up_o(i),
         but_down_o      => but_down_o(i),
         but_left_o      => but_left_o(i),
-        but_right_o     => but_right_o(i)
+        but_right_o     => but_right_o(i),
+		  but_0_o         => but_0_o(i),
+        but_1_o         => but_1_o(i),
+        but_2_o         => but_2_o(i),
+        but_3_o         => but_3_o(i),
+        but_4_o         => but_4_o(i),
+        but_5_o         => but_5_o(i),
+        but_6_o         => but_6_o(i),
+        but_7_o         => but_7_o(i),
+        but_8_o         => but_8_o(i),
+        but_9_o         => but_9_o(i),
+        but_star_o      => but_star_o(i),
+        but_num_o       => but_num_o(i),
+        but_dot_o       => but_dot_o(i),
+        but_clear_o     => but_clear_o(i),
+        but_equal_o     => but_equal_o(i)
       );
   end generate;
 
@@ -190,6 +235,10 @@ end struct;
 -- File History:
 --
 -- $Log: snespad.vhd,v $
+--
+-- Revision 1.3  2018/08/22 10:00:00  bmack36
+-- added SFC NTT data controller compatibility
+--
 -- Revision 1.2  2004/10/05 18:22:40  arniml
 -- comments for the generic parameters
 --

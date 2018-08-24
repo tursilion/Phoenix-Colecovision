@@ -77,7 +77,22 @@ entity snespad_pad is
     but_up_o        : out std_logic;
     but_down_o      : out std_logic;
     but_left_o      : out std_logic;
-    but_right_o     : out std_logic
+    but_right_o     : out std_logic;
+	 but_0_o    	  : out std_logic;
+	 but_1_o    	  : out std_logic;
+    but_2_o    	  : out std_logic;
+    but_3_o    	  : out std_logic;
+    but_4_o    	  : out std_logic;
+    but_5_o    	  : out std_logic;
+    but_6_o    	  : out std_logic;
+    but_7_o    	  : out std_logic;
+    but_8_o    	  : out std_logic;
+    but_9_o    	  : out std_logic;
+    but_star_o      : out std_logic;
+    but_num_o    	  : out std_logic;
+    but_dot_o    	  : out std_logic;
+    but_clear_o     : out std_logic;
+    but_equal_o	  : out std_logic
   );
 
 end snespad_pad;
@@ -142,7 +157,21 @@ begin
   but_down_o  <= buttons_q(but_pos_down_c);
   but_left_o  <= buttons_q(but_pos_left_c);
   but_right_o <= buttons_q(but_pos_right_c);
-
+  but_0_o     <= buttons_q(but_pos_0_c);
+  but_1_o     <= buttons_q(but_pos_1_c);
+  but_2_o     <= buttons_q(but_pos_2_c);
+  but_3_o     <= buttons_q(but_pos_3_c);
+  but_4_o     <= buttons_q(but_pos_4_c);
+  but_5_o     <= buttons_q(but_pos_5_c);
+  but_6_o     <= buttons_q(but_pos_6_c);
+  but_7_o     <= buttons_q(but_pos_7_c);
+  but_8_o     <= buttons_q(but_pos_8_c);
+  but_9_o     <= buttons_q(but_pos_9_c);
+  but_star_o  <= buttons_q(but_pos_star_c);
+  but_num_o   <= buttons_q(but_pos_num_c);
+  but_dot_o   <= buttons_q(but_pos_dot_c);
+  but_clear_o <= buttons_q(but_pos_clear_c);
+  but_equal_o <= buttons_q(but_pos_equal_c);
 end rtl;
 
 

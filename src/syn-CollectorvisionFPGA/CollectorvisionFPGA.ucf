@@ -144,7 +144,7 @@ NET "cart_data_i<4>"    LOC="D1"  | IOSTANDARD = LVCMOS33 | PULLUP;
 NET "cart_data_i<5>"    LOC="E1"  | IOSTANDARD = LVCMOS33 | PULLUP;
 NET "cart_data_i<6>"    LOC="F2"  | IOSTANDARD = LVCMOS33 | PULLUP;
 NET "cart_data_i<7>"    LOC="G3"  | IOSTANDARD = LVCMOS33 | PULLUP;
-NET "cart_dir_o"        LOC="N1"  | IOSTANDARD = LVCMOS33;
+NET "cart_dir_o"        LOC="N1"  | IOSTANDARD = LVCMOS33 | PULLUP; #remove pullup on next rev of board
 NET "cart_oe_n_o"       LOC="N2"  | IOSTANDARD = LVCMOS33;
 NET "cart_en_80_n_o"    LOC="J3"  | IOSTANDARD = LVCMOS33;
 NET "cart_en_A0_n_o"    LOC="K1"  | IOSTANDARD = LVCMOS33;

@@ -11,9 +11,9 @@
 #define poke16(A,V) *(volatile unsigned int*)(A)=(V)
 
 /* I/O ports */
-__sfr __at 0x50 STATUS;
-__sfr __at 0x52 CONFIG;
-__sfr __at 0x53 MACHID;
+__sfr __at 0x56 STATUS;
+__sfr __at 0x55 CONFIG;
+__sfr __at 0x58 MACHID;
 
 /* Constants */
 
@@ -26,7 +26,7 @@ static const char * mcfile    = "MULTCARTROM";
 
 //                                     11111111112222222222333
 //                            12345678901234567890123456789012
-static const char TITULO[] = "      COLECOVISION LOADER       ";
+static const char TITULO[] = "      COLECOVISION LOADER MK3   ";
 
 /* Variables */
 
@@ -62,7 +62,7 @@ void startMulticart()
 	*cp++=0x3e;		// LD A, 2
 	*cp++=0x02;
 	*cp++=0xd3;		// OUT (0x52), A
-	*cp++=0x52;
+	*cp++=0x55;
 	*cp++=0xc3;		// JP 0
 	*cp++=0x00;
 	*cp++=0x00;
@@ -78,7 +78,7 @@ void startExtCart()
 	*cp++=0x3e;		// LD A, 4
 	*cp++=0x04;
 	*cp++=0xd3;		// OUT (0x52), A
-	*cp++=0x52;
+	*cp++=0x55;
 	*cp++=0xc3;		// JP 0
 	*cp++=0x00;
 	*cp++=0x00;

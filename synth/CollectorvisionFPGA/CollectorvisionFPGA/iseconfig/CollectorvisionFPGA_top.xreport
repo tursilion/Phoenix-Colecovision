@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <report-views version="2.0" >
  <header>
-  <DateModified>2018-08-22T15:16:17</DateModified>
+  <DateModified>2018-08-23T00:20:24</DateModified>
   <ModuleName>CollectorvisionFPGA_top</ModuleName>
-  <SummaryTimeStamp>2018-08-20T16:53:54</SummaryTimeStamp>
+  <SummaryTimeStamp>2018-08-22T21:28:32</SummaryTimeStamp>
   <SavedFilePath>C:/Users/bburney/Desktop/cvgs/git/synth/CollectorvisionFPGA/CollectorvisionFPGA/iseconfig/CollectorvisionFPGA_top.xreport</SavedFilePath>
   <ImplementationReportsDirectory>C:/Users/bburney/Desktop/cvgs/git/synth/CollectorvisionFPGA/CollectorvisionFPGA\</ImplementationReportsDirectory>
   <DateInitialized>2018-08-20T16:46:25</DateInitialized>

@@ -9,8 +9,8 @@ mmc_type:
 
 	.area	_CODE
 
-SPI_CTRL = 0x50;
-SPI_DATA = 0x51;
+SPI_CTRL = 0x56;
+SPI_DATA = 0x57;
 
 ; Comandos SPI:
 CMD0	= 0  | 0x40

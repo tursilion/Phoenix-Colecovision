@@ -61,6 +61,12 @@ entity CollectorvisionFPGA_top is
 		sram_oe_n_o			: out   std_logic								:= '1';
 		sram_we_n_o			: out   std_logic								:= '1';
 
+		-- PS2
+		ps2_clk_io			: inout std_logic								:= 'Z';
+		ps2_data_io			: inout std_logic								:= 'Z';
+--		ps2_mouse_clk_io  : inout std_logic								:= 'Z';
+--		ps2_mouse_data_io : inout std_logic								:= 'Z';
+
 		-- SD Card
 		sd_cs_n_o			: out   std_logic								:= '1';
 		sd_sclk_o			: out   std_logic								:= '0';
@@ -76,11 +82,7 @@ entity CollectorvisionFPGA_top is
 		flash_wp_o			: out   std_logic								:= '0';
 		flash_hold_o		: out   std_logic								:= '1';
 
-		-- PS2
-		ps2_clk_io			: inout std_logic								:= 'Z';
-		ps2_data_io			: inout std_logic								:= 'Z';
---		ps2_mouse_clk_io  : inout std_logic								:= 'Z';
---		ps2_mouse_data_io : inout std_logic								:= 'Z';
+
 
 		-- Joystick
 		joy_p5_o				: out   std_logic;
@@ -146,6 +148,7 @@ architecture behavior of CollectorvisionFPGA_top is
 	signal clock_vdp_en_s	: std_logic;
 	signal clock_5m_en_s		: std_logic;
 	signal clock_3m_en_s		: std_logic;
+	signal clock_wsg_en_s	: std_logic;
 	signal clock_vga_s		: std_logic;
 	signal clock_hdmi_s		: std_logic;
 	signal clock_hdmi_n_s	: std_logic;
@@ -275,7 +278,8 @@ begin
 		por_i				=> por_s,
 		clock_vdp_en_o	=> clock_vdp_en_s,
 		clock_5m_en_o	=> clock_5m_en_s,
-		clock_3m_en_o	=> clock_3m_en_s
+		clock_3m_en_o	=> clock_3m_en_s,
+		clock_wsg_en_o	=> clock_wsg_en_s
 	);
 
 	-- The Colecovision
@@ -289,6 +293,7 @@ begin
 		clk_en_10m7_i		=> clock_vdp_en_s,
 		clk_en_5m37_i		=> clock_5m_en_s,
 		clk_en_3m58_i		=> clock_3m_en_s,
+		clk_en_1m79_i		=> clock_wsg_en_s,
 		reset_i				=> reset_s,
 		por_n_i				=> por_n_s,
 		-- Controller Interface
@@ -422,12 +427,12 @@ begin
 
 	por_s			<= '1' when por_cnt_s /= 0		else '0';
 	por_n_s		<= '0' when por_cnt_s /= 0		else '1';
-	reset_s		<= por_s or not btn_reset_n_i;
+	reset_s		<= por_s or not btn_reset_n_i or soft_reset_s;
 	audio_s		<= std_logic_vector(unsigned(audio_signed_s + 128));
 	dac_l_o		<= audio_dac_s;
 	dac_r_o		<= audio_dac_s;
 	sd_cs_n_o	<= sd_cs_n_s;
-	cart_dir_o	<= '1';
+	--cart_dir_o	<= '1';
 
 	-- Memory
 	bios_addr_s	<= ram_addr_s(12 downto 0);
@@ -484,7 +489,7 @@ begin
 		
 	);
 
--- Controller
+	-- Controller
 	-----------------------------------------------------------------------------
 	-- Process pad_ctrl
 	--
@@ -812,7 +817,7 @@ begin
 		I_CLK_PIXEL		=> clock_vga_s,
 		I_R				=> vga_r_s & vga_r_s,
 		I_G				=> vga_g_s & vga_g_s,
-		I_B				=> vga_b_s & vga_g_s,
+		I_B				=> vga_b_s & vga_b_s,
 		I_BLANK			=> vga_blank_s,
 		I_HSYNC			=> vga_hsync_n_s,
 		I_VSYNC			=> vga_vsync_n_s,
@@ -841,5 +846,6 @@ begin
 	-- LED
 --	led_o		<= not sd_cs_n_s;
 	led2_o	<= '0';
+	
 
 end architecture;

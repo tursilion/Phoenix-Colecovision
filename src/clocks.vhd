@@ -47,6 +47,7 @@ entity clocks is
 		clock_i			: in  std_logic;				-- 21 MHz
 		por_i				: in  std_logic;
 		clock_vdp_en_o	: out std_logic;
+		clock_wsg_en_o	: out std_logic;
 		clock_5m_en_o	: out std_logic;
 		clock_3m_en_o	: out std_logic
 	);
@@ -56,8 +57,9 @@ architecture rtl of clocks is
 
 	-- Clocks
 	signal clk1_cnt_q			: unsigned(1 downto 0);
-	signal clk2_cnt_q			: unsigned(1 downto 0);
+	signal clk2_cnt_q			: unsigned(2 downto 0);
 	signal clock_vdp_en_s	: std_logic								:= '0';	-- 10.7 MHz 
+	signal clock_wsg_en_s	: std_logic								:= '0';
 	signal clock_5m_en_s		: std_logic								:= '0';
 	signal clock_3m_en_s		: std_logic								:= '0';
 
@@ -107,7 +109,7 @@ begin
 		elsif rising_edge(clock_i) then
 			if clock_vdp_en_s = '1' then
 				if clk2_cnt_q = 0 then
-					clk2_cnt_q <= "10";
+					clk2_cnt_q <= "101";
 				else
 					clk2_cnt_q <= clk2_cnt_q - 1;
 				end if;
@@ -115,10 +117,12 @@ begin
 		end if;
 	end process;
 
-	clock_3m_en_s <= clock_vdp_en_s	when	clk2_cnt_q = 0	else	'0';
+	clock_3m_en_s  <= clock_vdp_en_s	when (clk2_cnt_q = "000") or (clk2_cnt_q = "011") else '0';
+	clock_wsg_en_s <= clock_vdp_en_s	when clk2_cnt_q = "000" else '0';
 
 	--
 	clock_vdp_en_o	<= clock_vdp_en_s;
+	clock_wsg_en_o	<= clock_wsg_en_s;
 	clock_5m_en_o	<= clock_5m_en_s;
 	clock_3m_en_o	<= clock_3m_en_s;
 

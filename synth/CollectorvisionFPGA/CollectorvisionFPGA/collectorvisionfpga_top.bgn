@@ -6,7 +6,7 @@ C:\Xilinx\14.7\ISE_DS\ISE\.
 csg324, speed -2
 Opened constraints file CollectorvisionFPGA_top.pcf.
 
-Wed Aug 22 15:17:45 2018
+Thu Aug 23 21:58:37 2018
 
 C:\Xilinx\14.7\ISE_DS\ISE\bin\nt\unwrapped\bitgen.exe -filter iseconfig/filter.filter -intstyle ise -w -g DebugBitstream:No -g Binary:no -g CRC:Enable -g Reset_on_err:No -g ConfigRate:2 -g ProgPin:PullUp -g TckPin:PullUp -g TdiPin:PullUp -g TdoPin:PullUp -g TmsPin:PullUp -g UnusedPin:PullDown -g UserID:0xFFFFFFFF -g ExtMasterCclk_en:Yes -g ExtMasterCclk_divide:8 -g SPI_buswidth:4 -g TIMER_CFG:0xFFFF -g multipin_wakeup:No -g StartUpClk:CClk -g DONE_cycle:4 -g GTS_cycle:5 -g GWE_cycle:6 -g LCK_cycle:NoWait -g Security:None -g DonePipe:Yes -g DriveDone:No -g en_sw_gsr:No -g drive_awake:No -g sw_clk:Startupclk -g sw_gwe_cycle:5 -g sw_gts_cycle:4 CollectorvisionFPGA_top.ncd 
 
@@ -131,16 +131,19 @@ There were 0 CONFIG constraint(s) processed from CollectorvisionFPGA_top.pcf.
 
 
 Running DRC.
+WARNING:PhysDesignRules:372 - Gated clock. Clock net por_n_s_inv is sourced by a
+   combinatorial pin. This is not good design practice. Use the CE pin to
+   control the loading of data into the flip-flop.
 WARNING:PhysDesignRules:372 - Gated clock. Clock net
    ps2if_inst/ps2kbd_inst/Rst_n_inv is sourced by a combinatorial pin. This is
    not good design practice. Use the CE pin to control the loading of data into
    the flip-flop.
-WARNING:PhysDesignRules:372 - Gated clock. Clock net por_n_s_inv is sourced by a
-   combinatorial pin. This is not good design practice. Use the CE pin to
+WARNING:PhysDesignRules:372 - Gated clock. Clock net vg/WSG/BUSADR is sourced by
+   a combinatorial pin. This is not good design practice. Use the CE pin to
    control the loading of data into the flip-flop.
-WARNING:PhysDesignRules:367 - The signal <vg/cpu/u0/Regs/Mram_RegsL11_RAMD_D1_O>
-   is incomplete. The signal does not drive any load pins in the design.
 WARNING:PhysDesignRules:367 - The signal <vg/cpu/u0/Regs/Mram_RegsH11_RAMD_D1_O>
+   is incomplete. The signal does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal <vg/cpu/u0/Regs/Mram_RegsL11_RAMD_D1_O>
    is incomplete. The signal does not drive any load pins in the design.
 WARNING:PhysDesignRules:2212 - Async clocking for BRAM (comp
    vga/frbuff/Mram_ram_q10) port(s) with READ_FIRST mode has certain
@@ -270,7 +273,7 @@ WARNING:PhysDesignRules:2212 - Async clocking for BRAM (comp
    including A4 cannot be same. When any one port is 36 bits wide, A13-7
    including A5 cannot be the same. Violating this restriction may result in the
    incorrect operation of the BRAM.
-DRC detected 0 errors and 20 warnings.  Please see the previously displayed
+DRC detected 0 errors and 21 warnings.  Please see the previously displayed
 individual error or warning messages for more details.
 Creating bit map...
 Saving bit stream in "collectorvisionfpga_top.bit".

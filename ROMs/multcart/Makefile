@@ -1,4 +1,4 @@
-CP = copy
+CP = cp
 RM = rm -f
 CC = sdcc
 AS = sdasz80
@@ -15,11 +15,15 @@ LDFLAGS = -mz80 --code-loc 0x8100 --data-loc 0x7000 --no-std-crt0
 _OBJS = crt0.rel mmc.rel pff.rel coleco.rel main.rel
 OBJS = $(patsubst %,$(ODIR)/%,$(_OBJS))
 
-all: dir MULTCART.ROM
+.ONESHELL:
 
-MULTCART.ROM: MULTCART.ihx
+all: dir multcart.ROM
+
+multcart.ROM: multcart.ihx
 	$(H2B) -e ROM $<
-	fillfile $@ 16384
+#	fillfile $@ 16384
+	pad $@ $@.pad 16384 255
+	mv -f $@.pad $@
 
 multcart.ihx: $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS)
@@ -29,8 +33,8 @@ multcart.ihx: $(OBJS)
 clean:
 	$(RM) $(ODIR)/* *.map *.lk *.noi *.bin *.ihx
 
-dir:
-	if not exist obj mkdir obj
+#dir:
+#	if not exist obj mkdir obj
 
 $(ODIR)/%.rel: $(SDIR)/%.s
 	$(AS) -o $@ $<
