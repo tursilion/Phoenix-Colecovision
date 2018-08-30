@@ -43,7 +43,9 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
+use work.vdp18_col_pack.all;
 
 entity zxuno_top is
 	port (
@@ -111,7 +113,6 @@ entity zxuno_top is
 end entity;
 
 use work.cv_keys_pack.all;
-use work.vdp18_col_pack.all;
 
 architecture behavior of zxuno_top is
 
@@ -121,6 +122,7 @@ architecture behavior of zxuno_top is
 	signal clock_vdp_en_s	: std_logic;
 	signal clock_5m_en_s		: std_logic;
 	signal clock_3m_en_s		: std_logic;
+	signal clock_wsg_en_s	: std_logic;
 	signal clock_vga_s		: std_logic;
 	signal clock_hdmi_s		: std_logic;
 
@@ -130,6 +132,14 @@ architecture behavior of zxuno_top is
 	signal reset_s				: std_logic;
 	signal soft_reset_s		: std_logic;
 	signal core_reload_s		: std_logic;
+
+	-- Internal BIOS
+	signal bios_addr_s		: std_logic_vector(12 downto 0);		-- 8K
+	signal d_from_bios_s		: std_logic_vector( 7 downto 0);
+	signal bios_ce_s			: std_logic;
+	signal bios_we_s			: std_logic;
+
+	signal d_to_cv_s			: std_logic_vector( 7 downto 0);
 
 	-- RAM memory
 	signal ram_addr_s			: std_logic_vector(16 downto 0);		-- 128K
@@ -193,6 +203,8 @@ architecture behavior of zxuno_top is
 	signal ctrl_p7_s			: std_logic_vector( 2 downto 1);
 	signal ctrl_p8_s			: std_logic_vector( 2 downto 1);
 	signal ctrl_p9_s			: std_logic_vector( 2 downto 1);
+
+	-- SNES
 	signal but_a_s				: std_logic_vector( 1 downto 0);
 	signal but_b_s				: std_logic_vector( 1 downto 0);
 	signal but_x_s				: std_logic_vector( 1 downto 0);
@@ -228,7 +240,8 @@ begin
 		por_i				=> not por_n_s,
 		clock_vdp_en_o	=> clock_vdp_en_s,
 		clock_5m_en_o	=> clock_5m_en_s,
-		clock_3m_en_o	=> clock_3m_en_s
+		clock_3m_en_o	=> clock_3m_en_s,
+		clock_wsg_en_o	=> clock_wsg_en_s
 	);
 
 	-- The Colecovision
@@ -242,6 +255,7 @@ begin
 		clk_en_10m7_i		=> clock_vdp_en_s,
 		clk_en_5m37_i		=> clock_5m_en_s,
 		clk_en_3m58_i		=> clock_3m_en_s,
+		clk_en_1m79_i		=> clock_wsg_en_s,
 		reset_i				=> reset_s,
 		por_n_i				=> por_n_s,
 		-- Controller Interface
@@ -259,7 +273,7 @@ begin
 		ram_ce_o				=> ram_ce_s,
 		ram_we_o				=> ram_we_s,
 		ram_oe_o				=> ram_oe_s,
-		ram_data_i			=> d_from_ram_s,
+		ram_data_i			=> d_to_cv_s,
 		ram_data_o			=> d_to_ram_s,
 		-- Video RAM Interface
 		vram_addr_o			=> vram_addr_s,
@@ -293,9 +307,21 @@ begin
 		spi_mosi_o			=> sd_mosi_o,
 		spi_sclk_o			=> sd_sclk_o,
 		spi_cs_n_o			=> sd_cs_n_s,
+		sd_cd_n_i         => '0',
 		-- DEBUG
 		D_cpu_addr			=> open--D_cpu_addr
 	 );
+
+	-- Internal BIOS
+	bios: entity work.colecobios
+	port map (
+		clock_i		=> clock_master_s,
+		addr_wr_i	=> bios_addr_s,
+		data_i		=> d_to_ram_s,
+		we_i			=> bios_we_s,
+		addr_rd_i	=> bios_addr_s,
+		data_o		=> d_from_bios_s
+	);
 
 	-- SRAM
 	sram0: entity work.dpSRAM_5128
@@ -383,9 +409,18 @@ begin
 	audio_s		<= std_logic_vector(unsigned(audio_signed_s + 128));
 	dac_l_o		<= audio_dac_s;
 	dac_r_o		<= audio_dac_s;
-
 	sd_cs_n_o	<= sd_cs_n_s;
 	led_o			<= not sd_cs_n_s;
+
+	-- Memory
+	bios_addr_s	<= ram_addr_s(12 downto 0);
+	bios_ce_s	<= '1' when ram_addr_s(16 downto 13) = "0000" and ram_ce_s = '1'	else '0';
+	bios_we_s	<= '1' when bios_ce_s = '1' and ram_we_s = '1'							else '0';
+
+	d_to_cv_s	<= d_from_bios_s when bios_ce_s = '1'		else d_from_ram_s;
+	
+	
+	
 
 	-- Controller
 	-----------------------------------------------------------------------------
@@ -588,6 +623,7 @@ begin
 	port map (
 		clock_pixel_i		=> clock_vga_s,
 		clock_tdms_i		=> clock_hdmi_s,
+		clock_tdms_n_i		=> not clock_hdmi_s,
 		red_i					=> tdms_r_s,
 		green_i				=> tdms_g_s,
 		blue_i				=> tdms_b_s,

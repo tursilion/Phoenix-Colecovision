@@ -312,9 +312,9 @@ begin
 	audio_signed_o	<= AUDIO_SUM(8 downto 1);
 
 	-----------------------------------------------------------------------------
-	-- SEX 7289 "COURTNEY" Wavetable Sound Generator
+	-- SEX7264 "COURTNEY" Wavetable Sound Generator
 	-----------------------------------------------------------------------------
-	WSG : ENTITY work.SEX7289
+	WSG : ENTITY work.SEX7264
 	port map
 	(
 		 CLK				=> clock_i      ,
