@@ -1,4 +1,4 @@
--- SEX 7264 "COURTNEY"
+-- SEX7264 COURTNEY
 -- AY-3-8913-COMPATIBLE WSG
 -- DEVISED BY MADONNA MARK III
 -- (C) 2018 SILICON SEX
@@ -29,10 +29,10 @@ ENTITY SEX7264 IS
 --		 GND															-- 19
 		 CLK			: IN  STD_LOGIC						 ;	-- 20
 		 CLKENA		: IN  STD_LOGIC						 ;	-- 20*
-		nRESET		: IN  STD_LOGIC						 ;	-- 21
-		nA9			: IN  STD_LOGIC := '0'				 ;	-- 22 ON-CHIP PULL DOWN
-		 A8			: IN  STD_LOGIC := '1'				 ;	-- 23 ON-CHIP PULL UP
-		nCHIP_SELECT: IN  STD_LOGIC := '0'				 ;	-- 24 ON-CHIP PULL DOWN
+		nRESET      : IN  STD_LOGIC := '1'            ; -- 21 ON-CHIP PULL-UP
+		nA9			: IN  STD_LOGIC := '0'				 ;	-- 22 ON-CHIP PULL-DOWN
+		 A8			: IN  STD_LOGIC := '1'				 ;	-- 23 ON-CHIP PULL-UP
+		nCHIP_SELECT: IN  STD_LOGIC := '0'				 ;	-- 24 ON-CHIP PULL-DOWN
 
 		 LEGACY		: IN  STD_LOGIC := '1'				 ;	-- 0: NATIVE | 1: LEGACY
 		 DIGITAL_MIX: OUT UNSIGNED        (7 DOWNTO 0)	-- MIXED AUDIO
@@ -82,12 +82,16 @@ ARCHITECTURE RTL OF SEX7264 IS
 	SIGNAL CLKENAN	: STD_LOGIC;
 	SIGNAL CLKENAT	: STD_LOGIC;
 
-	SIGNAL DCONCNT	: UNSIGNED(4 DOWNTO 0);
-	SIGNAL DCONDAT	: STD_LOGIC_VECTOR(16 DOWNTO 0) := (OTHERS => '0');
-	SIGNAL DCONOUT	: STD_LOGIC;
+--	TONE DCO'S
 
 	SIGNAL DCOTCNT	: PERARRAY := (OTHERS => (OTHERS => '0'));
 	SIGNAL DCOTOUT	: STD_LOGIC_VECTOR( 3 DOWNTO 1) := "000";
+
+--	NOISE DCO
+
+	SIGNAL DCONCNT	: UNSIGNED(7 DOWNTO 0);
+	SIGNAL DCONDAT	: STD_LOGIC_VECTOR(16 DOWNTO 0) := (OTHERS => '0');
+	SIGNAL DCONOUT	: STD_LOGIC;
 
 	SIGNAL ENVSET	: STD_LOGIC;
 	SIGNAL ENVAMP	: STD_LOGIC_VECTOR( 4 DOWNTO 0);
@@ -97,10 +101,12 @@ ARCHITECTURE RTL OF SEX7264 IS
 	SIGNAL ENVINC	: STD_LOGIC;
 	SIGNAL ENVRES	: STD_LOGIC;
 
+--	INTERNAL REGISTERS
+
 	SIGNAL DCOAPER	: STD_LOGIC_VECTOR(11 DOWNTO 0);
 	SIGNAL DCOBPER	: STD_LOGIC_VECTOR(11 DOWNTO 0);
 	SIGNAL DCOCPER	: STD_LOGIC_VECTOR(11 DOWNTO 0);
-	SIGNAL DCONPER	: STD_LOGIC_VECTOR( 4 DOWNTO 0);
+	SIGNAL DCONPER	: STD_LOGIC_VECTOR( 7 DOWNTO 0);
 	SIGNAL DCOENA  : STD_LOGIC_VECTOR( 7 DOWNTO 0);
 	SIGNAL DCOAAMP : STD_LOGIC_VECTOR( 4 DOWNTO 0);
 	SIGNAL DCOBAMP : STD_LOGIC_VECTOR( 4 DOWNTO 0);
@@ -177,33 +183,52 @@ BEGIN
 			DCOAPER  <=     "111111111111";
 			DCOBPER  <=     "111111111111";
 			DCOCPER  <=     "111111111111";
-			DCONPER  <=            "11111";
+			DCONPER  <=         "00000000";
 			DCOENA   <=         "11111111";
 			DCOAAMP  <=            "11111";
 			DCOBAMP  <=            "11111";
 			DCOCAMP  <=            "11111";
 			ENVPER   <= "1111111111111111";
 			ENVSHAPE <=             "1111";
-
-			ENVRES   <= '0';
+			ENVRES   <=                '0';
 		ELSIF FALLING_EDGE(BUSENAW) THEN
-			CASE REGADR(3 DOWNTO 0) IS
-				WHEN X"0"   => DCOAPER ( 7 DOWNTO 0) <= DAI            ;
-				WHEN X"1"   => DCOAPER (11 DOWNTO 8) <= DAI(3 DOWNTO 0);
-				WHEN X"2"   => DCOBPER ( 7 DOWNTO 0) <= DAI            ;
-				WHEN X"3"   => DCOBPER (11 DOWNTO 8) <= DAI(3 DOWNTO 0);
-				WHEN X"4"   => DCOCPER ( 7 DOWNTO 0) <= DAI            ;
-				WHEN X"5"   => DCOCPER (11 DOWNTO 8) <= DAI(3 DOWNTO 0);
-				WHEN X"6"   => DCONPER               <= DAI(4 DOWNTO 0);
-				WHEN X"7"   => DCOENA                <= DAI            ;
-				WHEN X"8"   => DCOAAMP               <= DAI(4 DOWNTO 0);
-				WHEN X"9"   => DCOBAMP               <= DAI(4 DOWNTO 0);
-				WHEN X"A"   => DCOCAMP               <= DAI(4 DOWNTO 0);
-				WHEN X"B"   => ENVPER  ( 7 DOWNTO 0) <= DAI            ;
-				WHEN X"C"   => ENVPER  (15 DOWNTO 8) <= DAI            ;
-				WHEN X"D"   => ENVSHAPE              <= DAI(3 DOWNTO 0); ENVRES <= NOT ENVSET;
-				WHEN OTHERS => NULL;
-			END CASE;
+			IF LEGACY = '1' THEN
+				CASE REGADR(3 DOWNTO 0) IS
+					WHEN X"0"   => DCOAPER ( 7 DOWNTO 0) <= DAI            ;
+					WHEN X"1"   => DCOAPER (11 DOWNTO 8) <= DAI(3 DOWNTO 0);
+					WHEN X"2"   => DCOBPER ( 7 DOWNTO 0) <= DAI            ;
+					WHEN X"3"   => DCOBPER (11 DOWNTO 8) <= DAI(3 DOWNTO 0);
+					WHEN X"4"   => DCOCPER ( 7 DOWNTO 0) <= DAI            ;
+					WHEN X"5"   => DCOCPER (11 DOWNTO 8) <= DAI(3 DOWNTO 0);
+					WHEN X"6"   => DCONPER               <= "000" & DAI(4 DOWNTO 0);
+					WHEN X"7"   => DCOENA                <= DAI            ;
+					WHEN X"8"   => DCOAAMP               <= DAI(4 DOWNTO 0);
+					WHEN X"9"   => DCOBAMP               <= DAI(4 DOWNTO 0);
+					WHEN X"A"   => DCOCAMP               <= DAI(4 DOWNTO 0);
+					WHEN X"B"   => ENVPER  ( 7 DOWNTO 0) <= DAI            ;
+					WHEN X"C"   => ENVPER  (15 DOWNTO 8) <= DAI            ;
+					WHEN X"D"   => ENVSHAPE              <= DAI(3 DOWNTO 0); ENVRES <= NOT ENVSET;
+					WHEN OTHERS => NULL;
+				END CASE;
+			ELSE
+				CASE REGADR(3 DOWNTO 0) IS
+					WHEN X"0"   => DCOAPER ( 7 DOWNTO 0) <= DAI            ;
+					WHEN X"1"   => DCOAPER (11 DOWNTO 8) <= DAI(3 DOWNTO 0);
+					WHEN X"2"   => DCOBPER ( 7 DOWNTO 0) <= DAI            ;
+					WHEN X"3"   => DCOBPER (11 DOWNTO 8) <= DAI(3 DOWNTO 0);
+					WHEN X"4"   => DCOCPER ( 7 DOWNTO 0) <= DAI            ;
+					WHEN X"5"   => DCOCPER (11 DOWNTO 8) <= DAI(3 DOWNTO 0);
+					WHEN X"6"   => DCONPER               <= DAI(7 DOWNTO 0);
+					WHEN X"7"   => DCOENA                <= DAI            ;
+					WHEN X"8"   => DCOAAMP               <= DAI(4 DOWNTO 0);
+					WHEN X"9"   => DCOBAMP               <= DAI(4 DOWNTO 0);
+					WHEN X"A"   => DCOCAMP               <= DAI(4 DOWNTO 0);
+					WHEN X"B"   => ENVPER  ( 7 DOWNTO 0) <= DAI            ;
+					WHEN X"C"   => ENVPER  (15 DOWNTO 8) <= DAI            ;
+					WHEN X"D"   => ENVSHAPE              <= DAI(3 DOWNTO 0); ENVRES <= NOT ENVSET;
+					WHEN OTHERS => NULL;
+				END CASE;
+			END IF;
 		END IF;
 	END PROCESS;
 
@@ -220,7 +245,7 @@ BEGIN
 				WHEN X"3"   => DAO <= "0000" & DCOBPER (11 DOWNTO 8);
 				WHEN X"4"   => DAO <=          DCOCPER ( 7 DOWNTO 0);
 				WHEN X"5"   => DAO <= "0000" & DCOCPER (11 DOWNTO 8);
-				WHEN X"6"   => DAO <= "000"  & DCONPER              ;
+				WHEN X"6"   => DAO <=          DCONPER              ;
 				WHEN X"7"   => DAO <=          DCOENA               ;
 				WHEN X"8"   => DAO <= "000"  & DCOAAMP              ;
 				WHEN X"9"   => DAO <= "000"  & DCOBAMP              ;
@@ -256,12 +281,12 @@ BEGIN
 --	NOISE DCO
 
 	PROCESS (CLK)
-		VARIABLE DCONCMP  : UNSIGNED(4 DOWNTO 0);
+		VARIABLE DCONCMP  : UNSIGNED(7 DOWNTO 0);
 		VARIABLE DCONDAT0 : STD_LOGIC           ;
 	BEGIN
 		IF RISING_EDGE(CLK) THEN
-			IF DCONPER  = "00000" THEN
-				DCONCMP := "00000";
+			IF DCONPER  = "00000000" THEN
+				DCONCMP := "00000000";
 			ELSE
 				DCONCMP := UNSIGNED(DCONPER) - 1;
 			END IF;
@@ -275,7 +300,7 @@ BEGIN
 			IF CLKENA = '1' THEN
 				IF CLKENAN = '1' THEN
 					IF DCONCNT >= DCONCMP THEN
-						DCONCNT <= "00000";
+						DCONCNT <= "00000000";
 						DCONDAT <= (DCONDAT(0) XOR DCONDAT(2) XOR DCONDAT0) & DCONDAT(16 DOWNTO 1);
 					ELSE
 						DCONCNT <= DCONCNT + 1;

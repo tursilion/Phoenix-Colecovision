@@ -312,20 +312,20 @@ begin
 	audio_signed_o	<= AUDIO_SUM(8 downto 1);
 
 	-----------------------------------------------------------------------------
-	-- SEX7264 "COURTNEY" Wavetable Sound Generator
+	-- COURTNEY (SEX 7264) WAVETABLE SOUND GENERATOR (WSG)
 	-----------------------------------------------------------------------------
 	WSG : ENTITY work.SEX7264
-	port map
+	PORT MAP
 	(
-		 CLK				=> clock_i      ,
-		 CLKENA			=> clk_en_3m58_i, -- WARNING
-		nRESET			=> reset_n_s    ,
-		 BDIR				=> WSG_BDIR     ,
-		 BC1				=> WSG_BC1      ,
-		 DAI				=> d_from_cpu_s ,
-		 DAO				=> d_from_wsg_s ,
-
-		 DIGITAL_MIX	=> AUDIO_WSG
+		 CLK         => clock_i      ,
+		 CLKENA      => clk_en_3m58_i, -- WARNING
+		nRESET       => reset_n_s    ,
+		 BDIR        => WSG_BDIR     ,
+		 BC1         => WSG_BC1      ,
+		 DAI         => d_from_cpu_s ,
+		 DAO         => d_from_wsg_s ,
+		 LEGACY      => '0'          ,
+		 DIGITAL_MIX => AUDIO_WSG
 	)
 	;
 	-----------------------------------------------------------------------------
