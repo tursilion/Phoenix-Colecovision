@@ -174,6 +174,11 @@ architecture Behavior of colecovision is
 
 	-- SN76489 signal
 	signal audio_s				: signed(7 downto 0);
+	signal psg_ready_s      : std_logic;
+	signal psg_we_n_s			: std_logic;
+
+	-- COURTNEY signal
+	signal wsg_native_q		: std_logic;
 
 	signal AUDIO_WSG			: unsigned(7 downto 0);
 	signal AUDIO_EX			: signed(7 downto 0);
@@ -184,9 +189,6 @@ architecture Behavior of colecovision is
 	signal WSG_CS           : std_logic;
 	signal WSG_BDIR         : std_logic;
 	signal WSG_BC1          : std_logic;
-
-	signal psg_ready_s      : std_logic;
-	signal psg_we_n_s			: std_logic;
 
 	-- Controller signals
 	signal d_from_ctrl_s    : std_logic_vector( 7 downto 0);
@@ -324,7 +326,7 @@ begin
 		 BC1         => WSG_BC1      ,
 		 DAI         => d_from_cpu_s ,
 		 DAO         => d_from_wsg_s ,
-		 LEGACY      => '0'          ,
+		 NATIVE      => wsg_native_q ,
 		 DIGITAL_MIX => AUDIO_WSG
 	)
 	;
@@ -412,7 +414,7 @@ begin
 	--                                 6 5432 1098 7654 3210
 	--                                 - ---- ---- ---- ----
 	-- 00000 - 01FFF = SGM RAM   ( 8K) 0 000x xxxx xxxx xxxx
-	-- 02000 - 07FFF = RAM       (24K) 0 001x xxxx xxxx xxxx
+	-- 02000 - 07FFF = RAM       (24K) 0 0ppp xxxx xxxx xxxx ppp = 010 to 111
 	-- 08000 - 0FFFF = Multicart (32K) 0 1xxx xxxx xxxx xxxx
 	-- 10000 - 17FFF = Cartridge (32K) 1 0xxx xxxx xxxx xxxx
 	-- 18000 - 19FFF = BIOS      ( 8K) 1 100x xxxx xxxx xxxx
@@ -422,8 +424,8 @@ begin
 	--  6543210
 		"1100"    & cpu_addr_s(12 downto 0)	when bios_ce_s = '1'											else	-- 0000-1FFF
 --		"0001"    & cpu_addr_s(12 downto 0)	when ram_ce_s = '1'	and multcart_q = '1'	and exp_ram_bs_s = '0'		   else	-- 8K linear RAM
-----	"00"      & cpu_addr_s(14 downto 0)	when ram_ce_s = '1'																		else	-- 24K linear RAM
-		"000"     & cpu_addr_s(13 downto 0)	when ram_ce_s = '1'																		else	-- 24K linear RAM
+		"00"      & cpu_addr_s(14 downto 0)	when ram_ce_s = '1'																		else	-- 24K linear RAM
+----	"000"     & cpu_addr_s(13 downto 0)	when ram_ce_s = '1'																		else	-- 24K linear RAM
 --		"0001100" & cpu_addr_s( 9 downto 0)	when ram_ce_s = '1'	and multcart_q = '0' and exp_ram_bs_s = '0'		   else	-- 1K mirrored RAM
 		"01"      & cpu_addr_s(14 downto 0)	when cart_ce_s = '1' and loader_q = '1'											else
 		"01"      & cpu_addr_s(14 downto 0)	when cart_ce_s = '1' and multcart_q = '1' and cart_oe_s = '1'				else
@@ -478,13 +480,16 @@ begin
 	process (por_n_i, reset_i, clock_i)
 	begin
 		if por_n_i = '0' then
+			wsg_native_q <= '0';
 			ext_cart_en_q	<= '1';
 			multcart_q <= '1';
 			loader_q	  <= '1';
 		elsif reset_i = '1' then
+			wsg_native_q <= '0';
 			multcart_q <= '1';
 		elsif rising_edge(clock_i) then
 			if clk_en_3m58_i = '1' and cfg_port_cs_s = '1' then
+				wsg_native_q	<= d_from_cpu_s(3);
 				ext_cart_en_q	<= d_from_cpu_s(2);
 				multcart_q <= d_from_cpu_s(1);
 				loader_q	  <= d_from_cpu_s(0);
