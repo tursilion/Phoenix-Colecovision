@@ -408,19 +408,22 @@ begin
 	cart_we_s		<= (not wr_n_s) and cart_ce_s		when multcart_q = '1'	else '0';
 
 	-- RAM map
-	--														1111111
-	--														65432109876543210
-	-- 00000 - 01FFF = BIOS (8K)					0000xxxxxxxxxxxxx
-	-- 02000 - 03FFF = RAM  (8K)					0001xxxxxxxxxxxxx
-	-- 08000 - 0FFFF = Multicart (32K)			01xxxxxxxxxxxxxxx
-	-- 10000 - 17FFF = Cartridge (32K)			10xxxxxxxxxxxxxxx
+	--                                 1 1111 11
+	--                                 6 5432 1098 7654 3210
+	--                                 - ---- ---- ---- ----
+	-- 00000 - 01FFF = SGM RAM   ( 8K) 0 000x xxxx xxxx xxxx
+	-- 02000 - 07FFF = RAM       (24K) 0 001x xxxx xxxx xxxx
+	-- 08000 - 0FFFF = Multicart (32K) 0 1xxx xxxx xxxx xxxx
+	-- 10000 - 17FFF = Cartridge (32K) 1 0xxx xxxx xxxx xxxx
+	-- 18000 - 19FFF = BIOS      ( 8K) 1 100x xxxx xxxx xxxx
 	--
 	ram_addr_o		<=
 	--  1111111
 	--  6543210
-		"0000"    & cpu_addr_s(12 downto 0)	when bios_ce_s = '1'											else	-- 0000-1FFF
+		"1100"    & cpu_addr_s(12 downto 0)	when bios_ce_s = '1'											else	-- 0000-1FFF
 --		"0001"    & cpu_addr_s(12 downto 0)	when ram_ce_s = '1'	and multcart_q = '1'	and exp_ram_bs_s = '0'		   else	-- 8K linear RAM
-		"00"      & cpu_addr_s(14 downto 0)	when ram_ce_s = '1'																		else	-- 24K linear RAM
+----	"00"      & cpu_addr_s(14 downto 0)	when ram_ce_s = '1'																		else	-- 24K linear RAM
+		"000"     & cpu_addr_s(13 downto 0)	when ram_ce_s = '1'																		else	-- 24K linear RAM
 --		"0001100" & cpu_addr_s( 9 downto 0)	when ram_ce_s = '1'	and multcart_q = '0' and exp_ram_bs_s = '0'		   else	-- 1K mirrored RAM
 		"01"      & cpu_addr_s(14 downto 0)	when cart_ce_s = '1' and loader_q = '1'											else
 		"01"      & cpu_addr_s(14 downto 0)	when cart_ce_s = '1' and multcart_q = '1' and cart_oe_s = '1'				else
