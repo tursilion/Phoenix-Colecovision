@@ -1,0 +1,2833 @@
+//! **************************************************************************
+// Written by: Map P.20131013 on Sun Sep 02 14:55:33 2018
+//! **************************************************************************
+
+SCHEMATIC START;
+COMP "vga_vsync_n_o" LOCATE = SITE "V11" LEVEL 1;
+COMP "vga_b_o<0>" LOCATE = SITE "R3" LEVEL 1;
+COMP "vga_b_o<1>" LOCATE = SITE "T3" LEVEL 1;
+COMP "vga_b_o<2>" LOCATE = SITE "F5" LEVEL 1;
+COMP "vga_b_o<3>" LOCATE = SITE "T4" LEVEL 1;
+COMP "ps2_data_io" LOCATE = SITE "B4" LEVEL 1;
+COMP "hdmi_n_o<0>" LOCATE = SITE "V6" LEVEL 1;
+COMP "hdmi_n_o<1>" LOCATE = SITE "V7" LEVEL 1;
+COMP "hdmi_n_o<2>" LOCATE = SITE "V8" LEVEL 1;
+COMP "vga_g_o<0>" LOCATE = SITE "V4" LEVEL 1;
+COMP "hdmi_n_o<3>" LOCATE = SITE "V5" LEVEL 1;
+COMP "vga_g_o<1>" LOCATE = SITE "T5" LEVEL 1;
+COMP "vga_g_o<2>" LOCATE = SITE "R5" LEVEL 1;
+COMP "vga_g_o<3>" LOCATE = SITE "R7" LEVEL 1;
+COMP "hdmi_p_o<0>" LOCATE = SITE "T6" LEVEL 1;
+COMP "hdmi_p_o<1>" LOCATE = SITE "U7" LEVEL 1;
+COMP "hdmi_p_o<2>" LOCATE = SITE "U8" LEVEL 1;
+COMP "hdmi_p_o<3>" LOCATE = SITE "U5" LEVEL 1;
+COMP "vga_r_o<0>" LOCATE = SITE "T7" LEVEL 1;
+COMP "vga_r_o<1>" LOCATE = SITE "T8" LEVEL 1;
+COMP "vga_r_o<2>" LOCATE = SITE "R8" LEVEL 1;
+COMP "vga_r_o<3>" LOCATE = SITE "V9" LEVEL 1;
+COMP "dac_l_o" LOCATE = SITE "P1" LEVEL 1;
+COMP "dac_r_o" LOCATE = SITE "P2" LEVEL 1;
+COMP "joy1_p1_i" LOCATE = SITE "A15" LEVEL 1;
+COMP "joy1_p2_i" LOCATE = SITE "A14" LEVEL 1;
+COMP "joy1_p3_i" LOCATE = SITE "B12" LEVEL 1;
+COMP "joy1_p4_i" LOCATE = SITE "A12" LEVEL 1;
+COMP "snesjoy_clock_o" LOCATE = SITE "A2" LEVEL 1;
+COMP "joy1_p6_i" LOCATE = SITE "B14" LEVEL 1;
+COMP "joy1_p7_i" LOCATE = SITE "C14" LEVEL 1;
+COMP "joy1_p9_i" LOCATE = SITE "B11" LEVEL 1;
+COMP "joy2_p1_i" LOCATE = SITE "A11" LEVEL 1;
+COMP "joy2_p2_i" LOCATE = SITE "A10" LEVEL 1;
+COMP "joy2_p3_i" LOCATE = SITE "A9" LEVEL 1;
+COMP "joy2_p4_i" LOCATE = SITE "B8" LEVEL 1;
+COMP "joy2_p6_i" LOCATE = SITE "C11" LEVEL 1;
+COMP "joy2_p7_i" LOCATE = SITE "B9" LEVEL 1;
+COMP "joy2_p9_i" LOCATE = SITE "A8" LEVEL 1;
+COMP "cart_dir_o" LOCATE = SITE "N1" LEVEL 1;
+COMP "snesjoy_latch_o" LOCATE = SITE "B3" LEVEL 1;
+COMP "pal_clk_en_o" LOCATE = SITE "H5" LEVEL 1;
+COMP "flash_cs_n_o" LOCATE = SITE "V3" LEVEL 1;
+COMP "sram_addr_o<10>" LOCATE = SITE "J16" LEVEL 1;
+COMP "sram_addr_o<11>" LOCATE = SITE "J18" LEVEL 1;
+COMP "sram_addr_o<12>" LOCATE = SITE "H17" LEVEL 1;
+COMP "sram_addr_o<20>" LOCATE = SITE "C18" LEVEL 1;
+COMP "sram_addr_o<13>" LOCATE = SITE "H18" LEVEL 1;
+COMP "sram_addr_o<14>" LOCATE = SITE "G16" LEVEL 1;
+COMP "sram_addr_o<15>" LOCATE = SITE "E18" LEVEL 1;
+COMP "sram_addr_o<16>" LOCATE = SITE "D17" LEVEL 1;
+COMP "sram_addr_o<17>" LOCATE = SITE "D18" LEVEL 1;
+COMP "sram_addr_o<18>" LOCATE = SITE "C17" LEVEL 1;
+COMP "flash_hold_o" LOCATE = SITE "V14" LEVEL 1;
+COMP "sram_addr_o<19>" LOCATE = SITE "K18" LEVEL 1;
+COMP "flash_miso_i" LOCATE = SITE "R13" LEVEL 1;
+COMP "flash_sclk_o" LOCATE = SITE "R15" LEVEL 1;
+COMP "sd_cd_n_i" LOCATE = SITE "C6" LEVEL 1;
+COMP "flash_mosi_o" LOCATE = SITE "T13" LEVEL 1;
+COMP "clock_50_i" LOCATE = SITE "V10" LEVEL 1;
+COMP "sd_cs_n_o" LOCATE = SITE "C5" LEVEL 1;
+COMP "sd_miso_i" LOCATE = SITE "A6" LEVEL 1;
+COMP "sd_sclk_o" LOCATE = SITE "B6" LEVEL 1;
+COMP "sd_mosi_o" LOCATE = SITE "A5" LEVEL 1;
+COMP "ps2_clk_io" LOCATE = SITE "A4" LEVEL 1;
+COMP "btn_reset_n_i" LOCATE = SITE "B2" LEVEL 1;
+COMP "flash_wp_o" LOCATE = SITE "T14" LEVEL 1;
+COMP "led2_o" LOCATE = SITE "D14" LEVEL 1;
+COMP "sram_data_io<0>" LOCATE = SITE "P18" LEVEL 1;
+COMP "sram_data_io<1>" LOCATE = SITE "P17" LEVEL 1;
+COMP "sram_data_io<2>" LOCATE = SITE "N18" LEVEL 1;
+COMP "sram_data_io<3>" LOCATE = SITE "N17" LEVEL 1;
+COMP "sram_data_io<4>" LOCATE = SITE "G18" LEVEL 1;
+COMP "sram_data_io<5>" LOCATE = SITE "F17" LEVEL 1;
+COMP "sram_data_io<6>" LOCATE = SITE "F18" LEVEL 1;
+COMP "sram_data_io<7>" LOCATE = SITE "E16" LEVEL 1;
+COMP "snesjoy_data_i" LOCATE = SITE "A3" LEVEL 1;
+COMP "stnd_o" LOCATE = SITE "H4" LEVEL 1;
+COMP "cart_addr_o<10>" LOCATE = SITE "H2" LEVEL 1;
+COMP "cart_addr_o<11>" LOCATE = SITE "G1" LEVEL 1;
+COMP "cart_addr_o<12>" LOCATE = SITE "L2" LEVEL 1;
+COMP "cart_addr_o<13>" LOCATE = SITE "J1" LEVEL 1;
+COMP "cart_addr_o<14>" LOCATE = SITE "K3" LEVEL 1;
+COMP "sram_addr_o<0>" LOCATE = SITE "U18" LEVEL 1;
+COMP "sram_addr_o<1>" LOCATE = SITE "U17" LEVEL 1;
+COMP "sram_addr_o<2>" LOCATE = SITE "T18" LEVEL 1;
+COMP "sram_addr_o<3>" LOCATE = SITE "T17" LEVEL 1;
+COMP "sram_addr_o<4>" LOCATE = SITE "P16" LEVEL 1;
+COMP "sram_addr_o<5>" LOCATE = SITE "M16" LEVEL 1;
+COMP "sram_addr_o<6>" LOCATE = SITE "K16" LEVEL 1;
+COMP "sram_addr_o<7>" LOCATE = SITE "K17" LEVEL 1;
+COMP "sram_addr_o<8>" LOCATE = SITE "L17" LEVEL 1;
+COMP "sram_addr_o<9>" LOCATE = SITE "L18" LEVEL 1;
+COMP "vga_hsync_n_o" LOCATE = SITE "U10" LEVEL 1;
+COMP "joy_p5_o" LOCATE = SITE "A7" LEVEL 1;
+COMP "joy_p8_o" LOCATE = SITE "C8" LEVEL 1;
+COMP "sram_oe_n_o" LOCATE = SITE "F16" LEVEL 1;
+COMP "cart_oe_n_o" LOCATE = SITE "N2" LEVEL 1;
+COMP "sram_we_n_o" LOCATE = SITE "M18" LEVEL 1;
+COMP "cart_en_80_n_o" LOCATE = SITE "J3" LEVEL 1;
+COMP "cart_en_A0_n_o" LOCATE = SITE "K1" LEVEL 1;
+COMP "cart_en_C0_n_o" LOCATE = SITE "D3" LEVEL 1;
+COMP "cart_addr_o<0>" LOCATE = SITE "E3" LEVEL 1;
+COMP "cart_addr_o<1>" LOCATE = SITE "F3" LEVEL 1;
+COMP "cart_addr_o<2>" LOCATE = SITE "F1" LEVEL 1;
+COMP "cart_addr_o<3>" LOCATE = SITE "H3" LEVEL 1;
+COMP "cart_en_E0_n_o" LOCATE = SITE "M1" LEVEL 1;
+COMP "cart_addr_o<4>" LOCATE = SITE "H1" LEVEL 1;
+COMP "cart_addr_o<5>" LOCATE = SITE "K2" LEVEL 1;
+COMP "cart_addr_o<6>" LOCATE = SITE "L3" LEVEL 1;
+COMP "cart_addr_o<7>" LOCATE = SITE "L1" LEVEL 1;
+COMP "cart_addr_o<8>" LOCATE = SITE "N3" LEVEL 1;
+COMP "cart_addr_o<9>" LOCATE = SITE "M3" LEVEL 1;
+COMP "cart_data_i<0>" LOCATE = SITE "D2" LEVEL 1;
+COMP "cart_data_i<1>" LOCATE = SITE "C2" LEVEL 1;
+COMP "cart_data_i<2>" LOCATE = SITE "E4" LEVEL 1;
+COMP "cart_data_i<3>" LOCATE = SITE "C1" LEVEL 1;
+COMP "cart_data_i<4>" LOCATE = SITE "D1" LEVEL 1;
+COMP "cart_data_i<5>" LOCATE = SITE "E1" LEVEL 1;
+COMP "cart_data_i<6>" LOCATE = SITE "F2" LEVEL 1;
+COMP "cart_data_i<7>" LOCATE = SITE "G3" LEVEL 1;
+PIN bios/Mram_ram_q1_pins<26> = BEL "bios/Mram_ram_q1" PINNAME CLKA;
+PIN bios/Mram_ram_q1_pins<27> = BEL "bios/Mram_ram_q1" PINNAME CLKB;
+PIN bios/Mram_ram_q4_pins<26> = BEL "bios/Mram_ram_q4" PINNAME CLKA;
+PIN bios/Mram_ram_q4_pins<27> = BEL "bios/Mram_ram_q4" PINNAME CLKB;
+PIN bios/Mram_ram_q2_pins<26> = BEL "bios/Mram_ram_q2" PINNAME CLKA;
+PIN bios/Mram_ram_q2_pins<27> = BEL "bios/Mram_ram_q2" PINNAME CLKB;
+PIN bios/Mram_ram_q3_pins<26> = BEL "bios/Mram_ram_q3" PINNAME CLKA;
+PIN bios/Mram_ram_q3_pins<27> = BEL "bios/Mram_ram_q3" PINNAME CLKB;
+PIN vga/frbuff/Mram_ram_q16_pins<28> = BEL "vga/frbuff/Mram_ram_q16" PINNAME
+        CLKA;
+PIN vga/frbuff/Mram_ram_q15_pins<28> = BEL "vga/frbuff/Mram_ram_q15" PINNAME
+        CLKA;
+PIN vga/frbuff/Mram_ram_q13_pins<28> = BEL "vga/frbuff/Mram_ram_q13" PINNAME
+        CLKA;
+PIN vga/frbuff/Mram_ram_q12_pins<28> = BEL "vga/frbuff/Mram_ram_q12" PINNAME
+        CLKA;
+PIN vga/frbuff/Mram_ram_q14_pins<28> = BEL "vga/frbuff/Mram_ram_q14" PINNAME
+        CLKA;
+PIN vga/frbuff/Mram_ram_q10_pins<28> = BEL "vga/frbuff/Mram_ram_q10" PINNAME
+        CLKA;
+PIN vga/frbuff/Mram_ram_q9_pins<28> = BEL "vga/frbuff/Mram_ram_q9" PINNAME
+        CLKA;
+PIN vga/frbuff/Mram_ram_q11_pins<28> = BEL "vga/frbuff/Mram_ram_q11" PINNAME
+        CLKA;
+PIN vga/frbuff/Mram_ram_q7_pins<28> = BEL "vga/frbuff/Mram_ram_q7" PINNAME
+        CLKA;
+PIN vga/frbuff/Mram_ram_q6_pins<28> = BEL "vga/frbuff/Mram_ram_q6" PINNAME
+        CLKA;
+PIN vga/frbuff/Mram_ram_q8_pins<28> = BEL "vga/frbuff/Mram_ram_q8" PINNAME
+        CLKA;
+PIN vga/frbuff/Mram_ram_q5_pins<28> = BEL "vga/frbuff/Mram_ram_q5" PINNAME
+        CLKA;
+PIN vga/frbuff/Mram_ram_q4_pins<28> = BEL "vga/frbuff/Mram_ram_q4" PINNAME
+        CLKA;
+PIN vga/frbuff/Mram_ram_q3_pins<28> = BEL "vga/frbuff/Mram_ram_q3" PINNAME
+        CLKA;
+PIN vga/frbuff/Mram_ram_q2_pins<28> = BEL "vga/frbuff/Mram_ram_q2" PINNAME
+        CLKA;
+PIN vga/frbuff/Mram_ram_q1_pins<28> = BEL "vga/frbuff/Mram_ram_q1" PINNAME
+        CLKA;
+PIN vg/lr/Mram_ADDR[12]_PWR_26_o_wide_mux_0_OUT4_pins<13> = BEL
+        "vg/lr/Mram_ADDR[12]_PWR_26_o_wide_mux_0_OUT4" PINNAME CLKA;
+PIN vg/lr/Mram_ADDR[12]_PWR_26_o_wide_mux_0_OUT3_pins<13> = BEL
+        "vg/lr/Mram_ADDR[12]_PWR_26_o_wide_mux_0_OUT3" PINNAME CLKA;
+PIN vg/lr/Mram_ADDR[12]_PWR_26_o_wide_mux_0_OUT2_pins<13> = BEL
+        "vg/lr/Mram_ADDR[12]_PWR_26_o_wide_mux_0_OUT2" PINNAME CLKA;
+PIN vg/lr/Mram_ADDR[12]_PWR_26_o_wide_mux_0_OUT1_pins<13> = BEL
+        "vg/lr/Mram_ADDR[12]_PWR_26_o_wide_mux_0_OUT1" PINNAME CLKA;
+TIMEGRP clock_master_s = BEL "vg/wsg_native_q" BEL "vg/cfg_page_r_0" BEL
+        "vg/cfg_page_r_1" BEL "vg/cfg_page_r_2" BEL "vg/cfg_page_r_3" BEL
+        "vg/cfg_page_r_4" BEL "vg/cfg_page_r_5" BEL "vg/cfg_page_r_6" BEL
+        "vg/cfg_page_r_7" BEL "vg/loader_q" BEL "vg/m1_wait_q" BEL
+        "vg/multcart_q" BEL "vg/ext_cart_en_q" BEL "vg/bios_ram_bs_s" BEL
+        "audioout/DACout_q" BEL "vg/psg_b/tone3_b/freq_ff_q" BEL
+        "vg/psg_b/tone3_b/f_q_0" BEL "vg/psg_b/tone3_b/f_q_1" BEL
+        "vg/psg_b/tone3_b/f_q_2" BEL "vg/psg_b/tone3_b/f_q_3" BEL
+        "vg/psg_b/tone3_b/f_q_4" BEL "vg/psg_b/tone3_b/f_q_5" BEL
+        "vg/psg_b/tone3_b/f_q_6" BEL "vg/psg_b/tone3_b/f_q_7" BEL
+        "vg/psg_b/tone3_b/f_q_8" BEL "vg/psg_b/tone3_b/f_q_9" BEL
+        "vg/psg_b/tone3_b/a_q_0" BEL "vg/psg_b/tone3_b/a_q_1" BEL
+        "vg/psg_b/tone3_b/a_q_2" BEL "vg/psg_b/tone3_b/a_q_3" BEL
+        "vg/psg_b/tone2_b/freq_ff_q" BEL "vg/psg_b/tone2_b/f_q_0" BEL
+        "vg/psg_b/tone2_b/f_q_1" BEL "vg/psg_b/tone2_b/f_q_2" BEL
+        "vg/psg_b/tone2_b/f_q_3" BEL "vg/psg_b/tone2_b/f_q_4" BEL
+        "vg/psg_b/tone2_b/f_q_5" BEL "vg/psg_b/tone2_b/f_q_6" BEL
+        "vg/psg_b/tone2_b/f_q_7" BEL "vg/psg_b/tone2_b/f_q_8" BEL
+        "vg/psg_b/tone2_b/f_q_9" BEL "vg/psg_b/tone2_b/a_q_0" BEL
+        "vg/psg_b/tone2_b/a_q_1" BEL "vg/psg_b/tone2_b/a_q_2" BEL
+        "vg/psg_b/tone2_b/a_q_3" BEL "vg/psg_b/tone1_b/freq_ff_q" BEL
+        "vg/psg_b/tone1_b/f_q_0" BEL "vg/psg_b/tone1_b/f_q_1" BEL
+        "vg/psg_b/tone1_b/f_q_2" BEL "vg/psg_b/tone1_b/f_q_3" BEL
+        "vg/psg_b/tone1_b/f_q_4" BEL "vg/psg_b/tone1_b/f_q_5" BEL
+        "vg/psg_b/tone1_b/f_q_6" BEL "vg/psg_b/tone1_b/f_q_7" BEL
+        "vg/psg_b/tone1_b/f_q_8" BEL "vg/psg_b/tone1_b/f_q_9" BEL
+        "vg/psg_b/tone1_b/a_q_0" BEL "vg/psg_b/tone1_b/a_q_1" BEL
+        "vg/psg_b/tone1_b/a_q_2" BEL "vg/psg_b/tone1_b/a_q_3" BEL
+        "por_cnt_s_0" BEL "por_cnt_s_1" BEL "por_cnt_s_2" BEL "por_cnt_s_3"
+        BEL "por_cnt_s_4" BEL "por_cnt_s_5" BEL "por_cnt_s_6" BEL
+        "por_cnt_s_7" BEL "audioout/SigmaLatch_q_2" BEL
+        "audioout/SigmaLatch_q_0" BEL "audioout/SigmaLatch_q_1" BEL
+        "audioout/SigmaLatch_q_3" BEL "audioout/SigmaLatch_q_4" BEL
+        "audioout/SigmaLatch_q_7" BEL "audioout/SigmaLatch_q_5" BEL
+        "audioout/SigmaLatch_q_6" BEL "vg/psg_b/clock_div_b/cnt_q_0" BEL
+        "vg/psg_b/clock_div_b/cnt_q_1" BEL "vg/psg_b/clock_div_b/cnt_q_2" BEL
+        "vg/psg_b/clock_div_b/cnt_q_3" BEL "vg/psg_b/tone2_b/freq_cnt_q_9" BEL
+        "vg/psg_b/tone2_b/freq_cnt_q_8" BEL "vg/psg_b/tone2_b/freq_cnt_q_7"
+        BEL "vg/psg_b/tone2_b/freq_cnt_q_6" BEL
+        "vg/psg_b/tone2_b/freq_cnt_q_5" BEL "vg/psg_b/tone2_b/freq_cnt_q_4"
+        BEL "vg/psg_b/tone2_b/freq_cnt_q_3" BEL
+        "vg/psg_b/tone2_b/freq_cnt_q_2" BEL "vg/psg_b/tone2_b/freq_cnt_q_1"
+        BEL "vg/psg_b/tone2_b/freq_cnt_q_0" BEL
+        "vg/psg_b/tone3_b/freq_cnt_q_9" BEL "vg/psg_b/tone3_b/freq_cnt_q_8"
+        BEL "vg/psg_b/tone3_b/freq_cnt_q_7" BEL
+        "vg/psg_b/tone3_b/freq_cnt_q_6" BEL "vg/psg_b/tone3_b/freq_cnt_q_5"
+        BEL "vg/psg_b/tone3_b/freq_cnt_q_4" BEL
+        "vg/psg_b/tone3_b/freq_cnt_q_3" BEL "vg/psg_b/tone3_b/freq_cnt_q_2"
+        BEL "vg/psg_b/tone3_b/freq_cnt_q_1" BEL
+        "vg/psg_b/tone3_b/freq_cnt_q_0" BEL "vg/psg_b/tone1_b/freq_cnt_q_9"
+        BEL "vg/psg_b/tone1_b/freq_cnt_q_8" BEL
+        "vg/psg_b/tone1_b/freq_cnt_q_7" BEL "vg/psg_b/tone1_b/freq_cnt_q_6"
+        BEL "vg/psg_b/tone1_b/freq_cnt_q_5" BEL
+        "vg/psg_b/tone1_b/freq_cnt_q_4" BEL "vg/psg_b/tone1_b/freq_cnt_q_3"
+        BEL "vg/psg_b/tone1_b/freq_cnt_q_2" BEL
+        "vg/psg_b/tone1_b/freq_cnt_q_1" BEL "vg/psg_b/tone1_b/freq_cnt_q_0"
+        BEL "audioout/SigmaLatch_q_9" BEL "vg/cpu/mreq_s" BEL "vg/cpu/rd_s"
+        BEL "vg/cpu/iorq_n_s" BEL "vg/cpu/wr_n_s" BEL
+        "vg/cpu/ireq_inhibit_n_s" BEL "vg/cpu/mreq_inhibit_s" BEL
+        "vg/cpu/req_inhibit_s" BEL "vg/cpu/data_r_7" BEL "vg/cpu/data_r_6" BEL
+        "vg/cpu/data_r_5" BEL "vg/cpu/data_r_4" BEL "vg/cpu/data_r_3" BEL
+        "vg/cpu/data_r_2" BEL "vg/cpu/data_r_1" BEL "vg/cpu/data_r_0" BEL
+        "vg/cpu/reset_s" BEL "vg/ctrl_b/sel_q" BEL
+        "vg/vdp18_b/cpu_io_b/state_q_FSM_FFd1" BEL
+        "vg/vdp18_b/cpu_io_b/state_q_FSM_FFd2" BEL
+        "vg/vdp18_b/cpu_io_b/addr_q_0" BEL "vg/vdp18_b/cpu_io_b/addr_q_1" BEL
+        "vg/vdp18_b/cpu_io_b/addr_q_2" BEL "vg/vdp18_b/cpu_io_b/addr_q_3" BEL
+        "vg/vdp18_b/cpu_io_b/addr_q_4" BEL "vg/vdp18_b/cpu_io_b/addr_q_5" BEL
+        "vg/vdp18_b/cpu_io_b/addr_q_6" BEL "vg/vdp18_b/cpu_io_b/addr_q_7" BEL
+        "vg/vdp18_b/cpu_io_b/addr_q_8" BEL "vg/vdp18_b/cpu_io_b/addr_q_9" BEL
+        "vg/vdp18_b/cpu_io_b/addr_q_10" BEL "vg/vdp18_b/cpu_io_b/addr_q_11"
+        BEL "vg/vdp18_b/cpu_io_b/addr_q_12" BEL
+        "vg/vdp18_b/cpu_io_b/addr_q_13" BEL
+        "vg/vdp18_b/cpu_io_b/state_q_FSM_FFd4" BEL
+        "vg/vdp18_b/cpu_io_b/state_q_FSM_FFd3" BEL
+        "vg/vdp18_b/cpu_io_b/buffer_q_0" BEL "vg/vdp18_b/cpu_io_b/buffer_q_1"
+        BEL "vg/vdp18_b/cpu_io_b/buffer_q_2" BEL
+        "vg/vdp18_b/cpu_io_b/buffer_q_3" BEL "vg/vdp18_b/cpu_io_b/buffer_q_4"
+        BEL "vg/vdp18_b/cpu_io_b/buffer_q_5" BEL
+        "vg/vdp18_b/cpu_io_b/buffer_q_6" BEL "vg/vdp18_b/cpu_io_b/buffer_q_7"
+        BEL "vg/vdp18_b/cpu_io_b/wrvram_sched_q" BEL
+        "vg/vdp18_b/cpu_io_b/rdvram_sched_q" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_7_0" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_7_1" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_7_2" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_7_3" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_7_4" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_7_5" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_7_6" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_7_7" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_1_1" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_1_2" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_1_3" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_1_4" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_1_6" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_1_7" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_3_0" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_3_1" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_3_2" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_3_3" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_3_4" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_3_5" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_3_6" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_3_7" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_0_6" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_2_4" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_2_5" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_2_6" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_2_7" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_4_5" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_4_6" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_4_7" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_5_1" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_5_2" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_5_3" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_5_4" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_5_5" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_5_6" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_5_7" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_6_5" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_6_6" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_6_7" BEL
+        "vg/vdp18_b/cpu_io_b/sprite_5th_q" BEL
+        "vg/vdp18_b/cpu_io_b/sprite_coll_q" BEL "vg/vdp18_b/cpu_io_b/wrvram_q"
+        BEL "vg/vdp18_b/cpu_io_b/rdvram_q" BEL "vg/vdp18_b/cpu_io_b/int_n_q"
+        BEL "vg/vdp18_b/cpu_io_b/tmp_q_0" BEL "vg/vdp18_b/cpu_io_b/tmp_q_1"
+        BEL "vg/vdp18_b/cpu_io_b/tmp_q_2" BEL "vg/vdp18_b/cpu_io_b/tmp_q_3"
+        BEL "vg/vdp18_b/cpu_io_b/tmp_q_4" BEL "vg/vdp18_b/cpu_io_b/tmp_q_5"
+        BEL "vg/vdp18_b/cpu_io_b/tmp_q_6" BEL "vg/vdp18_b/cpu_io_b/tmp_q_7"
+        BEL "vg/vdp18_b/cpu_io_b/sprite_5th_num_q_0" BEL
+        "vg/vdp18_b/cpu_io_b/sprite_5th_num_q_1" BEL
+        "vg/vdp18_b/cpu_io_b/sprite_5th_num_q_2" BEL
+        "vg/vdp18_b/cpu_io_b/sprite_5th_num_q_3" BEL
+        "vg/vdp18_b/cpu_io_b/sprite_5th_num_q_4" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_0" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_1" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_2" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_3" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_4" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_5" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_6" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_7" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_8" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_9" BEL
+        "vg/vdp18_b/pattern_b/pat_shift_q_0" BEL
+        "vg/vdp18_b/pattern_b/pat_shift_q_1" BEL
+        "vg/vdp18_b/pattern_b/pat_shift_q_2" BEL
+        "vg/vdp18_b/pattern_b/pat_shift_q_3" BEL
+        "vg/vdp18_b/pattern_b/pat_shift_q_4" BEL
+        "vg/vdp18_b/pattern_b/pat_shift_q_5" BEL
+        "vg/vdp18_b/pattern_b/pat_shift_q_6" BEL
+        "vg/vdp18_b/pattern_b/pat_shift_q_7" BEL
+        "vg/vdp18_b/pattern_b/pat_col_q_0" BEL
+        "vg/vdp18_b/pattern_b/pat_col_q_1" BEL
+        "vg/vdp18_b/pattern_b/pat_col_q_2" BEL
+        "vg/vdp18_b/pattern_b/pat_col_q_3" BEL
+        "vg/vdp18_b/pattern_b/pat_col_q_4" BEL
+        "vg/vdp18_b/pattern_b/pat_col_q_5" BEL
+        "vg/vdp18_b/pattern_b/pat_col_q_6" BEL
+        "vg/vdp18_b/pattern_b/pat_col_q_7" BEL
+        "vg/vdp18_b/pattern_b/pat_tmp_q_0" BEL
+        "vg/vdp18_b/pattern_b/pat_tmp_q_1" BEL
+        "vg/vdp18_b/pattern_b/pat_tmp_q_2" BEL
+        "vg/vdp18_b/pattern_b/pat_tmp_q_3" BEL
+        "vg/vdp18_b/pattern_b/pat_tmp_q_4" BEL
+        "vg/vdp18_b/pattern_b/pat_tmp_q_5" BEL
+        "vg/vdp18_b/pattern_b/pat_tmp_q_6" BEL
+        "vg/vdp18_b/pattern_b/pat_tmp_q_7" BEL
+        "vg/vdp18_b/pattern_b/pat_name_q_0" BEL
+        "vg/vdp18_b/pattern_b/pat_name_q_1" BEL
+        "vg/vdp18_b/pattern_b/pat_name_q_2" BEL
+        "vg/vdp18_b/pattern_b/pat_name_q_3" BEL
+        "vg/vdp18_b/pattern_b/pat_name_q_4" BEL
+        "vg/vdp18_b/pattern_b/pat_name_q_5" BEL
+        "vg/vdp18_b/pattern_b/pat_name_q_6" BEL
+        "vg/vdp18_b/pattern_b/pat_name_q_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_num_q_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_num_q_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_num_q_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_num_q_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_num_q_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_idx_q_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_idx_q_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_idx_q_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_8" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_9" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_10" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_11" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_12" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_13" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_14" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_15" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_8" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_9" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_10" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_11" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_12" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_13" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_14" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_15" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_8" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_9" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_10" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_11" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_12" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_13" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_14" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_15" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_8" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_9" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_10" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_11" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_12" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_13" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_14" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_15" BEL
+        "vg/vdp18_b/sprite_b/sprite_xtog_q_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_xtog_q_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_xtog_q_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_xtog_q_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_line_q_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_line_q_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_line_q_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_line_q_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_3_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_3_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_3_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_3_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_3_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_3_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_3_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_3_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_1_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_1_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_1_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_1_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_1_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_1_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_1_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_1_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_0_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_0_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_0_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_0_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_0_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_0_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_0_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_0_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_2_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_2_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_2_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_2_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_2_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_2_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_2_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_2_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_ec_q_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_ec_q_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_ec_q_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_ec_q_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_0_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_0_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_0_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_0_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_0_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_3_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_3_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_3_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_3_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_3_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_1_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_1_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_1_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_1_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_1_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_2_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_2_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_2_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_2_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_2_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_3_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_3_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_3_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_3_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_2_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_2_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_2_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_2_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_0_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_0_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_0_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_0_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_1_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_1_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_1_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_1_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_name_q_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_name_q_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_name_q_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_name_q_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_name_q_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_name_q_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_name_q_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_name_q_7" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_8" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_7" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_5" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_4" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_6" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_3" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_2" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_0" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_8" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_1" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_7" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_6" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_4" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_3" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_5" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_1" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_0" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_2" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_ver_s_7" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_ver_s_6" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_ver_s_5" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_ver_s_4" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_ver_s_3" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_ver_s_2" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_ver_s_1" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_ver_s_0" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_8" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_7" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_6" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_5" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_4" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_3" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_2" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_1" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_0" BEL
+        "vg/vdp18_b/hor_vert_b/vblank_q" BEL "vg/vdp18_b/hor_vert_b/vsync_n_o"
+        BEL "vg/vdp18_b/hor_vert_b/hblank_q" BEL
+        "vg/vdp18_b/ctrl_b/sprite_line_act_q" BEL
+        "vg/vdp18_b/ctrl_b/vram_ce_o" BEL "vg/vdp18_b/ctrl_b/vram_oe_o" BEL
+        "vg/vdp18_b/ctrl_b/vert_active_q" BEL
+        "vg/vdp18_b/ctrl_b/sprite_active_q" BEL
+        "vg/vdp18_b/ctrl_b/hor_active_q" BEL "vg/cpu/u0/TState_2" BEL
+        "vg/cpu/u0/TState_1" BEL "vg/cpu/u0/TState_0" BEL "vg/cpu/u0/DO_7" BEL
+        "vg/cpu/u0/DO_6" BEL "vg/cpu/u0/DO_5" BEL "vg/cpu/u0/DO_4" BEL
+        "vg/cpu/u0/DO_3" BEL "vg/cpu/u0/DO_2" BEL "vg/cpu/u0/DO_1" BEL
+        "vg/cpu/u0/DO_0" BEL "vg/cpu/u0/A_15" BEL "vg/cpu/u0/A_14" BEL
+        "vg/cpu/u0/A_13" BEL "vg/cpu/u0/A_12" BEL "vg/cpu/u0/A_11" BEL
+        "vg/cpu/u0/A_10" BEL "vg/cpu/u0/A_9" BEL "vg/cpu/u0/A_8" BEL
+        "vg/cpu/u0/A_7" BEL "vg/cpu/u0/A_6" BEL "vg/cpu/u0/A_5" BEL
+        "vg/cpu/u0/A_4" BEL "vg/cpu/u0/A_3" BEL "vg/cpu/u0/A_2" BEL
+        "vg/cpu/u0/A_1" BEL "vg/cpu/u0/A_0" BEL "vg/cpu/u0/BusA_7" BEL
+        "vg/cpu/u0/BusA_6" BEL "vg/cpu/u0/BusA_5" BEL "vg/cpu/u0/BusA_4" BEL
+        "vg/cpu/u0/BusA_3" BEL "vg/cpu/u0/BusA_2" BEL "vg/cpu/u0/BusA_1" BEL
+        "vg/cpu/u0/BusA_0" BEL "vg/cpu/u0/ALU_Op_r_3" BEL
+        "vg/cpu/u0/ALU_Op_r_2" BEL "vg/cpu/u0/ALU_Op_r_1" BEL
+        "vg/cpu/u0/ALU_Op_r_0" BEL "vg/cpu/u0/Halt_FF" BEL
+        "vg/cpu/u0/Save_ALU_r" BEL "vg/cpu/u0/ALU_cpi_r" BEL
+        "vg/cpu/u0/MCycles_2" BEL "vg/cpu/u0/MCycles_1" BEL
+        "vg/cpu/u0/MCycles_0" BEL "vg/cpu/u0/Arith16_r" BEL "vg/cpu/u0/F_7"
+        BEL "vg/cpu/u0/F_6" BEL "vg/cpu/u0/F_5" BEL "vg/cpu/u0/F_4" BEL
+        "vg/cpu/u0/F_3" BEL "vg/cpu/u0/F_2" BEL "vg/cpu/u0/F_1" BEL
+        "vg/cpu/u0/F_0" BEL "vg/cpu/u0/ACC_7" BEL "vg/cpu/u0/ACC_6" BEL
+        "vg/cpu/u0/ACC_5" BEL "vg/cpu/u0/ACC_4" BEL "vg/cpu/u0/ACC_3" BEL
+        "vg/cpu/u0/ACC_2" BEL "vg/cpu/u0/ACC_1" BEL "vg/cpu/u0/ACC_0" BEL
+        "vg/cpu/u0/BusB_7" BEL "vg/cpu/u0/BusB_6" BEL "vg/cpu/u0/BusB_5" BEL
+        "vg/cpu/u0/BusB_4" BEL "vg/cpu/u0/BusB_3" BEL "vg/cpu/u0/BusB_2" BEL
+        "vg/cpu/u0/BusB_1" BEL "vg/cpu/u0/BusB_0" BEL "vg/cpu/u0/PC_15" BEL
+        "vg/cpu/u0/PC_14" BEL "vg/cpu/u0/PC_13" BEL "vg/cpu/u0/PC_12" BEL
+        "vg/cpu/u0/PC_11" BEL "vg/cpu/u0/PC_10" BEL "vg/cpu/u0/PC_9" BEL
+        "vg/cpu/u0/PC_8" BEL "vg/cpu/u0/PC_7" BEL "vg/cpu/u0/PC_6" BEL
+        "vg/cpu/u0/PC_5" BEL "vg/cpu/u0/PC_4" BEL "vg/cpu/u0/PC_3" BEL
+        "vg/cpu/u0/PC_2" BEL "vg/cpu/u0/PC_1" BEL "vg/cpu/u0/PC_0" BEL
+        "vg/cpu/u0/TmpAddr_15" BEL "vg/cpu/u0/TmpAddr_14" BEL
+        "vg/cpu/u0/TmpAddr_13" BEL "vg/cpu/u0/TmpAddr_12" BEL
+        "vg/cpu/u0/TmpAddr_11" BEL "vg/cpu/u0/TmpAddr_10" BEL
+        "vg/cpu/u0/TmpAddr_9" BEL "vg/cpu/u0/TmpAddr_8" BEL
+        "vg/cpu/u0/TmpAddr_7" BEL "vg/cpu/u0/TmpAddr_6" BEL
+        "vg/cpu/u0/TmpAddr_5" BEL "vg/cpu/u0/TmpAddr_4" BEL
+        "vg/cpu/u0/TmpAddr_3" BEL "vg/cpu/u0/TmpAddr_2" BEL
+        "vg/cpu/u0/TmpAddr_1" BEL "vg/cpu/u0/TmpAddr_0" BEL "vg/cpu/u0/SP_15"
+        BEL "vg/cpu/u0/SP_14" BEL "vg/cpu/u0/SP_13" BEL "vg/cpu/u0/SP_12" BEL
+        "vg/cpu/u0/SP_11" BEL "vg/cpu/u0/SP_10" BEL "vg/cpu/u0/SP_9" BEL
+        "vg/cpu/u0/SP_8" BEL "vg/cpu/u0/SP_7" BEL "vg/cpu/u0/SP_6" BEL
+        "vg/cpu/u0/SP_5" BEL "vg/cpu/u0/SP_4" BEL "vg/cpu/u0/SP_3" BEL
+        "vg/cpu/u0/SP_2" BEL "vg/cpu/u0/SP_1" BEL "vg/cpu/u0/SP_0" BEL
+        "vg/cpu/u0/RegAddrC_2" BEL "vg/cpu/u0/RegAddrC_1" BEL
+        "vg/cpu/u0/RegAddrC_0" BEL "vg/cpu/u0/RegAddrB_r_2" BEL
+        "vg/cpu/u0/RegAddrB_r_1" BEL "vg/cpu/u0/RegAddrB_r_0" BEL
+        "vg/cpu/u0/RegAddrA_r_2" BEL "vg/cpu/u0/RegAddrA_r_1" BEL
+        "vg/cpu/u0/RegAddrA_r_0" BEL "vg/cpu/u0/IntE_FF2" BEL "vg/cpu/u0/R_7"
+        BEL "vg/cpu/u0/R_6" BEL "vg/cpu/u0/R_5" BEL "vg/cpu/u0/R_4" BEL
+        "vg/cpu/u0/R_3" BEL "vg/cpu/u0/R_2" BEL "vg/cpu/u0/R_1" BEL
+        "vg/cpu/u0/R_0" BEL "vg/cpu/u0/MCycle_2" BEL "vg/cpu/u0/MCycle_1" BEL
+        "vg/cpu/u0/MCycle_0" BEL "vg/cpu/u0/XY_State_1" BEL
+        "vg/cpu/u0/XY_State_0" BEL "vg/cpu/u0/M1_n" BEL
+        "vg/cpu/u0/Auto_Wait_t2" BEL "vg/cpu/u0/Read_To_Reg_r_4" BEL
+        "vg/cpu/u0/Read_To_Reg_r_3" BEL "vg/cpu/u0/Read_To_Reg_r_2" BEL
+        "vg/cpu/u0/Read_To_Reg_r_1" BEL "vg/cpu/u0/Read_To_Reg_r_0" BEL
+        "vg/cpu/u0/ISet_1" BEL "vg/cpu/u0/ISet_0" BEL "vg/cpu/u0/Auto_Wait_t1"
+        BEL "vg/cpu/u0/IR_7" BEL "vg/cpu/u0/IR_6" BEL "vg/cpu/u0/IR_5" BEL
+        "vg/cpu/u0/IR_4" BEL "vg/cpu/u0/IR_3" BEL "vg/cpu/u0/IR_2" BEL
+        "vg/cpu/u0/IR_1" BEL "vg/cpu/u0/IR_0" BEL "vg/cpu/u0/IncDecZ" BEL
+        "vg/cpu/u0/Pre_XY_F_M_2" BEL "vg/cpu/u0/Pre_XY_F_M_1" BEL
+        "vg/cpu/u0/Pre_XY_F_M_0" BEL "vg/cpu/u0/RegBusA_r_15" BEL
+        "vg/cpu/u0/RegBusA_r_14" BEL "vg/cpu/u0/RegBusA_r_13" BEL
+        "vg/cpu/u0/RegBusA_r_12" BEL "vg/cpu/u0/RegBusA_r_11" BEL
+        "vg/cpu/u0/RegBusA_r_10" BEL "vg/cpu/u0/RegBusA_r_9" BEL
+        "vg/cpu/u0/RegBusA_r_8" BEL "vg/cpu/u0/RegBusA_r_7" BEL
+        "vg/cpu/u0/RegBusA_r_6" BEL "vg/cpu/u0/RegBusA_r_5" BEL
+        "vg/cpu/u0/RegBusA_r_4" BEL "vg/cpu/u0/RegBusA_r_3" BEL
+        "vg/cpu/u0/RegBusA_r_2" BEL "vg/cpu/u0/RegBusA_r_1" BEL
+        "vg/cpu/u0/RegBusA_r_0" BEL "vg/cpu/u0/I_7" BEL "vg/cpu/u0/I_6" BEL
+        "vg/cpu/u0/I_5" BEL "vg/cpu/u0/I_4" BEL "vg/cpu/u0/I_3" BEL
+        "vg/cpu/u0/I_2" BEL "vg/cpu/u0/I_1" BEL "vg/cpu/u0/I_0" BEL
+        "vg/cpu/u0/Fp_7" BEL "vg/cpu/u0/Fp_6" BEL "vg/cpu/u0/Fp_5" BEL
+        "vg/cpu/u0/Fp_4" BEL "vg/cpu/u0/Fp_3" BEL "vg/cpu/u0/Fp_2" BEL
+        "vg/cpu/u0/Fp_1" BEL "vg/cpu/u0/Fp_0" BEL "vg/cpu/u0/Ap_7" BEL
+        "vg/cpu/u0/Ap_6" BEL "vg/cpu/u0/Ap_5" BEL "vg/cpu/u0/Ap_4" BEL
+        "vg/cpu/u0/Ap_3" BEL "vg/cpu/u0/Ap_2" BEL "vg/cpu/u0/Ap_1" BEL
+        "vg/cpu/u0/Ap_0" BEL "vg/cpu/u0/No_BTR" BEL "vg/cpu/u0/NMICycle" BEL
+        "vg/cpu/u0/OldNMI_n" BEL "vg/cpu/u0/NMI_s" BEL "vg/cpu/u0/XY_Ind" BEL
+        "vg/cpu/u0/PreserveC_r" BEL "vg/cpu/u0/BTR_r" BEL "vg/cpu/u0/Z16_r"
+        BEL "vg/cpu/u0/Alternate" BEL "vg/cpu/u0/RFSH_n" BEL
+        "vg/psg_b/latch_ctrl_b/we_q" BEL "vg/psg_b/latch_ctrl_b/reg_q_0" BEL
+        "vg/psg_b/latch_ctrl_b/reg_q_1" BEL "vg/psg_b/latch_ctrl_b/reg_q_2"
+        BEL "vg/psg_b/latch_ctrl_b/ready_q" BEL
+        "vg/psg_b/noise_b/freq_cnt_q_0" BEL "vg/psg_b/noise_b/freq_cnt_q_1"
+        BEL "vg/psg_b/noise_b/freq_cnt_q_2" BEL
+        "vg/psg_b/noise_b/freq_cnt_q_3" BEL "vg/psg_b/noise_b/freq_cnt_q_4"
+        BEL "vg/psg_b/noise_b/freq_cnt_q_5" BEL
+        "vg/psg_b/noise_b/freq_cnt_q_6" BEL "vg/psg_b/noise_b/lfsr_q_0" BEL
+        "vg/psg_b/noise_b/lfsr_q_1" BEL "vg/psg_b/noise_b/lfsr_q_2" BEL
+        "vg/psg_b/noise_b/lfsr_q_3" BEL "vg/psg_b/noise_b/lfsr_q_4" BEL
+        "vg/psg_b/noise_b/lfsr_q_5" BEL "vg/psg_b/noise_b/lfsr_q_6" BEL
+        "vg/psg_b/noise_b/lfsr_q_7" BEL "vg/psg_b/noise_b/lfsr_q_8" BEL
+        "vg/psg_b/noise_b/lfsr_q_9" BEL "vg/psg_b/noise_b/lfsr_q_10" BEL
+        "vg/psg_b/noise_b/lfsr_q_11" BEL "vg/psg_b/noise_b/lfsr_q_12" BEL
+        "vg/psg_b/noise_b/lfsr_q_13" BEL "vg/psg_b/noise_b/lfsr_q_14" BEL
+        "vg/psg_b/noise_b/lfsr_q_15" BEL "vg/psg_b/noise_b/shift_source_q" BEL
+        "vg/psg_b/noise_b/freq_ff_q" BEL "vg/psg_b/noise_b/fb_q" BEL
+        "vg/psg_b/noise_b/nf_q_0" BEL "vg/psg_b/noise_b/nf_q_1" BEL
+        "vg/psg_b/noise_b/a_q_0" BEL "vg/psg_b/noise_b/a_q_1" BEL
+        "vg/psg_b/noise_b/a_q_2" BEL "vg/psg_b/noise_b/a_q_3" BEL
+        "vg/WSG/ENVCNT_15" BEL "vg/WSG/ENVCNT_14" BEL "vg/WSG/ENVCNT_13" BEL
+        "vg/WSG/ENVCNT_12" BEL "vg/WSG/ENVCNT_11" BEL "vg/WSG/ENVCNT_10" BEL
+        "vg/WSG/ENVCNT_9" BEL "vg/WSG/ENVCNT_8" BEL "vg/WSG/ENVCNT_7" BEL
+        "vg/WSG/ENVCNT_6" BEL "vg/WSG/ENVCNT_5" BEL "vg/WSG/ENVCNT_4" BEL
+        "vg/WSG/ENVCNT_3" BEL "vg/WSG/ENVCNT_2" BEL "vg/WSG/ENVCNT_1" BEL
+        "vg/WSG/ENVCNT_0" BEL "vg/WSG/DCOTCNT_3_11" BEL "vg/WSG/DCOTCNT_3_10"
+        BEL "vg/WSG/DCOTCNT_3_9" BEL "vg/WSG/DCOTCNT_3_8" BEL
+        "vg/WSG/DCOTCNT_3_7" BEL "vg/WSG/DCOTCNT_3_6" BEL "vg/WSG/DCOTCNT_3_5"
+        BEL "vg/WSG/DCOTCNT_3_4" BEL "vg/WSG/DCOTCNT_3_3" BEL
+        "vg/WSG/DCOTCNT_3_2" BEL "vg/WSG/DCOTCNT_3_1" BEL "vg/WSG/DCOTCNT_3_0"
+        BEL "vg/WSG/DCOTCNT_1_11" BEL "vg/WSG/DCOTCNT_1_10" BEL
+        "vg/WSG/DCOTCNT_1_9" BEL "vg/WSG/DCOTCNT_1_8" BEL "vg/WSG/DCOTCNT_1_7"
+        BEL "vg/WSG/DCOTCNT_1_6" BEL "vg/WSG/DCOTCNT_1_5" BEL
+        "vg/WSG/DCOTCNT_1_4" BEL "vg/WSG/DCOTCNT_1_3" BEL "vg/WSG/DCOTCNT_1_2"
+        BEL "vg/WSG/DCOTCNT_1_1" BEL "vg/WSG/DCOTCNT_1_0" BEL
+        "vg/WSG/DCONCNT_7" BEL "vg/WSG/DCONCNT_6" BEL "vg/WSG/DCONCNT_5" BEL
+        "vg/WSG/DCONCNT_4" BEL "vg/WSG/DCONCNT_3" BEL "vg/WSG/DCONCNT_2" BEL
+        "vg/WSG/DCONCNT_1" BEL "vg/WSG/DCONCNT_0" BEL "vg/WSG/DCOTCNT_2_11"
+        BEL "vg/WSG/DCOTCNT_2_10" BEL "vg/WSG/DCOTCNT_2_9" BEL
+        "vg/WSG/DCOTCNT_2_8" BEL "vg/WSG/DCOTCNT_2_7" BEL "vg/WSG/DCOTCNT_2_6"
+        BEL "vg/WSG/DCOTCNT_2_5" BEL "vg/WSG/DCOTCNT_2_4" BEL
+        "vg/WSG/DCOTCNT_2_3" BEL "vg/WSG/DCOTCNT_2_2" BEL "vg/WSG/DCOTCNT_2_1"
+        BEL "vg/WSG/DCOTCNT_2_0" BEL "vg/WSG/DIGITAL_MIX_7" BEL
+        "vg/WSG/DIGITAL_MIX_6" BEL "vg/WSG/DIGITAL_MIX_5" BEL
+        "vg/WSG/DIGITAL_MIX_4" BEL "vg/WSG/DIGITAL_MIX_3" BEL
+        "vg/WSG/DIGITAL_MIX_2" BEL "vg/WSG/DIGITAL_MIX_1" BEL
+        "vg/WSG/DIGITAL_MIX_0" BEL "vg/WSG/B_4" BEL "vg/WSG/B_3" BEL
+        "vg/WSG/B_2" BEL "vg/WSG/B_1" BEL "vg/WSG/B_0" BEL "vg/WSG/A_4" BEL
+        "vg/WSG/A_3" BEL "vg/WSG/A_2" BEL "vg/WSG/A_1" BEL "vg/WSG/A_0" BEL
+        "vg/WSG/C_4" BEL "vg/WSG/C_3" BEL "vg/WSG/C_2" BEL "vg/WSG/C_1" BEL
+        "vg/WSG/C_0" BEL "vg/WSG/DCOTOUT_3" BEL "vg/WSG/DCOTOUT_2" BEL
+        "vg/WSG/DCOTOUT_1" BEL "vg/WSG/ENVENA" BEL "vg/WSG/ENVSET" BEL
+        "vg/WSG/DCONDAT_16" BEL "vg/WSG/DCONDAT_15" BEL "vg/WSG/DCONDAT_14"
+        BEL "vg/WSG/DCONDAT_13" BEL "vg/WSG/DCONDAT_12" BEL
+        "vg/WSG/DCONDAT_11" BEL "vg/WSG/DCONDAT_10" BEL "vg/WSG/DCONDAT_9" BEL
+        "vg/WSG/DCONDAT_8" BEL "vg/WSG/DCONDAT_7" BEL "vg/WSG/DCONDAT_6" BEL
+        "vg/WSG/DCONDAT_5" BEL "vg/WSG/DCONDAT_4" BEL "vg/WSG/DCONDAT_3" BEL
+        "vg/WSG/DCONDAT_2" BEL "vg/WSG/DCONDAT_1" BEL "vg/WSG/DCONDAT_0" BEL
+        "vg/WSG/CLKENAN" BEL "vg/WSG/CLKDIVN" BEL "vg/WSG/CLKENAT" BEL
+        "ps2if_inst/count_4" BEL "ps2if_inst/count_3" BEL "ps2if_inst/count_2"
+        BEL "ps2if_inst/count_1" BEL "ps2if_inst/count_0" BEL
+        "ps2if_inst/joy_4" BEL "ps2if_inst/joy_3" BEL "ps2if_inst/joy_2" BEL
+        "ps2if_inst/joy_1" BEL "ps2if_inst/joy_0" BEL "ps2if_inst/keys_14" BEL
+        "ps2if_inst/keys_13" BEL "ps2if_inst/keys_12" BEL "ps2if_inst/keys_11"
+        BEL "ps2if_inst/keys_10" BEL "ps2if_inst/keys_9" BEL
+        "ps2if_inst/keys_8" BEL "ps2if_inst/keys_7" BEL "ps2if_inst/keys_6"
+        BEL "ps2if_inst/keys_5" BEL "ps2if_inst/keys_3" BEL
+        "ps2if_inst/keys_2" BEL "ps2if_inst/keys_1" BEL "ps2if_inst/keys_0"
+        BEL "ps2if_inst/tick1us" BEL "ps2if_inst/ps2kbd_inst/Reset" BEL
+        "ps2if_inst/ps2kbd_inst/Press" BEL "ps2if_inst/ps2kbd_inst/Release"
+        BEL "ps2if_inst/ps2kbd_inst/RX_Received" BEL
+        "ps2if_inst/ps2kbd_inst/RX_Bit_Cnt_3" BEL
+        "ps2if_inst/ps2kbd_inst/RX_Bit_Cnt_2" BEL
+        "ps2if_inst/ps2kbd_inst/RX_Bit_Cnt_1" BEL
+        "ps2if_inst/ps2kbd_inst/RX_Bit_Cnt_0" BEL
+        "ps2if_inst/ps2kbd_inst/Cnt_30" BEL "ps2if_inst/ps2kbd_inst/Cnt_29"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_28" BEL
+        "ps2if_inst/ps2kbd_inst/Cnt_27" BEL "ps2if_inst/ps2kbd_inst/Cnt_26"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_25" BEL
+        "ps2if_inst/ps2kbd_inst/Cnt_24" BEL "ps2if_inst/ps2kbd_inst/Cnt_23"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_22" BEL
+        "ps2if_inst/ps2kbd_inst/Cnt_21" BEL "ps2if_inst/ps2kbd_inst/Cnt_20"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_19" BEL
+        "ps2if_inst/ps2kbd_inst/Cnt_18" BEL "ps2if_inst/ps2kbd_inst/Cnt_17"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_16" BEL
+        "ps2if_inst/ps2kbd_inst/Cnt_15" BEL "ps2if_inst/ps2kbd_inst/Cnt_14"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_13" BEL
+        "ps2if_inst/ps2kbd_inst/Cnt_12" BEL "ps2if_inst/ps2kbd_inst/Cnt_11"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_10" BEL "ps2if_inst/ps2kbd_inst/Cnt_9"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_8" BEL "ps2if_inst/ps2kbd_inst/Cnt_7"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_6" BEL "ps2if_inst/ps2kbd_inst/Cnt_5"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_4" BEL "ps2if_inst/ps2kbd_inst/Cnt_3"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_2" BEL "ps2if_inst/ps2kbd_inst/Cnt_1"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_0" BEL
+        "ps2if_inst/ps2kbd_inst/PS2_Sample" BEL
+        "ps2if_inst/ps2kbd_inst/RX_ShiftReg_7" BEL
+        "ps2if_inst/ps2kbd_inst/RX_ShiftReg_6" BEL
+        "ps2if_inst/ps2kbd_inst/RX_ShiftReg_5" BEL
+        "ps2if_inst/ps2kbd_inst/RX_ShiftReg_4" BEL
+        "ps2if_inst/ps2kbd_inst/RX_ShiftReg_3" BEL
+        "ps2if_inst/ps2kbd_inst/RX_ShiftReg_2" BEL
+        "ps2if_inst/ps2kbd_inst/RX_ShiftReg_1" BEL
+        "ps2if_inst/ps2kbd_inst/RX_ShiftReg_0" BEL
+        "ps2if_inst/ps2kbd_inst/PS2_Data_s" BEL
+        "ps2if_inst/ps2kbd_inst/PS2_Clk_State" BEL
+        "ps2if_inst/ps2kbd_inst/PS2_Data_r_1" BEL
+        "ps2if_inst/ps2kbd_inst/PS2_Data_r_0" BEL
+        "ps2if_inst/ps2kbd_inst/PS2_Clk_r_1" BEL
+        "ps2if_inst/ps2kbd_inst/PS2_Clk_r_0" BEL
+        "ps2if_inst/ps2kbd_inst/RX_Release" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_31" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_30" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_29" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_28" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_27" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_26" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_25" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_24" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_23" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_22" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_21" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_20" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_15" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_14" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_13" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_12" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_11" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_10" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_9" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_8" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_7" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_6" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_5" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_4" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_3" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_0" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_31" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_30" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_29" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_28" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_27" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_26" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_25" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_24" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_23" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_22" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_21" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_15" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_14" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_13" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_12" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_11" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_10" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_9" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_8" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_7" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_6" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_5" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_4" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_3" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_2" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_1" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_0" BEL
+        "snespads_b/ctrl_b/state_q_FSM_FFd1" BEL
+        "snespads_b/ctrl_b/state_q_FSM_FFd2" BEL
+        "snespads_b/ctrl_b/clocks_per_6us_q_6" BEL
+        "snespads_b/ctrl_b/clocks_per_6us_q_5" BEL
+        "snespads_b/ctrl_b/clocks_per_6us_q_4" BEL
+        "snespads_b/ctrl_b/clocks_per_6us_q_3" BEL
+        "snespads_b/ctrl_b/clocks_per_6us_q_2" BEL
+        "snespads_b/ctrl_b/clocks_per_6us_q_1" BEL
+        "snespads_b/ctrl_b/clocks_per_6us_q_0" BEL
+        "snespads_b/ctrl_b/pad_clk_q" BEL "snespads_b/ctrl_b/pad_latch_q" BEL
+        "clks/clk2_cnt_q_2" BEL "clks/clk2_cnt_q_1" BEL "clks/clk2_cnt_q_0"
+        BEL "clks/clk1_cnt_q_1" BEL "clks/clk1_cnt_q_0" BEL
+        "clks/clock_5m_en_s" BEL "clks/clock_vdp_en_s" BEL "vg/WSG/ENVAMP_4"
+        BEL "vg/WSG/ENVAMP_3" BEL "vg/WSG/ENVAMP_2" BEL "vg/WSG/ENVAMP_1" BEL
+        "vg/WSG/ENVAMP_0" BEL "vg/WSG/CLKDIVT_3" BEL "vg/WSG/CLKDIVT_2" BEL
+        "vg/WSG/CLKDIVT_1" BEL "vg/WSG/CLKDIVT_0" BEL "vg/WSG/ENVINC" BEL
+        "vg/WSG/ENVHLD" BEL "ps2if_inst/ps2kbd_inst/Cnt_31_C_31" BEL
+        "ps2if_inst/ps2kbd_inst/Cnt_31_P_31" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_4_C_4" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_4_P_4" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_3_C_3" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_3_P_3" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_2_C_2" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_2_P_2" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_1_C_1" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_1_P_1" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_0_C_0" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_0_P_0" PIN
+        "bios/Mram_ram_q1_pins<26>" PIN "bios/Mram_ram_q1_pins<27>" PIN
+        "bios/Mram_ram_q4_pins<26>" PIN "bios/Mram_ram_q4_pins<27>" PIN
+        "bios/Mram_ram_q2_pins<26>" PIN "bios/Mram_ram_q2_pins<27>" PIN
+        "bios/Mram_ram_q3_pins<26>" PIN "bios/Mram_ram_q3_pins<27>" PIN
+        "vga/frbuff/Mram_ram_q16_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q15_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q13_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q12_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q14_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q10_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q9_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q11_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q7_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q6_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q8_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q5_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q4_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q3_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q2_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q1_pins<28>" PIN
+        "vg/lr/Mram_ADDR[12]_PWR_26_o_wide_mux_0_OUT4_pins<13>" PIN
+        "vg/lr/Mram_ADDR[12]_PWR_26_o_wide_mux_0_OUT3_pins<13>" PIN
+        "vg/lr/Mram_ADDR[12]_PWR_26_o_wide_mux_0_OUT2_pins<13>" PIN
+        "vg/lr/Mram_ADDR[12]_PWR_26_o_wide_mux_0_OUT1_pins<13>" BEL
+        "snespads_b/pads[0].pad_b/Mshreg_shift_buttons_q_20" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_201" BEL
+        "por_n_s_inv_shift1" BEL "por_n_s_inv_shift2" BEL "por_n_s_inv_shift3"
+        BEL "por_n_s_inv_shift4" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_20" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH1/DP" BEL "vg/cpu/u0/Regs/Mram_RegsH1/SP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsH121/DP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH121/SP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH122/DP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH122/SP" BEL "vg/cpu/u0/Regs/Mram_RegsH2/DP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsH2/SP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH3/DP" BEL "vg/cpu/u0/Regs/Mram_RegsH3/SP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsH4/DP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH4/SP" BEL "vg/cpu/u0/Regs/Mram_RegsH5/DP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsH5/SP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH6/DP" BEL "vg/cpu/u0/Regs/Mram_RegsH6/SP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsH7/DP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH7/SP" BEL "vg/cpu/u0/Regs/Mram_RegsH8/DP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsH8/SP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL1/DP" BEL "vg/cpu/u0/Regs/Mram_RegsL1/SP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsL121/DP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL121/SP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL122/DP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL122/SP" BEL "vg/cpu/u0/Regs/Mram_RegsL2/DP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsL2/SP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL3/DP" BEL "vg/cpu/u0/Regs/Mram_RegsL3/SP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsL4/DP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL4/SP" BEL "vg/cpu/u0/Regs/Mram_RegsL5/DP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsL5/SP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL6/DP" BEL "vg/cpu/u0/Regs/Mram_RegsL6/SP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsL7/DP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL7/SP" BEL "vg/cpu/u0/Regs/Mram_RegsL8/DP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsL8/SP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH11_RAMA_D1" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH11_RAMA" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH11_RAMB_D1" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH11_RAMB" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH11_RAMC_D1" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH11_RAMC" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH11_RAMD_D1" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH11_RAMD" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL11_RAMA_D1" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL11_RAMA" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL11_RAMB_D1" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL11_RAMB" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL11_RAMC_D1" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL11_RAMC" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL11_RAMD_D1" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL11_RAMD";
+TIMEGRP pll_1_clkout0 = BEL "vg/wsg_native_q" BEL "vg/cfg_page_r_0" BEL
+        "vg/cfg_page_r_1" BEL "vg/cfg_page_r_2" BEL "vg/cfg_page_r_3" BEL
+        "vg/cfg_page_r_4" BEL "vg/cfg_page_r_5" BEL "vg/cfg_page_r_6" BEL
+        "vg/cfg_page_r_7" BEL "vg/loader_q" BEL "vg/m1_wait_q" BEL
+        "vg/multcart_q" BEL "vg/ext_cart_en_q" BEL "vg/bios_ram_bs_s" BEL
+        "audioout/DACout_q" BEL "vg/psg_b/tone3_b/freq_ff_q" BEL
+        "vg/psg_b/tone3_b/f_q_0" BEL "vg/psg_b/tone3_b/f_q_1" BEL
+        "vg/psg_b/tone3_b/f_q_2" BEL "vg/psg_b/tone3_b/f_q_3" BEL
+        "vg/psg_b/tone3_b/f_q_4" BEL "vg/psg_b/tone3_b/f_q_5" BEL
+        "vg/psg_b/tone3_b/f_q_6" BEL "vg/psg_b/tone3_b/f_q_7" BEL
+        "vg/psg_b/tone3_b/f_q_8" BEL "vg/psg_b/tone3_b/f_q_9" BEL
+        "vg/psg_b/tone3_b/a_q_0" BEL "vg/psg_b/tone3_b/a_q_1" BEL
+        "vg/psg_b/tone3_b/a_q_2" BEL "vg/psg_b/tone3_b/a_q_3" BEL
+        "vg/psg_b/tone2_b/freq_ff_q" BEL "vg/psg_b/tone2_b/f_q_0" BEL
+        "vg/psg_b/tone2_b/f_q_1" BEL "vg/psg_b/tone2_b/f_q_2" BEL
+        "vg/psg_b/tone2_b/f_q_3" BEL "vg/psg_b/tone2_b/f_q_4" BEL
+        "vg/psg_b/tone2_b/f_q_5" BEL "vg/psg_b/tone2_b/f_q_6" BEL
+        "vg/psg_b/tone2_b/f_q_7" BEL "vg/psg_b/tone2_b/f_q_8" BEL
+        "vg/psg_b/tone2_b/f_q_9" BEL "vg/psg_b/tone2_b/a_q_0" BEL
+        "vg/psg_b/tone2_b/a_q_1" BEL "vg/psg_b/tone2_b/a_q_2" BEL
+        "vg/psg_b/tone2_b/a_q_3" BEL "vg/psg_b/tone1_b/freq_ff_q" BEL
+        "vg/psg_b/tone1_b/f_q_0" BEL "vg/psg_b/tone1_b/f_q_1" BEL
+        "vg/psg_b/tone1_b/f_q_2" BEL "vg/psg_b/tone1_b/f_q_3" BEL
+        "vg/psg_b/tone1_b/f_q_4" BEL "vg/psg_b/tone1_b/f_q_5" BEL
+        "vg/psg_b/tone1_b/f_q_6" BEL "vg/psg_b/tone1_b/f_q_7" BEL
+        "vg/psg_b/tone1_b/f_q_8" BEL "vg/psg_b/tone1_b/f_q_9" BEL
+        "vg/psg_b/tone1_b/a_q_0" BEL "vg/psg_b/tone1_b/a_q_1" BEL
+        "vg/psg_b/tone1_b/a_q_2" BEL "vg/psg_b/tone1_b/a_q_3" BEL
+        "por_cnt_s_0" BEL "por_cnt_s_1" BEL "por_cnt_s_2" BEL "por_cnt_s_3"
+        BEL "por_cnt_s_4" BEL "por_cnt_s_5" BEL "por_cnt_s_6" BEL
+        "por_cnt_s_7" BEL "audioout/SigmaLatch_q_2" BEL
+        "audioout/SigmaLatch_q_0" BEL "audioout/SigmaLatch_q_1" BEL
+        "audioout/SigmaLatch_q_3" BEL "audioout/SigmaLatch_q_4" BEL
+        "audioout/SigmaLatch_q_7" BEL "audioout/SigmaLatch_q_5" BEL
+        "audioout/SigmaLatch_q_6" BEL "vg/psg_b/clock_div_b/cnt_q_0" BEL
+        "vg/psg_b/clock_div_b/cnt_q_1" BEL "vg/psg_b/clock_div_b/cnt_q_2" BEL
+        "vg/psg_b/clock_div_b/cnt_q_3" BEL "vg/psg_b/tone2_b/freq_cnt_q_9" BEL
+        "vg/psg_b/tone2_b/freq_cnt_q_8" BEL "vg/psg_b/tone2_b/freq_cnt_q_7"
+        BEL "vg/psg_b/tone2_b/freq_cnt_q_6" BEL
+        "vg/psg_b/tone2_b/freq_cnt_q_5" BEL "vg/psg_b/tone2_b/freq_cnt_q_4"
+        BEL "vg/psg_b/tone2_b/freq_cnt_q_3" BEL
+        "vg/psg_b/tone2_b/freq_cnt_q_2" BEL "vg/psg_b/tone2_b/freq_cnt_q_1"
+        BEL "vg/psg_b/tone2_b/freq_cnt_q_0" BEL
+        "vg/psg_b/tone3_b/freq_cnt_q_9" BEL "vg/psg_b/tone3_b/freq_cnt_q_8"
+        BEL "vg/psg_b/tone3_b/freq_cnt_q_7" BEL
+        "vg/psg_b/tone3_b/freq_cnt_q_6" BEL "vg/psg_b/tone3_b/freq_cnt_q_5"
+        BEL "vg/psg_b/tone3_b/freq_cnt_q_4" BEL
+        "vg/psg_b/tone3_b/freq_cnt_q_3" BEL "vg/psg_b/tone3_b/freq_cnt_q_2"
+        BEL "vg/psg_b/tone3_b/freq_cnt_q_1" BEL
+        "vg/psg_b/tone3_b/freq_cnt_q_0" BEL "vg/psg_b/tone1_b/freq_cnt_q_9"
+        BEL "vg/psg_b/tone1_b/freq_cnt_q_8" BEL
+        "vg/psg_b/tone1_b/freq_cnt_q_7" BEL "vg/psg_b/tone1_b/freq_cnt_q_6"
+        BEL "vg/psg_b/tone1_b/freq_cnt_q_5" BEL
+        "vg/psg_b/tone1_b/freq_cnt_q_4" BEL "vg/psg_b/tone1_b/freq_cnt_q_3"
+        BEL "vg/psg_b/tone1_b/freq_cnt_q_2" BEL
+        "vg/psg_b/tone1_b/freq_cnt_q_1" BEL "vg/psg_b/tone1_b/freq_cnt_q_0"
+        BEL "audioout/SigmaLatch_q_9" BEL "vg/cpu/mreq_s" BEL "vg/cpu/rd_s"
+        BEL "vg/cpu/iorq_n_s" BEL "vg/cpu/wr_n_s" BEL
+        "vg/cpu/ireq_inhibit_n_s" BEL "vg/cpu/mreq_inhibit_s" BEL
+        "vg/cpu/req_inhibit_s" BEL "vg/cpu/data_r_7" BEL "vg/cpu/data_r_6" BEL
+        "vg/cpu/data_r_5" BEL "vg/cpu/data_r_4" BEL "vg/cpu/data_r_3" BEL
+        "vg/cpu/data_r_2" BEL "vg/cpu/data_r_1" BEL "vg/cpu/data_r_0" BEL
+        "vg/cpu/reset_s" BEL "vg/ctrl_b/sel_q" BEL
+        "vg/vdp18_b/cpu_io_b/state_q_FSM_FFd1" BEL
+        "vg/vdp18_b/cpu_io_b/state_q_FSM_FFd2" BEL
+        "vg/vdp18_b/cpu_io_b/addr_q_0" BEL "vg/vdp18_b/cpu_io_b/addr_q_1" BEL
+        "vg/vdp18_b/cpu_io_b/addr_q_2" BEL "vg/vdp18_b/cpu_io_b/addr_q_3" BEL
+        "vg/vdp18_b/cpu_io_b/addr_q_4" BEL "vg/vdp18_b/cpu_io_b/addr_q_5" BEL
+        "vg/vdp18_b/cpu_io_b/addr_q_6" BEL "vg/vdp18_b/cpu_io_b/addr_q_7" BEL
+        "vg/vdp18_b/cpu_io_b/addr_q_8" BEL "vg/vdp18_b/cpu_io_b/addr_q_9" BEL
+        "vg/vdp18_b/cpu_io_b/addr_q_10" BEL "vg/vdp18_b/cpu_io_b/addr_q_11"
+        BEL "vg/vdp18_b/cpu_io_b/addr_q_12" BEL
+        "vg/vdp18_b/cpu_io_b/addr_q_13" BEL
+        "vg/vdp18_b/cpu_io_b/state_q_FSM_FFd4" BEL
+        "vg/vdp18_b/cpu_io_b/state_q_FSM_FFd3" BEL
+        "vg/vdp18_b/cpu_io_b/buffer_q_0" BEL "vg/vdp18_b/cpu_io_b/buffer_q_1"
+        BEL "vg/vdp18_b/cpu_io_b/buffer_q_2" BEL
+        "vg/vdp18_b/cpu_io_b/buffer_q_3" BEL "vg/vdp18_b/cpu_io_b/buffer_q_4"
+        BEL "vg/vdp18_b/cpu_io_b/buffer_q_5" BEL
+        "vg/vdp18_b/cpu_io_b/buffer_q_6" BEL "vg/vdp18_b/cpu_io_b/buffer_q_7"
+        BEL "vg/vdp18_b/cpu_io_b/wrvram_sched_q" BEL
+        "vg/vdp18_b/cpu_io_b/rdvram_sched_q" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_7_0" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_7_1" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_7_2" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_7_3" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_7_4" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_7_5" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_7_6" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_7_7" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_1_1" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_1_2" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_1_3" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_1_4" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_1_6" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_1_7" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_3_0" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_3_1" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_3_2" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_3_3" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_3_4" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_3_5" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_3_6" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_3_7" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_0_6" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_2_4" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_2_5" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_2_6" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_2_7" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_4_5" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_4_6" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_4_7" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_5_1" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_5_2" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_5_3" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_5_4" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_5_5" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_5_6" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_5_7" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_6_5" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_6_6" BEL
+        "vg/vdp18_b/cpu_io_b/ctrl_reg_q_6_7" BEL
+        "vg/vdp18_b/cpu_io_b/sprite_5th_q" BEL
+        "vg/vdp18_b/cpu_io_b/sprite_coll_q" BEL "vg/vdp18_b/cpu_io_b/wrvram_q"
+        BEL "vg/vdp18_b/cpu_io_b/rdvram_q" BEL "vg/vdp18_b/cpu_io_b/int_n_q"
+        BEL "vg/vdp18_b/cpu_io_b/tmp_q_0" BEL "vg/vdp18_b/cpu_io_b/tmp_q_1"
+        BEL "vg/vdp18_b/cpu_io_b/tmp_q_2" BEL "vg/vdp18_b/cpu_io_b/tmp_q_3"
+        BEL "vg/vdp18_b/cpu_io_b/tmp_q_4" BEL "vg/vdp18_b/cpu_io_b/tmp_q_5"
+        BEL "vg/vdp18_b/cpu_io_b/tmp_q_6" BEL "vg/vdp18_b/cpu_io_b/tmp_q_7"
+        BEL "vg/vdp18_b/cpu_io_b/sprite_5th_num_q_0" BEL
+        "vg/vdp18_b/cpu_io_b/sprite_5th_num_q_1" BEL
+        "vg/vdp18_b/cpu_io_b/sprite_5th_num_q_2" BEL
+        "vg/vdp18_b/cpu_io_b/sprite_5th_num_q_3" BEL
+        "vg/vdp18_b/cpu_io_b/sprite_5th_num_q_4" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_0" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_1" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_2" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_3" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_4" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_5" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_6" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_7" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_8" BEL
+        "vg/vdp18_b/pattern_b/pat_cnt_q_9" BEL
+        "vg/vdp18_b/pattern_b/pat_shift_q_0" BEL
+        "vg/vdp18_b/pattern_b/pat_shift_q_1" BEL
+        "vg/vdp18_b/pattern_b/pat_shift_q_2" BEL
+        "vg/vdp18_b/pattern_b/pat_shift_q_3" BEL
+        "vg/vdp18_b/pattern_b/pat_shift_q_4" BEL
+        "vg/vdp18_b/pattern_b/pat_shift_q_5" BEL
+        "vg/vdp18_b/pattern_b/pat_shift_q_6" BEL
+        "vg/vdp18_b/pattern_b/pat_shift_q_7" BEL
+        "vg/vdp18_b/pattern_b/pat_col_q_0" BEL
+        "vg/vdp18_b/pattern_b/pat_col_q_1" BEL
+        "vg/vdp18_b/pattern_b/pat_col_q_2" BEL
+        "vg/vdp18_b/pattern_b/pat_col_q_3" BEL
+        "vg/vdp18_b/pattern_b/pat_col_q_4" BEL
+        "vg/vdp18_b/pattern_b/pat_col_q_5" BEL
+        "vg/vdp18_b/pattern_b/pat_col_q_6" BEL
+        "vg/vdp18_b/pattern_b/pat_col_q_7" BEL
+        "vg/vdp18_b/pattern_b/pat_tmp_q_0" BEL
+        "vg/vdp18_b/pattern_b/pat_tmp_q_1" BEL
+        "vg/vdp18_b/pattern_b/pat_tmp_q_2" BEL
+        "vg/vdp18_b/pattern_b/pat_tmp_q_3" BEL
+        "vg/vdp18_b/pattern_b/pat_tmp_q_4" BEL
+        "vg/vdp18_b/pattern_b/pat_tmp_q_5" BEL
+        "vg/vdp18_b/pattern_b/pat_tmp_q_6" BEL
+        "vg/vdp18_b/pattern_b/pat_tmp_q_7" BEL
+        "vg/vdp18_b/pattern_b/pat_name_q_0" BEL
+        "vg/vdp18_b/pattern_b/pat_name_q_1" BEL
+        "vg/vdp18_b/pattern_b/pat_name_q_2" BEL
+        "vg/vdp18_b/pattern_b/pat_name_q_3" BEL
+        "vg/vdp18_b/pattern_b/pat_name_q_4" BEL
+        "vg/vdp18_b/pattern_b/pat_name_q_5" BEL
+        "vg/vdp18_b/pattern_b/pat_name_q_6" BEL
+        "vg/vdp18_b/pattern_b/pat_name_q_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_num_q_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_num_q_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_num_q_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_num_q_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_num_q_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_idx_q_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_idx_q_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_idx_q_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_8" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_9" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_10" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_11" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_12" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_13" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_14" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_3_15" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_8" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_9" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_10" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_11" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_12" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_13" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_14" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_1_15" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_8" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_9" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_10" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_11" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_12" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_13" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_14" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_0_15" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_8" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_9" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_10" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_11" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_12" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_13" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_14" BEL
+        "vg/vdp18_b/sprite_b/sprite_pats_q_2_15" BEL
+        "vg/vdp18_b/sprite_b/sprite_xtog_q_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_xtog_q_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_xtog_q_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_xtog_q_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_line_q_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_line_q_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_line_q_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_line_q_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_3_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_3_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_3_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_3_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_3_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_3_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_3_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_3_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_1_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_1_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_1_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_1_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_1_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_1_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_1_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_1_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_0_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_0_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_0_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_0_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_0_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_0_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_0_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_0_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_2_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_2_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_2_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_2_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_2_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_2_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_2_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_xpos_q_2_7" BEL
+        "vg/vdp18_b/sprite_b/sprite_ec_q_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_ec_q_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_ec_q_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_ec_q_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_0_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_0_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_0_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_0_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_0_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_3_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_3_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_3_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_3_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_3_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_1_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_1_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_1_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_1_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_1_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_2_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_2_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_2_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_2_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_numbers_q_2_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_3_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_3_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_3_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_3_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_2_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_2_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_2_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_2_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_0_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_0_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_0_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_0_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_1_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_1_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_1_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_cols_q_1_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_name_q_0" BEL
+        "vg/vdp18_b/sprite_b/sprite_name_q_1" BEL
+        "vg/vdp18_b/sprite_b/sprite_name_q_2" BEL
+        "vg/vdp18_b/sprite_b/sprite_name_q_3" BEL
+        "vg/vdp18_b/sprite_b/sprite_name_q_4" BEL
+        "vg/vdp18_b/sprite_b/sprite_name_q_5" BEL
+        "vg/vdp18_b/sprite_b/sprite_name_q_6" BEL
+        "vg/vdp18_b/sprite_b/sprite_name_q_7" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_8" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_7" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_5" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_4" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_6" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_3" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_2" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_0" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_8" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_vert_q_1" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_7" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_6" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_4" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_3" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_5" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_1" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_0" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_q_2" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_ver_s_7" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_ver_s_6" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_ver_s_5" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_ver_s_4" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_ver_s_3" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_ver_s_2" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_ver_s_1" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_ver_s_0" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_8" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_7" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_6" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_5" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_4" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_3" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_2" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_1" BEL
+        "vg/vdp18_b/hor_vert_b/cnt_hor_s_0" BEL
+        "vg/vdp18_b/hor_vert_b/vblank_q" BEL "vg/vdp18_b/hor_vert_b/vsync_n_o"
+        BEL "vg/vdp18_b/hor_vert_b/hblank_q" BEL
+        "vg/vdp18_b/ctrl_b/sprite_line_act_q" BEL
+        "vg/vdp18_b/ctrl_b/vram_ce_o" BEL "vg/vdp18_b/ctrl_b/vram_oe_o" BEL
+        "vg/vdp18_b/ctrl_b/vert_active_q" BEL
+        "vg/vdp18_b/ctrl_b/sprite_active_q" BEL
+        "vg/vdp18_b/ctrl_b/hor_active_q" BEL "vg/cpu/u0/TState_2" BEL
+        "vg/cpu/u0/TState_1" BEL "vg/cpu/u0/TState_0" BEL "vg/cpu/u0/DO_7" BEL
+        "vg/cpu/u0/DO_6" BEL "vg/cpu/u0/DO_5" BEL "vg/cpu/u0/DO_4" BEL
+        "vg/cpu/u0/DO_3" BEL "vg/cpu/u0/DO_2" BEL "vg/cpu/u0/DO_1" BEL
+        "vg/cpu/u0/DO_0" BEL "vg/cpu/u0/A_15" BEL "vg/cpu/u0/A_14" BEL
+        "vg/cpu/u0/A_13" BEL "vg/cpu/u0/A_12" BEL "vg/cpu/u0/A_11" BEL
+        "vg/cpu/u0/A_10" BEL "vg/cpu/u0/A_9" BEL "vg/cpu/u0/A_8" BEL
+        "vg/cpu/u0/A_7" BEL "vg/cpu/u0/A_6" BEL "vg/cpu/u0/A_5" BEL
+        "vg/cpu/u0/A_4" BEL "vg/cpu/u0/A_3" BEL "vg/cpu/u0/A_2" BEL
+        "vg/cpu/u0/A_1" BEL "vg/cpu/u0/A_0" BEL "vg/cpu/u0/BusA_7" BEL
+        "vg/cpu/u0/BusA_6" BEL "vg/cpu/u0/BusA_5" BEL "vg/cpu/u0/BusA_4" BEL
+        "vg/cpu/u0/BusA_3" BEL "vg/cpu/u0/BusA_2" BEL "vg/cpu/u0/BusA_1" BEL
+        "vg/cpu/u0/BusA_0" BEL "vg/cpu/u0/ALU_Op_r_3" BEL
+        "vg/cpu/u0/ALU_Op_r_2" BEL "vg/cpu/u0/ALU_Op_r_1" BEL
+        "vg/cpu/u0/ALU_Op_r_0" BEL "vg/cpu/u0/Halt_FF" BEL
+        "vg/cpu/u0/Save_ALU_r" BEL "vg/cpu/u0/ALU_cpi_r" BEL
+        "vg/cpu/u0/MCycles_2" BEL "vg/cpu/u0/MCycles_1" BEL
+        "vg/cpu/u0/MCycles_0" BEL "vg/cpu/u0/Arith16_r" BEL "vg/cpu/u0/F_7"
+        BEL "vg/cpu/u0/F_6" BEL "vg/cpu/u0/F_5" BEL "vg/cpu/u0/F_4" BEL
+        "vg/cpu/u0/F_3" BEL "vg/cpu/u0/F_2" BEL "vg/cpu/u0/F_1" BEL
+        "vg/cpu/u0/F_0" BEL "vg/cpu/u0/ACC_7" BEL "vg/cpu/u0/ACC_6" BEL
+        "vg/cpu/u0/ACC_5" BEL "vg/cpu/u0/ACC_4" BEL "vg/cpu/u0/ACC_3" BEL
+        "vg/cpu/u0/ACC_2" BEL "vg/cpu/u0/ACC_1" BEL "vg/cpu/u0/ACC_0" BEL
+        "vg/cpu/u0/BusB_7" BEL "vg/cpu/u0/BusB_6" BEL "vg/cpu/u0/BusB_5" BEL
+        "vg/cpu/u0/BusB_4" BEL "vg/cpu/u0/BusB_3" BEL "vg/cpu/u0/BusB_2" BEL
+        "vg/cpu/u0/BusB_1" BEL "vg/cpu/u0/BusB_0" BEL "vg/cpu/u0/PC_15" BEL
+        "vg/cpu/u0/PC_14" BEL "vg/cpu/u0/PC_13" BEL "vg/cpu/u0/PC_12" BEL
+        "vg/cpu/u0/PC_11" BEL "vg/cpu/u0/PC_10" BEL "vg/cpu/u0/PC_9" BEL
+        "vg/cpu/u0/PC_8" BEL "vg/cpu/u0/PC_7" BEL "vg/cpu/u0/PC_6" BEL
+        "vg/cpu/u0/PC_5" BEL "vg/cpu/u0/PC_4" BEL "vg/cpu/u0/PC_3" BEL
+        "vg/cpu/u0/PC_2" BEL "vg/cpu/u0/PC_1" BEL "vg/cpu/u0/PC_0" BEL
+        "vg/cpu/u0/TmpAddr_15" BEL "vg/cpu/u0/TmpAddr_14" BEL
+        "vg/cpu/u0/TmpAddr_13" BEL "vg/cpu/u0/TmpAddr_12" BEL
+        "vg/cpu/u0/TmpAddr_11" BEL "vg/cpu/u0/TmpAddr_10" BEL
+        "vg/cpu/u0/TmpAddr_9" BEL "vg/cpu/u0/TmpAddr_8" BEL
+        "vg/cpu/u0/TmpAddr_7" BEL "vg/cpu/u0/TmpAddr_6" BEL
+        "vg/cpu/u0/TmpAddr_5" BEL "vg/cpu/u0/TmpAddr_4" BEL
+        "vg/cpu/u0/TmpAddr_3" BEL "vg/cpu/u0/TmpAddr_2" BEL
+        "vg/cpu/u0/TmpAddr_1" BEL "vg/cpu/u0/TmpAddr_0" BEL "vg/cpu/u0/SP_15"
+        BEL "vg/cpu/u0/SP_14" BEL "vg/cpu/u0/SP_13" BEL "vg/cpu/u0/SP_12" BEL
+        "vg/cpu/u0/SP_11" BEL "vg/cpu/u0/SP_10" BEL "vg/cpu/u0/SP_9" BEL
+        "vg/cpu/u0/SP_8" BEL "vg/cpu/u0/SP_7" BEL "vg/cpu/u0/SP_6" BEL
+        "vg/cpu/u0/SP_5" BEL "vg/cpu/u0/SP_4" BEL "vg/cpu/u0/SP_3" BEL
+        "vg/cpu/u0/SP_2" BEL "vg/cpu/u0/SP_1" BEL "vg/cpu/u0/SP_0" BEL
+        "vg/cpu/u0/RegAddrC_2" BEL "vg/cpu/u0/RegAddrC_1" BEL
+        "vg/cpu/u0/RegAddrC_0" BEL "vg/cpu/u0/RegAddrB_r_2" BEL
+        "vg/cpu/u0/RegAddrB_r_1" BEL "vg/cpu/u0/RegAddrB_r_0" BEL
+        "vg/cpu/u0/RegAddrA_r_2" BEL "vg/cpu/u0/RegAddrA_r_1" BEL
+        "vg/cpu/u0/RegAddrA_r_0" BEL "vg/cpu/u0/IntE_FF2" BEL "vg/cpu/u0/R_7"
+        BEL "vg/cpu/u0/R_6" BEL "vg/cpu/u0/R_5" BEL "vg/cpu/u0/R_4" BEL
+        "vg/cpu/u0/R_3" BEL "vg/cpu/u0/R_2" BEL "vg/cpu/u0/R_1" BEL
+        "vg/cpu/u0/R_0" BEL "vg/cpu/u0/MCycle_2" BEL "vg/cpu/u0/MCycle_1" BEL
+        "vg/cpu/u0/MCycle_0" BEL "vg/cpu/u0/XY_State_1" BEL
+        "vg/cpu/u0/XY_State_0" BEL "vg/cpu/u0/M1_n" BEL
+        "vg/cpu/u0/Auto_Wait_t2" BEL "vg/cpu/u0/Read_To_Reg_r_4" BEL
+        "vg/cpu/u0/Read_To_Reg_r_3" BEL "vg/cpu/u0/Read_To_Reg_r_2" BEL
+        "vg/cpu/u0/Read_To_Reg_r_1" BEL "vg/cpu/u0/Read_To_Reg_r_0" BEL
+        "vg/cpu/u0/ISet_1" BEL "vg/cpu/u0/ISet_0" BEL "vg/cpu/u0/Auto_Wait_t1"
+        BEL "vg/cpu/u0/IR_7" BEL "vg/cpu/u0/IR_6" BEL "vg/cpu/u0/IR_5" BEL
+        "vg/cpu/u0/IR_4" BEL "vg/cpu/u0/IR_3" BEL "vg/cpu/u0/IR_2" BEL
+        "vg/cpu/u0/IR_1" BEL "vg/cpu/u0/IR_0" BEL "vg/cpu/u0/IncDecZ" BEL
+        "vg/cpu/u0/Pre_XY_F_M_2" BEL "vg/cpu/u0/Pre_XY_F_M_1" BEL
+        "vg/cpu/u0/Pre_XY_F_M_0" BEL "vg/cpu/u0/RegBusA_r_15" BEL
+        "vg/cpu/u0/RegBusA_r_14" BEL "vg/cpu/u0/RegBusA_r_13" BEL
+        "vg/cpu/u0/RegBusA_r_12" BEL "vg/cpu/u0/RegBusA_r_11" BEL
+        "vg/cpu/u0/RegBusA_r_10" BEL "vg/cpu/u0/RegBusA_r_9" BEL
+        "vg/cpu/u0/RegBusA_r_8" BEL "vg/cpu/u0/RegBusA_r_7" BEL
+        "vg/cpu/u0/RegBusA_r_6" BEL "vg/cpu/u0/RegBusA_r_5" BEL
+        "vg/cpu/u0/RegBusA_r_4" BEL "vg/cpu/u0/RegBusA_r_3" BEL
+        "vg/cpu/u0/RegBusA_r_2" BEL "vg/cpu/u0/RegBusA_r_1" BEL
+        "vg/cpu/u0/RegBusA_r_0" BEL "vg/cpu/u0/I_7" BEL "vg/cpu/u0/I_6" BEL
+        "vg/cpu/u0/I_5" BEL "vg/cpu/u0/I_4" BEL "vg/cpu/u0/I_3" BEL
+        "vg/cpu/u0/I_2" BEL "vg/cpu/u0/I_1" BEL "vg/cpu/u0/I_0" BEL
+        "vg/cpu/u0/Fp_7" BEL "vg/cpu/u0/Fp_6" BEL "vg/cpu/u0/Fp_5" BEL
+        "vg/cpu/u0/Fp_4" BEL "vg/cpu/u0/Fp_3" BEL "vg/cpu/u0/Fp_2" BEL
+        "vg/cpu/u0/Fp_1" BEL "vg/cpu/u0/Fp_0" BEL "vg/cpu/u0/Ap_7" BEL
+        "vg/cpu/u0/Ap_6" BEL "vg/cpu/u0/Ap_5" BEL "vg/cpu/u0/Ap_4" BEL
+        "vg/cpu/u0/Ap_3" BEL "vg/cpu/u0/Ap_2" BEL "vg/cpu/u0/Ap_1" BEL
+        "vg/cpu/u0/Ap_0" BEL "vg/cpu/u0/No_BTR" BEL "vg/cpu/u0/NMICycle" BEL
+        "vg/cpu/u0/OldNMI_n" BEL "vg/cpu/u0/NMI_s" BEL "vg/cpu/u0/XY_Ind" BEL
+        "vg/cpu/u0/PreserveC_r" BEL "vg/cpu/u0/BTR_r" BEL "vg/cpu/u0/Z16_r"
+        BEL "vg/cpu/u0/Alternate" BEL "vg/cpu/u0/RFSH_n" BEL
+        "vg/psg_b/latch_ctrl_b/we_q" BEL "vg/psg_b/latch_ctrl_b/reg_q_0" BEL
+        "vg/psg_b/latch_ctrl_b/reg_q_1" BEL "vg/psg_b/latch_ctrl_b/reg_q_2"
+        BEL "vg/psg_b/latch_ctrl_b/ready_q" BEL
+        "vg/psg_b/noise_b/freq_cnt_q_0" BEL "vg/psg_b/noise_b/freq_cnt_q_1"
+        BEL "vg/psg_b/noise_b/freq_cnt_q_2" BEL
+        "vg/psg_b/noise_b/freq_cnt_q_3" BEL "vg/psg_b/noise_b/freq_cnt_q_4"
+        BEL "vg/psg_b/noise_b/freq_cnt_q_5" BEL
+        "vg/psg_b/noise_b/freq_cnt_q_6" BEL "vg/psg_b/noise_b/lfsr_q_0" BEL
+        "vg/psg_b/noise_b/lfsr_q_1" BEL "vg/psg_b/noise_b/lfsr_q_2" BEL
+        "vg/psg_b/noise_b/lfsr_q_3" BEL "vg/psg_b/noise_b/lfsr_q_4" BEL
+        "vg/psg_b/noise_b/lfsr_q_5" BEL "vg/psg_b/noise_b/lfsr_q_6" BEL
+        "vg/psg_b/noise_b/lfsr_q_7" BEL "vg/psg_b/noise_b/lfsr_q_8" BEL
+        "vg/psg_b/noise_b/lfsr_q_9" BEL "vg/psg_b/noise_b/lfsr_q_10" BEL
+        "vg/psg_b/noise_b/lfsr_q_11" BEL "vg/psg_b/noise_b/lfsr_q_12" BEL
+        "vg/psg_b/noise_b/lfsr_q_13" BEL "vg/psg_b/noise_b/lfsr_q_14" BEL
+        "vg/psg_b/noise_b/lfsr_q_15" BEL "vg/psg_b/noise_b/shift_source_q" BEL
+        "vg/psg_b/noise_b/freq_ff_q" BEL "vg/psg_b/noise_b/fb_q" BEL
+        "vg/psg_b/noise_b/nf_q_0" BEL "vg/psg_b/noise_b/nf_q_1" BEL
+        "vg/psg_b/noise_b/a_q_0" BEL "vg/psg_b/noise_b/a_q_1" BEL
+        "vg/psg_b/noise_b/a_q_2" BEL "vg/psg_b/noise_b/a_q_3" BEL
+        "vg/WSG/ENVCNT_15" BEL "vg/WSG/ENVCNT_14" BEL "vg/WSG/ENVCNT_13" BEL
+        "vg/WSG/ENVCNT_12" BEL "vg/WSG/ENVCNT_11" BEL "vg/WSG/ENVCNT_10" BEL
+        "vg/WSG/ENVCNT_9" BEL "vg/WSG/ENVCNT_8" BEL "vg/WSG/ENVCNT_7" BEL
+        "vg/WSG/ENVCNT_6" BEL "vg/WSG/ENVCNT_5" BEL "vg/WSG/ENVCNT_4" BEL
+        "vg/WSG/ENVCNT_3" BEL "vg/WSG/ENVCNT_2" BEL "vg/WSG/ENVCNT_1" BEL
+        "vg/WSG/ENVCNT_0" BEL "vg/WSG/DCOTCNT_3_11" BEL "vg/WSG/DCOTCNT_3_10"
+        BEL "vg/WSG/DCOTCNT_3_9" BEL "vg/WSG/DCOTCNT_3_8" BEL
+        "vg/WSG/DCOTCNT_3_7" BEL "vg/WSG/DCOTCNT_3_6" BEL "vg/WSG/DCOTCNT_3_5"
+        BEL "vg/WSG/DCOTCNT_3_4" BEL "vg/WSG/DCOTCNT_3_3" BEL
+        "vg/WSG/DCOTCNT_3_2" BEL "vg/WSG/DCOTCNT_3_1" BEL "vg/WSG/DCOTCNT_3_0"
+        BEL "vg/WSG/DCOTCNT_1_11" BEL "vg/WSG/DCOTCNT_1_10" BEL
+        "vg/WSG/DCOTCNT_1_9" BEL "vg/WSG/DCOTCNT_1_8" BEL "vg/WSG/DCOTCNT_1_7"
+        BEL "vg/WSG/DCOTCNT_1_6" BEL "vg/WSG/DCOTCNT_1_5" BEL
+        "vg/WSG/DCOTCNT_1_4" BEL "vg/WSG/DCOTCNT_1_3" BEL "vg/WSG/DCOTCNT_1_2"
+        BEL "vg/WSG/DCOTCNT_1_1" BEL "vg/WSG/DCOTCNT_1_0" BEL
+        "vg/WSG/DCONCNT_7" BEL "vg/WSG/DCONCNT_6" BEL "vg/WSG/DCONCNT_5" BEL
+        "vg/WSG/DCONCNT_4" BEL "vg/WSG/DCONCNT_3" BEL "vg/WSG/DCONCNT_2" BEL
+        "vg/WSG/DCONCNT_1" BEL "vg/WSG/DCONCNT_0" BEL "vg/WSG/DCOTCNT_2_11"
+        BEL "vg/WSG/DCOTCNT_2_10" BEL "vg/WSG/DCOTCNT_2_9" BEL
+        "vg/WSG/DCOTCNT_2_8" BEL "vg/WSG/DCOTCNT_2_7" BEL "vg/WSG/DCOTCNT_2_6"
+        BEL "vg/WSG/DCOTCNT_2_5" BEL "vg/WSG/DCOTCNT_2_4" BEL
+        "vg/WSG/DCOTCNT_2_3" BEL "vg/WSG/DCOTCNT_2_2" BEL "vg/WSG/DCOTCNT_2_1"
+        BEL "vg/WSG/DCOTCNT_2_0" BEL "vg/WSG/DIGITAL_MIX_7" BEL
+        "vg/WSG/DIGITAL_MIX_6" BEL "vg/WSG/DIGITAL_MIX_5" BEL
+        "vg/WSG/DIGITAL_MIX_4" BEL "vg/WSG/DIGITAL_MIX_3" BEL
+        "vg/WSG/DIGITAL_MIX_2" BEL "vg/WSG/DIGITAL_MIX_1" BEL
+        "vg/WSG/DIGITAL_MIX_0" BEL "vg/WSG/B_4" BEL "vg/WSG/B_3" BEL
+        "vg/WSG/B_2" BEL "vg/WSG/B_1" BEL "vg/WSG/B_0" BEL "vg/WSG/A_4" BEL
+        "vg/WSG/A_3" BEL "vg/WSG/A_2" BEL "vg/WSG/A_1" BEL "vg/WSG/A_0" BEL
+        "vg/WSG/C_4" BEL "vg/WSG/C_3" BEL "vg/WSG/C_2" BEL "vg/WSG/C_1" BEL
+        "vg/WSG/C_0" BEL "vg/WSG/DCOTOUT_3" BEL "vg/WSG/DCOTOUT_2" BEL
+        "vg/WSG/DCOTOUT_1" BEL "vg/WSG/ENVENA" BEL "vg/WSG/ENVSET" BEL
+        "vg/WSG/DCONDAT_16" BEL "vg/WSG/DCONDAT_15" BEL "vg/WSG/DCONDAT_14"
+        BEL "vg/WSG/DCONDAT_13" BEL "vg/WSG/DCONDAT_12" BEL
+        "vg/WSG/DCONDAT_11" BEL "vg/WSG/DCONDAT_10" BEL "vg/WSG/DCONDAT_9" BEL
+        "vg/WSG/DCONDAT_8" BEL "vg/WSG/DCONDAT_7" BEL "vg/WSG/DCONDAT_6" BEL
+        "vg/WSG/DCONDAT_5" BEL "vg/WSG/DCONDAT_4" BEL "vg/WSG/DCONDAT_3" BEL
+        "vg/WSG/DCONDAT_2" BEL "vg/WSG/DCONDAT_1" BEL "vg/WSG/DCONDAT_0" BEL
+        "vg/WSG/CLKENAN" BEL "vg/WSG/CLKDIVN" BEL "vg/WSG/CLKENAT" BEL
+        "pll_1/clkout1_buf" BEL "ps2if_inst/count_4" BEL "ps2if_inst/count_3"
+        BEL "ps2if_inst/count_2" BEL "ps2if_inst/count_1" BEL
+        "ps2if_inst/count_0" BEL "ps2if_inst/joy_4" BEL "ps2if_inst/joy_3" BEL
+        "ps2if_inst/joy_2" BEL "ps2if_inst/joy_1" BEL "ps2if_inst/joy_0" BEL
+        "ps2if_inst/keys_14" BEL "ps2if_inst/keys_13" BEL "ps2if_inst/keys_12"
+        BEL "ps2if_inst/keys_11" BEL "ps2if_inst/keys_10" BEL
+        "ps2if_inst/keys_9" BEL "ps2if_inst/keys_8" BEL "ps2if_inst/keys_7"
+        BEL "ps2if_inst/keys_6" BEL "ps2if_inst/keys_5" BEL
+        "ps2if_inst/keys_3" BEL "ps2if_inst/keys_2" BEL "ps2if_inst/keys_1"
+        BEL "ps2if_inst/keys_0" BEL "ps2if_inst/tick1us" BEL
+        "ps2if_inst/ps2kbd_inst/Reset" BEL "ps2if_inst/ps2kbd_inst/Press" BEL
+        "ps2if_inst/ps2kbd_inst/Release" BEL
+        "ps2if_inst/ps2kbd_inst/RX_Received" BEL
+        "ps2if_inst/ps2kbd_inst/RX_Bit_Cnt_3" BEL
+        "ps2if_inst/ps2kbd_inst/RX_Bit_Cnt_2" BEL
+        "ps2if_inst/ps2kbd_inst/RX_Bit_Cnt_1" BEL
+        "ps2if_inst/ps2kbd_inst/RX_Bit_Cnt_0" BEL
+        "ps2if_inst/ps2kbd_inst/Cnt_30" BEL "ps2if_inst/ps2kbd_inst/Cnt_29"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_28" BEL
+        "ps2if_inst/ps2kbd_inst/Cnt_27" BEL "ps2if_inst/ps2kbd_inst/Cnt_26"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_25" BEL
+        "ps2if_inst/ps2kbd_inst/Cnt_24" BEL "ps2if_inst/ps2kbd_inst/Cnt_23"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_22" BEL
+        "ps2if_inst/ps2kbd_inst/Cnt_21" BEL "ps2if_inst/ps2kbd_inst/Cnt_20"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_19" BEL
+        "ps2if_inst/ps2kbd_inst/Cnt_18" BEL "ps2if_inst/ps2kbd_inst/Cnt_17"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_16" BEL
+        "ps2if_inst/ps2kbd_inst/Cnt_15" BEL "ps2if_inst/ps2kbd_inst/Cnt_14"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_13" BEL
+        "ps2if_inst/ps2kbd_inst/Cnt_12" BEL "ps2if_inst/ps2kbd_inst/Cnt_11"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_10" BEL "ps2if_inst/ps2kbd_inst/Cnt_9"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_8" BEL "ps2if_inst/ps2kbd_inst/Cnt_7"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_6" BEL "ps2if_inst/ps2kbd_inst/Cnt_5"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_4" BEL "ps2if_inst/ps2kbd_inst/Cnt_3"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_2" BEL "ps2if_inst/ps2kbd_inst/Cnt_1"
+        BEL "ps2if_inst/ps2kbd_inst/Cnt_0" BEL
+        "ps2if_inst/ps2kbd_inst/PS2_Sample" BEL
+        "ps2if_inst/ps2kbd_inst/RX_ShiftReg_7" BEL
+        "ps2if_inst/ps2kbd_inst/RX_ShiftReg_6" BEL
+        "ps2if_inst/ps2kbd_inst/RX_ShiftReg_5" BEL
+        "ps2if_inst/ps2kbd_inst/RX_ShiftReg_4" BEL
+        "ps2if_inst/ps2kbd_inst/RX_ShiftReg_3" BEL
+        "ps2if_inst/ps2kbd_inst/RX_ShiftReg_2" BEL
+        "ps2if_inst/ps2kbd_inst/RX_ShiftReg_1" BEL
+        "ps2if_inst/ps2kbd_inst/RX_ShiftReg_0" BEL
+        "ps2if_inst/ps2kbd_inst/PS2_Data_s" BEL
+        "ps2if_inst/ps2kbd_inst/PS2_Clk_State" BEL
+        "ps2if_inst/ps2kbd_inst/PS2_Data_r_1" BEL
+        "ps2if_inst/ps2kbd_inst/PS2_Data_r_0" BEL
+        "ps2if_inst/ps2kbd_inst/PS2_Clk_r_1" BEL
+        "ps2if_inst/ps2kbd_inst/PS2_Clk_r_0" BEL
+        "ps2if_inst/ps2kbd_inst/RX_Release" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_31" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_30" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_29" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_28" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_27" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_26" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_25" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_24" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_23" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_22" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_21" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_20" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_15" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_14" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_13" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_12" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_11" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_10" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_9" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_8" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_7" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_6" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_5" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_4" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_3" BEL
+        "snespads_b/pads[0].pad_b/buttons_q_0" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_31" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_30" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_29" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_28" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_27" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_26" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_25" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_24" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_23" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_22" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_21" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_15" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_14" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_13" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_12" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_11" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_10" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_9" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_8" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_7" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_6" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_5" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_4" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_3" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_2" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_1" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_0" BEL
+        "snespads_b/ctrl_b/state_q_FSM_FFd1" BEL
+        "snespads_b/ctrl_b/state_q_FSM_FFd2" BEL
+        "snespads_b/ctrl_b/clocks_per_6us_q_6" BEL
+        "snespads_b/ctrl_b/clocks_per_6us_q_5" BEL
+        "snespads_b/ctrl_b/clocks_per_6us_q_4" BEL
+        "snespads_b/ctrl_b/clocks_per_6us_q_3" BEL
+        "snespads_b/ctrl_b/clocks_per_6us_q_2" BEL
+        "snespads_b/ctrl_b/clocks_per_6us_q_1" BEL
+        "snespads_b/ctrl_b/clocks_per_6us_q_0" BEL
+        "snespads_b/ctrl_b/pad_clk_q" BEL "snespads_b/ctrl_b/pad_latch_q" BEL
+        "clks/clk2_cnt_q_2" BEL "clks/clk2_cnt_q_1" BEL "clks/clk2_cnt_q_0"
+        BEL "clks/clk1_cnt_q_1" BEL "clks/clk1_cnt_q_0" BEL
+        "clks/clock_5m_en_s" BEL "clks/clock_vdp_en_s" BEL "vg/WSG/ENVAMP_4"
+        BEL "vg/WSG/ENVAMP_3" BEL "vg/WSG/ENVAMP_2" BEL "vg/WSG/ENVAMP_1" BEL
+        "vg/WSG/ENVAMP_0" BEL "vg/WSG/CLKDIVT_3" BEL "vg/WSG/CLKDIVT_2" BEL
+        "vg/WSG/CLKDIVT_1" BEL "vg/WSG/CLKDIVT_0" BEL "vg/WSG/ENVINC" BEL
+        "vg/WSG/ENVHLD" BEL "ps2if_inst/ps2kbd_inst/Cnt_31_C_31" BEL
+        "ps2if_inst/ps2kbd_inst/Cnt_31_P_31" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_4_C_4" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_4_P_4" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_3_C_3" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_3_P_3" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_2_C_2" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_2_P_2" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_1_C_1" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_1_P_1" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_0_C_0" BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_0_P_0" PIN
+        "bios/Mram_ram_q1_pins<26>" PIN "bios/Mram_ram_q1_pins<27>" PIN
+        "bios/Mram_ram_q4_pins<26>" PIN "bios/Mram_ram_q4_pins<27>" PIN
+        "bios/Mram_ram_q2_pins<26>" PIN "bios/Mram_ram_q2_pins<27>" PIN
+        "bios/Mram_ram_q3_pins<26>" PIN "bios/Mram_ram_q3_pins<27>" PIN
+        "vga/frbuff/Mram_ram_q16_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q15_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q13_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q12_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q14_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q10_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q9_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q11_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q7_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q6_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q8_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q5_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q4_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q3_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q2_pins<28>" PIN
+        "vga/frbuff/Mram_ram_q1_pins<28>" PIN
+        "vg/lr/Mram_ADDR[12]_PWR_26_o_wide_mux_0_OUT4_pins<13>" PIN
+        "vg/lr/Mram_ADDR[12]_PWR_26_o_wide_mux_0_OUT3_pins<13>" PIN
+        "vg/lr/Mram_ADDR[12]_PWR_26_o_wide_mux_0_OUT2_pins<13>" PIN
+        "vg/lr/Mram_ADDR[12]_PWR_26_o_wide_mux_0_OUT1_pins<13>" BEL
+        "snespads_b/pads[0].pad_b/Mshreg_shift_buttons_q_20" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_201" BEL
+        "por_n_s_inv_shift1" BEL "por_n_s_inv_shift2" BEL "por_n_s_inv_shift3"
+        BEL "por_n_s_inv_shift4" BEL
+        "snespads_b/pads[0].pad_b/shift_buttons_q_20" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH1/DP" BEL "vg/cpu/u0/Regs/Mram_RegsH1/SP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsH121/DP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH121/SP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH122/DP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH122/SP" BEL "vg/cpu/u0/Regs/Mram_RegsH2/DP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsH2/SP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH3/DP" BEL "vg/cpu/u0/Regs/Mram_RegsH3/SP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsH4/DP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH4/SP" BEL "vg/cpu/u0/Regs/Mram_RegsH5/DP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsH5/SP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH6/DP" BEL "vg/cpu/u0/Regs/Mram_RegsH6/SP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsH7/DP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH7/SP" BEL "vg/cpu/u0/Regs/Mram_RegsH8/DP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsH8/SP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL1/DP" BEL "vg/cpu/u0/Regs/Mram_RegsL1/SP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsL121/DP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL121/SP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL122/DP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL122/SP" BEL "vg/cpu/u0/Regs/Mram_RegsL2/DP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsL2/SP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL3/DP" BEL "vg/cpu/u0/Regs/Mram_RegsL3/SP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsL4/DP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL4/SP" BEL "vg/cpu/u0/Regs/Mram_RegsL5/DP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsL5/SP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL6/DP" BEL "vg/cpu/u0/Regs/Mram_RegsL6/SP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsL7/DP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL7/SP" BEL "vg/cpu/u0/Regs/Mram_RegsL8/DP"
+        BEL "vg/cpu/u0/Regs/Mram_RegsL8/SP" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH11_RAMA_D1" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH11_RAMA" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH11_RAMB_D1" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH11_RAMB" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH11_RAMC_D1" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH11_RAMC" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH11_RAMD_D1" BEL
+        "vg/cpu/u0/Regs/Mram_RegsH11_RAMD" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL11_RAMA_D1" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL11_RAMA" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL11_RAMB_D1" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL11_RAMB" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL11_RAMC_D1" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL11_RAMC" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL11_RAMD_D1" BEL
+        "vg/cpu/u0/Regs/Mram_RegsL11_RAMD";
+PIN vga/Maddsub_n0107_pins<92> = BEL "vga/Maddsub_n0107" PINNAME CLK;
+PIN vga/frbuff/Mram_ram_q16_pins<29> = BEL "vga/frbuff/Mram_ram_q16" PINNAME
+        CLKB;
+PIN vga/frbuff/Mram_ram_q15_pins<29> = BEL "vga/frbuff/Mram_ram_q15" PINNAME
+        CLKB;
+PIN vga/frbuff/Mram_ram_q13_pins<29> = BEL "vga/frbuff/Mram_ram_q13" PINNAME
+        CLKB;
+PIN vga/frbuff/Mram_ram_q12_pins<29> = BEL "vga/frbuff/Mram_ram_q12" PINNAME
+        CLKB;
+PIN vga/frbuff/Mram_ram_q14_pins<29> = BEL "vga/frbuff/Mram_ram_q14" PINNAME
+        CLKB;
+PIN vga/frbuff/Mram_ram_q10_pins<29> = BEL "vga/frbuff/Mram_ram_q10" PINNAME
+        CLKB;
+PIN vga/frbuff/Mram_ram_q9_pins<29> = BEL "vga/frbuff/Mram_ram_q9" PINNAME
+        CLKB;
+PIN vga/frbuff/Mram_ram_q11_pins<29> = BEL "vga/frbuff/Mram_ram_q11" PINNAME
+        CLKB;
+PIN vga/frbuff/Mram_ram_q7_pins<29> = BEL "vga/frbuff/Mram_ram_q7" PINNAME
+        CLKB;
+PIN vga/frbuff/Mram_ram_q6_pins<29> = BEL "vga/frbuff/Mram_ram_q6" PINNAME
+        CLKB;
+PIN vga/frbuff/Mram_ram_q8_pins<29> = BEL "vga/frbuff/Mram_ram_q8" PINNAME
+        CLKB;
+PIN vga/frbuff/Mram_ram_q5_pins<29> = BEL "vga/frbuff/Mram_ram_q5" PINNAME
+        CLKB;
+PIN vga/frbuff/Mram_ram_q4_pins<29> = BEL "vga/frbuff/Mram_ram_q4" PINNAME
+        CLKB;
+PIN vga/frbuff/Mram_ram_q3_pins<29> = BEL "vga/frbuff/Mram_ram_q3" PINNAME
+        CLKB;
+PIN vga/frbuff/Mram_ram_q2_pins<29> = BEL "vga/frbuff/Mram_ram_q2" PINNAME
+        CLKB;
+PIN vga/frbuff/Mram_ram_q1_pins<29> = BEL "vga/frbuff/Mram_ram_q1" PINNAME
+        CLKB;
+TIMEGRP clock_vga_s = BEL "vga_r_s_0" BEL "vga_r_s_1" BEL "vga_r_s_2" BEL
+        "vga_r_s_3" BEL "vga_g_s_0" BEL "vga_g_s_1" BEL "vga_g_s_2" BEL
+        "vga_g_s_3" BEL "vga_b_s_0" BEL "vga_b_s_1" BEL "vga_b_s_2" BEL
+        "vga_b_s_3" BEL "vga/vcnt_9" BEL "vga/vcnt_8" BEL "vga/vcnt_7" BEL
+        "vga/vcnt_6" BEL "vga/vcnt_5" BEL "vga/vcnt_4" BEL "vga/vcnt_3" BEL
+        "vga/vcnt_2" BEL "vga/vcnt_1" BEL "vga/vcnt_0" BEL "vga/hcnt_9" BEL
+        "vga/hcnt_8" BEL "vga/hcnt_7" BEL "vga/hcnt_6" BEL "vga/hcnt_5" BEL
+        "vga/hcnt_4" BEL "vga/hcnt_3" BEL "vga/hcnt_2" BEL "vga/hcnt_1" BEL
+        "vga/hcnt_0" BEL "vga/inst_LPM_FF1_0" BEL "vga/inst_LPM_FF1_1" BEL
+        "vga/window_vcnt_8" BEL "vga/window_vcnt_7" BEL "vga/window_vcnt_6"
+        BEL "vga/window_vcnt_5" BEL "vga/window_vcnt_4" BEL
+        "vga/window_vcnt_3" BEL "vga/window_vcnt_2" BEL "vga/window_vcnt_1"
+        BEL "vga/window_hcnt_9" BEL "vga/window_hcnt_8" BEL
+        "vga/window_hcnt_7" BEL "vga/window_hcnt_6" BEL "vga/window_hcnt_5"
+        BEL "vga/window_hcnt_4" BEL "vga/window_hcnt_3" BEL
+        "vga/window_hcnt_2" BEL "vga/window_hcnt_1" BEL "vga/window_hcnt_0"
+        BEL "vga/h_9" BEL "vga/h_8" BEL "vga/h_7" BEL "vga/h_6" BEL "vga/h_5"
+        BEL "vga/h_4" BEL "vga/h_3" PIN "vga/Maddsub_n0107_pins<92>" BEL
+        "hdmi/ctl2" BEL "hdmi/clockCounter_10" BEL "hdmi/clockCounter_9" BEL
+        "hdmi/clockCounter_8" BEL "hdmi/clockCounter_7" BEL
+        "hdmi/clockCounter_6" BEL "hdmi/clockCounter_5" BEL
+        "hdmi/clockCounter_4" BEL "hdmi/clockCounter_3" BEL
+        "hdmi/clockCounter_2" BEL "hdmi/clockCounter_1" BEL
+        "hdmi/clockCounter_0" BEL "hdmi/ctl0" BEL "hdmi/prevData" BEL
+        "hdmi/prevBlank" BEL "hdmi/dataenc/channelStatusIdx_7" BEL
+        "hdmi/dataenc/channelStatusIdx_6" BEL
+        "hdmi/dataenc/channelStatusIdx_5" BEL
+        "hdmi/dataenc/channelStatusIdx_4" BEL
+        "hdmi/dataenc/channelStatusIdx_3" BEL
+        "hdmi/dataenc/channelStatusIdx_2" BEL
+        "hdmi/dataenc/channelStatusIdx_1" BEL
+        "hdmi/dataenc/channelStatusIdx_0" BEL "hdmi/dataenc/counterX_15" BEL
+        "hdmi/dataenc/counterX_14" BEL "hdmi/dataenc/counterX_13" BEL
+        "hdmi/dataenc/counterX_12" BEL "hdmi/dataenc/counterX_11" BEL
+        "hdmi/dataenc/counterX_10" BEL "hdmi/dataenc/counterX_9" BEL
+        "hdmi/dataenc/counterX_8" BEL "hdmi/dataenc/counterX_7" BEL
+        "hdmi/dataenc/counterX_6" BEL "hdmi/dataenc/counterX_5" BEL
+        "hdmi/dataenc/counterX_4" BEL "hdmi/dataenc/counterX_3" BEL
+        "hdmi/dataenc/counterX_2" BEL "hdmi/dataenc/counterX_1" BEL
+        "hdmi/dataenc/counterX_0" BEL "hdmi/dataenc/dataOffset_4" BEL
+        "hdmi/dataenc/dataOffset_3" BEL "hdmi/dataenc/dataOffset_2" BEL
+        "hdmi/dataenc/dataOffset_1" BEL "hdmi/dataenc/dataOffset_0" BEL
+        "hdmi/dataenc/audioLAvgSum_25" BEL "hdmi/dataenc/audioLAvgSum_24" BEL
+        "hdmi/dataenc/audioLAvgSum_23" BEL "hdmi/dataenc/audioLAvgSum_22" BEL
+        "hdmi/dataenc/audioLAvgSum_21" BEL "hdmi/dataenc/audioLAvgSum_20" BEL
+        "hdmi/dataenc/audioLAvgSum_19" BEL "hdmi/dataenc/audioLAvgSum_18" BEL
+        "hdmi/dataenc/audioLAvgSum_17" BEL "hdmi/dataenc/audioLAvgSum_16" BEL
+        "hdmi/dataenc/audioLAvgSum_15" BEL "hdmi/dataenc/audioLAvgSum_14" BEL
+        "hdmi/dataenc/audioLAvgSum_13" BEL "hdmi/dataenc/audioLAvgSum_12" BEL
+        "hdmi/dataenc/audioLAvgSum_11" BEL "hdmi/dataenc/audioLAvgSum_10" BEL
+        "hdmi/dataenc/audioLAvgSum_9" BEL "hdmi/dataenc/audioLAvgSum_8" BEL
+        "hdmi/dataenc/audioLAvgSum_7" BEL "hdmi/dataenc/audioLAvgSum_6" BEL
+        "hdmi/dataenc/audioLAvgSum_5" BEL "hdmi/dataenc/audioLAvgSum_4" BEL
+        "hdmi/dataenc/audioLAvgSum_3" BEL "hdmi/dataenc/audioLAvgSum_2" BEL
+        "hdmi/dataenc/audioLAvgSum_1" BEL "hdmi/dataenc/audioLAvgSum_0" BEL
+        "hdmi/dataenc/samplesHead_1" BEL "hdmi/dataenc/samplesHead_0" BEL
+        "hdmi/dataenc/dataChannel0_3" BEL "hdmi/dataenc/dataChannel0_2" BEL
+        "hdmi/dataenc/dataChannel0_1" BEL "hdmi/dataenc/dataChannel0_0" BEL
+        "hdmi/dataenc/dataChannel2_3" BEL "hdmi/dataenc/dataChannel2_2" BEL
+        "hdmi/dataenc/dataChannel2_1" BEL "hdmi/dataenc/dataChannel2_0" BEL
+        "hdmi/dataenc/dataChannel1_3" BEL "hdmi/dataenc/dataChannel1_2" BEL
+        "hdmi/dataenc/dataChannel1_1" BEL "hdmi/dataenc/dataChannel1_0" BEL
+        "hdmi/dataenc/ctsTimer_16" BEL "hdmi/dataenc/ctsTimer_15" BEL
+        "hdmi/dataenc/ctsTimer_14" BEL "hdmi/dataenc/ctsTimer_13" BEL
+        "hdmi/dataenc/ctsTimer_12" BEL "hdmi/dataenc/ctsTimer_11" BEL
+        "hdmi/dataenc/ctsTimer_10" BEL "hdmi/dataenc/ctsTimer_9" BEL
+        "hdmi/dataenc/ctsTimer_8" BEL "hdmi/dataenc/ctsTimer_7" BEL
+        "hdmi/dataenc/ctsTimer_6" BEL "hdmi/dataenc/ctsTimer_5" BEL
+        "hdmi/dataenc/ctsTimer_4" BEL "hdmi/dataenc/ctsTimer_3" BEL
+        "hdmi/dataenc/ctsTimer_2" BEL "hdmi/dataenc/ctsTimer_1" BEL
+        "hdmi/dataenc/ctsTimer_0" BEL "hdmi/dataenc/packetHeader_19" BEL
+        "hdmi/dataenc/packetHeader_18" BEL "hdmi/dataenc/packetHeader_17" BEL
+        "hdmi/dataenc/packetHeader_16" BEL "hdmi/dataenc/packetHeader_15" BEL
+        "hdmi/dataenc/packetHeader_14" BEL "hdmi/dataenc/packetHeader_13" BEL
+        "hdmi/dataenc/packetHeader_12" BEL "hdmi/dataenc/packetHeader_11" BEL
+        "hdmi/dataenc/packetHeader_10" BEL "hdmi/dataenc/packetHeader_9" BEL
+        "hdmi/dataenc/packetHeader_8" BEL "hdmi/dataenc/packetHeader_7" BEL
+        "hdmi/dataenc/packetHeader_6" BEL "hdmi/dataenc/packetHeader_5" BEL
+        "hdmi/dataenc/packetHeader_4" BEL "hdmi/dataenc/packetHeader_3" BEL
+        "hdmi/dataenc/packetHeader_2" BEL "hdmi/dataenc/packetHeader_1" BEL
+        "hdmi/dataenc/packetHeader_0" BEL "hdmi/dataenc/audioLAvg_15" BEL
+        "hdmi/dataenc/audioLAvg_14" BEL "hdmi/dataenc/audioLAvg_13" BEL
+        "hdmi/dataenc/audioLAvg_12" BEL "hdmi/dataenc/audioLAvg_11" BEL
+        "hdmi/dataenc/audioLAvg_10" BEL "hdmi/dataenc/audioLAvg_9" BEL
+        "hdmi/dataenc/audioLAvg_8" BEL "hdmi/dataenc/audioLAvg_7" BEL
+        "hdmi/dataenc/audioLAvg_6" BEL "hdmi/dataenc/audioLAvg_5" BEL
+        "hdmi/dataenc/audioLAvg_4" BEL "hdmi/dataenc/audioLAvg_3" BEL
+        "hdmi/dataenc/audioLAvg_2" BEL "hdmi/dataenc/audioLAvg_1" BEL
+        "hdmi/dataenc/audioLAvg_0" BEL "hdmi/dataenc/audioPacketHeader_23" BEL
+        "hdmi/dataenc/audioPacketHeader_22" BEL
+        "hdmi/dataenc/audioPacketHeader_21" BEL
+        "hdmi/dataenc/audioPacketHeader_20" BEL
+        "hdmi/dataenc/audioPacketHeader_19" BEL
+        "hdmi/dataenc/audioPacketHeader_18" BEL
+        "hdmi/dataenc/audioPacketHeader_17" BEL
+        "hdmi/dataenc/audioPacketHeader_16" BEL
+        "hdmi/dataenc/audioPacketHeader_15" BEL
+        "hdmi/dataenc/audioPacketHeader_14" BEL
+        "hdmi/dataenc/audioPacketHeader_13" BEL
+        "hdmi/dataenc/audioPacketHeader_12" BEL
+        "hdmi/dataenc/audioPacketHeader_11" BEL
+        "hdmi/dataenc/audioPacketHeader_10" BEL
+        "hdmi/dataenc/audioPacketHeader_9" BEL
+        "hdmi/dataenc/audioPacketHeader_8" BEL
+        "hdmi/dataenc/audioPacketHeader_7" BEL
+        "hdmi/dataenc/audioPacketHeader_6" BEL
+        "hdmi/dataenc/audioPacketHeader_5" BEL
+        "hdmi/dataenc/audioPacketHeader_4" BEL
+        "hdmi/dataenc/audioPacketHeader_3" BEL
+        "hdmi/dataenc/audioPacketHeader_2" BEL
+        "hdmi/dataenc/audioPacketHeader_1" BEL
+        "hdmi/dataenc/audioPacketHeader_0" BEL "hdmi/dataenc/bchCode_0_31" BEL
+        "hdmi/dataenc/bchCode_0_30" BEL "hdmi/dataenc/bchCode_0_24" BEL
+        "hdmi/dataenc/bchCode_0_23" BEL "hdmi/dataenc/bchCode_0_22" BEL
+        "hdmi/dataenc/bchCode_0_16" BEL "hdmi/dataenc/bchCode_0_15" BEL
+        "hdmi/dataenc/bchCode_0_14" BEL "hdmi/dataenc/bchCode_0_8" BEL
+        "hdmi/dataenc/bchCode_0_7" BEL "hdmi/dataenc/bchCode_0_6" BEL
+        "hdmi/dataenc/bchCode_0_0" BEL "hdmi/dataenc/bchHdr_7" BEL
+        "hdmi/dataenc/bchHdr_6" BEL "hdmi/dataenc/audioTimer_16" BEL
+        "hdmi/dataenc/audioTimer_15" BEL "hdmi/dataenc/audioTimer_14" BEL
+        "hdmi/dataenc/audioTimer_13" BEL "hdmi/dataenc/audioTimer_12" BEL
+        "hdmi/dataenc/audioTimer_11" BEL "hdmi/dataenc/audioTimer_10" BEL
+        "hdmi/dataenc/audioTimer_9" BEL "hdmi/dataenc/audioTimer_8" BEL
+        "hdmi/dataenc/audioTimer_7" BEL "hdmi/dataenc/audioTimer_6" BEL
+        "hdmi/dataenc/audioTimer_5" BEL "hdmi/dataenc/audioTimer_4" BEL
+        "hdmi/dataenc/audioAvgCnt_10" BEL "hdmi/dataenc/audioAvgCnt_9" BEL
+        "hdmi/dataenc/audioAvgCnt_8" BEL "hdmi/dataenc/audioAvgCnt_7" BEL
+        "hdmi/dataenc/audioAvgCnt_6" BEL "hdmi/dataenc/audioAvgCnt_5" BEL
+        "hdmi/dataenc/audioAvgCnt_4" BEL "hdmi/dataenc/audioAvgCnt_3" BEL
+        "hdmi/dataenc/audioAvgCnt_2" BEL "hdmi/dataenc/audioAvgCnt_1" BEL
+        "hdmi/dataenc/audioAvgCnt_0" BEL "hdmi/dataenc/oddLine" BEL
+        "hdmi/dataenc/subpacket_0_186" BEL "hdmi/dataenc/subpacket_0_185" BEL
+        "hdmi/dataenc/subpacket_0_184" BEL "hdmi/dataenc/subpacket_0_183" BEL
+        "hdmi/dataenc/subpacket_0_182" BEL "hdmi/dataenc/subpacket_0_181" BEL
+        "hdmi/dataenc/subpacket_0_180" BEL "hdmi/dataenc/subpacket_0_179" BEL
+        "hdmi/dataenc/subpacket_0_178" BEL "hdmi/dataenc/subpacket_0_177" BEL
+        "hdmi/dataenc/subpacket_0_176" BEL "hdmi/dataenc/subpacket_0_175" BEL
+        "hdmi/dataenc/subpacket_0_174" BEL "hdmi/dataenc/subpacket_0_173" BEL
+        "hdmi/dataenc/subpacket_0_172" BEL "hdmi/dataenc/subpacket_0_171" BEL
+        "hdmi/dataenc/subpacket_0_170" BEL "hdmi/dataenc/subpacket_0_169" BEL
+        "hdmi/dataenc/subpacket_0_168" BEL "hdmi/dataenc/subpacket_0_76" BEL
+        "hdmi/dataenc/subpacket_0_75" BEL "hdmi/dataenc/subpacket_0_43" BEL
+        "hdmi/dataenc/subpacket_0_41" BEL "hdmi/dataenc/subpacket_0_39" BEL
+        "hdmi/dataenc/subpacket_0_37" BEL "hdmi/dataenc/subpacket_0_35" BEL
+        "hdmi/dataenc/subpacket_0_33" BEL "hdmi/dataenc/subpacket_0_31" BEL
+        "hdmi/dataenc/subpacket_0_29" BEL "hdmi/dataenc/subpacket_0_28" BEL
+        "hdmi/dataenc/subpacket_0_27" BEL "hdmi/dataenc/subpacket_0_26" BEL
+        "hdmi/dataenc/subpacket_0_25" BEL "hdmi/dataenc/subpacket_0_24" BEL
+        "hdmi/dataenc/subpacket_0_23" BEL "hdmi/dataenc/subpacket_0_22" BEL
+        "hdmi/dataenc/subpacket_0_21" BEL "hdmi/dataenc/subpacket_0_20" BEL
+        "hdmi/dataenc/subpacket_0_19" BEL "hdmi/dataenc/subpacket_0_18" BEL
+        "hdmi/dataenc/subpacket_0_17" BEL "hdmi/dataenc/subpacket_0_16" BEL
+        "hdmi/dataenc/subpacket_0_15" BEL "hdmi/dataenc/subpacket_0_14" BEL
+        "hdmi/dataenc/subpacket_0_13" BEL "hdmi/dataenc/subpacket_0_12" BEL
+        "hdmi/dataenc/subpacket_0_11" BEL "hdmi/dataenc/subpacket_0_10" BEL
+        "hdmi/dataenc/subpacket_0_9" BEL "hdmi/dataenc/subpacket_0_8" BEL
+        "hdmi/dataenc/subpacket_0_7" BEL "hdmi/dataenc/subpacket_0_6" BEL
+        "hdmi/dataenc/subpacket_0_5" BEL "hdmi/dataenc/subpacket_0_4" BEL
+        "hdmi/dataenc/subpacket_0_3" BEL "hdmi/dataenc/subpacket_0_2" BEL
+        "hdmi/dataenc/subpacket_0_1" BEL "hdmi/dataenc/subpacket_0_0" BEL
+        "hdmi/dataenc/audioSubPacket_0_223" BEL
+        "hdmi/dataenc/audioSubPacket_0_222" BEL
+        "hdmi/dataenc/audioSubPacket_0_221" BEL
+        "hdmi/dataenc/audioSubPacket_0_220" BEL
+        "hdmi/dataenc/audioSubPacket_0_219" BEL
+        "hdmi/dataenc/audioSubPacket_0_218" BEL
+        "hdmi/dataenc/audioSubPacket_0_217" BEL
+        "hdmi/dataenc/audioSubPacket_0_216" BEL
+        "hdmi/dataenc/audioSubPacket_0_215" BEL
+        "hdmi/dataenc/audioSubPacket_0_214" BEL
+        "hdmi/dataenc/audioSubPacket_0_213" BEL
+        "hdmi/dataenc/audioSubPacket_0_212" BEL
+        "hdmi/dataenc/audioSubPacket_0_211" BEL
+        "hdmi/dataenc/audioSubPacket_0_210" BEL
+        "hdmi/dataenc/audioSubPacket_0_209" BEL
+        "hdmi/dataenc/audioSubPacket_0_208" BEL
+        "hdmi/dataenc/audioSubPacket_0_207" BEL
+        "hdmi/dataenc/audioSubPacket_0_206" BEL
+        "hdmi/dataenc/audioSubPacket_0_205" BEL
+        "hdmi/dataenc/audioSubPacket_0_204" BEL
+        "hdmi/dataenc/audioSubPacket_0_203" BEL
+        "hdmi/dataenc/audioSubPacket_0_202" BEL
+        "hdmi/dataenc/audioSubPacket_0_201" BEL
+        "hdmi/dataenc/audioSubPacket_0_200" BEL
+        "hdmi/dataenc/audioSubPacket_0_199" BEL
+        "hdmi/dataenc/audioSubPacket_0_198" BEL
+        "hdmi/dataenc/audioSubPacket_0_197" BEL
+        "hdmi/dataenc/audioSubPacket_0_196" BEL
+        "hdmi/dataenc/audioSubPacket_0_195" BEL
+        "hdmi/dataenc/audioSubPacket_0_194" BEL
+        "hdmi/dataenc/audioSubPacket_0_193" BEL
+        "hdmi/dataenc/audioSubPacket_0_192" BEL
+        "hdmi/dataenc/audioSubPacket_0_191" BEL
+        "hdmi/dataenc/audioSubPacket_0_190" BEL
+        "hdmi/dataenc/audioSubPacket_0_189" BEL
+        "hdmi/dataenc/audioSubPacket_0_188" BEL
+        "hdmi/dataenc/audioSubPacket_0_187" BEL
+        "hdmi/dataenc/audioSubPacket_0_186" BEL
+        "hdmi/dataenc/audioSubPacket_0_185" BEL
+        "hdmi/dataenc/audioSubPacket_0_184" BEL
+        "hdmi/dataenc/audioSubPacket_0_183" BEL
+        "hdmi/dataenc/audioSubPacket_0_182" BEL
+        "hdmi/dataenc/audioSubPacket_0_181" BEL
+        "hdmi/dataenc/audioSubPacket_0_180" BEL
+        "hdmi/dataenc/audioSubPacket_0_179" BEL
+        "hdmi/dataenc/audioSubPacket_0_178" BEL
+        "hdmi/dataenc/audioSubPacket_0_177" BEL
+        "hdmi/dataenc/audioSubPacket_0_176" BEL
+        "hdmi/dataenc/audioSubPacket_0_175" BEL
+        "hdmi/dataenc/audioSubPacket_0_174" BEL
+        "hdmi/dataenc/audioSubPacket_0_173" BEL
+        "hdmi/dataenc/audioSubPacket_0_172" BEL
+        "hdmi/dataenc/audioSubPacket_0_171" BEL
+        "hdmi/dataenc/audioSubPacket_0_170" BEL
+        "hdmi/dataenc/audioSubPacket_0_169" BEL
+        "hdmi/dataenc/audioSubPacket_0_168" BEL
+        "hdmi/dataenc/audioSubPacket_0_167" BEL
+        "hdmi/dataenc/audioSubPacket_0_166" BEL
+        "hdmi/dataenc/audioSubPacket_0_165" BEL
+        "hdmi/dataenc/audioSubPacket_0_164" BEL
+        "hdmi/dataenc/audioSubPacket_0_163" BEL
+        "hdmi/dataenc/audioSubPacket_0_162" BEL
+        "hdmi/dataenc/audioSubPacket_0_161" BEL
+        "hdmi/dataenc/audioSubPacket_0_160" BEL
+        "hdmi/dataenc/audioSubPacket_0_159" BEL
+        "hdmi/dataenc/audioSubPacket_0_158" BEL
+        "hdmi/dataenc/audioSubPacket_0_157" BEL
+        "hdmi/dataenc/audioSubPacket_0_156" BEL
+        "hdmi/dataenc/audioSubPacket_0_155" BEL
+        "hdmi/dataenc/audioSubPacket_0_154" BEL
+        "hdmi/dataenc/audioSubPacket_0_153" BEL
+        "hdmi/dataenc/audioSubPacket_0_152" BEL
+        "hdmi/dataenc/audioSubPacket_0_151" BEL
+        "hdmi/dataenc/audioSubPacket_0_150" BEL
+        "hdmi/dataenc/audioSubPacket_0_149" BEL
+        "hdmi/dataenc/audioSubPacket_0_148" BEL
+        "hdmi/dataenc/audioSubPacket_0_147" BEL
+        "hdmi/dataenc/audioSubPacket_0_146" BEL
+        "hdmi/dataenc/audioSubPacket_0_145" BEL
+        "hdmi/dataenc/audioSubPacket_0_144" BEL
+        "hdmi/dataenc/audioSubPacket_0_143" BEL
+        "hdmi/dataenc/audioSubPacket_0_142" BEL
+        "hdmi/dataenc/audioSubPacket_0_141" BEL
+        "hdmi/dataenc/audioSubPacket_0_140" BEL
+        "hdmi/dataenc/audioSubPacket_0_139" BEL
+        "hdmi/dataenc/audioSubPacket_0_138" BEL
+        "hdmi/dataenc/audioSubPacket_0_137" BEL
+        "hdmi/dataenc/audioSubPacket_0_136" BEL
+        "hdmi/dataenc/audioSubPacket_0_135" BEL
+        "hdmi/dataenc/audioSubPacket_0_134" BEL
+        "hdmi/dataenc/audioSubPacket_0_133" BEL
+        "hdmi/dataenc/audioSubPacket_0_132" BEL
+        "hdmi/dataenc/audioSubPacket_0_131" BEL
+        "hdmi/dataenc/audioSubPacket_0_130" BEL
+        "hdmi/dataenc/audioSubPacket_0_129" BEL
+        "hdmi/dataenc/audioSubPacket_0_128" BEL
+        "hdmi/dataenc/audioSubPacket_0_127" BEL
+        "hdmi/dataenc/audioSubPacket_0_126" BEL
+        "hdmi/dataenc/audioSubPacket_0_125" BEL
+        "hdmi/dataenc/audioSubPacket_0_124" BEL
+        "hdmi/dataenc/audioSubPacket_0_123" BEL
+        "hdmi/dataenc/audioSubPacket_0_122" BEL
+        "hdmi/dataenc/audioSubPacket_0_121" BEL
+        "hdmi/dataenc/audioSubPacket_0_120" BEL
+        "hdmi/dataenc/audioSubPacket_0_119" BEL
+        "hdmi/dataenc/audioSubPacket_0_118" BEL
+        "hdmi/dataenc/audioSubPacket_0_117" BEL
+        "hdmi/dataenc/audioSubPacket_0_116" BEL
+        "hdmi/dataenc/audioSubPacket_0_115" BEL
+        "hdmi/dataenc/audioSubPacket_0_114" BEL
+        "hdmi/dataenc/audioSubPacket_0_113" BEL
+        "hdmi/dataenc/audioSubPacket_0_112" BEL
+        "hdmi/dataenc/audioSubPacket_0_111" BEL
+        "hdmi/dataenc/audioSubPacket_0_110" BEL
+        "hdmi/dataenc/audioSubPacket_0_109" BEL
+        "hdmi/dataenc/audioSubPacket_0_108" BEL
+        "hdmi/dataenc/audioSubPacket_0_107" BEL
+        "hdmi/dataenc/audioSubPacket_0_106" BEL
+        "hdmi/dataenc/audioSubPacket_0_105" BEL
+        "hdmi/dataenc/audioSubPacket_0_104" BEL
+        "hdmi/dataenc/audioSubPacket_0_103" BEL
+        "hdmi/dataenc/audioSubPacket_0_102" BEL
+        "hdmi/dataenc/audioSubPacket_0_101" BEL
+        "hdmi/dataenc/audioSubPacket_0_100" BEL
+        "hdmi/dataenc/audioSubPacket_0_99" BEL
+        "hdmi/dataenc/audioSubPacket_0_98" BEL
+        "hdmi/dataenc/audioSubPacket_0_97" BEL
+        "hdmi/dataenc/audioSubPacket_0_96" BEL
+        "hdmi/dataenc/audioSubPacket_0_95" BEL
+        "hdmi/dataenc/audioSubPacket_0_94" BEL
+        "hdmi/dataenc/audioSubPacket_0_93" BEL
+        "hdmi/dataenc/audioSubPacket_0_92" BEL
+        "hdmi/dataenc/audioSubPacket_0_91" BEL
+        "hdmi/dataenc/audioSubPacket_0_90" BEL
+        "hdmi/dataenc/audioSubPacket_0_89" BEL
+        "hdmi/dataenc/audioSubPacket_0_88" BEL
+        "hdmi/dataenc/audioSubPacket_0_87" BEL
+        "hdmi/dataenc/audioSubPacket_0_86" BEL
+        "hdmi/dataenc/audioSubPacket_0_85" BEL
+        "hdmi/dataenc/audioSubPacket_0_84" BEL
+        "hdmi/dataenc/audioSubPacket_0_83" BEL
+        "hdmi/dataenc/audioSubPacket_0_82" BEL
+        "hdmi/dataenc/audioSubPacket_0_81" BEL
+        "hdmi/dataenc/audioSubPacket_0_80" BEL
+        "hdmi/dataenc/audioSubPacket_0_79" BEL
+        "hdmi/dataenc/audioSubPacket_0_78" BEL
+        "hdmi/dataenc/audioSubPacket_0_77" BEL
+        "hdmi/dataenc/audioSubPacket_0_76" BEL
+        "hdmi/dataenc/audioSubPacket_0_75" BEL
+        "hdmi/dataenc/audioSubPacket_0_74" BEL
+        "hdmi/dataenc/audioSubPacket_0_73" BEL
+        "hdmi/dataenc/audioSubPacket_0_72" BEL
+        "hdmi/dataenc/audioSubPacket_0_71" BEL
+        "hdmi/dataenc/audioSubPacket_0_70" BEL
+        "hdmi/dataenc/audioSubPacket_0_69" BEL
+        "hdmi/dataenc/audioSubPacket_0_68" BEL
+        "hdmi/dataenc/audioSubPacket_0_67" BEL
+        "hdmi/dataenc/audioSubPacket_0_66" BEL
+        "hdmi/dataenc/audioSubPacket_0_65" BEL
+        "hdmi/dataenc/audioSubPacket_0_64" BEL
+        "hdmi/dataenc/audioSubPacket_0_63" BEL
+        "hdmi/dataenc/audioSubPacket_0_62" BEL
+        "hdmi/dataenc/audioSubPacket_0_61" BEL
+        "hdmi/dataenc/audioSubPacket_0_60" BEL
+        "hdmi/dataenc/audioSubPacket_0_59" BEL
+        "hdmi/dataenc/audioSubPacket_0_58" BEL
+        "hdmi/dataenc/audioSubPacket_0_57" BEL
+        "hdmi/dataenc/audioSubPacket_0_56" BEL
+        "hdmi/dataenc/audioSubPacket_0_55" BEL
+        "hdmi/dataenc/audioSubPacket_0_54" BEL
+        "hdmi/dataenc/audioSubPacket_0_53" BEL
+        "hdmi/dataenc/audioSubPacket_0_52" BEL
+        "hdmi/dataenc/audioSubPacket_0_51" BEL
+        "hdmi/dataenc/audioSubPacket_0_50" BEL
+        "hdmi/dataenc/audioSubPacket_0_49" BEL
+        "hdmi/dataenc/audioSubPacket_0_48" BEL
+        "hdmi/dataenc/audioSubPacket_0_47" BEL
+        "hdmi/dataenc/audioSubPacket_0_46" BEL
+        "hdmi/dataenc/audioSubPacket_0_45" BEL
+        "hdmi/dataenc/audioSubPacket_0_44" BEL
+        "hdmi/dataenc/audioSubPacket_0_43" BEL
+        "hdmi/dataenc/audioSubPacket_0_42" BEL
+        "hdmi/dataenc/audioSubPacket_0_41" BEL
+        "hdmi/dataenc/audioSubPacket_0_40" BEL
+        "hdmi/dataenc/audioSubPacket_0_39" BEL
+        "hdmi/dataenc/audioSubPacket_0_38" BEL
+        "hdmi/dataenc/audioSubPacket_0_37" BEL
+        "hdmi/dataenc/audioSubPacket_0_36" BEL
+        "hdmi/dataenc/audioSubPacket_0_35" BEL
+        "hdmi/dataenc/audioSubPacket_0_34" BEL
+        "hdmi/dataenc/audioSubPacket_0_33" BEL
+        "hdmi/dataenc/audioSubPacket_0_32" BEL
+        "hdmi/dataenc/audioSubPacket_0_31" BEL
+        "hdmi/dataenc/audioSubPacket_0_30" BEL
+        "hdmi/dataenc/audioSubPacket_0_29" BEL
+        "hdmi/dataenc/audioSubPacket_0_28" BEL
+        "hdmi/dataenc/audioSubPacket_0_27" BEL
+        "hdmi/dataenc/audioSubPacket_0_26" BEL
+        "hdmi/dataenc/audioSubPacket_0_25" BEL
+        "hdmi/dataenc/audioSubPacket_0_24" BEL
+        "hdmi/dataenc/audioSubPacket_0_23" BEL
+        "hdmi/dataenc/audioSubPacket_0_22" BEL
+        "hdmi/dataenc/audioSubPacket_0_21" BEL
+        "hdmi/dataenc/audioSubPacket_0_20" BEL
+        "hdmi/dataenc/audioSubPacket_0_19" BEL
+        "hdmi/dataenc/audioSubPacket_0_18" BEL
+        "hdmi/dataenc/audioSubPacket_0_17" BEL
+        "hdmi/dataenc/audioSubPacket_0_16" BEL
+        "hdmi/dataenc/audioSubPacket_0_15" BEL
+        "hdmi/dataenc/audioSubPacket_0_14" BEL
+        "hdmi/dataenc/audioSubPacket_0_13" BEL
+        "hdmi/dataenc/audioSubPacket_0_12" BEL
+        "hdmi/dataenc/audioSubPacket_0_11" BEL
+        "hdmi/dataenc/audioSubPacket_0_10" BEL
+        "hdmi/dataenc/audioSubPacket_0_9" BEL
+        "hdmi/dataenc/audioSubPacket_0_8" BEL
+        "hdmi/dataenc/audioSubPacket_0_7" BEL
+        "hdmi/dataenc/audioSubPacket_0_6" BEL
+        "hdmi/dataenc/audioSubPacket_0_5" BEL
+        "hdmi/dataenc/audioSubPacket_0_4" BEL
+        "hdmi/dataenc/audioSubPacket_0_3" BEL
+        "hdmi/dataenc/audioSubPacket_0_2" BEL
+        "hdmi/dataenc/audioSubPacket_0_1" BEL
+        "hdmi/dataenc/audioSubPacket_0_0" BEL "hdmi/dataenc/prevHSync" BEL
+        "hdmi/delay_line/q_pipe_0_13" BEL "hdmi/enc2/dc_bias_3" BEL
+        "hdmi/enc2/dc_bias_2" BEL "hdmi/enc2/dc_bias_1" BEL
+        "hdmi/enc2/dc_bias_0" BEL "hdmi/enc2/ENCODED_9" BEL
+        "hdmi/enc2/ENCODED_8" BEL "hdmi/enc2/ENCODED_7" BEL
+        "hdmi/enc2/ENCODED_6" BEL "hdmi/enc2/ENCODED_5" BEL
+        "hdmi/enc2/ENCODED_4" BEL "hdmi/enc2/ENCODED_3" BEL
+        "hdmi/enc2/ENCODED_2" BEL "hdmi/enc2/ENCODED_1" BEL
+        "hdmi/enc2/ENCODED_0" BEL "hdmi/enc1/dc_bias_3" BEL
+        "hdmi/enc1/dc_bias_2" BEL "hdmi/enc1/dc_bias_1" BEL
+        "hdmi/enc1/dc_bias_0" BEL "hdmi/enc1/ENCODED_9" BEL
+        "hdmi/enc1/ENCODED_8" BEL "hdmi/enc1/ENCODED_7" BEL
+        "hdmi/enc1/ENCODED_6" BEL "hdmi/enc1/ENCODED_5" BEL
+        "hdmi/enc1/ENCODED_4" BEL "hdmi/enc1/ENCODED_3" BEL
+        "hdmi/enc1/ENCODED_2" BEL "hdmi/enc1/ENCODED_1" BEL
+        "hdmi/enc1/ENCODED_0" BEL "hdmi/enc0/dc_bias_3" BEL
+        "hdmi/enc0/dc_bias_2" BEL "hdmi/enc0/dc_bias_1" BEL
+        "hdmi/enc0/dc_bias_0" BEL "hdmi/enc0/ENCODED_9" BEL
+        "hdmi/enc0/ENCODED_8" BEL "hdmi/enc0/ENCODED_7" BEL
+        "hdmi/enc0/ENCODED_6" BEL "hdmi/enc0/ENCODED_5" BEL
+        "hdmi/enc0/ENCODED_4" BEL "hdmi/enc0/ENCODED_3" BEL
+        "hdmi/enc0/ENCODED_2" BEL "hdmi/enc0/ENCODED_1" BEL
+        "hdmi/enc0/ENCODED_0" BEL "hdmi/state_FSM_FFd2" BEL
+        "hdmi/state_FSM_FFd3" BEL "hdmi/state_FSM_FFd1" BEL
+        "hdmi/dataenc/tercData" BEL "hdmi/dataenc/firstHSyncChange" BEL
+        "hdmi/dataenc/allowGeneration" BEL "hdmi/dataenc/audioAvgCnt_0_1" BEL
+        "hdmi/dataenc/audioAvgCnt_2_1" BEL "hdmi/dataenc/audioAvgCnt_1_1" BEL
+        "hdmi/dataenc/audioAvgCnt_3_1" BEL "hdmi/dataenc/audioAvgCnt_4_1" BEL
+        "hdmi/dataenc/audioAvgCnt_9_1" BEL "hdmi/dataenc/audioAvgCnt_5_1" BEL
+        "hdmi/dataenc/audioAvgCnt_8_1" BEL "hdmi/dataenc/audioAvgCnt_6_1" BEL
+        "hdmi/dataenc/audioAvgCnt_7_1" BEL "hdmi/dataenc/audioAvgCnt_10_1" BEL
+        "hdmi/dataenc/audioLAvgSum_23_1" BEL "hdmi/dataenc/audioLAvgSum_21_1"
+        BEL "hdmi/dataenc/audioLAvgSum_22_1" BEL
+        "hdmi/dataenc/audioAvgCnt_3_2" BEL "hdmi/dataenc/audioAvgCnt_4_2" BEL
+        "hdmi/dataenc/audioAvgCnt_2_2" BEL "hdmi/dataenc/audioAvgCnt_9_2" BEL
+        "hdmi/dataenc/audioAvgCnt_5_2" BEL "hdmi/dataenc/audioAvgCnt_8_2" BEL
+        "hdmi/dataenc/audioAvgCnt_6_2" BEL "hdmi/dataenc/audioAvgCnt_10_2" BEL
+        "hdmi/dataenc/audioAvgCnt_0_2" BEL "hdmi/dataenc/audioAvgCnt_0_3" BEL
+        "hdmi/dataenc/audioAvgCnt_1_2" BEL "hdmi/dataenc/audioAvgCnt_7_2" BEL
+        "hdmi/dataenc/audioLAvgSum_23_2" BEL "hdmi/dataenc/audioLAvgSum_21_2"
+        BEL "hdmi/dataenc/audioLAvgSum_22_2" BEL
+        "hdmi/dataenc/audioAvgCnt_2_3" BEL "hdmi/dataenc/audioAvgCnt_5_3" BEL
+        "hdmi/dataenc/audioAvgCnt_3_3" BEL "hdmi/dataenc/audioAvgCnt_0_4" BEL
+        "hdmi/dataenc/audioAvgCnt_1_3" BEL "hdmi/dataenc/audioAvgCnt_6_3" BEL
+        "hdmi/dataenc/audioAvgCnt_10_3" BEL "hdmi/dataenc/audioAvgCnt_7_3" BEL
+        "hdmi/dataenc/audioAvgCnt_9_3" BEL "hdmi/dataenc/audioAvgCnt_8_3" BEL
+        "hdmi/dataenc/audioLAvgSum_23_3" BEL "hdmi/dataenc/audioLAvgSum_21_3"
+        BEL "hdmi/dataenc/audioAvgCnt_1_4" BEL "hdmi/dataenc/audioAvgCnt_0_5"
+        BEL "hdmi/dataenc/audioAvgCnt_3_4" BEL "hdmi/dataenc/audioAvgCnt_9_4"
+        BEL "hdmi/dataenc/audioAvgCnt_8_4" BEL "hdmi/dataenc/audioAvgCnt_10_4"
+        BEL "hdmi/dataenc/audioAvgCnt_2_4" BEL
+        "hdmi/dataenc/audioLAvgSum_23_4" BEL "hdmi/dataenc/audioAvgCnt_5_4"
+        BEL "hdmi/dataenc/audioAvgCnt_6_4" BEL "hdmi/dataenc/audioAvgCnt_0_6"
+        BEL "hdmi/dataenc/audioAvgCnt_1_5" BEL
+        "hdmi/dataenc/audioLAvgSum_23_5" BEL "hdmi/dataenc/audioAvgCnt_1_6"
+        BEL "hdmi/dataenc/audioAvgCnt_7_4" BEL "hdmi/dataenc/audioAvgCnt_8_5"
+        PIN "vga/frbuff/Mram_ram_q16_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q15_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q13_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q12_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q14_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q10_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q9_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q11_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q7_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q6_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q8_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q5_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q4_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q3_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q2_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q1_pins<29>" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_28" BEL "hdmi/dataenc/bchCode_0_28" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_29" BEL "hdmi/dataenc/bchCode_0_29" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_21" BEL "hdmi/dataenc/bchCode_0_21" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_20" BEL "hdmi/dataenc/bchCode_0_20" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_5" BEL "hdmi/dataenc/bchCode_0_5" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_13" BEL "hdmi/dataenc/bchCode_0_13" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_12" BEL "hdmi/dataenc/bchCode_0_12" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_4" BEL "hdmi/dataenc/bchCode_0_4" BEL
+        "hdmi/dataenc/Mshreg_bchHdr_5" BEL "hdmi/dataenc/bchHdr_5" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_33" BEL
+        "hdmi/delay_line/q_pipe_10_33" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_35" BEL
+        "hdmi/delay_line/q_pipe_10_35" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_34" BEL
+        "hdmi/delay_line/q_pipe_10_34" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_32" BEL
+        "hdmi/delay_line/q_pipe_10_32" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_27" BEL
+        "hdmi/delay_line/q_pipe_10_27" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_26" BEL
+        "hdmi/delay_line/q_pipe_10_26" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_25" BEL
+        "hdmi/delay_line/q_pipe_10_25" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_24" BEL
+        "hdmi/delay_line/q_pipe_10_24" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_19" BEL
+        "hdmi/delay_line/q_pipe_10_19" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_16" BEL
+        "hdmi/delay_line/q_pipe_10_16" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_18" BEL
+        "hdmi/delay_line/q_pipe_10_18" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_17" BEL
+        "hdmi/delay_line/q_pipe_10_17" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_15" BEL
+        "hdmi/delay_line/q_pipe_10_15" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_14" BEL
+        "hdmi/delay_line/q_pipe_10_14" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_11" BEL
+        "hdmi/delay_line/q_pipe_10_11" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_13" BEL
+        "hdmi/delay_line/q_pipe_10_13" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_12" BEL
+        "hdmi/delay_line/q_pipe_10_12" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_10" BEL
+        "hdmi/delay_line/q_pipe_10_10" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_9" BEL "hdmi/delay_line/q_pipe_10_9"
+        BEL "hdmi/delay_line/Mshreg_q_pipe_10_6" BEL
+        "hdmi/delay_line/q_pipe_10_6" BEL "hdmi/delay_line/Mshreg_q_pipe_10_8"
+        BEL "hdmi/delay_line/q_pipe_10_8" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_7" BEL "hdmi/delay_line/q_pipe_10_7"
+        BEL "hdmi/delay_line/Mshreg_q_pipe_10_5" BEL
+        "hdmi/delay_line/q_pipe_10_5" BEL "hdmi/delay_line/Mshreg_q_pipe_10_4"
+        BEL "hdmi/delay_line/q_pipe_10_4" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_3" BEL "hdmi/delay_line/q_pipe_10_3"
+        BEL "hdmi/delay_line/Mshreg_q_pipe_10_2" BEL
+        "hdmi/delay_line/q_pipe_10_2" BEL "hdmi/delay_line/Mshreg_q_pipe_10_1"
+        BEL "hdmi/delay_line/q_pipe_10_1" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_0" BEL
+        "hdmi/delay_line/q_pipe_10_0";
+TIMEGRP pll_1_clkout2 = BEL "vga_r_s_0" BEL "vga_r_s_1" BEL "vga_r_s_2" BEL
+        "vga_r_s_3" BEL "vga_g_s_0" BEL "vga_g_s_1" BEL "vga_g_s_2" BEL
+        "vga_g_s_3" BEL "vga_b_s_0" BEL "vga_b_s_1" BEL "vga_b_s_2" BEL
+        "vga_b_s_3" BEL "pll_1/clkout3_buf" BEL "vga/vcnt_9" BEL "vga/vcnt_8"
+        BEL "vga/vcnt_7" BEL "vga/vcnt_6" BEL "vga/vcnt_5" BEL "vga/vcnt_4"
+        BEL "vga/vcnt_3" BEL "vga/vcnt_2" BEL "vga/vcnt_1" BEL "vga/vcnt_0"
+        BEL "vga/hcnt_9" BEL "vga/hcnt_8" BEL "vga/hcnt_7" BEL "vga/hcnt_6"
+        BEL "vga/hcnt_5" BEL "vga/hcnt_4" BEL "vga/hcnt_3" BEL "vga/hcnt_2"
+        BEL "vga/hcnt_1" BEL "vga/hcnt_0" BEL "vga/inst_LPM_FF1_0" BEL
+        "vga/inst_LPM_FF1_1" BEL "vga/window_vcnt_8" BEL "vga/window_vcnt_7"
+        BEL "vga/window_vcnt_6" BEL "vga/window_vcnt_5" BEL
+        "vga/window_vcnt_4" BEL "vga/window_vcnt_3" BEL "vga/window_vcnt_2"
+        BEL "vga/window_vcnt_1" BEL "vga/window_hcnt_9" BEL
+        "vga/window_hcnt_8" BEL "vga/window_hcnt_7" BEL "vga/window_hcnt_6"
+        BEL "vga/window_hcnt_5" BEL "vga/window_hcnt_4" BEL
+        "vga/window_hcnt_3" BEL "vga/window_hcnt_2" BEL "vga/window_hcnt_1"
+        BEL "vga/window_hcnt_0" BEL "vga/h_9" BEL "vga/h_8" BEL "vga/h_7" BEL
+        "vga/h_6" BEL "vga/h_5" BEL "vga/h_4" BEL "vga/h_3" PIN
+        "vga/Maddsub_n0107_pins<92>" BEL "hdmi/ctl2" BEL
+        "hdmi/clockCounter_10" BEL "hdmi/clockCounter_9" BEL
+        "hdmi/clockCounter_8" BEL "hdmi/clockCounter_7" BEL
+        "hdmi/clockCounter_6" BEL "hdmi/clockCounter_5" BEL
+        "hdmi/clockCounter_4" BEL "hdmi/clockCounter_3" BEL
+        "hdmi/clockCounter_2" BEL "hdmi/clockCounter_1" BEL
+        "hdmi/clockCounter_0" BEL "hdmi/ctl0" BEL "hdmi/prevData" BEL
+        "hdmi/prevBlank" BEL "hdmi/dataenc/channelStatusIdx_7" BEL
+        "hdmi/dataenc/channelStatusIdx_6" BEL
+        "hdmi/dataenc/channelStatusIdx_5" BEL
+        "hdmi/dataenc/channelStatusIdx_4" BEL
+        "hdmi/dataenc/channelStatusIdx_3" BEL
+        "hdmi/dataenc/channelStatusIdx_2" BEL
+        "hdmi/dataenc/channelStatusIdx_1" BEL
+        "hdmi/dataenc/channelStatusIdx_0" BEL "hdmi/dataenc/counterX_15" BEL
+        "hdmi/dataenc/counterX_14" BEL "hdmi/dataenc/counterX_13" BEL
+        "hdmi/dataenc/counterX_12" BEL "hdmi/dataenc/counterX_11" BEL
+        "hdmi/dataenc/counterX_10" BEL "hdmi/dataenc/counterX_9" BEL
+        "hdmi/dataenc/counterX_8" BEL "hdmi/dataenc/counterX_7" BEL
+        "hdmi/dataenc/counterX_6" BEL "hdmi/dataenc/counterX_5" BEL
+        "hdmi/dataenc/counterX_4" BEL "hdmi/dataenc/counterX_3" BEL
+        "hdmi/dataenc/counterX_2" BEL "hdmi/dataenc/counterX_1" BEL
+        "hdmi/dataenc/counterX_0" BEL "hdmi/dataenc/dataOffset_4" BEL
+        "hdmi/dataenc/dataOffset_3" BEL "hdmi/dataenc/dataOffset_2" BEL
+        "hdmi/dataenc/dataOffset_1" BEL "hdmi/dataenc/dataOffset_0" BEL
+        "hdmi/dataenc/audioLAvgSum_25" BEL "hdmi/dataenc/audioLAvgSum_24" BEL
+        "hdmi/dataenc/audioLAvgSum_23" BEL "hdmi/dataenc/audioLAvgSum_22" BEL
+        "hdmi/dataenc/audioLAvgSum_21" BEL "hdmi/dataenc/audioLAvgSum_20" BEL
+        "hdmi/dataenc/audioLAvgSum_19" BEL "hdmi/dataenc/audioLAvgSum_18" BEL
+        "hdmi/dataenc/audioLAvgSum_17" BEL "hdmi/dataenc/audioLAvgSum_16" BEL
+        "hdmi/dataenc/audioLAvgSum_15" BEL "hdmi/dataenc/audioLAvgSum_14" BEL
+        "hdmi/dataenc/audioLAvgSum_13" BEL "hdmi/dataenc/audioLAvgSum_12" BEL
+        "hdmi/dataenc/audioLAvgSum_11" BEL "hdmi/dataenc/audioLAvgSum_10" BEL
+        "hdmi/dataenc/audioLAvgSum_9" BEL "hdmi/dataenc/audioLAvgSum_8" BEL
+        "hdmi/dataenc/audioLAvgSum_7" BEL "hdmi/dataenc/audioLAvgSum_6" BEL
+        "hdmi/dataenc/audioLAvgSum_5" BEL "hdmi/dataenc/audioLAvgSum_4" BEL
+        "hdmi/dataenc/audioLAvgSum_3" BEL "hdmi/dataenc/audioLAvgSum_2" BEL
+        "hdmi/dataenc/audioLAvgSum_1" BEL "hdmi/dataenc/audioLAvgSum_0" BEL
+        "hdmi/dataenc/samplesHead_1" BEL "hdmi/dataenc/samplesHead_0" BEL
+        "hdmi/dataenc/dataChannel0_3" BEL "hdmi/dataenc/dataChannel0_2" BEL
+        "hdmi/dataenc/dataChannel0_1" BEL "hdmi/dataenc/dataChannel0_0" BEL
+        "hdmi/dataenc/dataChannel2_3" BEL "hdmi/dataenc/dataChannel2_2" BEL
+        "hdmi/dataenc/dataChannel2_1" BEL "hdmi/dataenc/dataChannel2_0" BEL
+        "hdmi/dataenc/dataChannel1_3" BEL "hdmi/dataenc/dataChannel1_2" BEL
+        "hdmi/dataenc/dataChannel1_1" BEL "hdmi/dataenc/dataChannel1_0" BEL
+        "hdmi/dataenc/ctsTimer_16" BEL "hdmi/dataenc/ctsTimer_15" BEL
+        "hdmi/dataenc/ctsTimer_14" BEL "hdmi/dataenc/ctsTimer_13" BEL
+        "hdmi/dataenc/ctsTimer_12" BEL "hdmi/dataenc/ctsTimer_11" BEL
+        "hdmi/dataenc/ctsTimer_10" BEL "hdmi/dataenc/ctsTimer_9" BEL
+        "hdmi/dataenc/ctsTimer_8" BEL "hdmi/dataenc/ctsTimer_7" BEL
+        "hdmi/dataenc/ctsTimer_6" BEL "hdmi/dataenc/ctsTimer_5" BEL
+        "hdmi/dataenc/ctsTimer_4" BEL "hdmi/dataenc/ctsTimer_3" BEL
+        "hdmi/dataenc/ctsTimer_2" BEL "hdmi/dataenc/ctsTimer_1" BEL
+        "hdmi/dataenc/ctsTimer_0" BEL "hdmi/dataenc/packetHeader_19" BEL
+        "hdmi/dataenc/packetHeader_18" BEL "hdmi/dataenc/packetHeader_17" BEL
+        "hdmi/dataenc/packetHeader_16" BEL "hdmi/dataenc/packetHeader_15" BEL
+        "hdmi/dataenc/packetHeader_14" BEL "hdmi/dataenc/packetHeader_13" BEL
+        "hdmi/dataenc/packetHeader_12" BEL "hdmi/dataenc/packetHeader_11" BEL
+        "hdmi/dataenc/packetHeader_10" BEL "hdmi/dataenc/packetHeader_9" BEL
+        "hdmi/dataenc/packetHeader_8" BEL "hdmi/dataenc/packetHeader_7" BEL
+        "hdmi/dataenc/packetHeader_6" BEL "hdmi/dataenc/packetHeader_5" BEL
+        "hdmi/dataenc/packetHeader_4" BEL "hdmi/dataenc/packetHeader_3" BEL
+        "hdmi/dataenc/packetHeader_2" BEL "hdmi/dataenc/packetHeader_1" BEL
+        "hdmi/dataenc/packetHeader_0" BEL "hdmi/dataenc/audioLAvg_15" BEL
+        "hdmi/dataenc/audioLAvg_14" BEL "hdmi/dataenc/audioLAvg_13" BEL
+        "hdmi/dataenc/audioLAvg_12" BEL "hdmi/dataenc/audioLAvg_11" BEL
+        "hdmi/dataenc/audioLAvg_10" BEL "hdmi/dataenc/audioLAvg_9" BEL
+        "hdmi/dataenc/audioLAvg_8" BEL "hdmi/dataenc/audioLAvg_7" BEL
+        "hdmi/dataenc/audioLAvg_6" BEL "hdmi/dataenc/audioLAvg_5" BEL
+        "hdmi/dataenc/audioLAvg_4" BEL "hdmi/dataenc/audioLAvg_3" BEL
+        "hdmi/dataenc/audioLAvg_2" BEL "hdmi/dataenc/audioLAvg_1" BEL
+        "hdmi/dataenc/audioLAvg_0" BEL "hdmi/dataenc/audioPacketHeader_23" BEL
+        "hdmi/dataenc/audioPacketHeader_22" BEL
+        "hdmi/dataenc/audioPacketHeader_21" BEL
+        "hdmi/dataenc/audioPacketHeader_20" BEL
+        "hdmi/dataenc/audioPacketHeader_19" BEL
+        "hdmi/dataenc/audioPacketHeader_18" BEL
+        "hdmi/dataenc/audioPacketHeader_17" BEL
+        "hdmi/dataenc/audioPacketHeader_16" BEL
+        "hdmi/dataenc/audioPacketHeader_15" BEL
+        "hdmi/dataenc/audioPacketHeader_14" BEL
+        "hdmi/dataenc/audioPacketHeader_13" BEL
+        "hdmi/dataenc/audioPacketHeader_12" BEL
+        "hdmi/dataenc/audioPacketHeader_11" BEL
+        "hdmi/dataenc/audioPacketHeader_10" BEL
+        "hdmi/dataenc/audioPacketHeader_9" BEL
+        "hdmi/dataenc/audioPacketHeader_8" BEL
+        "hdmi/dataenc/audioPacketHeader_7" BEL
+        "hdmi/dataenc/audioPacketHeader_6" BEL
+        "hdmi/dataenc/audioPacketHeader_5" BEL
+        "hdmi/dataenc/audioPacketHeader_4" BEL
+        "hdmi/dataenc/audioPacketHeader_3" BEL
+        "hdmi/dataenc/audioPacketHeader_2" BEL
+        "hdmi/dataenc/audioPacketHeader_1" BEL
+        "hdmi/dataenc/audioPacketHeader_0" BEL "hdmi/dataenc/bchCode_0_31" BEL
+        "hdmi/dataenc/bchCode_0_30" BEL "hdmi/dataenc/bchCode_0_24" BEL
+        "hdmi/dataenc/bchCode_0_23" BEL "hdmi/dataenc/bchCode_0_22" BEL
+        "hdmi/dataenc/bchCode_0_16" BEL "hdmi/dataenc/bchCode_0_15" BEL
+        "hdmi/dataenc/bchCode_0_14" BEL "hdmi/dataenc/bchCode_0_8" BEL
+        "hdmi/dataenc/bchCode_0_7" BEL "hdmi/dataenc/bchCode_0_6" BEL
+        "hdmi/dataenc/bchCode_0_0" BEL "hdmi/dataenc/bchHdr_7" BEL
+        "hdmi/dataenc/bchHdr_6" BEL "hdmi/dataenc/audioTimer_16" BEL
+        "hdmi/dataenc/audioTimer_15" BEL "hdmi/dataenc/audioTimer_14" BEL
+        "hdmi/dataenc/audioTimer_13" BEL "hdmi/dataenc/audioTimer_12" BEL
+        "hdmi/dataenc/audioTimer_11" BEL "hdmi/dataenc/audioTimer_10" BEL
+        "hdmi/dataenc/audioTimer_9" BEL "hdmi/dataenc/audioTimer_8" BEL
+        "hdmi/dataenc/audioTimer_7" BEL "hdmi/dataenc/audioTimer_6" BEL
+        "hdmi/dataenc/audioTimer_5" BEL "hdmi/dataenc/audioTimer_4" BEL
+        "hdmi/dataenc/audioAvgCnt_10" BEL "hdmi/dataenc/audioAvgCnt_9" BEL
+        "hdmi/dataenc/audioAvgCnt_8" BEL "hdmi/dataenc/audioAvgCnt_7" BEL
+        "hdmi/dataenc/audioAvgCnt_6" BEL "hdmi/dataenc/audioAvgCnt_5" BEL
+        "hdmi/dataenc/audioAvgCnt_4" BEL "hdmi/dataenc/audioAvgCnt_3" BEL
+        "hdmi/dataenc/audioAvgCnt_2" BEL "hdmi/dataenc/audioAvgCnt_1" BEL
+        "hdmi/dataenc/audioAvgCnt_0" BEL "hdmi/dataenc/oddLine" BEL
+        "hdmi/dataenc/subpacket_0_186" BEL "hdmi/dataenc/subpacket_0_185" BEL
+        "hdmi/dataenc/subpacket_0_184" BEL "hdmi/dataenc/subpacket_0_183" BEL
+        "hdmi/dataenc/subpacket_0_182" BEL "hdmi/dataenc/subpacket_0_181" BEL
+        "hdmi/dataenc/subpacket_0_180" BEL "hdmi/dataenc/subpacket_0_179" BEL
+        "hdmi/dataenc/subpacket_0_178" BEL "hdmi/dataenc/subpacket_0_177" BEL
+        "hdmi/dataenc/subpacket_0_176" BEL "hdmi/dataenc/subpacket_0_175" BEL
+        "hdmi/dataenc/subpacket_0_174" BEL "hdmi/dataenc/subpacket_0_173" BEL
+        "hdmi/dataenc/subpacket_0_172" BEL "hdmi/dataenc/subpacket_0_171" BEL
+        "hdmi/dataenc/subpacket_0_170" BEL "hdmi/dataenc/subpacket_0_169" BEL
+        "hdmi/dataenc/subpacket_0_168" BEL "hdmi/dataenc/subpacket_0_76" BEL
+        "hdmi/dataenc/subpacket_0_75" BEL "hdmi/dataenc/subpacket_0_43" BEL
+        "hdmi/dataenc/subpacket_0_41" BEL "hdmi/dataenc/subpacket_0_39" BEL
+        "hdmi/dataenc/subpacket_0_37" BEL "hdmi/dataenc/subpacket_0_35" BEL
+        "hdmi/dataenc/subpacket_0_33" BEL "hdmi/dataenc/subpacket_0_31" BEL
+        "hdmi/dataenc/subpacket_0_29" BEL "hdmi/dataenc/subpacket_0_28" BEL
+        "hdmi/dataenc/subpacket_0_27" BEL "hdmi/dataenc/subpacket_0_26" BEL
+        "hdmi/dataenc/subpacket_0_25" BEL "hdmi/dataenc/subpacket_0_24" BEL
+        "hdmi/dataenc/subpacket_0_23" BEL "hdmi/dataenc/subpacket_0_22" BEL
+        "hdmi/dataenc/subpacket_0_21" BEL "hdmi/dataenc/subpacket_0_20" BEL
+        "hdmi/dataenc/subpacket_0_19" BEL "hdmi/dataenc/subpacket_0_18" BEL
+        "hdmi/dataenc/subpacket_0_17" BEL "hdmi/dataenc/subpacket_0_16" BEL
+        "hdmi/dataenc/subpacket_0_15" BEL "hdmi/dataenc/subpacket_0_14" BEL
+        "hdmi/dataenc/subpacket_0_13" BEL "hdmi/dataenc/subpacket_0_12" BEL
+        "hdmi/dataenc/subpacket_0_11" BEL "hdmi/dataenc/subpacket_0_10" BEL
+        "hdmi/dataenc/subpacket_0_9" BEL "hdmi/dataenc/subpacket_0_8" BEL
+        "hdmi/dataenc/subpacket_0_7" BEL "hdmi/dataenc/subpacket_0_6" BEL
+        "hdmi/dataenc/subpacket_0_5" BEL "hdmi/dataenc/subpacket_0_4" BEL
+        "hdmi/dataenc/subpacket_0_3" BEL "hdmi/dataenc/subpacket_0_2" BEL
+        "hdmi/dataenc/subpacket_0_1" BEL "hdmi/dataenc/subpacket_0_0" BEL
+        "hdmi/dataenc/audioSubPacket_0_223" BEL
+        "hdmi/dataenc/audioSubPacket_0_222" BEL
+        "hdmi/dataenc/audioSubPacket_0_221" BEL
+        "hdmi/dataenc/audioSubPacket_0_220" BEL
+        "hdmi/dataenc/audioSubPacket_0_219" BEL
+        "hdmi/dataenc/audioSubPacket_0_218" BEL
+        "hdmi/dataenc/audioSubPacket_0_217" BEL
+        "hdmi/dataenc/audioSubPacket_0_216" BEL
+        "hdmi/dataenc/audioSubPacket_0_215" BEL
+        "hdmi/dataenc/audioSubPacket_0_214" BEL
+        "hdmi/dataenc/audioSubPacket_0_213" BEL
+        "hdmi/dataenc/audioSubPacket_0_212" BEL
+        "hdmi/dataenc/audioSubPacket_0_211" BEL
+        "hdmi/dataenc/audioSubPacket_0_210" BEL
+        "hdmi/dataenc/audioSubPacket_0_209" BEL
+        "hdmi/dataenc/audioSubPacket_0_208" BEL
+        "hdmi/dataenc/audioSubPacket_0_207" BEL
+        "hdmi/dataenc/audioSubPacket_0_206" BEL
+        "hdmi/dataenc/audioSubPacket_0_205" BEL
+        "hdmi/dataenc/audioSubPacket_0_204" BEL
+        "hdmi/dataenc/audioSubPacket_0_203" BEL
+        "hdmi/dataenc/audioSubPacket_0_202" BEL
+        "hdmi/dataenc/audioSubPacket_0_201" BEL
+        "hdmi/dataenc/audioSubPacket_0_200" BEL
+        "hdmi/dataenc/audioSubPacket_0_199" BEL
+        "hdmi/dataenc/audioSubPacket_0_198" BEL
+        "hdmi/dataenc/audioSubPacket_0_197" BEL
+        "hdmi/dataenc/audioSubPacket_0_196" BEL
+        "hdmi/dataenc/audioSubPacket_0_195" BEL
+        "hdmi/dataenc/audioSubPacket_0_194" BEL
+        "hdmi/dataenc/audioSubPacket_0_193" BEL
+        "hdmi/dataenc/audioSubPacket_0_192" BEL
+        "hdmi/dataenc/audioSubPacket_0_191" BEL
+        "hdmi/dataenc/audioSubPacket_0_190" BEL
+        "hdmi/dataenc/audioSubPacket_0_189" BEL
+        "hdmi/dataenc/audioSubPacket_0_188" BEL
+        "hdmi/dataenc/audioSubPacket_0_187" BEL
+        "hdmi/dataenc/audioSubPacket_0_186" BEL
+        "hdmi/dataenc/audioSubPacket_0_185" BEL
+        "hdmi/dataenc/audioSubPacket_0_184" BEL
+        "hdmi/dataenc/audioSubPacket_0_183" BEL
+        "hdmi/dataenc/audioSubPacket_0_182" BEL
+        "hdmi/dataenc/audioSubPacket_0_181" BEL
+        "hdmi/dataenc/audioSubPacket_0_180" BEL
+        "hdmi/dataenc/audioSubPacket_0_179" BEL
+        "hdmi/dataenc/audioSubPacket_0_178" BEL
+        "hdmi/dataenc/audioSubPacket_0_177" BEL
+        "hdmi/dataenc/audioSubPacket_0_176" BEL
+        "hdmi/dataenc/audioSubPacket_0_175" BEL
+        "hdmi/dataenc/audioSubPacket_0_174" BEL
+        "hdmi/dataenc/audioSubPacket_0_173" BEL
+        "hdmi/dataenc/audioSubPacket_0_172" BEL
+        "hdmi/dataenc/audioSubPacket_0_171" BEL
+        "hdmi/dataenc/audioSubPacket_0_170" BEL
+        "hdmi/dataenc/audioSubPacket_0_169" BEL
+        "hdmi/dataenc/audioSubPacket_0_168" BEL
+        "hdmi/dataenc/audioSubPacket_0_167" BEL
+        "hdmi/dataenc/audioSubPacket_0_166" BEL
+        "hdmi/dataenc/audioSubPacket_0_165" BEL
+        "hdmi/dataenc/audioSubPacket_0_164" BEL
+        "hdmi/dataenc/audioSubPacket_0_163" BEL
+        "hdmi/dataenc/audioSubPacket_0_162" BEL
+        "hdmi/dataenc/audioSubPacket_0_161" BEL
+        "hdmi/dataenc/audioSubPacket_0_160" BEL
+        "hdmi/dataenc/audioSubPacket_0_159" BEL
+        "hdmi/dataenc/audioSubPacket_0_158" BEL
+        "hdmi/dataenc/audioSubPacket_0_157" BEL
+        "hdmi/dataenc/audioSubPacket_0_156" BEL
+        "hdmi/dataenc/audioSubPacket_0_155" BEL
+        "hdmi/dataenc/audioSubPacket_0_154" BEL
+        "hdmi/dataenc/audioSubPacket_0_153" BEL
+        "hdmi/dataenc/audioSubPacket_0_152" BEL
+        "hdmi/dataenc/audioSubPacket_0_151" BEL
+        "hdmi/dataenc/audioSubPacket_0_150" BEL
+        "hdmi/dataenc/audioSubPacket_0_149" BEL
+        "hdmi/dataenc/audioSubPacket_0_148" BEL
+        "hdmi/dataenc/audioSubPacket_0_147" BEL
+        "hdmi/dataenc/audioSubPacket_0_146" BEL
+        "hdmi/dataenc/audioSubPacket_0_145" BEL
+        "hdmi/dataenc/audioSubPacket_0_144" BEL
+        "hdmi/dataenc/audioSubPacket_0_143" BEL
+        "hdmi/dataenc/audioSubPacket_0_142" BEL
+        "hdmi/dataenc/audioSubPacket_0_141" BEL
+        "hdmi/dataenc/audioSubPacket_0_140" BEL
+        "hdmi/dataenc/audioSubPacket_0_139" BEL
+        "hdmi/dataenc/audioSubPacket_0_138" BEL
+        "hdmi/dataenc/audioSubPacket_0_137" BEL
+        "hdmi/dataenc/audioSubPacket_0_136" BEL
+        "hdmi/dataenc/audioSubPacket_0_135" BEL
+        "hdmi/dataenc/audioSubPacket_0_134" BEL
+        "hdmi/dataenc/audioSubPacket_0_133" BEL
+        "hdmi/dataenc/audioSubPacket_0_132" BEL
+        "hdmi/dataenc/audioSubPacket_0_131" BEL
+        "hdmi/dataenc/audioSubPacket_0_130" BEL
+        "hdmi/dataenc/audioSubPacket_0_129" BEL
+        "hdmi/dataenc/audioSubPacket_0_128" BEL
+        "hdmi/dataenc/audioSubPacket_0_127" BEL
+        "hdmi/dataenc/audioSubPacket_0_126" BEL
+        "hdmi/dataenc/audioSubPacket_0_125" BEL
+        "hdmi/dataenc/audioSubPacket_0_124" BEL
+        "hdmi/dataenc/audioSubPacket_0_123" BEL
+        "hdmi/dataenc/audioSubPacket_0_122" BEL
+        "hdmi/dataenc/audioSubPacket_0_121" BEL
+        "hdmi/dataenc/audioSubPacket_0_120" BEL
+        "hdmi/dataenc/audioSubPacket_0_119" BEL
+        "hdmi/dataenc/audioSubPacket_0_118" BEL
+        "hdmi/dataenc/audioSubPacket_0_117" BEL
+        "hdmi/dataenc/audioSubPacket_0_116" BEL
+        "hdmi/dataenc/audioSubPacket_0_115" BEL
+        "hdmi/dataenc/audioSubPacket_0_114" BEL
+        "hdmi/dataenc/audioSubPacket_0_113" BEL
+        "hdmi/dataenc/audioSubPacket_0_112" BEL
+        "hdmi/dataenc/audioSubPacket_0_111" BEL
+        "hdmi/dataenc/audioSubPacket_0_110" BEL
+        "hdmi/dataenc/audioSubPacket_0_109" BEL
+        "hdmi/dataenc/audioSubPacket_0_108" BEL
+        "hdmi/dataenc/audioSubPacket_0_107" BEL
+        "hdmi/dataenc/audioSubPacket_0_106" BEL
+        "hdmi/dataenc/audioSubPacket_0_105" BEL
+        "hdmi/dataenc/audioSubPacket_0_104" BEL
+        "hdmi/dataenc/audioSubPacket_0_103" BEL
+        "hdmi/dataenc/audioSubPacket_0_102" BEL
+        "hdmi/dataenc/audioSubPacket_0_101" BEL
+        "hdmi/dataenc/audioSubPacket_0_100" BEL
+        "hdmi/dataenc/audioSubPacket_0_99" BEL
+        "hdmi/dataenc/audioSubPacket_0_98" BEL
+        "hdmi/dataenc/audioSubPacket_0_97" BEL
+        "hdmi/dataenc/audioSubPacket_0_96" BEL
+        "hdmi/dataenc/audioSubPacket_0_95" BEL
+        "hdmi/dataenc/audioSubPacket_0_94" BEL
+        "hdmi/dataenc/audioSubPacket_0_93" BEL
+        "hdmi/dataenc/audioSubPacket_0_92" BEL
+        "hdmi/dataenc/audioSubPacket_0_91" BEL
+        "hdmi/dataenc/audioSubPacket_0_90" BEL
+        "hdmi/dataenc/audioSubPacket_0_89" BEL
+        "hdmi/dataenc/audioSubPacket_0_88" BEL
+        "hdmi/dataenc/audioSubPacket_0_87" BEL
+        "hdmi/dataenc/audioSubPacket_0_86" BEL
+        "hdmi/dataenc/audioSubPacket_0_85" BEL
+        "hdmi/dataenc/audioSubPacket_0_84" BEL
+        "hdmi/dataenc/audioSubPacket_0_83" BEL
+        "hdmi/dataenc/audioSubPacket_0_82" BEL
+        "hdmi/dataenc/audioSubPacket_0_81" BEL
+        "hdmi/dataenc/audioSubPacket_0_80" BEL
+        "hdmi/dataenc/audioSubPacket_0_79" BEL
+        "hdmi/dataenc/audioSubPacket_0_78" BEL
+        "hdmi/dataenc/audioSubPacket_0_77" BEL
+        "hdmi/dataenc/audioSubPacket_0_76" BEL
+        "hdmi/dataenc/audioSubPacket_0_75" BEL
+        "hdmi/dataenc/audioSubPacket_0_74" BEL
+        "hdmi/dataenc/audioSubPacket_0_73" BEL
+        "hdmi/dataenc/audioSubPacket_0_72" BEL
+        "hdmi/dataenc/audioSubPacket_0_71" BEL
+        "hdmi/dataenc/audioSubPacket_0_70" BEL
+        "hdmi/dataenc/audioSubPacket_0_69" BEL
+        "hdmi/dataenc/audioSubPacket_0_68" BEL
+        "hdmi/dataenc/audioSubPacket_0_67" BEL
+        "hdmi/dataenc/audioSubPacket_0_66" BEL
+        "hdmi/dataenc/audioSubPacket_0_65" BEL
+        "hdmi/dataenc/audioSubPacket_0_64" BEL
+        "hdmi/dataenc/audioSubPacket_0_63" BEL
+        "hdmi/dataenc/audioSubPacket_0_62" BEL
+        "hdmi/dataenc/audioSubPacket_0_61" BEL
+        "hdmi/dataenc/audioSubPacket_0_60" BEL
+        "hdmi/dataenc/audioSubPacket_0_59" BEL
+        "hdmi/dataenc/audioSubPacket_0_58" BEL
+        "hdmi/dataenc/audioSubPacket_0_57" BEL
+        "hdmi/dataenc/audioSubPacket_0_56" BEL
+        "hdmi/dataenc/audioSubPacket_0_55" BEL
+        "hdmi/dataenc/audioSubPacket_0_54" BEL
+        "hdmi/dataenc/audioSubPacket_0_53" BEL
+        "hdmi/dataenc/audioSubPacket_0_52" BEL
+        "hdmi/dataenc/audioSubPacket_0_51" BEL
+        "hdmi/dataenc/audioSubPacket_0_50" BEL
+        "hdmi/dataenc/audioSubPacket_0_49" BEL
+        "hdmi/dataenc/audioSubPacket_0_48" BEL
+        "hdmi/dataenc/audioSubPacket_0_47" BEL
+        "hdmi/dataenc/audioSubPacket_0_46" BEL
+        "hdmi/dataenc/audioSubPacket_0_45" BEL
+        "hdmi/dataenc/audioSubPacket_0_44" BEL
+        "hdmi/dataenc/audioSubPacket_0_43" BEL
+        "hdmi/dataenc/audioSubPacket_0_42" BEL
+        "hdmi/dataenc/audioSubPacket_0_41" BEL
+        "hdmi/dataenc/audioSubPacket_0_40" BEL
+        "hdmi/dataenc/audioSubPacket_0_39" BEL
+        "hdmi/dataenc/audioSubPacket_0_38" BEL
+        "hdmi/dataenc/audioSubPacket_0_37" BEL
+        "hdmi/dataenc/audioSubPacket_0_36" BEL
+        "hdmi/dataenc/audioSubPacket_0_35" BEL
+        "hdmi/dataenc/audioSubPacket_0_34" BEL
+        "hdmi/dataenc/audioSubPacket_0_33" BEL
+        "hdmi/dataenc/audioSubPacket_0_32" BEL
+        "hdmi/dataenc/audioSubPacket_0_31" BEL
+        "hdmi/dataenc/audioSubPacket_0_30" BEL
+        "hdmi/dataenc/audioSubPacket_0_29" BEL
+        "hdmi/dataenc/audioSubPacket_0_28" BEL
+        "hdmi/dataenc/audioSubPacket_0_27" BEL
+        "hdmi/dataenc/audioSubPacket_0_26" BEL
+        "hdmi/dataenc/audioSubPacket_0_25" BEL
+        "hdmi/dataenc/audioSubPacket_0_24" BEL
+        "hdmi/dataenc/audioSubPacket_0_23" BEL
+        "hdmi/dataenc/audioSubPacket_0_22" BEL
+        "hdmi/dataenc/audioSubPacket_0_21" BEL
+        "hdmi/dataenc/audioSubPacket_0_20" BEL
+        "hdmi/dataenc/audioSubPacket_0_19" BEL
+        "hdmi/dataenc/audioSubPacket_0_18" BEL
+        "hdmi/dataenc/audioSubPacket_0_17" BEL
+        "hdmi/dataenc/audioSubPacket_0_16" BEL
+        "hdmi/dataenc/audioSubPacket_0_15" BEL
+        "hdmi/dataenc/audioSubPacket_0_14" BEL
+        "hdmi/dataenc/audioSubPacket_0_13" BEL
+        "hdmi/dataenc/audioSubPacket_0_12" BEL
+        "hdmi/dataenc/audioSubPacket_0_11" BEL
+        "hdmi/dataenc/audioSubPacket_0_10" BEL
+        "hdmi/dataenc/audioSubPacket_0_9" BEL
+        "hdmi/dataenc/audioSubPacket_0_8" BEL
+        "hdmi/dataenc/audioSubPacket_0_7" BEL
+        "hdmi/dataenc/audioSubPacket_0_6" BEL
+        "hdmi/dataenc/audioSubPacket_0_5" BEL
+        "hdmi/dataenc/audioSubPacket_0_4" BEL
+        "hdmi/dataenc/audioSubPacket_0_3" BEL
+        "hdmi/dataenc/audioSubPacket_0_2" BEL
+        "hdmi/dataenc/audioSubPacket_0_1" BEL
+        "hdmi/dataenc/audioSubPacket_0_0" BEL "hdmi/dataenc/prevHSync" BEL
+        "hdmi/delay_line/q_pipe_0_13" BEL "hdmi/enc2/dc_bias_3" BEL
+        "hdmi/enc2/dc_bias_2" BEL "hdmi/enc2/dc_bias_1" BEL
+        "hdmi/enc2/dc_bias_0" BEL "hdmi/enc2/ENCODED_9" BEL
+        "hdmi/enc2/ENCODED_8" BEL "hdmi/enc2/ENCODED_7" BEL
+        "hdmi/enc2/ENCODED_6" BEL "hdmi/enc2/ENCODED_5" BEL
+        "hdmi/enc2/ENCODED_4" BEL "hdmi/enc2/ENCODED_3" BEL
+        "hdmi/enc2/ENCODED_2" BEL "hdmi/enc2/ENCODED_1" BEL
+        "hdmi/enc2/ENCODED_0" BEL "hdmi/enc1/dc_bias_3" BEL
+        "hdmi/enc1/dc_bias_2" BEL "hdmi/enc1/dc_bias_1" BEL
+        "hdmi/enc1/dc_bias_0" BEL "hdmi/enc1/ENCODED_9" BEL
+        "hdmi/enc1/ENCODED_8" BEL "hdmi/enc1/ENCODED_7" BEL
+        "hdmi/enc1/ENCODED_6" BEL "hdmi/enc1/ENCODED_5" BEL
+        "hdmi/enc1/ENCODED_4" BEL "hdmi/enc1/ENCODED_3" BEL
+        "hdmi/enc1/ENCODED_2" BEL "hdmi/enc1/ENCODED_1" BEL
+        "hdmi/enc1/ENCODED_0" BEL "hdmi/enc0/dc_bias_3" BEL
+        "hdmi/enc0/dc_bias_2" BEL "hdmi/enc0/dc_bias_1" BEL
+        "hdmi/enc0/dc_bias_0" BEL "hdmi/enc0/ENCODED_9" BEL
+        "hdmi/enc0/ENCODED_8" BEL "hdmi/enc0/ENCODED_7" BEL
+        "hdmi/enc0/ENCODED_6" BEL "hdmi/enc0/ENCODED_5" BEL
+        "hdmi/enc0/ENCODED_4" BEL "hdmi/enc0/ENCODED_3" BEL
+        "hdmi/enc0/ENCODED_2" BEL "hdmi/enc0/ENCODED_1" BEL
+        "hdmi/enc0/ENCODED_0" BEL "hdmi/state_FSM_FFd2" BEL
+        "hdmi/state_FSM_FFd3" BEL "hdmi/state_FSM_FFd1" BEL
+        "hdmi/dataenc/tercData" BEL "hdmi/dataenc/firstHSyncChange" BEL
+        "hdmi/dataenc/allowGeneration" BEL "hdmi/dataenc/audioAvgCnt_0_1" BEL
+        "hdmi/dataenc/audioAvgCnt_2_1" BEL "hdmi/dataenc/audioAvgCnt_1_1" BEL
+        "hdmi/dataenc/audioAvgCnt_3_1" BEL "hdmi/dataenc/audioAvgCnt_4_1" BEL
+        "hdmi/dataenc/audioAvgCnt_9_1" BEL "hdmi/dataenc/audioAvgCnt_5_1" BEL
+        "hdmi/dataenc/audioAvgCnt_8_1" BEL "hdmi/dataenc/audioAvgCnt_6_1" BEL
+        "hdmi/dataenc/audioAvgCnt_7_1" BEL "hdmi/dataenc/audioAvgCnt_10_1" BEL
+        "hdmi/dataenc/audioLAvgSum_23_1" BEL "hdmi/dataenc/audioLAvgSum_21_1"
+        BEL "hdmi/dataenc/audioLAvgSum_22_1" BEL
+        "hdmi/dataenc/audioAvgCnt_3_2" BEL "hdmi/dataenc/audioAvgCnt_4_2" BEL
+        "hdmi/dataenc/audioAvgCnt_2_2" BEL "hdmi/dataenc/audioAvgCnt_9_2" BEL
+        "hdmi/dataenc/audioAvgCnt_5_2" BEL "hdmi/dataenc/audioAvgCnt_8_2" BEL
+        "hdmi/dataenc/audioAvgCnt_6_2" BEL "hdmi/dataenc/audioAvgCnt_10_2" BEL
+        "hdmi/dataenc/audioAvgCnt_0_2" BEL "hdmi/dataenc/audioAvgCnt_0_3" BEL
+        "hdmi/dataenc/audioAvgCnt_1_2" BEL "hdmi/dataenc/audioAvgCnt_7_2" BEL
+        "hdmi/dataenc/audioLAvgSum_23_2" BEL "hdmi/dataenc/audioLAvgSum_21_2"
+        BEL "hdmi/dataenc/audioLAvgSum_22_2" BEL
+        "hdmi/dataenc/audioAvgCnt_2_3" BEL "hdmi/dataenc/audioAvgCnt_5_3" BEL
+        "hdmi/dataenc/audioAvgCnt_3_3" BEL "hdmi/dataenc/audioAvgCnt_0_4" BEL
+        "hdmi/dataenc/audioAvgCnt_1_3" BEL "hdmi/dataenc/audioAvgCnt_6_3" BEL
+        "hdmi/dataenc/audioAvgCnt_10_3" BEL "hdmi/dataenc/audioAvgCnt_7_3" BEL
+        "hdmi/dataenc/audioAvgCnt_9_3" BEL "hdmi/dataenc/audioAvgCnt_8_3" BEL
+        "hdmi/dataenc/audioLAvgSum_23_3" BEL "hdmi/dataenc/audioLAvgSum_21_3"
+        BEL "hdmi/dataenc/audioAvgCnt_1_4" BEL "hdmi/dataenc/audioAvgCnt_0_5"
+        BEL "hdmi/dataenc/audioAvgCnt_3_4" BEL "hdmi/dataenc/audioAvgCnt_9_4"
+        BEL "hdmi/dataenc/audioAvgCnt_8_4" BEL "hdmi/dataenc/audioAvgCnt_10_4"
+        BEL "hdmi/dataenc/audioAvgCnt_2_4" BEL
+        "hdmi/dataenc/audioLAvgSum_23_4" BEL "hdmi/dataenc/audioAvgCnt_5_4"
+        BEL "hdmi/dataenc/audioAvgCnt_6_4" BEL "hdmi/dataenc/audioAvgCnt_0_6"
+        BEL "hdmi/dataenc/audioAvgCnt_1_5" BEL
+        "hdmi/dataenc/audioLAvgSum_23_5" BEL "hdmi/dataenc/audioAvgCnt_1_6"
+        BEL "hdmi/dataenc/audioAvgCnt_7_4" BEL "hdmi/dataenc/audioAvgCnt_8_5"
+        PIN "vga/frbuff/Mram_ram_q16_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q15_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q13_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q12_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q14_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q10_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q9_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q11_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q7_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q6_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q8_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q5_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q4_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q3_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q2_pins<29>" PIN
+        "vga/frbuff/Mram_ram_q1_pins<29>" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_28" BEL "hdmi/dataenc/bchCode_0_28" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_29" BEL "hdmi/dataenc/bchCode_0_29" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_21" BEL "hdmi/dataenc/bchCode_0_21" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_20" BEL "hdmi/dataenc/bchCode_0_20" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_5" BEL "hdmi/dataenc/bchCode_0_5" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_13" BEL "hdmi/dataenc/bchCode_0_13" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_12" BEL "hdmi/dataenc/bchCode_0_12" BEL
+        "hdmi/dataenc/Mshreg_bchCode_0_4" BEL "hdmi/dataenc/bchCode_0_4" BEL
+        "hdmi/dataenc/Mshreg_bchHdr_5" BEL "hdmi/dataenc/bchHdr_5" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_33" BEL
+        "hdmi/delay_line/q_pipe_10_33" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_35" BEL
+        "hdmi/delay_line/q_pipe_10_35" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_34" BEL
+        "hdmi/delay_line/q_pipe_10_34" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_32" BEL
+        "hdmi/delay_line/q_pipe_10_32" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_27" BEL
+        "hdmi/delay_line/q_pipe_10_27" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_26" BEL
+        "hdmi/delay_line/q_pipe_10_26" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_25" BEL
+        "hdmi/delay_line/q_pipe_10_25" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_24" BEL
+        "hdmi/delay_line/q_pipe_10_24" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_19" BEL
+        "hdmi/delay_line/q_pipe_10_19" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_16" BEL
+        "hdmi/delay_line/q_pipe_10_16" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_18" BEL
+        "hdmi/delay_line/q_pipe_10_18" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_17" BEL
+        "hdmi/delay_line/q_pipe_10_17" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_15" BEL
+        "hdmi/delay_line/q_pipe_10_15" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_14" BEL
+        "hdmi/delay_line/q_pipe_10_14" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_11" BEL
+        "hdmi/delay_line/q_pipe_10_11" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_13" BEL
+        "hdmi/delay_line/q_pipe_10_13" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_12" BEL
+        "hdmi/delay_line/q_pipe_10_12" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_10" BEL
+        "hdmi/delay_line/q_pipe_10_10" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_9" BEL "hdmi/delay_line/q_pipe_10_9"
+        BEL "hdmi/delay_line/Mshreg_q_pipe_10_6" BEL
+        "hdmi/delay_line/q_pipe_10_6" BEL "hdmi/delay_line/Mshreg_q_pipe_10_8"
+        BEL "hdmi/delay_line/q_pipe_10_8" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_7" BEL "hdmi/delay_line/q_pipe_10_7"
+        BEL "hdmi/delay_line/Mshreg_q_pipe_10_5" BEL
+        "hdmi/delay_line/q_pipe_10_5" BEL "hdmi/delay_line/Mshreg_q_pipe_10_4"
+        BEL "hdmi/delay_line/q_pipe_10_4" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_3" BEL "hdmi/delay_line/q_pipe_10_3"
+        BEL "hdmi/delay_line/Mshreg_q_pipe_10_2" BEL
+        "hdmi/delay_line/q_pipe_10_2" BEL "hdmi/delay_line/Mshreg_q_pipe_10_1"
+        BEL "hdmi/delay_line/q_pipe_10_1" BEL
+        "hdmi/delay_line/Mshreg_q_pipe_10_0" BEL
+        "hdmi/delay_line/q_pipe_10_0";
+TIMEGRP clock_mem_s = BEL "sram/sram_data_io_7" BEL "sram/sram_data_io_6" BEL
+        "sram/sram_data_io_5" BEL "sram/sram_data_io_4" BEL
+        "sram/sram_data_io_3" BEL "sram/sram_data_io_2" BEL
+        "sram/sram_data_io_1" BEL "sram/sram_data_io_0" BEL
+        "sram/porta1_data_o_7" BEL "sram/porta1_data_o_6" BEL
+        "sram/porta1_data_o_5" BEL "sram/porta1_data_o_4" BEL
+        "sram/porta1_data_o_3" BEL "sram/porta1_data_o_2" BEL
+        "sram/porta1_data_o_1" BEL "sram/porta1_data_o_0" BEL
+        "sram/porta0_data_o_7" BEL "sram/porta0_data_o_6" BEL
+        "sram/porta0_data_o_5" BEL "sram/porta0_data_o_4" BEL
+        "sram/porta0_data_o_3" BEL "sram/porta0_data_o_2" BEL
+        "sram/porta0_data_o_1" BEL "sram/porta0_data_o_0" BEL "sram/sram_oe_s"
+        BEL "sram/sram_we_s" BEL "sram/p0_req_v_clk_i_DFF_210" BEL
+        "sram/sram_addr_o_17" BEL "sram/sram_addr_o_16" BEL
+        "sram/sram_addr_o_15" BEL "sram/sram_addr_o_14" BEL
+        "sram/sram_addr_o_13" BEL "sram/sram_addr_o_12" BEL
+        "sram/sram_addr_o_11" BEL "sram/sram_addr_o_10" BEL
+        "sram/sram_addr_o_9" BEL "sram/sram_addr_o_8" BEL "sram/sram_addr_o_7"
+        BEL "sram/sram_addr_o_6" BEL "sram/sram_addr_o_5" BEL
+        "sram/sram_addr_o_4" BEL "sram/sram_addr_o_3" BEL "sram/sram_addr_o_2"
+        BEL "sram/sram_addr_o_1" BEL "sram/sram_addr_o_0" BEL "sram/p1_req_v"
+        BEL "sram/p1_data_v_7" BEL "sram/p1_data_v_6" BEL "sram/p1_data_v_5"
+        BEL "sram/p1_data_v_4" BEL "sram/p1_data_v_3" BEL "sram/p1_data_v_2"
+        BEL "sram/p1_data_v_1" BEL "sram/p1_data_v_0" BEL "sram/p1_we_v" BEL
+        "sram/p0_data_v_7" BEL "sram/p0_data_v_6" BEL "sram/p0_data_v_5" BEL
+        "sram/p0_data_v_4" BEL "sram/p0_data_v_3" BEL "sram/p0_data_v_2" BEL
+        "sram/p0_data_v_1" BEL "sram/p0_data_v_0" BEL "sram/p0_we_v" BEL
+        "sram/p1_ce_v" BEL "sram/p0_ce_v" BEL "sram/p0_req_v" BEL
+        "sram/p1_addr_v_13" BEL "sram/p1_addr_v_12" BEL "sram/p1_addr_v_11"
+        BEL "sram/p1_addr_v_10" BEL "sram/p1_addr_v_9" BEL "sram/p1_addr_v_8"
+        BEL "sram/p1_addr_v_7" BEL "sram/p1_addr_v_6" BEL "sram/p1_addr_v_5"
+        BEL "sram/p1_addr_v_4" BEL "sram/p1_addr_v_3" BEL "sram/p1_addr_v_2"
+        BEL "sram/p1_addr_v_1" BEL "sram/p1_addr_v_0" BEL "sram/p0_addr_v_16"
+        BEL "sram/p0_addr_v_15" BEL "sram/p0_addr_v_14" BEL
+        "sram/p0_addr_v_13" BEL "sram/p0_addr_v_12" BEL "sram/p0_addr_v_11"
+        BEL "sram/p0_addr_v_10" BEL "sram/p0_addr_v_9" BEL "sram/p0_addr_v_8"
+        BEL "sram/p0_addr_v_7" BEL "sram/p0_addr_v_6" BEL "sram/p0_addr_v_5"
+        BEL "sram/p0_addr_v_4" BEL "sram/p0_addr_v_3" BEL "sram/p0_addr_v_2"
+        BEL "sram/p0_addr_v_1" BEL "sram/p0_addr_v_0" BEL "sram/state_v";
+TIMEGRP pll_1_clkout1 = BEL "sram/sram_data_io_7" BEL "sram/sram_data_io_6"
+        BEL "sram/sram_data_io_5" BEL "sram/sram_data_io_4" BEL
+        "sram/sram_data_io_3" BEL "sram/sram_data_io_2" BEL
+        "sram/sram_data_io_1" BEL "sram/sram_data_io_0" BEL
+        "sram/porta1_data_o_7" BEL "sram/porta1_data_o_6" BEL
+        "sram/porta1_data_o_5" BEL "sram/porta1_data_o_4" BEL
+        "sram/porta1_data_o_3" BEL "sram/porta1_data_o_2" BEL
+        "sram/porta1_data_o_1" BEL "sram/porta1_data_o_0" BEL
+        "sram/porta0_data_o_7" BEL "sram/porta0_data_o_6" BEL
+        "sram/porta0_data_o_5" BEL "sram/porta0_data_o_4" BEL
+        "sram/porta0_data_o_3" BEL "sram/porta0_data_o_2" BEL
+        "sram/porta0_data_o_1" BEL "sram/porta0_data_o_0" BEL "sram/sram_oe_s"
+        BEL "sram/sram_we_s" BEL "sram/p0_req_v_clk_i_DFF_210" BEL
+        "sram/sram_addr_o_17" BEL "sram/sram_addr_o_16" BEL
+        "sram/sram_addr_o_15" BEL "sram/sram_addr_o_14" BEL
+        "sram/sram_addr_o_13" BEL "sram/sram_addr_o_12" BEL
+        "sram/sram_addr_o_11" BEL "sram/sram_addr_o_10" BEL
+        "sram/sram_addr_o_9" BEL "sram/sram_addr_o_8" BEL "sram/sram_addr_o_7"
+        BEL "sram/sram_addr_o_6" BEL "sram/sram_addr_o_5" BEL
+        "sram/sram_addr_o_4" BEL "sram/sram_addr_o_3" BEL "sram/sram_addr_o_2"
+        BEL "sram/sram_addr_o_1" BEL "sram/sram_addr_o_0" BEL "sram/p1_req_v"
+        BEL "sram/p1_data_v_7" BEL "sram/p1_data_v_6" BEL "sram/p1_data_v_5"
+        BEL "sram/p1_data_v_4" BEL "sram/p1_data_v_3" BEL "sram/p1_data_v_2"
+        BEL "sram/p1_data_v_1" BEL "sram/p1_data_v_0" BEL "sram/p1_we_v" BEL
+        "sram/p0_data_v_7" BEL "sram/p0_data_v_6" BEL "sram/p0_data_v_5" BEL
+        "sram/p0_data_v_4" BEL "sram/p0_data_v_3" BEL "sram/p0_data_v_2" BEL
+        "sram/p0_data_v_1" BEL "sram/p0_data_v_0" BEL "sram/p0_we_v" BEL
+        "sram/p1_ce_v" BEL "sram/p0_ce_v" BEL "sram/p0_req_v" BEL
+        "sram/p1_addr_v_13" BEL "sram/p1_addr_v_12" BEL "sram/p1_addr_v_11"
+        BEL "sram/p1_addr_v_10" BEL "sram/p1_addr_v_9" BEL "sram/p1_addr_v_8"
+        BEL "sram/p1_addr_v_7" BEL "sram/p1_addr_v_6" BEL "sram/p1_addr_v_5"
+        BEL "sram/p1_addr_v_4" BEL "sram/p1_addr_v_3" BEL "sram/p1_addr_v_2"
+        BEL "sram/p1_addr_v_1" BEL "sram/p1_addr_v_0" BEL "sram/p0_addr_v_16"
+        BEL "sram/p0_addr_v_15" BEL "sram/p0_addr_v_14" BEL
+        "sram/p0_addr_v_13" BEL "sram/p0_addr_v_12" BEL "sram/p0_addr_v_11"
+        BEL "sram/p0_addr_v_10" BEL "sram/p0_addr_v_9" BEL "sram/p0_addr_v_8"
+        BEL "sram/p0_addr_v_7" BEL "sram/p0_addr_v_6" BEL "sram/p0_addr_v_5"
+        BEL "sram/p0_addr_v_4" BEL "sram/p0_addr_v_3" BEL "sram/p0_addr_v_2"
+        BEL "sram/p0_addr_v_1" BEL "sram/p0_addr_v_0" BEL "pll_1/clkout2_buf"
+        BEL "sram/state_v";
+PIN hdmio/g1[0].to_serial_pins<2> = BEL "hdmio/g1[0].to_serial" PINNAME CK1;
+PIN hdmio/g1[1].to_serial_pins<2> = BEL "hdmio/g1[1].to_serial" PINNAME CK1;
+PIN hdmio/g1[2].to_serial_pins<2> = BEL "hdmio/g1[2].to_serial" PINNAME CK1;
+PIN hdmio/g1[3].to_serial_pins<2> = BEL "hdmio/g1[3].to_serial" PINNAME CK1;
+TIMEGRP pll_1_clkout4 = BEL "pll_1/clkout5_buf" PIN
+        "hdmio/g1[0].to_serial_pins<2>" PIN "hdmio/g1[1].to_serial_pins<2>"
+        PIN "hdmio/g1[2].to_serial_pins<2>" PIN
+        "hdmio/g1[3].to_serial_pins<2>";
+PIN hdmio/g1[0].to_serial_pins<1> = BEL "hdmio/g1[0].to_serial" PINNAME CK0;
+PIN hdmio/g1[1].to_serial_pins<1> = BEL "hdmio/g1[1].to_serial" PINNAME CK0;
+PIN hdmio/g1[2].to_serial_pins<1> = BEL "hdmio/g1[2].to_serial" PINNAME CK0;
+PIN hdmio/g1[3].to_serial_pins<1> = BEL "hdmio/g1[3].to_serial" PINNAME CK0;
+TIMEGRP pll_1_clkout3 = BEL "pll_1/clkout4_buf" BEL "hdmio/mod5_2" BEL
+        "hdmio/mod5_1" BEL "hdmio/mod5_0" BEL "hdmio/shift_clk_3" BEL
+        "hdmio/shift_clk_1" BEL "hdmio/shift_clk_0" BEL "hdmio/shift_b_9" BEL
+        "hdmio/shift_b_8" BEL "hdmio/shift_b_7" BEL "hdmio/shift_b_6" BEL
+        "hdmio/shift_b_5" BEL "hdmio/shift_b_4" BEL "hdmio/shift_b_3" BEL
+        "hdmio/shift_b_2" BEL "hdmio/shift_b_1" BEL "hdmio/shift_b_0" BEL
+        "hdmio/shift_g_9" BEL "hdmio/shift_g_8" BEL "hdmio/shift_g_7" BEL
+        "hdmio/shift_g_6" BEL "hdmio/shift_g_5" BEL "hdmio/shift_g_4" BEL
+        "hdmio/shift_g_3" BEL "hdmio/shift_g_2" BEL "hdmio/shift_g_1" BEL
+        "hdmio/shift_g_0" BEL "hdmio/shift_r_9" BEL "hdmio/shift_r_8" BEL
+        "hdmio/shift_r_7" BEL "hdmio/shift_r_6" BEL "hdmio/shift_r_5" BEL
+        "hdmio/shift_r_4" BEL "hdmio/shift_r_3" BEL "hdmio/shift_r_2" BEL
+        "hdmio/shift_r_1" BEL "hdmio/shift_r_0" PIN
+        "hdmio/g1[0].to_serial_pins<1>" PIN "hdmio/g1[1].to_serial_pins<1>"
+        PIN "hdmio/g1[2].to_serial_pins<1>" PIN
+        "hdmio/g1[3].to_serial_pins<1>";
+TIMEGRP clock_hdmi_s = BEL "hdmio/mod5_2" BEL "hdmio/mod5_1" BEL
+        "hdmio/mod5_0" BEL "hdmio/shift_clk_3" BEL "hdmio/shift_clk_1" BEL
+        "hdmio/shift_clk_0" BEL "hdmio/shift_b_9" BEL "hdmio/shift_b_8" BEL
+        "hdmio/shift_b_7" BEL "hdmio/shift_b_6" BEL "hdmio/shift_b_5" BEL
+        "hdmio/shift_b_4" BEL "hdmio/shift_b_3" BEL "hdmio/shift_b_2" BEL
+        "hdmio/shift_b_1" BEL "hdmio/shift_b_0" BEL "hdmio/shift_g_9" BEL
+        "hdmio/shift_g_8" BEL "hdmio/shift_g_7" BEL "hdmio/shift_g_6" BEL
+        "hdmio/shift_g_5" BEL "hdmio/shift_g_4" BEL "hdmio/shift_g_3" BEL
+        "hdmio/shift_g_2" BEL "hdmio/shift_g_1" BEL "hdmio/shift_g_0" BEL
+        "hdmio/shift_r_9" BEL "hdmio/shift_r_8" BEL "hdmio/shift_r_7" BEL
+        "hdmio/shift_r_6" BEL "hdmio/shift_r_5" BEL "hdmio/shift_r_4" BEL
+        "hdmio/shift_r_3" BEL "hdmio/shift_r_2" BEL "hdmio/shift_r_1" BEL
+        "hdmio/shift_r_0" PIN "hdmio/g1[0].to_serial_pins<1>" PIN
+        "hdmio/g1[1].to_serial_pins<1>" PIN "hdmio/g1[2].to_serial_pins<1>"
+        PIN "hdmio/g1[3].to_serial_pins<1>";
+TIMEGRP TO_snespads_bctrl_bnum_buttons_read_q_4_LD = BEL
+        "snespads_b/ctrl_b/num_buttons_read_q_4_LD";
+PIN SP6_BUFIO2_INSERT_PLL1_ML_BUFIO2_0_pins<0> = BEL
+        "SP6_BUFIO2_INSERT_PLL1_ML_BUFIO2_0" PINNAME DIVCLK;
+PIN pll_1/pll_base_inst/PLL_ADV_pins<2> = BEL "pll_1/pll_base_inst/PLL_ADV"
+        PINNAME CLKIN1;
+TIMEGRP clock_50_i = PIN "SP6_BUFIO2_INSERT_PLL1_ML_BUFIO2_0_pins<0>" PIN
+        "pll_1/pll_base_inst/PLL_ADV_pins<2>";
+TS_clock_50_i = PERIOD TIMEGRP "clock_50_i" 20 ns HIGH 50%;
+TS_clock_master_s = PERIOD TIMEGRP "clock_master_s" 46.56 ns HIGH 50%;
+TS_clock_mem_s = PERIOD TIMEGRP "clock_mem_s" 23.28 ns HIGH 50%;
+TS_clock_vga_s = PERIOD TIMEGRP "clock_vga_s" 40 ns HIGH 50%;
+TS_clock_hdmi_s = PERIOD TIMEGRP "clock_hdmi_s" 8 ns HIGH 50%;
+TS_pll_1_clkout3 = PERIOD TIMEGRP "pll_1_clkout3" TS_clock_50_i / 2.5 HIGH
+        50%;
+TS_pll_1_clkout1 = PERIOD TIMEGRP "pll_1_clkout1" TS_clock_50_i / 0.869565217
+        HIGH 50%;
+TS_pll_1_clkout0 = PERIOD TIMEGRP "pll_1_clkout0" TS_clock_50_i / 0.434782609
+        HIGH 50%;
+TS_pll_1_clkout4 = PERIOD TIMEGRP "pll_1_clkout4" TS_clock_50_i / 2.5 PHASE 4
+        ns HIGH 50%;
+TS_pll_1_clkout2 = PERIOD TIMEGRP "pll_1_clkout2" TS_clock_50_i / 0.5 HIGH
+        50%;
+TS_TO_snespads_bctrl_bnum_buttons_read_q_4_LD = MAXDELAY TO TIMEGRP
+        "TO_snespads_bctrl_bnum_buttons_read_q_4_LD" TS_clock_master_s
+        DATAPATHONLY;
+SCHEMATIC END;
+

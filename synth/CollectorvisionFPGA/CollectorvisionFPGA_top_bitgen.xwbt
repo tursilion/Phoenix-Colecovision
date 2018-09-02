@@ -1,0 +1,8 @@
+INTSTYLE=ise
+INFILE=C:\Phoenix\synth\CollectorvisionFPGA\CollectorvisionFPGA_top.ncd
+OUTFILE=C:\Phoenix\synth\CollectorvisionFPGA\CollectorvisionFPGA_top.bit
+FAMILY=Spartan6
+PART=xc6slx16-2csg324
+WORKINGDIR=C:\Phoenix\synth\CollectorvisionFPGA
+LICENSE=WebPack
+USER_INFO=211280118_0_0_639

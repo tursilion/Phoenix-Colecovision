@@ -1,0 +1,74 @@
+Release 14.7 ngdbuild P.20131013 (nt)
+Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
+
+Command Line: C:\Xilinx\14.7\ISE_DS\ISE\bin\nt\unwrapped\ngdbuild.exe -filter
+iseconfig/filter.filter -intstyle ise -dd _ngo -sd ipcore_dir -nt timestamp -uc
+C:/Phoenix/src/syn-CollectorvisionFPGA/CollectorvisionFPGA.ucf -p
+xc6slx16-csg324-2 CollectorvisionFPGA_top.ngc CollectorvisionFPGA_top.ngd
+
+Reading NGO file
+"C:/Phoenix/synth/CollectorvisionFPGA/CollectorvisionFPGA_top.ngc" ...
+Gathering constraint information from source properties...
+Done.
+
+Annotating constraints to design from ucf file
+"C:/Phoenix/src/syn-CollectorvisionFPGA/CollectorvisionFPGA.ucf" ...
+Resolving constraint associations...
+Checking Constraint Associations...
+INFO:ConstraintSystem:178 - TNM 'clock_50_i', used in period specification
+   'TS_clock_50_i', was traced into PLL_ADV instance PLL_ADV. The following new
+   TNM groups and period specifications were generated at the PLL_ADV output(s):
+    
+   CLKOUT3: <TIMESPEC TS_pll_1_clkout3 = PERIOD "pll_1_clkout3" TS_clock_50_i /
+   2.5 HIGH 50%>
+
+INFO:ConstraintSystem:178 - TNM 'clock_50_i', used in period specification
+   'TS_clock_50_i', was traced into PLL_ADV instance PLL_ADV. The following new
+   TNM groups and period specifications were generated at the PLL_ADV output(s):
+    
+   CLKOUT1: <TIMESPEC TS_pll_1_clkout1 = PERIOD "pll_1_clkout1" TS_clock_50_i /
+   0.869565217 HIGH 50%>
+
+INFO:ConstraintSystem:178 - TNM 'clock_50_i', used in period specification
+   'TS_clock_50_i', was traced into PLL_ADV instance PLL_ADV. The following new
+   TNM groups and period specifications were generated at the PLL_ADV output(s):
+    
+   CLKOUT0: <TIMESPEC TS_pll_1_clkout0 = PERIOD "pll_1_clkout0" TS_clock_50_i /
+   0.434782609 HIGH 50%>
+
+INFO:ConstraintSystem:178 - TNM 'clock_50_i', used in period specification
+   'TS_clock_50_i', was traced into PLL_ADV instance PLL_ADV. The following new
+   TNM groups and period specifications were generated at the PLL_ADV output(s):
+    
+   CLKOUT4: <TIMESPEC TS_pll_1_clkout4 = PERIOD "pll_1_clkout4" TS_clock_50_i /
+   2.5 PHASE 4 ns HIGH 50%>
+
+INFO:ConstraintSystem:178 - TNM 'clock_50_i', used in period specification
+   'TS_clock_50_i', was traced into PLL_ADV instance PLL_ADV. The following new
+   TNM groups and period specifications were generated at the PLL_ADV output(s):
+    
+   CLKOUT2: <TIMESPEC TS_pll_1_clkout2 = PERIOD "pll_1_clkout2" TS_clock_50_i /
+   0.5 HIGH 50%>
+
+Done...
+
+Checking expanded design ...
+
+Partition Implementation Status
+-------------------------------
+
+  No Partitions were found in this design.
+
+-------------------------------
+
+NGDBUILD Design Results Summary:
+  Number of errors:     0
+  Number of warnings:   0
+
+Total memory usage is 170880 kilobytes
+
+Writing NGD file "CollectorvisionFPGA_top.ngd" ...
+Total REAL time to NGDBUILD completion:  6 sec
+Total CPU time to NGDBUILD completion:   6 sec
+
+Writing NGDBUILD log file "CollectorvisionFPGA_top.bld"...

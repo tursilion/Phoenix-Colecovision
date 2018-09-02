@@ -22,7 +22,51 @@
   <sourceproject xmlns="http://www.xilinx.com/XMLSchema" xil_pn:fileType="FILE_XISE" xil_pn:name="CollectorvisionFPGA.xise"/>
 
   <files xmlns="http://www.xilinx.com/XMLSchema">
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGDBUILD_LOG" xil_pn:name="CollectorvisionFPGA_top.bld"/>
+    <file xil_pn:fileType="FILE_CMD_LOG" xil_pn:name="CollectorvisionFPGA_top.cmd_log"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_LSO" xil_pn:name="CollectorvisionFPGA_top.lso"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NCD" xil_pn:name="CollectorvisionFPGA_top.ncd" xil_pn:subbranch="Par"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGC" xil_pn:name="CollectorvisionFPGA_top.ngc"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGD" xil_pn:name="CollectorvisionFPGA_top.ngd"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGR" xil_pn:name="CollectorvisionFPGA_top.ngr"/>
+    <file xil_pn:fileType="FILE_PAD_MISC" xil_pn:name="CollectorvisionFPGA_top.pad"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_PAR_REPORT" xil_pn:name="CollectorvisionFPGA_top.par" xil_pn:subbranch="Par"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_PCF" xil_pn:name="CollectorvisionFPGA_top.pcf" xil_pn:subbranch="Map"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="CollectorvisionFPGA_top.prj"/>
+    <file xil_pn:fileType="FILE_TRCE_MISC" xil_pn:name="CollectorvisionFPGA_top.ptwx"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST_STX" xil_pn:name="CollectorvisionFPGA_top.stx"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST_REPORT" xil_pn:name="CollectorvisionFPGA_top.syr"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_TIMING_TXT_REPORT" xil_pn:name="CollectorvisionFPGA_top.twr" xil_pn:subbranch="Par"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_TIMING_XML_REPORT" xil_pn:name="CollectorvisionFPGA_top.twx" xil_pn:subbranch="Par"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_UNROUTES" xil_pn:name="CollectorvisionFPGA_top.unroutes" xil_pn:subbranch="Par"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_BITGEN_REPORT" xil_pn:name="CollectorvisionFPGA_top.ut" xil_pn:subbranch="FPGAConfiguration"/>
+    <file xil_pn:fileType="FILE_XPI" xil_pn:name="CollectorvisionFPGA_top.xpi"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST" xil_pn:name="CollectorvisionFPGA_top.xst"/>
+    <file xil_pn:fileType="FILE_HTML" xil_pn:name="CollectorvisionFPGA_top_envsettings.html"/>
+    <file xil_pn:fileType="FILE_NCD" xil_pn:name="CollectorvisionFPGA_top_guide.ncd" xil_pn:origination="imported"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_MAP_REPORT" xil_pn:name="CollectorvisionFPGA_top_map.map" xil_pn:subbranch="Map"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_MAP_REPORT" xil_pn:name="CollectorvisionFPGA_top_map.mrp" xil_pn:subbranch="Map"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NCD" xil_pn:name="CollectorvisionFPGA_top_map.ncd" xil_pn:subbranch="Map"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGM" xil_pn:name="CollectorvisionFPGA_top_map.ngm" xil_pn:subbranch="Map"/>
+    <file xil_pn:fileType="FILE_XRPT" xil_pn:name="CollectorvisionFPGA_top_map.xrpt"/>
+    <file xil_pn:fileType="FILE_XRPT" xil_pn:name="CollectorvisionFPGA_top_ngdbuild.xrpt"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_PAD_EXCEL_REPORT" xil_pn:name="CollectorvisionFPGA_top_pad.csv" xil_pn:subbranch="Par"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_PAD_TXT_REPORT" xil_pn:name="CollectorvisionFPGA_top_pad.txt" xil_pn:subbranch="Par"/>
+    <file xil_pn:fileType="FILE_XRPT" xil_pn:name="CollectorvisionFPGA_top_par.xrpt"/>
+    <file xil_pn:fileType="FILE_HTML" xil_pn:name="CollectorvisionFPGA_top_summary.html"/>
+    <file xil_pn:fileType="FILE_FITTER_REPORT" xil_pn:name="CollectorvisionFPGA_top_summary.xml"/>
+    <file xil_pn:fileType="FILE_WEBTALK" xil_pn:name="CollectorvisionFPGA_top_usage.xml"/>
+    <file xil_pn:fileType="FILE_XRPT" xil_pn:name="CollectorvisionFPGA_top_xst.xrpt"/>
+    <file xil_pn:fileType="FILE_DIRECTORY" xil_pn:name="_ngo"/>
+    <file xil_pn:fileType="FILE_XMSGS" xil_pn:name="_xmsgs/bitgen.xmsgs"/>
+    <file xil_pn:fileType="FILE_XMSGS" xil_pn:name="_xmsgs/map.xmsgs"/>
+    <file xil_pn:fileType="FILE_XMSGS" xil_pn:name="_xmsgs/ngdbuild.xmsgs"/>
+    <file xil_pn:fileType="FILE_XMSGS" xil_pn:name="_xmsgs/par.xmsgs"/>
+    <file xil_pn:fileType="FILE_XMSGS" xil_pn:name="_xmsgs/trce.xmsgs"/>
     <file xil_pn:fileType="FILE_XMSGS" xil_pn:name="_xmsgs/xst.xmsgs"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_BITGEN_REPORT" xil_pn:name="collectorvisionfpga_top.bgn" xil_pn:subbranch="FPGAConfiguration"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_BIT" xil_pn:name="collectorvisionfpga_top.bit" xil_pn:subbranch="FPGAConfiguration"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_BITGEN_DRC" xil_pn:name="collectorvisionfpga_top.drc" xil_pn:subbranch="FPGAConfiguration"/>
     <file xil_pn:fileType="FILE_CMD_LOG" xil_pn:name="cvuno3_top.cmd_log"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_LSO" xil_pn:name="cvuno3_top.lso"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGC" xil_pn:name="cvuno3_top.ngc"/>
@@ -34,71 +78,122 @@
     <file xil_pn:fileType="FILE_HTML" xil_pn:name="cvuno3_top_envsettings.html"/>
     <file xil_pn:fileType="FILE_HTML" xil_pn:name="cvuno3_top_summary.html"/>
     <file xil_pn:fileType="FILE_XRPT" xil_pn:name="cvuno3_top_xst.xrpt"/>
+    <file xil_pn:fileType="FILE_HTML" xil_pn:name="usage_statistics_webtalk.html"/>
+    <file xil_pn:fileType="FILE_LOG" xil_pn:name="webtalk.log"/>
     <file xil_pn:fileType="FILE_FITTER_REPORT" xil_pn:name="webtalk_pn.xml"/>
+    <file xil_pn:fileType="FILE_DIRECTORY" xil_pn:name="xlnx_auto_0_xdb"/>
     <file xil_pn:fileType="FILE_DIRECTORY" xil_pn:name="xst"/>
   </files>
 
   <transforms xmlns="http://www.xilinx.com/XMLSchema">
-    <transform xil_pn:end_ts="1533063854" xil_pn:name="TRAN_copyInitialToXSTAbstractSynthesis" xil_pn:start_ts="1533063854">
+    <transform xil_pn:end_ts="1535914338" xil_pn:name="TRAN_copyInitialToXSTAbstractSynthesis" xil_pn:start_ts="1535914338">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1533063854" xil_pn:name="TRAN_schematicsToHdl" xil_pn:prop_ck="-3521696183675161852" xil_pn:start_ts="1533063854">
+    <transform xil_pn:end_ts="1535914338" xil_pn:name="TRAN_schematicsToHdl" xil_pn:prop_ck="-5410266880396346173" xil_pn:start_ts="1535914338">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForProperties"/>
     </transform>
-    <transform xil_pn:end_ts="1533063854" xil_pn:in_ck="2640053158465561696" xil_pn:name="TRAN_regenerateCores" xil_pn:prop_ck="-313382546256236910" xil_pn:start_ts="1533063854">
+    <transform xil_pn:end_ts="1535914338" xil_pn:in_ck="2640053158465561696" xil_pn:name="TRAN_regenerateCores" xil_pn:prop_ck="-9133240267875189551" xil_pn:start_ts="1535914338">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForProperties"/>
       <outfile xil_pn:name="ipcore_dir/pll1.vhd"/>
     </transform>
-    <transform xil_pn:end_ts="1533063854" xil_pn:in_ck="-5111966139184215345" xil_pn:name="TRAN_SubProjectAbstractToPreProxy" xil_pn:start_ts="1533063854">
+    <transform xil_pn:end_ts="1535914338" xil_pn:in_ck="-5111966139184215345" xil_pn:name="TRAN_SubProjectAbstractToPreProxy" xil_pn:start_ts="1535914338">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1533063854" xil_pn:name="TRAN_xawsTohdl" xil_pn:prop_ck="-597854071041511290" xil_pn:start_ts="1533063854">
+    <transform xil_pn:end_ts="1535914338" xil_pn:name="TRAN_xawsTohdl" xil_pn:prop_ck="678503327071067525" xil_pn:start_ts="1535914338">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForProperties"/>
     </transform>
-    <transform xil_pn:end_ts="1533063854" xil_pn:in_ck="-5111966139184215345" xil_pn:name="TRAN_SubProjectPreToStructuralProxy" xil_pn:prop_ck="1106364426758808884" xil_pn:start_ts="1533063854">
+    <transform xil_pn:end_ts="1535914338" xil_pn:in_ck="-5111966139184215345" xil_pn:name="TRAN_SubProjectPreToStructuralProxy" xil_pn:prop_ck="1106364426758808884" xil_pn:start_ts="1535914338">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForPredecessor"/>
     </transform>
-    <transform xil_pn:end_ts="1533063854" xil_pn:name="TRAN_platgen" xil_pn:prop_ck="8183250739260429596" xil_pn:start_ts="1533063854">
+    <transform xil_pn:end_ts="1535914338" xil_pn:name="TRAN_platgen" xil_pn:prop_ck="7124781532652860315" xil_pn:start_ts="1535914338">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForProperties"/>
-      <status xil_pn:value="OutOfDateForPredecessor"/>
     </transform>
-    <transform xil_pn:end_ts="1533063907" xil_pn:in_ck="-4180520897745851266" xil_pn:name="TRANEXT_xstsynthesize_spartan6" xil_pn:prop_ck="-2604944995820526165" xil_pn:start_ts="1533063854">
+    <transform xil_pn:end_ts="1535914424" xil_pn:in_ck="-2540600156425711440" xil_pn:name="TRANEXT_xstsynthesize_spartan6" xil_pn:prop_ck="4087126698737617834" xil_pn:start_ts="1535914338">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="WarningsGenerated"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForInputs"/>
-      <status xil_pn:value="OutOfDateForProperties"/>
-      <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
-      <status xil_pn:value="InputAdded"/>
-      <status xil_pn:value="InputRemoved"/>
-      <status xil_pn:value="OutputRemoved"/>
+      <status xil_pn:value="OutputChanged"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.lso"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.ngc"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.ngr"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.prj"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.stx"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.syr"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.xst"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top_xst.xrpt"/>
+      <outfile xil_pn:name="_xmsgs/xst.xmsgs"/>
+      <outfile xil_pn:name="webtalk_pn.xml"/>
+      <outfile xil_pn:name="xst"/>
     </transform>
-    <transform xil_pn:end_ts="1533063907" xil_pn:in_ck="-4886040396509906787" xil_pn:name="TRAN_compileBCD2" xil_pn:prop_ck="-6421553048018242053" xil_pn:start_ts="1533063907">
+    <transform xil_pn:end_ts="1535914425" xil_pn:in_ck="-4886040396509906787" xil_pn:name="TRAN_compileBCD2" xil_pn:prop_ck="-2548723988384337382" xil_pn:start_ts="1535914424">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForProperties"/>
-      <status xil_pn:value="OutOfDateForPredecessor"/>
     </transform>
-    <transform xil_pn:end_ts="1533305720" xil_pn:in_ck="4440000253261265439" xil_pn:name="TRANEXT_ngdbuild_FPGA" xil_pn:prop_ck="8922909454908354461" xil_pn:start_ts="1533063907">
-      <status xil_pn:value="AbortedRun"/>
-      <status xil_pn:value="NotReadyToRun"/>
-      <status xil_pn:value="OutOfDateForInputs"/>
-      <status xil_pn:value="OutOfDateForProperties"/>
-      <status xil_pn:value="OutOfDateForPredecessor"/>
-      <status xil_pn:value="InputRemoved"/>
+    <transform xil_pn:end_ts="1535914438" xil_pn:in_ck="1678334010090424916" xil_pn:name="TRANEXT_ngdbuild_FPGA" xil_pn:prop_ck="-2551638248564685092" xil_pn:start_ts="1535914425">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.bld"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.ngd"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top_ngdbuild.xrpt"/>
+      <outfile xil_pn:name="_ngo"/>
+      <outfile xil_pn:name="_xmsgs/ngdbuild.xmsgs"/>
+    </transform>
+    <transform xil_pn:end_ts="1535914537" xil_pn:in_ck="578194309223271199" xil_pn:name="TRANEXT_map_spartan6" xil_pn:prop_ck="-3180699873896808002" xil_pn:start_ts="1535914438">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="WarningsGenerated"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.pcf"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top_map.map"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top_map.mrp"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top_map.ncd"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top_map.ngm"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top_map.xrpt"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top_summary.xml"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top_usage.xml"/>
+      <outfile xil_pn:name="_xmsgs/map.xmsgs"/>
+    </transform>
+    <transform xil_pn:end_ts="1535914676" xil_pn:in_ck="8849426600053903800" xil_pn:name="TRANEXT_par_spartan6" xil_pn:prop_ck="-1178055513630676559" xil_pn:start_ts="1535914537">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="WarningsGenerated"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.ncd"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.pad"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.par"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.ptwx"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.unroutes"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.xpi"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top_pad.csv"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top_pad.txt"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top_par.xrpt"/>
+      <outfile xil_pn:name="_xmsgs/par.xmsgs"/>
+    </transform>
+    <transform xil_pn:end_ts="1535914704" xil_pn:in_ck="-419625656332963694" xil_pn:name="TRANEXT_bitFile_spartan6" xil_pn:prop_ck="-7945959082958701688" xil_pn:start_ts="1535914676">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="WarningsGenerated"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.ut"/>
+      <outfile xil_pn:name="_xmsgs/bitgen.xmsgs"/>
+      <outfile xil_pn:name="collectorvisionfpga_top.bgn"/>
+      <outfile xil_pn:name="collectorvisionfpga_top.bit"/>
+      <outfile xil_pn:name="collectorvisionfpga_top.drc"/>
+      <outfile xil_pn:name="usage_statistics_webtalk.html"/>
+      <outfile xil_pn:name="webtalk.log"/>
+      <outfile xil_pn:name="webtalk_pn.xml"/>
+    </transform>
+    <transform xil_pn:end_ts="1535914676" xil_pn:in_ck="578194309223271067" xil_pn:name="TRAN_postRouteTrce" xil_pn:prop_ck="445577401284416184" xil_pn:start_ts="1535914662">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.twr"/>
+      <outfile xil_pn:name="CollectorvisionFPGA_top.twx"/>
+      <outfile xil_pn:name="_xmsgs/trce.xmsgs"/>
     </transform>
   </transforms>
 
