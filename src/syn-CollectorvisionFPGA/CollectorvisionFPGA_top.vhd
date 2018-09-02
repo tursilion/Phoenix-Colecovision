@@ -512,7 +512,8 @@ begin
 
 		--------------------------------------------------------------------
 		-- soft reset to get to cart menu : use ps2 ESC key in keys(8)
-		if ps2_keys_s(8) = '1' then
+--		if (ps2_keys_s(8) = '1') or  (but_star_s(0) = '0') then
+		if ps2_keys_s(8) = '1' or but_equal_s(0) = '0' then
 			soft_reset_s <= '1';
 		else
 			soft_reset_s <= '0';
