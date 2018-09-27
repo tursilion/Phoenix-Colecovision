@@ -26,7 +26,7 @@ static const char * mcfile    = "MULTCARTROM";
 
 //                                     11111111112222222222333
 //                            12345678901234567890123456789012
-static const char TITULO[] = "      COLECOVISION LOADER MK3   ";
+static const char TITULO[] = "      COLECOVISION LOADER MK4   ";
 
 /* Variables */
 

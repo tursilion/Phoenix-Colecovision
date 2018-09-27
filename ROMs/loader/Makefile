@@ -24,7 +24,8 @@ loader: loader.bin
 #	fillfile $< 8192
 	pad $< $<.pad 8192 255
 	mv -f $<.pad $<
-	$(ROMGEN) $< loaderrom 13 a r > ../../src/rom/loaderrom.vhd
+#	$(ROMGEN) $< loaderrom 13 a r > ../../src/rom/loaderrom.vhd
+	$(ROMGEN) $< loaderrom 13 l r > ../../src/rom/loaderrom.vhd
 
 loader.bin: loader.ihx
 
