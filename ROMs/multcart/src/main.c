@@ -54,7 +54,7 @@ void main(void)
 	set_mode1();
 	disable_nmi();
 	fill_vram(0);
-	set_color(0xF4);
+	set_color(0xF0);
 	load_ascii();
 	screen_on();
 
