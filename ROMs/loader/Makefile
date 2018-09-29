@@ -18,24 +18,41 @@ OBJS = $(patsubst %,$(ODIR)/%,$(_OBJS))
 
 .ONESHELL:
 
-all: dir loader
+.PHONY: all clean loader merge merge-zxuno load-zxuno
 
-loader: loader.bin
-#	fillfile $< 8192
-	pad $< $<.pad 8192 255
-	mv -f $<.pad $<
-#	$(ROMGEN) $< loaderrom 13 a r > ../../src/rom/loaderrom.vhd
-	$(ROMGEN) $< loaderrom 13 l r > ../../src/rom/loaderrom.vhd
+load-zxuno: jtag.zxuno zxuno_top.merged.bit
+	sudo jtag $<
+
+all: loader
+
+clean:
+	$(RM) $(ODIR)/* *.map *.lk *.noi *.bin *.ihx *.mem
+
+loader: ../../src/rom/loaderrom.vhd loader.mem
+
+merge: CollectorvisionFPGA_top.merged.bit
+
+merge-zxuno: zxuno_top.merged.bit
+
+CollectorvisionFPGA_top.merged.bit: loader.mem
+	data2mem -bm ../../src/rom/loaderrom_bd.bmm -bt ../../synth/CollectorvisionFPGA/CollectorvisionFPGA_top.bit -bd $< tag avrmap.loaderrom -o b $@
+
+zxuno_top.merged.bit: loader.mem
+	data2mem -bm ../../src/rom/loaderrom_bd.bmm -bt ../../synth/zxuno/zxuno_top.bit -bd $< tag avrmap.loaderrom -o b $@
+
+../../src/rom/loaderrom.vhd: loader.pad.bin
+	$(ROMGEN) $< loaderrom 13 l r > $@
+
+loader.mem: loader.pad.bin
+	$(ROMGEN) $< loaderrom 13 m r > $@
+
+loader.pad.bin: loader.bin
+	pad $< $@ 8192 255
 
 loader.bin: loader.ihx
 
 loader.ihx: $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS)
-
-.PHONY: clean dir
-
-clean:
-	$(RM) $(ODIR)/* *.map *.lk *.noi *.bin *.ihx
 
 #dir:
 #	if not exist obj mkdir obj
@@ -48,3 +65,4 @@ $(ODIR)/%.rel: $(SDIR)/%.c
 
 %.bin: %.ihx
 	$(H2B) -e bin $<
+

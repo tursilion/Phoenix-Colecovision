@@ -140,6 +140,9 @@ void main()
 		}
 		pbios += 512;
 	}
+
+	vdp_patchfont();
+
 	// Test if external cartridge exists
 	ext_cart_id = peek16(0x8000);
 	if (ext_cart_id == 0x55AA || ext_cart_id == 0xAA55) {

@@ -41,5 +41,6 @@ void vdp_putcharxy(uint8 x, uint8 y, uint8 c);
 void vdp_putchar(uint8 c);
 void vdp_putcharcolor(uint8 c, uint8 color);
 void vdp_putstring(char *s);
+void vdp_patchfont();
 
 #endif	/* _VDP_H */

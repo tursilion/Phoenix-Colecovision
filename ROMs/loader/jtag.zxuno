@@ -1,0 +1,5 @@
+cable usbblaster
+detect
+pld load zxuno_top.merged.bit
+quit
+
