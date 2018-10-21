@@ -59,9 +59,9 @@ void startMulticart()
 	unsigned char *cp    = (unsigned char *)0x7100;
 
 	// Disable loader and start BIOS
-	*cp++=0x3e;		// LD A, 2
+	*cp++=0x3e;		// LD A,2
 	*cp++=0x02;
-	*cp++=0xd3;		// OUT (0x52), A
+	*cp++=0xd3;		// OUT (#55), A
 	*cp++=0x55;
 	*cp++=0xc3;		// JP 0
 	*cp++=0x00;
@@ -75,9 +75,9 @@ void startExtCart()
 	unsigned char *cp    = (unsigned char *)0x7100;
 
 	// Disable loader and start BIOS
-	*cp++=0x3e;		// LD A, 4
+	*cp++=0x3e;		// LD A,4
 	*cp++=0x04;
-	*cp++=0xd3;		// OUT (0x52), A
+	*cp++=0xd3;		// OUT (#55), A
 	*cp++=0x55;
 	*cp++=0xc3;		// JP 0
 	*cp++=0x00;
@@ -143,27 +143,31 @@ void main()
 
 	vdp_patchfont();
 
-	// Test if external cartridge exists
+//	Test if external cartridge exists
+
 	ext_cart_id = peek16(0x8000);
-	if (ext_cart_id == 0x55AA || ext_cart_id == 0xAA55) {
-		// Has external cartridge
+
+	if (ext_cart_id == 0x55AA || ext_cart_id == 0xAA55)
 		startExtCart();
-	} else {
-		// Do not has external cartridge
+	else
+	{
 		CONFIG = 0x03;
 		strcpy(msg, "Loading MULTCART ROM");
 		printCenter(10, msg);
 	
-		if (!FileOpen(&file, mcfile)) {							// Open file
+		if (!FileOpen(&file, mcfile))
 			erro("MULTCART.ROM file not found!");
-		}
-		if (file.size != 16384) {
+
+		if (file.size != 16384)
 			erro("MULTCART.ROM file size wrong!");
-		}
-		for (i = 0; i < 32; i++) {								// Read 32 blocks of 512 bytes (16384 bytes)
-			if (!FileRead(&file, pcart)) {
+
+	//	Read 32 blocks of 512 bytes (16384 bytes)
+
+		for (i = 0; i < 32; i++)
+		{
+			if (!FileRead(&file, pcart))
 				erro("Error reading file MULTCART.ROM");
-			}
+
 			pcart += 512;
 		}
 		vdp_putstring("OK");

@@ -1,24 +1,27 @@
-CP = cp
-RM = rm -f
-CC = sdcc
-AS = sdasz80
-LD = sdcc
-H2B = hex2bin
-ROMGEN = romgen
+CP     := cp
+RM     := rm -f
+CC     := sdcc
+AS     := sdasz80
+LD     := sdcc
+H2B    := hex2bin
+ROMGEN := romgen
 
-SDIR = src
-IDIR = inc
-ODIR = obj
+SDIR   := src
+IDIR   := inc
+ODIR   := obj
 
-CFLAGS = -mz80 --opt-code-size --fomit-frame-pointer -I$(IDIR) -I..
+CFLAGS  = -mz80 --opt-code-size --fomit-frame-pointer -I$(IDIR) -I..
 LDFLAGS = -mz80 --code-loc 0x0100 --data-loc 0x6000 --no-std-crt0
 
-_OBJS = crt0.rel main.rel vdp.rel mmc.rel joy.rel fat.rel
-OBJS = $(patsubst %,$(ODIR)/%,$(_OBJS))
+_OBJS   = crt0.rel main.rel vdp.rel mmc.rel joy.rel fat.rel
+OBJS    = $(patsubst %,$(ODIR)/%,$(_OBJS))
 
 .ONESHELL:
 
-.PHONY: all clean loader merge merge-zxuno load-zxuno
+.PHONY: all clean loader merge merge-zxuno load load-zxuno
+
+load: jtag.phoenix CollectorvisionFPGA_top.merged.bit
+	sudo jtag $<
 
 load-zxuno: jtag.zxuno zxuno_top.merged.bit
 	sudo jtag $<
@@ -65,4 +68,3 @@ $(ODIR)/%.rel: $(SDIR)/%.c
 
 %.bin: %.ihx
 	$(H2B) -e bin $<
-
