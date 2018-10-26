@@ -657,10 +657,10 @@ begin
 				end if;
 			end if;
 			
-			ctrl_p1_s(1) <= cv_keys_c(key_v)(1);
-			ctrl_p2_s(1) <= cv_keys_c(key_v)(2);
-			ctrl_p3_s(1) <= cv_keys_c(key_v)(3);
-			ctrl_p4_s(1) <= cv_keys_c(key_v)(4);
+			ctrl_p1_s(1) <= cv_keys_c(key_v)(1) and joy1_p1_i;
+			ctrl_p2_s(1) <= cv_keys_c(key_v)(2) and joy1_p2_i;
+			ctrl_p3_s(1) <= cv_keys_c(key_v)(3) and joy1_p3_i;
+			ctrl_p4_s(1) <= cv_keys_c(key_v)(4) and joy1_p4_i;
 
 			if but_tl_s(0) = '1' and but_tr_s(0) = '1' then		-- fire 2 only if the TL and TR buttons are not pressed
 				fire2_v := but_a_s(0) and joy1_p6_i;
