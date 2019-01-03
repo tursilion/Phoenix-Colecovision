@@ -1,47 +1,14 @@
-# colecofpga
-Colecovision FGPA port from old PACE project.
+**Phoenix RTL with F18A VDP Core**
 
-The original project information is here:
-http://members.iinet.net.au/~msmcdoug/pace/Nanoboard/nanoboard.html
+Please do not add an ISE project to this repo, a separate repo should be made for that if necessary (however, it is pretty easy to make an ISE project).
 
-This project is a ColecoFPGA design port to the Terasic DE-1 and DE-2 development boards, ZX-Uno board and a stand-alone version with a EP2C5 Chinese board.
+To create and ISE project for the Phoenix board:
 
-The Hardware folder is the Eagle project for the prototype. In Synth folder there are projects for all cards. The prototype 1 did not work and is abandoned, the project with the EP4C10 card is not completed.
+1. Open ISE 14.7 and create a new project.  Choose the Spartan-6 SLX16, CSG-324, speed grade 2.
+2. Add all the files in this repo to the project.  There will be several files that are not associated under the "phoenix_top", i.e. f18a_top, altera HDMI files, a generic serializer, etc.  Just remove those files from the project.
+3. Right-click the "Generate Programming File" process, choose Process Properties -> Configuration Options, and set the Configuration Rate to 26, and Unused IOB Pins to Float. Click OK.
+4. Double-click "Generate Programming File" to make a bit-stream.
 
-The second prototype use SNES control to emulate all of the original joystick buttons. Holding TL button the original buttons simulate:
+There will be 3 timing constraints not met.  Two are false due to all clocks being generated via a single PLL, which means ISE knows the timing between the CPU (derived from the 21.7MHz clock) and the F18A (which uses the 100MHz and 25MHz clocks).  Due to the differences, ISE sees a signal from the CPU to the F18A and thinks it only has 2ns for the signal, which fails two signals.  There may be a way to tell the tool to ignore these paths.
 
-<pre>
-Y      => 1
-X      => 2
-B      => 3
-A      => 4
-SELECT => 5
-START  => 6
-</pre>
-
-Holding TR button the original buttons simulate:
-
-<pre>
-Y      => 7
-X      => 8
-B      => 9
-A      => 0
-SELECT => *
-START  => #
-</pre>
-
-Holding START and SELECT together resets the machine, returning in the multcart menu.
-
-The B button and Y (auto-fire) is the fire 1 of original joystick. The A button and X (auto-fire) is the fire 2.
-
-For the DE-1, DE-2 and ZX-Uno boards the PS/2 keyboard emulates the original joystick:
-
-The arrow keys simulate the original directional. Z key is the 'fire 1', X key is 'fire 2', 0-9 is '0-9', Q key is '*' and W key is '#'. ESC key resets the machine. For the ZX-Uno the joystick port also works for directionals and fire 1.
-
-The key combination CTRL+ALT+BACKSPACE, on ZX-Uno version, reloads the main core of Xilinx, returning to the main menu.
-
-In boards with VGA output (ZX-Uno), uses the HOME key to toggle VGA output.
-
-In this circuit the BIOS ROM is loaded from the SD card as well as the ROM multcart. In the source folder 'SD_Card' contains all necessary files to the SD card. Format it to FAT16 and copy the files.
-
-In multcart menu, use the directionals to navigate the ROMs and use FIRE 1 button to load the selected ROM.
+The other constraint violation is valid and happens in the current HDMI core, specifically the audio encoder section.
