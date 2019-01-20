@@ -196,7 +196,10 @@ begin
 	//audioRAvgSum <= audioRAvgSum + i_audioR;
 	//audioLAvg <= audioLAvgSum/audioAvgCnt;
 	//audioRAvg <= audioRAvgSum/audioAvgCnt;
-	//audioAvgCnt <= audioAvgCnt + 1;
+	audioLAvg <= i_audioL;
+	audioRAvg <= i_audioR;
+	audioAvgCnt <= 1;
+//audioAvgCnt <= audioAvgCnt + 1;
 end
 endtask
 
