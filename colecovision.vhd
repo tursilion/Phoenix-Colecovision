@@ -122,6 +122,7 @@ architecture Behavior of colecovision is
    -- CPU signals
    signal clk_en_cpu_s     : std_logic;
    signal nmi_n_s          : std_logic;
+   signal int_n_s          : std_logic;
    signal iorq_n_s         : std_logic;
    signal m1_n_s           : std_logic;
    signal m1_wait_q        : std_logic;
@@ -192,6 +193,7 @@ architecture Behavior of colecovision is
    signal ctrl_r_n_s       : std_logic;
    signal ctrl_en_key_n_s  : std_logic;
    signal ctrl_en_joy_n_s  : std_logic;
+   signal ctrl_int_n_s     : std_logic;
 
    -- SPI
    signal d_from_spi_s     : std_logic_vector( 7 downto 0);
@@ -246,7 +248,7 @@ begin
       CLK_n    => clock_i,             -- in std_logic;
 		CLKEN    => clk_en_cpu_s,        -- in std_logic;
       WAIT_n   => '1',                 -- in std_logic;
-      INT_n    => '1',                 -- in std_logic;
+      INT_n    => int_n_s,           -- in std_logic;
       NMI_n    => nmi_n_s,             -- in std_logic;
       BUSRQ_n  => '1',                 -- in std_logic;
       M1_n     => m1_n_s,              -- out std_logic;
@@ -337,6 +339,8 @@ begin
    audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
    audio_signed_o <= AUDIO_SUM(8 downto 1);
 
+	int_n_s <= ctrl_int_n_s;
+	
    -----------------------------------------------------------------------------
    -- COURTNEY (SEX 7264) WAVETABLE SOUND GENERATOR (WSG)
    -----------------------------------------------------------------------------
@@ -374,7 +378,8 @@ begin
       ctrl_p7_i         => ctrl_p7_i,
       ctrl_p8_o         => ctrl_p8_o,
       ctrl_p9_i         => ctrl_p9_i,
-      d_o               => d_from_ctrl_s
+      d_o               => d_from_ctrl_s,
+      int_n_o         => ctrl_int_n_s
    );
 
    -- SPI

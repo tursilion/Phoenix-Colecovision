@@ -192,11 +192,11 @@ endtask
 
 task AproximateAudio;
 begin
-	audioLAvgSum <= audioLAvgSum + i_audioL;
-	audioRAvgSum <= audioRAvgSum + i_audioR;
-	audioLAvg <= audioLAvgSum/audioAvgCnt;
-	audioRAvg <= audioRAvgSum/audioAvgCnt;
-	audioAvgCnt <= audioAvgCnt + 1;
+	//audioLAvgSum <= audioLAvgSum + i_audioL;
+	//audioRAvgSum <= audioRAvgSum + i_audioR;
+	//audioLAvg <= audioLAvgSum/audioAvgCnt;
+	//audioRAvg <= audioRAvgSum/audioAvgCnt;
+	//audioAvgCnt <= audioAvgCnt + 1;
 end
 endtask
 
