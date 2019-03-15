@@ -1,2 +1,0 @@
-vhdl work "../../src/peripheral/ps2kbd.vhd"
-vhdl work "../../src/peripheral/keyboard.vhd"

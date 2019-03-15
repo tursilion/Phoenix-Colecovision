@@ -1,2 +1,0 @@
-# Output products list for <clk133m_dcm>
-clk133m_dcm_flist.txt

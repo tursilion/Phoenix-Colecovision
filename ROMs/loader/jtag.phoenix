@@ -1,3 +1,0 @@
-cable DigilentHS1
-detect
-pld load CollectorvisionFPGA_top.merged.bit
