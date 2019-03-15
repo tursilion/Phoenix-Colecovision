@@ -49,7 +49,7 @@ entity colecovision is
       compat_rgb_g   : integer := 0
    );
    port (
-      clock_i        : in  std_logic;
+      clock_i        : in  std_logic;        --  21.47727 (21.739) MHz
       clk_100m0_i    : in  std_logic;
       clk_25m0_i     : in  std_logic;
       clk_en_3m58_i  : in  std_logic;
@@ -57,15 +57,15 @@ entity colecovision is
       reset_i        : in  std_logic;        -- Reset, tbem acionado quando por_n_i for 0
       por_n_i        : in  std_logic;        -- Power-on Reset
       -- Controller Interface ---------------------------------------------------
-      ctrl_p1_i      : in  std_logic_vector( 1 downto 0);
-      ctrl_p2_i      : in  std_logic_vector( 1 downto 0);
-      ctrl_p3_i      : in  std_logic_vector( 1 downto 0);
-      ctrl_p4_i      : in  std_logic_vector( 1 downto 0);
-      ctrl_p5_o      : out std_logic_vector( 1 downto 0);
-      ctrl_p6_i      : in  std_logic_vector( 1 downto 0);
-      ctrl_p7_i      : in  std_logic_vector( 1 downto 0);
-      ctrl_p8_o      : out std_logic_vector( 1 downto 0);
-      ctrl_p9_i      : in  std_logic_vector( 1 downto 0);
+      ctrl_p1_i      : in  std_logic_vector( 2 downto 1);
+      ctrl_p2_i      : in  std_logic_vector( 2 downto 1);
+      ctrl_p3_i      : in  std_logic_vector( 2 downto 1);
+      ctrl_p4_i      : in  std_logic_vector( 2 downto 1);
+      ctrl_p5_o      : out std_logic;
+      ctrl_p6_i      : in  std_logic_vector( 2 downto 1);
+      ctrl_p7_i      : in  std_logic_vector( 2 downto 1);
+      ctrl_p8_o      : out std_logic;
+      ctrl_p9_i      : in  std_logic_vector( 2 downto 1);
       -- CPU RAM Interface ------------------------------------------------------
       ram_addr_o     : out std_logic_vector(16 downto 0);   -- 128K
       ram_ce_o       : out std_logic;
@@ -245,10 +245,10 @@ begin
    inst_t80 : entity work.t80se
    port map (
       RESET_n  => reset_n_s,           -- in std_logic;
-      CLK_n    => clock_i,             -- in std_logic;
-		CLKEN    => clk_en_cpu_s,        -- in std_logic;
+      CLK_n    => clock_i,             -- in std_logic;  21.47727 (21.739) MHz
+      CLKEN    => clk_en_cpu_s,        -- in std_logic;
       WAIT_n   => '1',                 -- in std_logic;
-      INT_n    => int_n_s,           -- in std_logic;
+      INT_n    => int_n_s,             -- in std_logic;
       NMI_n    => nmi_n_s,             -- in std_logic;
       BUSRQ_n  => '1',                 -- in std_logic;
       M1_n     => m1_n_s,              -- out std_logic;
@@ -264,6 +264,8 @@ begin
       DO       => d_from_cpu_s         -- out std_logic_vector(7 downto 0)
    );
 
+   -- CPU maskable interrupts, currently only the controllers.
+   int_n_s <= ctrl_int_n_s;
 
    -- Loader
    lr: entity work.loaderrom
@@ -339,8 +341,6 @@ begin
    audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
    audio_signed_o <= AUDIO_SUM(8 downto 1);
 
-	int_n_s <= ctrl_int_n_s;
-	
    -----------------------------------------------------------------------------
    -- COURTNEY (SEX 7264) WAVETABLE SOUND GENERATOR (WSG)
    -----------------------------------------------------------------------------
@@ -363,12 +363,11 @@ begin
    -----------------------------------------------------------------------------
    ctrl_b : entity work.cv_ctrl
    port map (
-      clock_i           => clock_i,
+      clk_21m47_i       => clock_i,
       clk_en_3m58_i     => clk_en_3m58_i,
       reset_n_i         => reset_n_s,
       ctrl_en_key_n_i   => ctrl_en_key_n_s,
       ctrl_en_joy_n_i   => ctrl_en_joy_n_s,
-      a1_i              => cpu_addr_s(1),
       ctrl_p1_i         => ctrl_p1_i,
       ctrl_p2_i         => ctrl_p2_i,
       ctrl_p3_i         => ctrl_p3_i,
@@ -378,9 +377,11 @@ begin
       ctrl_p7_i         => ctrl_p7_i,
       ctrl_p8_o         => ctrl_p8_o,
       ctrl_p9_i         => ctrl_p9_i,
-      d_o               => d_from_ctrl_s,
-      int_n_o         => ctrl_int_n_s
+      ctrl_sel_i        => cpu_addr_s(1), -- A1=0 read controller 1, A1=1 read controller 2
+      ctrl_d_o          => d_from_ctrl_s,
+      ctrl_int_n_o      => ctrl_int_n_s
    );
+   
 
    -- SPI
    sd: entity work.spi

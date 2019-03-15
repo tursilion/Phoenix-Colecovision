@@ -54,17 +54,20 @@ entity phoenix_top is
       -- Buttons
       btn_reset_n_i     : in     std_logic;
 
+      -- External IO port
+--      exp_io1_net       : inout  std_logic_vector(12 downto 2) := (others => 'Z');
+--      exp_io2_net       : inout  std_logic_vector(24 downto 15):= (others => 'Z');
+
       -- SRAM
       sram_addr_o       : out    std_logic_vector(20 downto 0) := (others => '0');
       sram_data_io      : inout  std_logic_vector(7 downto 0)  := (others => 'Z');
+      sram_ce_n_o       : out    std_logic                     := '1';
       sram_oe_n_o       : out    std_logic                     := '1';
       sram_we_n_o       : out    std_logic                     := '1';
 
       -- PS2
       ps2_clk_io        : inout  std_logic                     := 'Z';
       ps2_data_io       : inout  std_logic                     := 'Z';
---    ps2_mouse_clk_io  : inout  std_logic                     := 'Z';
---    ps2_mouse_data_io : inout  std_logic                     := 'Z';
 
       -- SD Card
       sd_cs_n_o         : out    std_logic                     := '1';
@@ -80,8 +83,6 @@ entity phoenix_top is
       flash_miso_i      : in     std_logic;
       flash_wp_o        : out    std_logic                     := '0';
       flash_hold_o      : out    std_logic                     := '1';
-
-
 
       -- Joystick
       joy_p5_o          : out    std_logic;
@@ -100,22 +101,11 @@ entity phoenix_top is
       joy2_p6_i         : in     std_logic;
       joy2_p7_i         : in     std_logic;
       joy2_p9_i         : in     std_logic;
+      
+      -- SNES controller
       snesjoy_clock_o   : out    std_logic                     := '1';
       snesjoy_latch_o   : out    std_logic                     := '1';
       snesjoy_data_i    : in     std_logic;
-
-      -- Audio
-      dac_l_o           : out    std_logic                     := '0';
-      dac_r_o           : out    std_logic                     := '0';
-
-      -- VGA
-      vga_r_o           : out    std_logic_vector(3 downto 0)  := (others => '0');
-      vga_g_o           : out    std_logic_vector(3 downto 0)  := (others => '0');
-      vga_b_o           : out    std_logic_vector(3 downto 0)  := (others => '0');
-      vga_hsync_n_o     : out    std_logic                     := '1';
-      vga_vsync_n_o     : out    std_logic                     := '1';
-      stnd_o            : out    std_logic                     := '1';
-      pal_clk_en_o      : out    std_logic                     := '1';
 
       -- HDMI
       hdmi_p_o          : out    std_logic_vector(3 downto 0);
@@ -124,7 +114,8 @@ entity phoenix_top is
       -- Cartridge
       cart_addr_o       : out    std_logic_vector(14 downto 0) := (others => '0');
       cart_data_i       : in     std_logic_vector( 7 downto 0);
-      cart_dir_o        : out    std_logic                     := '1';
+--      cart_dir_o        : out    std_logic                     := '1';  --Rev4 PCB
+      cart_dir_o        : out    std_logic                     := '0'; --Rev6 PCB
       cart_oe_n_o       : out    std_logic                     := '1';
       cart_en_80_n_o    : out    std_logic                     := '1';
       cart_en_A0_n_o    : out    std_logic                     := '1';
@@ -214,10 +205,10 @@ architecture behavior of phoenix_top is
    signal ctrl_p2_s        : std_logic_vector( 2 downto 1);
    signal ctrl_p3_s        : std_logic_vector( 2 downto 1);
    signal ctrl_p4_s        : std_logic_vector( 2 downto 1);
-   signal ctrl_p5_s        : std_logic_vector( 2 downto 1);
+   signal ctrl_p5_s        : std_logic;
    signal ctrl_p6_s        : std_logic_vector( 2 downto 1);
    signal ctrl_p7_s        : std_logic_vector( 2 downto 1);
-   signal ctrl_p8_s        : std_logic_vector( 2 downto 1);
+   signal ctrl_p8_s        : std_logic;
    signal ctrl_p9_s        : std_logic_vector( 2 downto 1);
 
    -- SNES
@@ -275,14 +266,14 @@ begin
       clock_wsg_en_o => clock_wsg_en_s
    );
 
-   -- The Colecovision
+   -- The ColecoVision
    vg: entity work.colecovision
    generic map (
       num_maq_g         => 8,       -- CVUNO board
       compat_rgb_g      => 0
    )
    port map (
-      clock_i           => clock_master_s,
+      clock_i           => clock_master_s,   --  21.47727 (21.739) MHz
       clk_100m0_i       => clk_100m0_s,
       clk_25m0_i        => clk_25m0_s,
       clk_en_3m58_i     => clock_3m_en_s,
@@ -373,22 +364,11 @@ begin
       -- SRAM in board
       sram_addr_o    => sram_addr_o(18 downto 0),
       sram_data_io   => sram_data_io,
-      sram_ce_n_o    => open,
+      sram_ce_n_o    => sram_ce_n_o,
       sram_oe_n_o    => sram_oe_n_o,
       sram_we_n_o    => sram_we_n_o
    );
 
-   -- Audio
-   audioout: entity work.dac
-   generic map (
-      msbi_g      => 7
-   )
-   port map (
-      clk_i    => clock_master_s,
-      res_i    => reset_s,
-      dac_i    => audio_s,
-      dac_o    => audio_dac_s
-   );
 
    -- PS/2 keyboard interface
    ps2if_inst : entity work.colecoKeyboard
@@ -419,17 +399,14 @@ begin
    por_n_s     <= '0' when por_cnt_s /= 0    else '1';
    reset_s     <= por_s or not btn_reset_n_i or soft_reset_s;
    audio_s     <= std_logic_vector(unsigned(audio_signed_s + 128));
-   dac_l_o     <= audio_dac_s;
-   dac_r_o     <= audio_dac_s;
    sd_cs_n_o   <= sd_cs_n_s;
-   --cart_dir_o   <= '1';
-
+   
    -- Memory
    bios_addr_s <= ram_addr_s(12 downto 0);
    bios_ce_s   <= '1' when ram_addr_s(16 downto 13) = "0000" and ram_ce_s = '1'  else '0';
    bios_we_s   <= '1' when bios_ce_s = '1' and ram_we_s = '1'                    else '0';
 
-   d_to_cv_s   <= d_from_bios_s when bios_ce_s = '1'     else d_from_ram_s;
+   d_to_cv_s   <= d_from_bios_s when bios_ce_s = '1' else d_from_ram_s;
 
 
 
@@ -479,17 +456,15 @@ begin
 
    );
 
-   -- Controller
-   -----------------------------------------------------------------------------
-   -- Process pad_ctrl
+
    --
-   -- Purpose:
-   --   Maps the gamepad signals to the controller buses of the console.
+   -- Mix the NES GamePad and PS2 keyboard signals to CV Controller 1.
+   -- The GamePad and keyboard do not provide quadrature signals, those
+   -- inputs are wired directly below this process.
    --
    pad_ctrl: process (
       ctrl_p5_s, ctrl_p8_s, ps2_keys_s, ps2_joy_s,
       joy1_p1_i, joy1_p2_i, joy1_p3_i, joy1_p4_i, joy1_p6_i,
-      joy2_p1_i, joy2_p2_i, joy2_p3_i, joy2_p4_i, joy2_p6_i,
       but_a_s, but_b_s, but_up_s, but_down_s, but_left_s, but_right_s,
       but_x_s, but_y_s, but_sel_s, but_start_s, but_tl_s, but_tr_s, but_0_s,
       but_1_s, but_2_s, but_3_s, but_4_s, but_5_s, but_6_s, but_7_s, but_8_s,
@@ -499,14 +474,11 @@ begin
       variable fire1_v : std_logic;
       variable fire2_v : std_logic;
    begin
-      -- quadrature device not implemented
-      --ctrl_p7_s          <= "11";
-      --ctrl_p9_s          <= "11";
 
       --------------------------------------------------------------------
       -- soft reset to get to cart menu : use ps2 ESC key in keys(8)
 --    if (ps2_keys_s(8) = '1') or  (but_star_s(0) = '0') then
-      if ps2_keys_s(8) = '1' or but_equal_s(0) = '0' then
+      if ps2_keys_s(8) = '1' then
          soft_reset_s <= '1';
       else
          soft_reset_s <= '0';
@@ -514,7 +486,7 @@ begin
       ------------------------------------------------------------------------
 
       -- Joy 1
-      if ctrl_p5_s(1) = '0' and ctrl_p8_s(1) = '1' then
+      if ctrl_p5_s = '0' and ctrl_p8_s = '1' then
          -- keys and right button enabled --------------------------------------
          -- keys not fully implemented
 
@@ -663,7 +635,7 @@ begin
 
          ctrl_p6_s(1) <= not ps2_keys_s(0) and fire2_v and joy1_p6_i; -- button right (fire 2)
 
-      elsif ctrl_p5_s(1) = '1' and ctrl_p8_s(1) = '0' then
+      elsif ctrl_p5_s = '1' and ctrl_p8_s = '0' then
          -- joystick and left button enabled -----------------------------------
          ctrl_p1_s(1) <= not ps2_joy_s(0) and but_up_s(0) and but_dot_s(0) and joy1_p1_i;    -- up
          ctrl_p2_s(1) <= not ps2_joy_s(1) and but_down_s(0) and joy1_p2_i; -- down
@@ -684,48 +656,25 @@ begin
          ctrl_p3_s(1)   <= joy1_p3_i;
          ctrl_p4_s(1)   <= joy1_p4_i;
          ctrl_p6_s(1)   <= joy1_p6_i;
-         --ctrl_p7_s(1) <= joy1_p7_i;
       end if;
-
-      -- Joy2
-      -- nothing active -----------------------------------------------------
-      ctrl_p1_s(2) <= joy2_p1_i;
-      ctrl_p2_s(2) <= joy2_p2_i;
-      ctrl_p3_s(2) <= joy2_p3_i;
-      ctrl_p4_s(2) <= joy2_p4_i;
-      ctrl_p6_s(2) <= joy2_p6_i;
-      --ctrl_p7_s(2) <= joy2_p7_i;
 
    end process pad_ctrl;
 
 
-   -- Controller
+   -- Controller 2, straight input signals.
    ctrl_p1_s(2) <= joy2_p1_i;
    ctrl_p2_s(2) <= joy2_p2_i;
    ctrl_p3_s(2) <= joy2_p3_i;
    ctrl_p4_s(2) <= joy2_p4_i;
    ctrl_p6_s(2) <= joy2_p6_i;
--- ctrl_p7_s(2) <= joy2_p7_i;
--- ctrl_p1_s   <= joy2_p1_i & joy1_p1_i;
--- ctrl_p2_s   <= joy2_p2_i & joy1_p2_i;
--- ctrl_p3_s   <= joy2_p3_i & joy1_p3_i;
--- ctrl_p4_s   <= joy2_p4_i & joy1_p4_i;
--- ctrl_p6_s   <= joy2_p6_i & joy1_p6_i;
-   ctrl_p7_s   <= joy2_p7_i & joy1_p7_i;
-   ctrl_p9_s   <= joy2_p9_i & joy1_p9_i;
-   joy_p5_o    <= ctrl_p5_s(1);
-   joy_p8_o    <= ctrl_p8_s(1);
 
+   -- Quadrature inputs for both controllers.
+   ctrl_p7_s <= joy2_p7_i & joy1_p7_i;
+   ctrl_p9_s <= joy2_p9_i & joy1_p9_i;
 
-   --
-   -- VGA output, currently unused (PCB does not have VGA header).
-   --
-
-   vga_r_o        <= vga_r_s;
-   vga_g_o        <= vga_g_s;
-   vga_b_o        <= vga_b_s;
-   vga_hsync_n_o  <= vga_hsync_n_s;
-   vga_vsync_n_o  <= vga_vsync_n_s;
+   -- Output stick vs keypad selection.
+   joy_p5_o <= ctrl_p5_s;
+   joy_p8_o <= ctrl_p8_s;
 
 
    --
@@ -774,8 +723,8 @@ begin
    -- LED, currently wired wrong, do not set to '1';
    led_o <= '0';
 
-   -- RGB-LED, set to yellow
-   rgb_led_o <= "001";
+   -- RGB-LED, set to green
+   rgb_led_o <= "101";
 
 
 end architecture;

@@ -130,7 +130,11 @@ begin
 
     elsif clk_i'event and clk_i = '1' then
       if save_buttons_i then
-        buttons_q <= shift_buttons_q;
+        if shift_buttons_q(but_pos_bit2_c) = 1 and shift_buttons_q(but_pos_bit3_c) = 0 then
+		    buttons_q(31 downto 16) <= shift_buttons_q(15 downto 0);
+		  else
+		    buttons_q <= shift_buttons_q;
+		  end if;
       end if;
 
       if clk_en_i and shift_buttons_i then
