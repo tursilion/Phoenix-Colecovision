@@ -328,7 +328,14 @@ begin
       spi_sclk_o        => sd_sclk_o,
       spi_cs_n_o        => sd_cs_n_s,
       sd_cd_n_i         => sd_cd_n_i,
-      -- DEBUG
+       -- SPI FLASH
+      flash_cs_n_o      => flash_cs_n_o,
+      flash_hold_o      => flash_hold_o,
+      flash_miso_i      => flash_miso_i,
+      flash_mosi_o      => flash_mosi_o,
+      flash_sclk_o      => flash_sclk_o,
+      flash_wp_o        => flash_wp_o  ,
+		-- DEBUG
       D_cpu_addr        => open--D_cpu_addr
     );
 

@@ -104,6 +104,13 @@ entity colecovision is
       spi_sclk_o     : out std_logic;
       spi_cs_n_o     : out std_logic;
       sd_cd_n_i      : in  std_logic;
+      -- SPI FLASH
+      flash_cs_n_o   : out std_logic;
+      flash_hold_o   : out std_logic;
+      flash_miso_i   : in  std_logic;
+      flash_mosi_o   : out std_logic;
+      flash_sclk_o   : out std_logic;
+      flash_wp_o     : out std_logic;
       -- DEBUG
       D_cpu_addr     : out std_logic_vector(15 downto 0)
    );
@@ -200,6 +207,10 @@ architecture Behavior of colecovision is
    signal spi_cs_s         : std_logic;
    signal spi_wr_s         : std_logic;
    signal spi_rd_s         : std_logic;
+
+	-- SPI FLASH
+	signal flash_r          : std_logic_vector(7 downto 0);
+   signal flash_r_cs_s     : std_logic;
 
    -- Cartridge
    signal d_from_cart_s    : std_logic_vector( 7 downto 0);
@@ -439,6 +450,13 @@ begin
    cart_oe_s      <= (not rd_n_s) and cart_ce_s;
    cart_we_s      <= (not wr_n_s) and cart_ce_s    when multcart_q = '1'   else '0';
 
+	--	SPI FLASH
+	flash_cs_n_o <= flash_r(0);
+	flash_sclk_o <= flash_r(1);
+	flash_mosi_o <= flash_r(2);
+	flash_wp_o   <= flash_r(3);
+	flash_hold_o <= flash_r(4);
+
    -- RAM map
    --                                 1 1111 11
    --                                 6 5432 1098 7654 3210
@@ -496,6 +514,7 @@ begin
    cfg_page_cs_s     <= '1'   when io_access_s = '1' and cpu_addr_s(7 downto 0) = X"54"      else '0';   -- Page port          => 54
    cfg_port_cs_s     <= '1'   when io_write_s = '1'  and cpu_addr_s(7 downto 0) = X"55"      else '0';   -- Config Port        => 55
    machine_id_cs_s   <= '1'   when io_read_s = '1'   and cpu_addr_s(7 downto 0) = X"58"      else '0';   -- Machine ID read    => 58
+   flash_r_cs_s      <= '1'   when io_access_s = '1' and cpu_addr_s(7 downto 0) = X"59"      else '0';   -- SPI FLASH          => 59
    bios_ram_cs_s     <= '1'   when io_write_s = '1'  and cpu_addr_s(7 downto 0) = X"7F"      else '0';   -- SGM BIOS ram bankswitch => 7F
    ctrl_en_key_n_s   <= '0'   when io_write_s = '1'  and cpu_addr_s(7 downto 5) = "100"      else '1';   -- Controller key set => 80 to 9F
    vdp_w_n_s         <= '0'   when io_write_s = '1'  and cpu_addr_s(7 downto 5) = "101"      else '1';   -- VDP write          => A0 to BF
@@ -560,6 +579,18 @@ begin
       elsif rising_edge(clock_i) then
          if clk_en_3m58_i = '1' and cfg_page_cs_s = '1' and wr_n_s = '0' then
             cfg_page_r <= d_from_cpu_s;
+         end if;
+      end if;
+   end process;
+
+   -- SPI FLASH: Write I/O port 59
+   process (por_n_i, clock_i)
+   begin
+      if por_n_i = '0' then
+         flash_r <= (others => '1');
+      elsif rising_edge(clock_i) then
+         if clk_en_3m58_i = '1' and flash_r_cs_s = '1' and wr_n_s = '0' then
+            flash_r <= d_from_cpu_s;
          end if;
       end if;
    end process;
