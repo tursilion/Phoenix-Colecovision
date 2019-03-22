@@ -9,7 +9,7 @@ NET "clock_50_i"        LOC="V10" | IOSTANDARD = LVCMOS33;
 
 # Buttons
 #
-NET "btn_reset_n_i"		LOC="B2"  | IOSTANDARD = LVCMOS33; # Ext pullup, 10mS reset
+NET "btn_reset_n_i"		LOC="B2"  | IOSTANDARD = LVCMOS33; # Ext pullup, 10ms reset
 
 
 # External expansion port
@@ -53,7 +53,7 @@ NET "hdmi_n_o<3>"       LOC="V5"  | IOSTANDARD = TMDS_33;
 NET "hdmi_p_o<3>"       LOC="U5"  | IOSTANDARD = TMDS_33;
 
 
-# SRAM
+# SRAM, 512Kx8, 10ns
 #
 NET "sram_addr_o<0>"    LOC="U18" | IOSTANDARD = LVCMOS33;
 NET "sram_addr_o<1>"    LOC="U17" | IOSTANDARD = LVCMOS33;
@@ -74,8 +74,6 @@ NET "sram_addr_o<15>"   LOC="E18" | IOSTANDARD = LVCMOS33;
 NET "sram_addr_o<16>"   LOC="D17" | IOSTANDARD = LVCMOS33;
 NET "sram_addr_o<17>"   LOC="D18" | IOSTANDARD = LVCMOS33;
 NET "sram_addr_o<18>"   LOC="C17" | IOSTANDARD = LVCMOS33;
-NET "sram_addr_o<19>"   LOC="K18" | IOSTANDARD = LVCMOS33;
-NET "sram_addr_o<20>"   LOC="C18" | IOSTANDARD = LVCMOS33;
 
 NET "sram_data_io<0>"   LOC="P18" | IOSTANDARD = LVCMOS33;
 NET "sram_data_io<1>"   LOC="P17" | IOSTANDARD = LVCMOS33;
@@ -113,15 +111,15 @@ NET "flash_hold_o"      LOC="V14" | IOSTANDARD = LVCMOS33 | DRIVE = 8; # Ext pul
 
 # PS2 Keyboard
 #
-NET "ps2_clk_io"        LOC="A4"  | IOSTANDARD = LVCMOS33 | DRIVE = 8; # Ext pullup
-NET "ps2_data_io"       LOC="B4"  | IOSTANDARD = LVCMOS33 | DRIVE = 8; # Ext pullup
+NET "ps2_clk_io"        LOC="A4"  | IOSTANDARD = LVCMOS33 | PULLUP | DRIVE = 8;
+NET "ps2_data_io"       LOC="B4"  | IOSTANDARD = LVCMOS33 | PULLUP | DRIVE = 8;
 
 
 # SNES controller
 #
-NET "snesjoy_clock_o"   LOC="A2"  | IOSTANDARD = LVCMOS33; # Ext pullup
-NET "snesjoy_latch_o"   LOC="B3"  | IOSTANDARD = LVCMOS33; # Ext pullup
-NET "snesjoy_data_i"    LOC="A3"  | IOSTANDARD = LVCMOS33; # Ext pullup
+NET "snesjoy_clock_o"   LOC="A2"  | IOSTANDARD = LVCMOS33 | PULLUP;
+NET "snesjoy_latch_o"   LOC="B3"  | IOSTANDARD = LVCMOS33 | PULLUP;
+NET "snesjoy_data_i"    LOC="A3"  | IOSTANDARD = LVCMOS33 | PULLUP;
 
 
 # Joystick controllers
@@ -164,14 +162,14 @@ NET "cart_addr_o<12>"   LOC="L2"  | IOSTANDARD = LVCMOS33;
 NET "cart_addr_o<13>"   LOC="J1"  | IOSTANDARD = LVCMOS33;
 NET "cart_addr_o<14>"   LOC="K3"  | IOSTANDARD = LVCMOS33;
 
-NET "cart_data_i<0>"    LOC="D2"  | IOSTANDARD = LVCMOS33;
-NET "cart_data_i<1>"    LOC="C2"  | IOSTANDARD = LVCMOS33;
-NET "cart_data_i<2>"    LOC="E4"  | IOSTANDARD = LVCMOS33;
-NET "cart_data_i<3>"    LOC="C1"  | IOSTANDARD = LVCMOS33;
-NET "cart_data_i<4>"    LOC="D1"  | IOSTANDARD = LVCMOS33;
-NET "cart_data_i<5>"    LOC="E1"  | IOSTANDARD = LVCMOS33;
-NET "cart_data_i<6>"    LOC="F2"  | IOSTANDARD = LVCMOS33;
-NET "cart_data_i<7>"    LOC="G3"  | IOSTANDARD = LVCMOS33;
+NET "cart_data_io<0>"   LOC="D2"  | IOSTANDARD = LVCMOS33;
+NET "cart_data_io<1>"   LOC="C2"  | IOSTANDARD = LVCMOS33;
+NET "cart_data_io<2>"   LOC="E4"  | IOSTANDARD = LVCMOS33;
+NET "cart_data_io<3>"   LOC="C1"  | IOSTANDARD = LVCMOS33;
+NET "cart_data_io<4>"   LOC="D1"  | IOSTANDARD = LVCMOS33;
+NET "cart_data_io<5>"   LOC="E1"  | IOSTANDARD = LVCMOS33;
+NET "cart_data_io<6>"   LOC="F2"  | IOSTANDARD = LVCMOS33;
+NET "cart_data_io<7>"   LOC="G3"  | IOSTANDARD = LVCMOS33;
 
 //NET "cart_dir_o"        LOC="N1"  | IOSTANDARD = LVCMOS33 | PULLUP; #rev4 PCB
 NET "cart_dir_o"        LOC="N1"  | IOSTANDARD = LVCMOS33; #Rev6 PCB

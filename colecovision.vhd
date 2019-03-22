@@ -49,14 +49,16 @@ entity colecovision is
       compat_rgb_g   : integer := 0
    );
    port (
-      clock_i        : in  std_logic;        --  21.47727 (21.739) MHz
+      clock_i        : in  std_logic;        --  21.47727 (21.739 PLL) MHz
+      clock_mem_i    : in  std_logic;        --  42.95454 (43.478 PLL) MHz
       clk_100m0_i    : in  std_logic;
       clk_25m0_i     : in  std_logic;
       clk_en_3m58_i  : in  std_logic;
       clk_en_1m79_i  : in  std_logic;
-      reset_i        : in  std_logic;        -- Reset, tbem acionado quando por_n_i for 0
-      por_n_i        : in  std_logic;        -- Power-on Reset
-      -- Controller Interface ---------------------------------------------------
+      reset_i        : in  std_logic;        -- Soft Reset, active high
+      por_n_i        : in  std_logic;        -- Power-on Reset, active low
+
+      -- Physical controller interface
       ctrl_p1_i      : in  std_logic_vector( 2 downto 1);
       ctrl_p2_i      : in  std_logic_vector( 2 downto 1);
       ctrl_p3_i      : in  std_logic_vector( 2 downto 1);
@@ -66,46 +68,57 @@ entity colecovision is
       ctrl_p7_i      : in  std_logic_vector( 2 downto 1);
       ctrl_p8_o      : out std_logic;
       ctrl_p9_i      : in  std_logic_vector( 2 downto 1);
-      -- CPU RAM Interface ------------------------------------------------------
-      ram_addr_o     : out std_logic_vector(16 downto 0);   -- 128K
-      ram_ce_o       : out std_logic;
-      ram_oe_o       : out std_logic;
-      ram_we_o       : out std_logic;
-      ram_data_i     : in  std_logic_vector( 7 downto 0);
-      ram_data_o     : out std_logic_vector( 7 downto 0);
-      -- Video RAM Interface ----------------------------------------------------
-      vram_addr_o    : out std_logic_vector(13 downto 0);   -- 16K
-      vram_ce_o      : out std_logic;
-      vram_oe_o      : out std_logic;
-      vram_we_o      : out std_logic;
-      vram_data_i    : in  std_logic_vector( 7 downto 0);
-      vram_data_o    : out std_logic_vector( 7 downto 0);
-      -- Cartridge ROM Interface ------------------------------------------------
+
+--      -- CPU RAM
+--      ram_addr_o     : out std_logic_vector(16 downto 0);   -- 128K
+--      ram_ce_o       : out std_logic;
+--      ram_oe_o       : out std_logic;
+--      ram_we_o       : out std_logic;
+--      ram_data_i     : in  std_logic_vector( 7 downto 0);
+--      ram_data_o     : out std_logic_vector( 7 downto 0);
+--      -- Video RAM Interface
+--      vram_addr_o    : out std_logic_vector(13 downto 0);   -- 16K
+--      vram_ce_o      : out std_logic;
+--      vram_oe_o      : out std_logic;
+--      vram_we_o      : out std_logic;
+--      vram_data_i    : in  std_logic_vector( 7 downto 0);
+--      vram_data_o    : out std_logic_vector( 7 downto 0);
+
+      -- Physical cartridge interface
       cart_addr_o    : out std_logic_vector(14 downto 0);   -- 32K
-      cart_data_i    : in  std_logic_vector( 7 downto 0);
+      cart_dir_o     : out std_logic;
+      cart_data_io   : inout std_logic_vector( 7 downto 0);
       cart_oe_n_o    : out std_logic;
       cart_en_80_n_o : out std_logic;
       cart_en_a0_n_o : out std_logic;
       cart_en_c0_n_o : out std_logic;
       cart_en_e0_n_o : out std_logic;
-      -- Audio Interface --------------------------------------------------------
+
+      -- Audio output
       audio_o        : out std_logic_vector(7 downto 0);
       audio_signed_o : out signed(7 downto 0);
-      -- VGA Video Output ----------------------------------------------------
+
+      -- VGA output
       blank_o        : out std_logic;
       hsync_n_o      : out std_logic;
       vsync_n_o      : out std_logic;
       red_o          : out std_logic_vector( 3 downto 0);
       grn_o          : out std_logic_vector( 3 downto 0);
       blu_o          : out std_logic_vector( 3 downto 0);
-      -- SPI
-      spi_miso_i     : in  std_logic;
-      spi_mosi_o     : out std_logic;
-      spi_sclk_o     : out std_logic;
-      spi_cs_n_o     : out std_logic;
-      sd_cd_n_i      : in  std_logic;
-      -- DEBUG
-      D_cpu_addr     : out std_logic_vector(15 downto 0)
+
+      -- External SRAM, 512Kx8, 10ns
+      sram_addr_o    : out    std_logic_vector(18 downto 0);
+      sram_data_io   : inout  std_logic_vector(7 downto 0);
+      sram_ce_n_o    : out    std_logic;
+      sram_oe_n_o    : out    std_logic;
+      sram_we_n_o    : out    std_logic;
+
+      -- SDcard SPI interface
+      sd_miso_i      : in  std_logic;
+      sd_mosi_o      : out std_logic;
+      sd_sclk_o      : out std_logic;
+      sd_cs_n_o      : out std_logic;
+      sd_cd_n_i      : in  std_logic      -- Card detect, active low.
    );
 
 end entity;
@@ -116,7 +129,6 @@ use std.textio.all;
 
 architecture Behavior of colecovision is
 
-   -- Reset
    signal reset_n_s        : std_logic;
 
    -- CPU signals
@@ -142,26 +154,34 @@ architecture Behavior of colecovision is
 
    -- machine id
    signal machine_id_cs_s  : std_logic;
-   constant machine_id_c   : std_logic_vector(7 downto 0)      := std_logic_vector(to_unsigned(num_maq_g, 8));
+   constant machine_id_c   : std_logic_vector(7 downto 0) := std_logic_vector(to_unsigned(num_maq_g, 8));
 
    -- Config port
    signal cfg_port_cs_s    : std_logic;
    signal cfg_page_cs_s    : std_logic;
    signal cfg_page_r       : std_logic_vector(7 downto 0);
 
-   -- BIOS
+   -- Loader
    signal bios_ram_cs_s    : std_logic;
    signal loader_ce_s      : std_logic;
    signal d_from_loader_s  : std_logic_vector( 7 downto 0);
    signal loader_q         : std_logic;
    signal multcart_q       : std_logic;
+
+   -- Internal BIOS
+   signal d_from_bios_s    : std_logic_vector( 7 downto 0);
+   signal bios_addr_s      : std_logic_vector(12 downto 0);
    signal bios_ce_s        : std_logic;
    signal bios_oe_s        : std_logic;
    signal bios_we_s        : std_logic;
 
-   -- RAM
+   -- External SRAM
    signal ram_ce_s         : std_logic;
-   signal bios_ram_bs_s    : std_logic                         :='1';
+   signal ram_oe_s         : std_logic;
+   signal ram_we_s         : std_logic;
+   signal d_from_sram_s    : std_logic_vector( 7 downto 0);
+
+   signal bios_ram_bs_s    : std_logic :='1';
    signal exp_ram_bs_s     : std_logic;
    signal exp_ram_cs_s     : std_logic;
 
@@ -172,8 +192,8 @@ architecture Behavior of colecovision is
 
    -- SN76489 signal
    signal audio_s          : signed(7 downto 0);
-   signal psg_ready_s      : std_logic;
-   signal psg_we_n_s       : std_logic;
+   signal sn489_ready_s    : std_logic;
+   signal sn489_we_n_s     : std_logic;
 
    -- COURTNEY signal
    signal wsg_native_q     : std_logic;
@@ -195,14 +215,16 @@ architecture Behavior of colecovision is
    signal ctrl_en_joy_n_s  : std_logic;
    signal ctrl_int_n_s     : std_logic;
 
-   -- SPI
-   signal d_from_spi_s     : std_logic_vector( 7 downto 0);
-   signal spi_cs_s         : std_logic;
-   signal spi_wr_s         : std_logic;
-   signal spi_rd_s         : std_logic;
+   -- SDcard SPI
+   signal d_from_sd_s      : std_logic_vector( 7 downto 0);
+   signal sd_cs_s          : std_logic;
+   signal sd_wr_s          : std_logic;
+   signal sd_rd_s          : std_logic;
 
    -- Cartridge
    signal d_from_cart_s    : std_logic_vector( 7 downto 0);
+   signal cart_oe_n_s      : std_logic;
+
    signal ext_cart_en_q    : std_logic;
    signal cart_en_80_n_s   : std_logic;
    signal cart_en_a0_n_s   : std_logic;
@@ -213,35 +235,56 @@ architecture Behavior of colecovision is
    signal cart_oe_s        : std_logic;
    signal cart_we_s        : std_logic;
 
+   -- Data and IO bus
+   signal io_decode_s      : std_logic_vector( 2 downto 0);
+   signal mem_data_mux_s   : std_logic_vector( 7 downto 0);
+   signal io_data_mux_s    : std_logic_vector( 7 downto 0);
+
 begin
 
-   -- CPU
---   cpu: entity work.T80a
---   generic map (
---      mode_g      => 0
---   )
---   port map (
---      clock_i     => clock_i,
---      clock_en_i  => clk_en_cpu_s,
---      reset_n_i   => reset_n_s,
---      address_o   => cpu_addr_s,
---      data_i      => d_to_cpu_s,
---      data_o      => d_from_cpu_s,
---      wait_n_i    => '1',
---      int_n_i     => '1',
---      nmi_n_i     => nmi_n_s,
---      m1_n_o      => m1_n_s,
---      mreq_n_o    => mreq_n_s,
---      iorq_n_o    => iorq_n_s,
---      rd_n_o      => rd_n_s,
---      wr_n_o      => wr_n_s,
---      refresh_n_o => rfsh_n_s,
---      halt_n_o    => open,
---      busrq_n_i   => '1',
---      busak_n_o   => open
---   );
+   -- Active-low version of the soft reset.
+   reset_n_s <= not reset_i;
 
+   --
+   -- Instruction Fetch Wait State Generator.
+   --
+   -- TODO: Matthew H, Mar 16, 2019
+   -- The real ColecoVision has what seems to be a circuit that creates a
+   -- wait-state for instruction fetches.  The measured signals on this
+   -- circuit are very odd, and the HDL below is not accurate (and never
+   -- would have created the single wait-state during the instruction
+   -- fetch-cycle to begin with).
+   --
+   -- It is also unclear why the ColecoVision would have a wait-state on
+   -- instruction fetch only, with all other memory accesses not having
+   -- the wait-state.
+   --
+   -- Leaving this out for now.
+--   m1_wait: process (clock_i, reset_n_s, m1_n_s)
+--   begin
+--      if reset_n_s = '0' or m1_n_s = '1' then
+--         m1_wait_q   <= '0';
+--      elsif rising_edge(clock_i) then
+--         if clk_en_3m58_i = '1' then
+--            m1_wait_q <= not m1_wait_q;
+--         end if;
+--      end if;
+--   end process m1_wait;
+
+   -- TODO: Matthew H, March 19, 2019
+   -- Why is the wait being created via the clock enable instead of the
+   -- real WAIT_n input to the CPU?  Is the T80 core WAIT_n broken?
+   --
+   -- Modified CPU clock enable based on slow devices or the wait state.
+--   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and not m1_wait_q;
+   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s;
+
+   -- CPU maskable interrupt input, currently only the controllers.
+   int_n_s <= ctrl_int_n_s;
+
+   --
    -- Z80 CPU, synchronous top level with clock enable
+   --
    inst_t80 : entity work.t80se
    port map (
       RESET_n  => reset_n_s,           -- in std_logic;
@@ -264,22 +307,10 @@ begin
       DO       => d_from_cpu_s         -- out std_logic_vector(7 downto 0)
    );
 
-   -- CPU maskable interrupts, currently only the controllers.
-   int_n_s <= ctrl_int_n_s;
-
-   -- Loader
-   lr: entity work.loaderrom
-   port map (
-      clk      => clock_i,
-      addr     => cpu_addr_s(12 downto 0),
-      data     => d_from_loader_s
-   );
-
 
    --
-   -- F18A
+   -- F18A VDP
    --
-
    inst_f18a : entity work.f18a_core
    port map (
       clk_100m0_i    => clk_100m0_i,   -- in  std_logic;
@@ -314,9 +345,9 @@ begin
    );
 
 
-   -----------------------------------------------------------------------------
+   --
    -- SN76489 Programmable Sound Generator
-   -----------------------------------------------------------------------------
+   --
    psg_b : entity work.sn76489_top
    generic map (
       clock_div_16_g => 1
@@ -325,9 +356,9 @@ begin
       clock_i     => clock_i,
       clock_en_i  => clk_en_3m58_i,
       res_n_i     => reset_n_s,
-      ce_n_i      => psg_we_n_s,
-      we_n_i      => psg_we_n_s,
-      ready_o     => psg_ready_s,
+      ce_n_i      => sn489_we_n_s,
+      we_n_i      => sn489_we_n_s,
+      ready_o     => sn489_ready_s,
       d_i         => d_from_cpu_s,
       aout_o      => audio_s
    );
@@ -341,9 +372,9 @@ begin
    audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
    audio_signed_o <= AUDIO_SUM(8 downto 1);
 
-   -----------------------------------------------------------------------------
+   --
    -- COURTNEY (SEX 7264) WAVETABLE SOUND GENERATOR (WSG)
-   -----------------------------------------------------------------------------
+   --
    WSG : ENTITY work.SEX7264
    PORT MAP
    (
@@ -356,11 +387,12 @@ begin
        DAO         => d_from_wsg_s ,
        NATIVE      => wsg_native_q ,
        DIGITAL_MIX => AUDIO_WSG
-   )
-   ;
-   -----------------------------------------------------------------------------
+   );
+
+
+   --
    -- Controller ports
-   -----------------------------------------------------------------------------
+   --
    ctrl_b : entity work.cv_ctrl
    port map (
       clk_21m47_i       => clock_i,
@@ -381,51 +413,253 @@ begin
       ctrl_d_o          => d_from_ctrl_s,
       ctrl_int_n_o      => ctrl_int_n_s
    );
-   
 
-   -- SPI
+
+   --
+   -- SDcard SPI
+   --
+   -- TODO: Really use the *enable* as the clock input?
+   --
    sd: entity work.spi
    port map (
       clock_i        => clk_en_3m58_i,
       reset_i        => reset_i,
       addr_i         => cpu_addr_s(0),
-      cs_i           => spi_cs_s,
-      wr_i           => spi_wr_s,
-      rd_i           => spi_rd_s,
+      cs_i           => sd_cs_s,
+      wr_i           => sd_wr_s,
+      rd_i           => sd_rd_s,
       data_i         => d_from_cpu_s,
-      data_o         => d_from_spi_s,
+      data_o         => d_from_sd_s,
       -- SD card interface
-      spi_cs_o       => spi_cs_n_o,
-      spi_sclk_o     => spi_sclk_o,
-      spi_mosi_o     => spi_mosi_o,
-      spi_miso_i     => spi_miso_i,
-      sd_cd_n_i      => sd_cd_n_i
+      spi_cs_o       => sd_cs_n_o,
+      spi_sclk_o     => sd_sclk_o,
+      spi_mosi_o     => sd_mosi_o,
+      spi_miso_i     => sd_miso_i,
+      sd_cd_n_i      => sd_cd_n_i      -- Card detect, active low.
    );
 
-   spi_wr_s    <= not wr_n_s;
-   spi_rd_s    <= not rd_n_s;
-
-   -- Glue
-   reset_n_s      <= not reset_i;
-   clk_en_cpu_s   <= clk_en_3m58_i and psg_ready_s and not m1_wait_q;
+   sd_wr_s <= not wr_n_s;
+   sd_rd_s <= not rd_n_s;
 
 
-   -----------------------------------------------------------------------------
-   -- Process m1_wait
    --
-   -- Purpose:
-   --   Implements flip-flop U8A which asserts a wait states controlled by M1.
+   -- Loader ROM
    --
-   m1_wait: process (clock_i, reset_n_s, m1_n_s)
+   lr: entity work.loaderrom
+   port map (
+      clk      => clock_i,
+      addr     => cpu_addr_s(12 downto 0),
+      data     => d_from_loader_s
+   );
+
+
+   --
+   -- Internal BIOS
+   --
+   bios: entity work.colecobios
+   port map (
+      clock_i     => clock_i,
+      we_i        => bios_we_s,
+      addr_i      => cpu_addr_s(12 downto 0),
+      data_i      => d_from_cpu_s,
+      data_o      => d_from_bios_s
+   );
+
+   -- TODO: Logic for allowing BIOS to be written to.
+   bios_we_s <= '0';
+
+
+   --
+   -- External SRAM, 512Kx8, 10ns
+   --
+   -- TODO: Rewrite with simpler FSM and mux for multiple "ports".
+   --
+   sram: entity work.dpSRAM_5128
+   port map (
+      clk_i          => clock_mem_i,
+      -- Port 0
+      porta0_addr_i  => "000" & cpu_addr_s,
+      porta0_ce_i    => ram_ce_s,
+      porta0_oe_i    => ram_oe_s,
+      porta0_we_i    => ram_we_s,
+      porta0_data_i  => d_from_cpu_s,
+      porta0_data_o  => d_from_sram_s,
+      -- Port 1
+      porta1_addr_i  => (others => '1'),
+      porta1_ce_i    => '0',
+      porta1_oe_i    => '0',
+      porta1_we_i    => '0',
+      porta1_data_i  => (others => '0'),
+      porta1_data_o  => open,
+      -- SRAM in board
+      sram_addr_o    => sram_addr_o,
+      sram_data_io   => sram_data_io,
+      sram_ce_n_o    => sram_ce_n_o,
+      sram_oe_n_o    => sram_oe_n_o,
+      sram_we_n_o    => sram_we_n_o
+   );
+
+   ram_we_s <= (not wr_n_s) and ram_ce_s;
+   ram_oe_s <= (not rd_n_s) and ram_ce_s;
+
+
+   --
+   -- External Cartridge Interface
+   --                    74245
+   --  Op      FPGA   !OE   DIR
+   -- ------------------------------
+   -- read      Z      0     0 (B->A)
+   -- write    CPU     0     1 (A->B)
+   -- !cart     Z      1     X
+   --
+
+   -- TODO: Maybe register the cart output so they do not glitch,
+   -- since they are driving real external hardware.
+
+   -- The output enable for the 74245 must remain active all the time
+   -- so the cart_en_XX_n_s outputs remain valid.  New carts seem to
+   -- rely heavily on these signals.
+   cart_oe_n_o    <= '0';
+   cart_dir_o     <= rd_n_s;
+   -- Only tri-state when reading, otherwise just drive whatever is on
+   -- the CPU bus out to the cartridge.  This is what the real CV does.
+   cart_data_io   <= (others => 'Z') when rd_n_s = '0' else d_from_cpu_s;
+   cart_addr_o    <= cpu_addr_s(14 downto 0);
+
+   -- Individual cartridge range select should always be valid.
+   cart_en_80_n_o <= cart_en_80_n_s;
+   cart_en_a0_n_o <= cart_en_A0_n_s;
+   cart_en_c0_n_o <= cart_en_C0_n_s;
+   cart_en_e0_n_o <= cart_en_E0_n_s;
+
+
+   --
+   -- CPU Data In Mux
+   --
+   d_to_cpu_s <=
+      mem_data_mux_s when (mreq_n_s = '0' and rfsh_n_s = '1') else
+      io_data_mux_s;
+
+
+   -- CV Memory Decode
+   --
+   -- A15 A14 A13
+   --  8   4   2
+   -- -----------
+   --  0   0   0   >0000 .. >1FFF (8K)    BIOS, 8K
+   --  0   0   1   >2000 .. >3FFF (8K)    EXT_20
+   --  0   1   0   >4000 .. >5FFF (8K)    EXT_40
+   --  0   1   1   >6000 .. >7FFF (8K)    RAM, 1K, appears at every 1K boundary
+   --  1   0   0   >8000 .. >9FFF (8K)    ROM_80
+   --  1   0   1   >A000 .. >BFFF (8K)    ROM_A0
+   --  1   1   0   >C000 .. >DFFF (8K)    ROM_C0
+   --  1   1   1   >E000 .. >FFFF (8K)    ROM_E0
+
+   process ( cpu_addr_s, mreq_n_s, rfsh_n_s,
+             d_from_bios_s, d_from_sram_s, cart_data_io )
    begin
-      if reset_n_s = '0' or m1_n_s = '1' then
-         m1_wait_q   <= '0';
-      elsif rising_edge(clock_i) then
-         if clk_en_3m58_i = '1' then
-            m1_wait_q <= not m1_wait_q;
-         end if;
+      bios_ce_s      <= '0';
+      ram_ce_s       <= '0';
+      cart_en_80_n_s <= '1';
+      cart_en_A0_n_s <= '1';
+      cart_en_C0_n_s <= '1';
+      cart_en_E0_n_s <= '1';
+      mem_data_mux_s <= cart_data_io;
+
+      if mreq_n_s = '0' and rfsh_n_s = '1' then
+         case cpu_addr_s(15 downto 13) is
+         when "000" =>  bios_ce_s      <= '1';
+                        mem_data_mux_s <= d_from_bios_s;
+         when "011" =>  ram_ce_s       <= '1';
+                        mem_data_mux_s <= d_from_sram_s;
+         when "100" =>  cart_en_80_n_s <= '0';
+         when "101" =>  cart_en_A0_n_s <= '0';
+         when "110" =>  cart_en_C0_n_s <= '0';
+         when "111" =>  cart_en_E0_n_s <= '0';
+         when others => null;
+         end case;
       end if;
-   end process m1_wait;
+   end process;
+
+   cart_oe_n_s <= cart_en_80_n_s and cart_en_A0_n_s and cart_en_C0_n_s and cart_en_E0_n_s;
+
+
+   -- CV I/O Decode
+   --
+   -- A7 A6 A5 WR
+   -- EN 4  2  1
+   -- -----------
+   -- 1  0  0  0  >80 .. >9F  (W) set controllers to keypad mode
+   -- 1  0  0  1  >80 .. >9F  (R) not connected
+   -- 1  0  1  0  >A0 .. >BF  (W) VDP csw_n, A0==mode
+   -- 1  0  1  1  >A0 .. >BF  (R) VDP csr_n, A0==mode
+   -- 1  1  0  0  >C0 .. >DF  (W) set controllers to joystick mode
+   -- 1  1  0  1  >C0 .. >DF  (R) not connected
+   -- 1  1  1  0  >E0 .. >FF  (W) sound chip (SN76489A)
+   -- 1  1  1  1  >E0 .. >FF  (R) read controller data, A1=0 read controller 1, A1=1 read controller 2
+
+   io_decode_s <= cpu_addr_s(6 downto 5) & wr_n_s;
+
+   process ( cpu_addr_s, io_decode_s, iorq_n_s, m1_n_s,
+             d_from_ctrl_s, d_from_vdp_s )
+   begin
+      vdp_w_n_s         <= '1';
+      vdp_r_n_s         <= '1';
+      sn489_we_n_s      <= '1';
+      ctrl_en_key_n_s   <= '1';
+      ctrl_en_joy_n_s   <= '1';
+      io_data_mux_s     <= d_from_ctrl_s;
+
+      if iorq_n_s = '0' and m1_n_s = '1' and cpu_addr_s(7) = '1' then
+         case io_decode_s is
+         when "000" =>  ctrl_en_key_n_s   <= '0';
+         when "010" =>  vdp_w_n_s         <= '0';
+         when "011" =>  vdp_r_n_s         <= '0';
+                        io_data_mux_s     <= d_from_vdp_s;
+         when "100" =>  ctrl_en_joy_n_s   <= '0';
+         when "110" =>  sn489_we_n_s      <= '0';
+         when others => null;
+         end case;
+      end if;
+   end process;
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- synthesis translate_off
+
+   -- Memory
+   bios_addr_s <= ram_addr_s(12 downto 0);
+   bios_ce_s   <= '1' when ram_addr_s(16 downto 13) = "0000" and ram_ce_s = '1'  else '0';
+   bios_we_s   <= '1' when bios_ce_s = '1' and ram_we_s = '1'                    else '0';
+
+   d_to_cv_s   <= d_from_bios_s when bios_ce_s = '1' else d_from_ram_s;
+
+
+   -- MUX data CPU
+   d_to_cpu_s  <= -- Memory
+      d_from_loader_s   when loader_ce_s = '1'     else
+      ram_data_i        when bios_ce_s = '1'       else
+      ram_data_i        when ram_ce_s  = '1'       else
+      ram_data_i        when cart_ce_s = '1'       else
+      cart_data_io      when ext_cart_ce_s = '1'   else
+      -- I/O
+      d_from_vdp_s      when vdp_r_n_s = '0'       else
+      d_from_ctrl_s     when ctrl_r_n_s = '0'      else
+      d_from_sd_s       when sd_cs_s = '1'         else
+      d_from_wsg_s      when WSG_CS = '1'          else
+      machine_id_c      when machine_id_cs_s = '1' else
+      cfg_page_r        when cfg_page_cs_s = '1'   else
+      (others => '1');
 
    -----------------------------------------------------------------------------
    -- Misc outputs
@@ -471,6 +705,8 @@ begin
    cart_addr_o    <= cpu_addr_s(14 downto 0);
 -- cart_oe_n_o    <= not cart_oe_s;
    cart_oe_n_o    <= '0';
+   cart_dir_o     <= '0' when ext_cart_ce_s = '1' and rd_n_s  else '1';
+   cart_data_io   <= (others => 'Z') when cart_dir_o = '0' else d_from_cpu_s;
    cart_en_80_n_o <= cart_en_80_n_s or rd_n_s   when ext_cart_en_q = '1'   else '1';
    cart_en_a0_n_o <= cart_en_A0_n_s or rd_n_s   when ext_cart_en_q = '1'   else '1';
    cart_en_c0_n_o <= cart_en_C0_n_s or rd_n_s   when ext_cart_en_q = '1'   else '1';
@@ -491,7 +727,7 @@ begin
    cart_en_e0_n_s <= '0'   when mem_access_s = '1' and cpu_addr_s(15 downto 13) = "111"      else '1';   -- Cartridge E0 => E000 to FFFF
 
    -- I/O
-   spi_cs_s          <= '1'   when io_access_s = '1' and cpu_addr_s(7 downto 1) = "0101011"  else '0';   -- SPI (R/W)          => 56 to 57
+   sd_cs_s           <= '1'   when io_access_s = '1' and cpu_addr_s(7 downto 1) = "0101011"  else '0';   -- SPI (R/W)          => 56 to 57
 -- exp_ram_cs_s      <= '1'   when io_write_s = '1'  and cpu_addr_s(7 downto 0) = X"53"      else '0';   -- SGM 24k ram enable => 53
    cfg_page_cs_s     <= '1'   when io_access_s = '1' and cpu_addr_s(7 downto 0) = X"54"      else '0';   -- Page port          => 54
    cfg_port_cs_s     <= '1'   when io_write_s = '1'  and cpu_addr_s(7 downto 0) = X"55"      else '0';   -- Config Port        => 55
@@ -564,24 +800,6 @@ begin
       end if;
    end process;
 
-   -- MUX data CPU
-   d_to_cpu_s  <= -- Memory
-                  d_from_loader_s            when loader_ce_s = '1'     else
-                  ram_data_i                 when bios_ce_s = '1'       else
-                  ram_data_i                 when ram_ce_s  = '1'       else
-                  ram_data_i                 when cart_ce_s = '1'       else
-                  cart_data_i                when ext_cart_ce_s = '1'   else
-                  -- I/O
-                  d_from_vdp_s               when vdp_r_n_s = '0'       else
-                  d_from_ctrl_s              when ctrl_r_n_s = '0'      else
-                  d_from_spi_s               when spi_cs_s = '1'        else
-                  d_from_wsg_s               when WSG_CS = '1'          else
-                  machine_id_c               when machine_id_cs_s = '1' else
-                  cfg_page_r                 when cfg_page_cs_s = '1'   else
-                  (others => '1');
-
-   -- Debug
-   D_cpu_addr  <= cpu_addr_s;
-
+ -- synthesis translate_on
 
 end architecture;

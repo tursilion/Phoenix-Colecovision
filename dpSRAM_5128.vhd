@@ -83,10 +83,10 @@ begin
 		variable p1_ce_v		: std_logic_vector(1 downto 0);
 		variable acesso0_v	: std_logic;
 		variable acesso1_v	: std_logic;
-		variable p0_req_v		: std_logic									:= '0';
-		variable p1_req_v		: std_logic									:= '0';
-		variable p0_we_v		: std_logic									:= '0';
-		variable p1_we_v		: std_logic									:= '0';
+		variable p0_req_v		: std_logic := '0';
+		variable p1_req_v		: std_logic := '0';
+		variable p0_we_v		: std_logic := '0';
+		variable p1_we_v		: std_logic := '0';
 		variable p0_addr_v	: std_logic_vector(18 downto 0);
 		variable p1_addr_v	: std_logic_vector(18 downto 0);
 		variable p0_data_v	: std_logic_vector(7 downto 0);

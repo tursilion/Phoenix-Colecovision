@@ -137,12 +137,12 @@
 -- To capture the other phases of QA vs QB, the controller data would have to
 -- be sampled during periods between the interrupts.
 --
--- During a very fast spin of the SAC wheel, a period of about 6mS for each
+-- During a very fast spin of the SAC wheel, a period of about 6ms for each
 -- quadrature input was measured.  The duty-cycle is 2:1 High:Low.
 -- __________ _____________ ___  ___
 --           V             V     INT
--- ____ 2mS  |_______      |___
---     \____/|  4mS  \____/|     QA bit-7
+-- ____ 2ms  |_______      |___
+--     \____/|  4ms  \____/|     QA bit-7
 --    ____   |      ____   |              CCW
 -- __/    \__|_____/    \__|___  QB bit-5
 -- __________| ____________| ___
@@ -418,7 +418,7 @@ begin
    p2_ifc_load_s <= p2_edge_s and p2_ifc_zero_s;
    p2_ifc_cnt_x <= "11100000000" when p2_ifc_load_s = '1' else p2_ifc_cnt_r - 1;
 
-   process ( clk_21m47_i )
+   process ( clk_21m47_i, clk_en_3m58_i )
    begin
    if rising_edge(clk_21m47_i) and clk_en_3m58_i = '1' then
       if reset_n_i = '0' then

@@ -52,37 +52,37 @@ entity phoenix_top is
       clock_50_i        : in     std_logic;
 
       -- Buttons
-      btn_reset_n_i     : in     std_logic;
+      btn_reset_n_i     : in     std_logic;  -- Active low, pull-up with RC time of ~10ms
 
       -- External IO port
 --      exp_io1_net       : inout  std_logic_vector(12 downto 2) := (others => 'Z');
 --      exp_io2_net       : inout  std_logic_vector(24 downto 15):= (others => 'Z');
 
       -- SRAM
-      sram_addr_o       : out    std_logic_vector(20 downto 0) := (others => '0');
+      sram_addr_o       : out    std_logic_vector(18 downto 0) := (others => '0');
       sram_data_io      : inout  std_logic_vector(7 downto 0)  := (others => 'Z');
-      sram_ce_n_o       : out    std_logic                     := '1';
-      sram_oe_n_o       : out    std_logic                     := '1';
-      sram_we_n_o       : out    std_logic                     := '1';
+      sram_ce_n_o       : out    std_logic := '1';
+      sram_oe_n_o       : out    std_logic := '1';
+      sram_we_n_o       : out    std_logic := '1';
 
       -- PS2
-      ps2_clk_io        : inout  std_logic                     := 'Z';
-      ps2_data_io       : inout  std_logic                     := 'Z';
+      ps2_clk_io        : inout  std_logic := 'Z';
+      ps2_data_io       : inout  std_logic := 'Z';
 
       -- SD Card
-      sd_cs_n_o         : out    std_logic                     := '1';
-      sd_sclk_o         : out    std_logic                     := '0';
-      sd_mosi_o         : out    std_logic                     := '0';
+      sd_cs_n_o         : out    std_logic := '1';
+      sd_sclk_o         : out    std_logic := '0';
+      sd_mosi_o         : out    std_logic := '0';
       sd_miso_i         : in     std_logic;
-      sd_cd_n_i         : in     std_logic;
+      sd_cd_n_i         : in     std_logic;           -- Card detect, active low
 
       -- Flash
-      flash_cs_n_o      : out    std_logic                     := '1';
-      flash_sclk_o      : out    std_logic                     := '0';
-      flash_mosi_o      : out    std_logic                     := '0';
+      flash_cs_n_o      : out    std_logic := '1';
+      flash_sclk_o      : out    std_logic := '0';
+      flash_mosi_o      : out    std_logic := '0';
       flash_miso_i      : in     std_logic;
-      flash_wp_o        : out    std_logic                     := '0';
-      flash_hold_o      : out    std_logic                     := '1';
+      flash_wp_o        : out    std_logic := '0';
+      flash_hold_o      : out    std_logic := '1';
 
       -- Joystick
       joy_p5_o          : out    std_logic;
@@ -101,10 +101,10 @@ entity phoenix_top is
       joy2_p6_i         : in     std_logic;
       joy2_p7_i         : in     std_logic;
       joy2_p9_i         : in     std_logic;
-      
+
       -- SNES controller
-      snesjoy_clock_o   : out    std_logic                     := '1';
-      snesjoy_latch_o   : out    std_logic                     := '1';
+      snesjoy_clock_o   : out    std_logic := '1';
+      snesjoy_latch_o   : out    std_logic := '1';
       snesjoy_data_i    : in     std_logic;
 
       -- HDMI
@@ -113,18 +113,17 @@ entity phoenix_top is
 
       -- Cartridge
       cart_addr_o       : out    std_logic_vector(14 downto 0) := (others => '0');
-      cart_data_i       : in     std_logic_vector( 7 downto 0);
---      cart_dir_o        : out    std_logic                     := '1';  --Rev4 PCB
-      cart_dir_o        : out    std_logic                     := '0'; --Rev6 PCB
-      cart_oe_n_o       : out    std_logic                     := '1';
-      cart_en_80_n_o    : out    std_logic                     := '1';
-      cart_en_A0_n_o    : out    std_logic                     := '1';
-      cart_en_C0_n_o    : out    std_logic                     := '1';
-      cart_en_E0_n_o    : out    std_logic                     := '1';
+      cart_data_io      : inout  std_logic_vector( 7 downto 0);
+      cart_dir_o        : out    std_logic := '0'; --Rev6 PCB
+      cart_oe_n_o       : out    std_logic := '1';
+      cart_en_80_n_o    : out    std_logic := '1';
+      cart_en_A0_n_o    : out    std_logic := '1';
+      cart_en_C0_n_o    : out    std_logic := '1';
+      cart_en_E0_n_o    : out    std_logic := '1';
 
       -- LED and RGB-LED
-      led_o             : out    std_logic                     := '0';
-      rgb_led_o         : out    std_logic_vector(2 downto 0)  := (others => '1')
+      led_o             : out    std_logic := '0';
+      rgb_led_o         : out    std_logic_vector(2 downto 0) := (others => '1')
    );
 end entity;
 
@@ -132,7 +131,7 @@ use work.cv_keys_pack.all;
 
 architecture behavior of phoenix_top is
 
-   -- Clocks
+   -- Clocks and enables
    signal clock_master_s   : std_logic;
    signal clock_mem_s      : std_logic;
    signal clock_vdp_en_s   : std_logic;
@@ -145,11 +144,14 @@ architecture behavior of phoenix_top is
    signal clk_100m0_s      : std_logic;
 
    -- Resets
-   signal por_cnt_s        : unsigned(7 downto 0)           := (others => '1');
-   signal por_s            : std_logic;
-   signal por_n_s          : std_logic;
-   signal reset_s          : std_logic;
-   signal soft_reset_s     : std_logic;
+   signal rst_cnt_r        : unsigned(7 downto 0) := (others => '1');
+   signal rst_cnt_x        : unsigned(7 downto 0);
+   signal rst_zero_s       : std_logic;
+   signal rst_trig_s       : std_logic;
+   signal rst_en_s         : std_logic;
+   signal por_n_r          : std_logic := '0';
+   signal reset_r          : std_logic := '1';
+   signal ps2_reset_s      : std_logic;
    signal core_reload_s    : std_logic;
 
    -- Internal BIOS
@@ -239,48 +241,121 @@ architecture behavior of phoenix_top is
    signal but_dot_s        : std_logic_vector( 0 downto 0);
    signal but_clear_s      : std_logic_vector( 0 downto 0);
    signal but_equal_s      : std_logic_vector( 0 downto 0);
-   -- SD
-   signal sd_cs_n_s        : std_logic;
 
 begin
 
-   -- PLL
+   --
+   -- PLL for master and video clocks.
+   --
    pll_1: entity work.pll1
    port map (
       clk_50m0_i     => clock_50_i,       --  50.000
-      clk_21m8_o     => clock_master_s,   --  21.47727 (21.739) MHz (6x NTSC)
-      clk_43m5_o     => clock_mem_s,      --  42.95454 (43.478) MHz
-      clk_25m0_o     => clk_25m0_s,       --  25.20000 (25.000) MHz
-      clk_100m0_o    => clk_100m0_s,      -- 100.0000 (100.000) MHz
-      clk_125m0_o    => clock_hdmi_s,     -- 126.0000 (125.000) MHz
+      clk_21m8_o     => clock_master_s,   --  21.47727 (21.739 PLL) MHz (6x NTSC)
+      clk_43m5_o     => clock_mem_s,      --  42.95454 (43.478 PLL) MHz
+      clk_25m0_o     => clk_25m0_s,       --  25.20000 (25.000 PLL) MHz
+      clk_100m0_o    => clk_100m0_s,      -- 100.0000 (100.000 PLL) MHz
+      clk_125m0_o    => clock_hdmi_s,     -- 126.0000 (125.000 PLL) MHz
       clk_125m0_n_o  => clock_hdmi_n_s    -- 180o
    );
 
 
-   -- Clocks
+   --
+   -- Clock enables.
+   --
    clks: entity work.clocks
    port map (
       clock_i        => clock_master_s,
-      por_i          => por_s,
       clock_3m_en_o  => clock_3m_en_s,
       clock_wsg_en_o => clock_wsg_en_s
    );
 
-   -- The ColecoVision
-   vg: entity work.colecovision
+
+   --
+   -- The System Reset has multiple sources:
+   --
+   --  1. Power-On Reset (PoR)
+   --  2. Push-Button Reset, does not PoR signal
+   --  3. Soft Reset via PS2 keyboard
+   --
+   -- Some devices do not get reset with the button, like the VDP.
+   -- This is accurate to the real ColecoVision.
+   --
+
+   -- Soft reset trigger can be the PS2 keyboard ESC key or
+   -- the reset button input.
+   rst_trig_s <= ps2_reset_s or (not btn_reset_n_i);
+
+   rst_zero_s <= '1' when rst_cnt_r = 0 else '0';
+
+   rst_en_s <= rst_trig_s or (not rst_zero_s);
+
+   rst_cnt_x <= rst_cnt_r - 1;
+
+   process(clock_master_s)
+   begin if rising_edge(clock_master_s) then
+      if rst_en_s = '1' then
+         rst_cnt_r <= rst_cnt_x;
+      end if;
+
+      -- PoR is a one-time event at power-on (hence the name).
+      if por_n_r = '0' then
+         por_n_r <= rst_zero_s;
+      end if;
+
+      -- Soft reset any time the reset counter is not zero.
+      reset_r <= not rst_zero_s;
+
+   end if;
+   end process;
+
+
+   --
+   -- General purpose LED and RGB LED.
+   --
+
+   -- LED, as wired, do not set FPGA output high!  That would cause
+   -- a path from ground, through the LED, directly to 3.3V.  The
+   -- only safe signals are '0' and 'Z' (tri-state floating).
+   --
+   -- When the FPGA output is 'Z', the LED current will be through the
+   -- resistor to 3.3V and it will turn on.
+   --
+   -- When the FPGA output is '0', the ground is applied to both sides
+   -- of the LED and it will be off, but the FPGA output will sink 10mA
+   -- through the resistor to 3.3V.
+   --
+   -- GND---|<|----+---/\/\/---3.3V
+   --       led    |    330
+   --        __    |
+   -- GND---o  o---+
+   --     FPGA out, '0' or 'Z' only! Never output a '1'.
+
+   -- Indicate reset with the LED.
+   led_o <= 'Z' when reset_r = '1' else '0';
+
+   -- RGB-LED, set to green
+   rgb_led_o <= "101";
+
+
+   --
+   -- ColecoVision Core
+   --
+   coleco : entity work.colecovision
    generic map (
-      num_maq_g         => 8,       -- CVUNO board
+      num_maq_g         => 8,                -- Phoenix board machine ID for port read.
       compat_rgb_g      => 0
    )
    port map (
-      clock_i           => clock_master_s,   --  21.47727 (21.739) MHz
+      clock_i           => clock_master_s,   --  21.47727 (21.739 PLL) MHz
+      clock_mem_i       => clock_mem_s,      --  42.95454 (43.478 PLL) MHz
       clk_100m0_i       => clk_100m0_s,
       clk_25m0_i        => clk_25m0_s,
       clk_en_3m58_i     => clock_3m_en_s,
       clk_en_1m79_i     => clock_wsg_en_s,
-      reset_i           => reset_s,
-      por_n_i           => por_n_s,
-      -- Controller Interface
+      reset_i           => reset_r,          -- Active high
+      por_n_i           => por_n_r,          -- Active low
+
+      -- Physical controller interface
       ctrl_p1_i         => ctrl_p1_s,
       ctrl_p2_i         => ctrl_p2_s,
       ctrl_p3_i         => ctrl_p3_s,
@@ -290,83 +365,58 @@ begin
       ctrl_p7_i         => ctrl_p7_s,
       ctrl_p8_o         => ctrl_p8_s,
       ctrl_p9_i         => ctrl_p9_s,
-      -- CPU RAM Interface
-      ram_addr_o        => ram_addr_s,
-      ram_ce_o          => ram_ce_s,
-      ram_we_o          => ram_we_s,
-      ram_oe_o          => ram_oe_s,
-      ram_data_i        => d_to_cv_s,
-      ram_data_o        => d_to_ram_s,
-      -- Video RAM Interface
-      vram_addr_o       => vram_addr_s,
-      vram_ce_o         => vram_ce_s,
-      vram_oe_o         => vram_oe_s,
-      vram_we_o         => vram_we_s,
-      vram_data_i       => vram_do_s,
-      vram_data_o       => vram_di_s,
-      -- Cartridge ROM Interface
+
+--      -- CPU RAM Interface
+--      ram_addr_o        => ram_addr_s,
+--      ram_ce_o          => ram_ce_s,
+--      ram_we_o          => ram_we_s,
+--      ram_oe_o          => ram_oe_s,
+--      ram_data_i        => d_to_cv_s,
+--      ram_data_o        => d_to_ram_s,
+
+--      -- Video RAM Interface
+--      vram_addr_o       => vram_addr_s,
+--      vram_ce_o         => vram_ce_s,
+--      vram_oe_o         => vram_oe_s,
+--      vram_we_o         => vram_we_s,
+--      vram_data_i       => vram_do_s,
+--      vram_data_o       => vram_di_s,
+
+      -- Physical cartridge interface
       cart_addr_o       => cart_addr_o,
-      cart_data_i       => cart_data_i,
+      cart_dir_o        => cart_dir_o,
+      cart_data_io      => cart_data_io,
       cart_oe_n_o       => cart_oe_n_o,
       cart_en_80_n_o    => cart_en_80_n_o,
       cart_en_a0_n_o    => cart_en_A0_n_o,
       cart_en_c0_n_o    => cart_en_C0_n_o,
       cart_en_e0_n_o    => cart_en_E0_n_o,
-      -- Audio Interface
+
+      -- Audio output
       audio_o           => open,
       audio_signed_o    => audio_signed_s,
-      -- VGA Output
+
+      -- VGA output
       blank_o           => vga_blank_s,
       hsync_n_o         => vga_hsync_n_s,
       vsync_n_o         => vga_vsync_n_s,
       red_o             => vga_r_s,
       grn_o             => vga_g_s,
       blu_o             => vga_b_s,
-      -- SPI
-      spi_miso_i        => sd_miso_i,
-      spi_mosi_o        => sd_mosi_o,
-      spi_sclk_o        => sd_sclk_o,
-      spi_cs_n_o        => sd_cs_n_s,
-      sd_cd_n_i         => sd_cd_n_i,
-      -- DEBUG
-      D_cpu_addr        => open--D_cpu_addr
-    );
 
-   -- Internal BIOS
-   bios: entity work.colecobios
-   port map (
-      clock_i     => clock_master_s,
-      addr_wr_i   => bios_addr_s,
-      data_i      => d_to_ram_s,
-      we_i        => bios_we_s,
-      addr_rd_i   => bios_addr_s,
-      data_o      => d_from_bios_s
-   );
+      -- External SRAM
+      sram_addr_o       => sram_addr_o,
+      sram_data_io      => sram_data_io,
+      sram_ce_n_o       => sram_ce_n_o,
+      sram_oe_n_o       => sram_oe_n_o,
+      sram_we_n_o       => sram_we_n_o,
 
-   -- SRAM
-   sram: entity work.dpSRAM_5128
-   port map (
-      clk_i          => clock_mem_s,
-      -- Port 0
-      porta0_addr_i  => "00" & ram_addr_s,
-      porta0_ce_i    => ram_ce_s,
-      porta0_oe_i    => ram_oe_s,
-      porta0_we_i    => ram_we_s,
-      porta0_data_i  => d_to_ram_s,
-      porta0_data_o  => d_from_ram_s,
-      -- Port 1
-      porta1_addr_i  => "11111" & vram_addr_s,
-      porta1_ce_i    => vram_ce_s,
-      porta1_oe_i    => vram_oe_s,
-      porta1_we_i    => vram_we_s,
-      porta1_data_i  => vram_di_s,
-      porta1_data_o  => vram_do_s,
-      -- SRAM in board
-      sram_addr_o    => sram_addr_o(18 downto 0),
-      sram_data_io   => sram_data_io,
-      sram_ce_n_o    => sram_ce_n_o,
-      sram_oe_n_o    => sram_oe_n_o,
-      sram_we_n_o    => sram_we_n_o
+      -- SDcard SPI
+      sd_miso_i         => sd_miso_i,
+      sd_mosi_o         => sd_mosi_o,
+      sd_sclk_o         => sd_sclk_o,
+      sd_cs_n_o         => sd_cs_n_o,
+      sd_cd_n_i         => sd_cd_n_i      -- Card detect, active low.
    );
 
 
@@ -374,7 +424,7 @@ begin
    ps2if_inst : entity work.colecoKeyboard
    port map (
       clk            => clock_master_s,
-      reset          => reset_s,
+      reset          => reset_r,          -- Active high
       -- inputs from PS/2 port
       ps2_clk        => ps2_clk_io,
       ps2_data       => ps2_data_io,
@@ -385,34 +435,10 @@ begin
       home_o         => homekey_s
    );
 
-   -- Glue logic
-   process(clock_master_s)
-   begin
-      if rising_edge(clock_master_s) then
-         if por_cnt_s /= 0 then
-            por_cnt_s <= por_cnt_s - 1;
-         end if;
-      end if;
-   end process;
 
-   por_s       <= '1' when por_cnt_s /= 0    else '0';
-   por_n_s     <= '0' when por_cnt_s /= 0    else '1';
-   reset_s     <= por_s or not btn_reset_n_i or soft_reset_s;
-   audio_s     <= std_logic_vector(unsigned(audio_signed_s + 128));
-   sd_cs_n_o   <= sd_cs_n_s;
-   
-   -- Memory
-   bios_addr_s <= ram_addr_s(12 downto 0);
-   bios_ce_s   <= '1' when ram_addr_s(16 downto 13) = "0000" and ram_ce_s = '1'  else '0';
-   bios_we_s   <= '1' when bios_ce_s = '1' and ram_we_s = '1'                    else '0';
-
-   d_to_cv_s   <= d_from_bios_s when bios_ce_s = '1' else d_from_ram_s;
-
-
-
-   -----------------------------------------------------------------------------
+   --
    -- SNES Gamepad (TODO: implement NTT)
-   -----------------------------------------------------------------------------
+   --
    snespads_b : entity work.snespad
    generic map (
       num_pads_g        => 1,
@@ -422,7 +448,7 @@ begin
    )
    port map (
       clk_i             => clock_master_s,
-      reset_i           => por_n_s,
+      reset_i           => por_n_r,          -- Active low
       pad_clk_o         => snesjoy_clock_o,
       pad_latch_o       => snesjoy_latch_o,
       pad_data_i(0)     => snesjoy_data_i,
@@ -453,7 +479,6 @@ begin
       but_dot_o         => but_dot_s,
       but_clear_o       => but_clear_s,
       but_equal_o       => but_equal_s
-
    );
 
 
@@ -475,19 +500,9 @@ begin
       variable fire2_v : std_logic;
    begin
 
-      --------------------------------------------------------------------
-      -- soft reset to get to cart menu : use ps2 ESC key in keys(8)
---    if (ps2_keys_s(8) = '1') or  (but_star_s(0) = '0') then
-      if ps2_keys_s(8) = '1' then
-         soft_reset_s <= '1';
-      else
-         soft_reset_s <= '0';
-      end if;
-      ------------------------------------------------------------------------
-
       -- Joy 1
       if ctrl_p5_s = '0' and ctrl_p8_s = '1' then
-         -- keys and right button enabled --------------------------------------
+         -- keys and right button enabled
          -- keys not fully implemented
 
          key_v := cv_key_none_c;
@@ -636,7 +651,7 @@ begin
          ctrl_p6_s(1) <= not ps2_keys_s(0) and fire2_v and joy1_p6_i; -- button right (fire 2)
 
       elsif ctrl_p5_s = '1' and ctrl_p8_s = '0' then
-         -- joystick and left button enabled -----------------------------------
+         -- joystick and left button enabled
          ctrl_p1_s(1) <= not ps2_joy_s(0) and but_up_s(0) and but_dot_s(0) and joy1_p1_i;    -- up
          ctrl_p2_s(1) <= not ps2_joy_s(1) and but_down_s(0) and joy1_p2_i; -- down
          ctrl_p3_s(1) <= not ps2_joy_s(2) and but_left_s(0) and joy1_p3_i; -- left
@@ -650,7 +665,7 @@ begin
 
          ctrl_p6_s(1) <= not ps2_joy_s(4) and fire1_v;   -- button left (fire 1)
       else
-         -- nothing active -----------------------------------------------------
+         -- nothing active
          ctrl_p1_s(1)   <= joy1_p1_i;
          ctrl_p2_s(1)   <= joy1_p2_i;
          ctrl_p3_s(1)   <= joy1_p3_i;
@@ -660,6 +675,8 @@ begin
 
    end process pad_ctrl;
 
+   -- PS2 system soft reset signal via the ESC key.
+   ps2_reset_s <= ps2_keys_s(8);
 
    -- Controller 2, straight input signals.
    ctrl_p1_s(2) <= joy2_p1_i;
@@ -681,6 +698,7 @@ begin
    -- HDMI
    --
 
+   audio_s <= std_logic_vector(unsigned(audio_signed_s + 128));
    sound_hdmi_s <= '0' & audio_s & audio_s(7 downto 1);
 
    hdmi: entity work.hdmi
@@ -719,12 +737,5 @@ begin
       tmds_out_p        => hdmi_p_o,
       tmds_out_n        => hdmi_n_o
    );
-
-   -- LED, currently wired wrong, do not set to '1';
-   led_o <= '0';
-
-   -- RGB-LED, set to green
-   rgb_led_o <= "101";
-
 
 end architecture;

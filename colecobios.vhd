@@ -1,3 +1,9 @@
+--
+-- Internal ROM BIOS.
+--
+-- Set up as a RAM to allow an alternate BIOS to be loaded from
+-- and external location, or changed via code.
+--
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -7,10 +13,9 @@ use ieee.numeric_std.all;
 entity colecobios is
 	port (
 		clock_i		: in  std_logic;
-		addr_wr_i	: in  std_logic_vector(12 downto 0);
-		data_i		: in  std_logic_vector( 7 downto 0);
 		we_i			: in  std_logic;
-		addr_rd_i	: in  std_logic_vector(12 downto 0);
+		addr_i	   : in  std_logic_vector(12 downto 0);
+		data_i		: in  std_logic_vector( 7 downto 0);
 		data_o		: out std_logic_vector( 7 downto 0)
 	);
 end;
@@ -1051,9 +1056,9 @@ begin
 	begin
 		if rising_edge(clock_i) then
 			if we_i = '1' then
-				ram_q(to_integer(unsigned(addr_wr_i))) <= data_i;
+				ram_q(to_integer(unsigned(addr_i))) <= data_i;
 			end if;
-			data_o <= ram_q(to_integer(unsigned(addr_rd_i)));
+			data_o <= ram_q(to_integer(unsigned(addr_i)));
 		end if;
 	end process;
 
