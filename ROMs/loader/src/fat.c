@@ -147,19 +147,19 @@ unsigned char FindDrive(void)
 				boot_sector = mbr->Partition[0].startlba;
 		else if(mbr->Signature != 0xaa55)
 		{
-				BootPrint("No partition signature found\n");
+//				BootPrint("No partition signature found\n");
 				return(0);
 		}
 		if (!MMC_Read(boot_sector, sector_buffer)) // read discriptor
 		    return(0);
-		BootPrint("Read boot sector from first partition\n");
+//		BootPrint("Read boot sector from first partition\n");
 	}
 
     if (compare(sector_buffer+0x52, "FAT32   ",8)==0) // check for FAT32
 		fat32=1;
 	else if (compare(sector_buffer+0x36, "FAT16   ",8)!=0) // check for FAT16
 	{
-        printf("Unsupported partition type!\r");
+//        printf("Unsupported partition type!\r");
 		return(0);
 	}
 
@@ -237,7 +237,7 @@ unsigned char FileOpen(fileTYPE *file, const char *name)
         {
             if ((iEntry & 0x0F) == 0) // first entry in sector, load the sector
             {
-				printf("Reading directory sector %d\n",iDirectorySector);
+//				printf("Reading directory sector %d\n",iDirectorySector);
                 MMC_Read(iDirectorySector++, sector_buffer); // root directory is linear
                 pEntry = (DIRENTRY*)sector_buffer;
             }
@@ -249,14 +249,14 @@ unsigned char FileOpen(fileTYPE *file, const char *name)
             {
                 if (!(pEntry->Attributes & (ATTR_VOLUME | ATTR_DIRECTORY))) // not a volume nor directory
                 {
-                	printf("Entrada '%s'\n", (const char*)pEntry->Name);
+//                	printf("Entrada '%s'\n", (const char*)pEntry->Name);
                     if (compare((const char*)pEntry->Name, name, 11) == 0)
                     {
                         file->size = pEntry->FileSize;
                         file->cluster = pEntry->StartCluster + (fat32 ? ((unsigned long)(pEntry->HighCluster & 0x0FFF)) << 16 : 0);
                         file->sector = 0;
 
-                        printf("file \"%s\" found\r", name);
+//                        printf("file \"%s\" found\r", name);
 
                         return(1);
                     }
@@ -267,7 +267,7 @@ unsigned char FileOpen(fileTYPE *file, const char *name)
         if (fat32) // subdirectory is a linked cluster chain
         {
             iDirectoryCluster = GetCluster(iDirectoryCluster); // get next cluster in chain
-			printf("GetFATLink returned %d\n",iDirectoryCluster);
+//			printf("GetFATLink returned %d\n",iDirectoryCluster);
 
 //            if (fat32 ? (iDirectoryCluster & 0x0FFFFFF8) == 0x0FFFFFF8 : (iDirectoryCluster & 0xFFF8) == 0xFFF8) // check if end of cluster chain
             if ((iDirectoryCluster & 0x0FFFFFF8) == 0x0FFFFFF8) // check if end of cluster chain

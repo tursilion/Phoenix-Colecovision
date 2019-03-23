@@ -27,11 +27,16 @@ xlnx_auto_0_xdb/
 /DOCs/Coleco_s700a/src/tb_vdp18
 /ROMs/bootrom.zip
 /ROMs/loader/*.bin
+/ROMs/loader/*.bit
 /ROMs/loader/*.ihx
 /ROMs/loader/*.lk
 /ROMs/loader/*.map
+/ROMs/loader/*.mem
 /ROMs/loader/*.noi
-/ROMs/loader/obj
+/ROMs/loader/obj/*.asm
+/ROMs/loader/obj/*.lst
+/ROMs/loader/obj/*.rel
+/ROMs/loader/obj/*.sym
 /ROMs/multcart/*.ihx
 /ROMs/multcart/*.lk
 /ROMs/multcart/*.map
