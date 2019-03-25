@@ -26,6 +26,10 @@ webtalk_pn.xml
 xlnx_auto_0_xdb/
 /DOCs/Coleco_s700a/src/tb_vdp18
 /ROMs/bootrom.zip
+/ROMs/Firmware/*.BIN
+/ROMs/Firmware/*.ROM
+/ROMs/Firmware/*.bit
+/ROMs/Firmware/*.mem
 /ROMs/loader/*.bin
 /ROMs/loader/*.bit
 /ROMs/loader/*.ihx
