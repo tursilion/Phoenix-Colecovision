@@ -156,14 +156,7 @@ VDPFILL	SUBRO //////////////////////////////////////////////////////// VDP FILL
 VDPCOPY	SUBRO //////////////////////////////////////////////////////// VDP COPY
 
 	CALL	VDPSETW
-/*
-	LD	A,B
 
-VDPCOPYX	LD	BC,VDPDAT
-.PAGE	OTIR
-	DEC	A
-	JR	NZ,.PAGE
-*/
 .BYTE	LD	A,(HL)
 	OUT	(VDPDAT),A
 	INC	HL
@@ -209,27 +202,4 @@ PCTDAT	DEFS	32,#F0
 
 	PAD	#2000
 
-/* OLD CHAIN TEST
-
-CAPCOM	EQU	#A100
-
-	ORG	#8000
-
-	LD	HL,STRTST
-	PUSH	HL
-	LD	A,4
-	PUSH	AF
-	INC	SP
-	LD	HL,(CAPCOM)
-	CALL	CALL_HL
-	POP	AF
-	INC	SP
-
-HANG	JR	HANG
-
-CALL_HL	JP	(HL)
-
-STRTST	DEFM	"DIECHE",0
-
-	DEFS	#C000-$
-*/
+////////////////////////////////////////////////////////////////////////////////
