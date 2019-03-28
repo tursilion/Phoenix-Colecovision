@@ -1,0 +1,94 @@
+////////////////////////////////////////////////////////////////////////////////
+
+;	SD CARD VOLUME
+
+	PRINT	04,08,STRFAT0
+
+	CALL	FATRESET
+	JR	NC,.RESETOK
+
+	ABORT	24,08,STRBAD
+.RESETOK	PRINT	24,08,STROK
+
+;	BIOS FILE
+
+	PRINT	04,10,STRFAT1
+
+	LD	HL,STRBIOS
+	LD	DE,#0000
+	CALL	FATLOAD
+	JR	NC,.LOADOK
+
+	ABORT	24,10,STRBAD
+.LOADOK	PRINT	24,10,STROK
+
+;	HALT
+
+	ABORT	15,23,STREND
+
+FATLOAD	SUBRO //////////////////////////////////////////////////////// FAT LOAD
+
+	LD	(FILEAREA),DE
+
+	CALL	FATOPEN
+
+	RET
+
+
+
+
+
+	OUT	(JOYRES),A
+.TSTJOY
+	LDXY	0,23
+	IN	A,(JOY0DAT)
+	AND	#1F
+	CALL	BCDPUTAT
+
+	JR	.TSTJOY
+
+	HALT
+
+/*
+	EXX
+	LD	A,H
+	LDXY	0,3
+	CALL	BCDPUTAT
+	LD	A,L
+	CALL	BCDPUT
+	EXX
+
+	LD	A,H
+	CALL	BCDPUT
+	LD	A,L
+	CALL	BCDPUT
+*/
+/*
+	LD	HL,SECBUF+#0180
+	LDXY	0,4
+	LD	B,16
+.ROW	LD	A,H
+	SUB	#70
+	CALL	BCDPUTAT
+	LD	A,L
+	CALL	BCDPUT
+	LD	A,' '
+	OUT	(VDPDAT),A
+	LD	A,' '
+	OUT	(VDPDAT),A
+	LD	C,8
+.B	LD	A,(HL)
+	INC	HL
+	CALL	BCDPUT
+	LD	A,' '
+	OUT	(VDPDAT),A
+	DEC	C
+	JR	NZ,.B
+	PUSH	HL
+	LD	HL,32
+	ADD	HL,DE
+	EX	DE,HL
+	POP	HL
+	DJNZ	.ROW
+*/
+////////////////////////////////////////////////////////////////////////////////

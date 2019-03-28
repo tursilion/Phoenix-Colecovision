@@ -1,0 +1,32 @@
+////////////////////////////////////////////////////////////////////////////////
+
+VDPIMG	DEFB	%00000000
+	DEFB	%10000010	; 16K VRAM | 16 X 16 SPRITES
+	DEFB	PNTBAS>>10
+	DEFB	PCTBAS>> 6
+	DEFB	PGTBAS>>11
+	DEFB	SATBAS>> 7
+	DEFB	SGTBAS>>11
+	DEFB	#00
+
+PGTDAT	INCBIN	"PGT.BIN"
+
+PCTDAT	DEFS	 2,#30
+	DEFS	30,#F0
+
+STRBIOS	DEFM	"COLECO  BIO"
+
+STREND	DEFM	"OK",0
+
+STRFAT16	DEFM	"FAT16   "
+STRFAT32	DEFM	"FAT32   "
+
+STRTTL	DEFM	"PHOENIX FIRMWARE STAGE -1",0
+
+STRFAT0	DEFM	"SD CARD VOLUME      WAIT",0
+STRFAT1	DEFM	"BIOS FILE           WAIT",0
+
+STROK	DEFM	"OK  ",0
+STRBAD	DEFM	"BAD ",0
+
+////////////////////////////////////////////////////////////////////////////////
