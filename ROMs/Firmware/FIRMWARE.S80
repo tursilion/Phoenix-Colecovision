@@ -74,7 +74,7 @@ VARS	#	VARSZ	; VARIABLES
 
 	ENDMAP
 
-SECBUF	EQU	#8000
+SECBUF	EQU	#C000
 
 ///////////////////////////////////////////////////////////////////// MEMORY MAP
 
