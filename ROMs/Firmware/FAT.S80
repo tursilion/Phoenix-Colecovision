@@ -4,20 +4,20 @@ FAT32	EQU	0
 
 	MAP	0
 
-DIRNAM	#	8	; NAME
-DIREXT	#	3	; EXTENSION
-DIRATR	#	1	; ATTRIBUTES
-DIRLOW	#	1	; LOWERCASE FLAGS
-DIR100	#	1	; 100TH OF SECOND
-DIRTIM	#	2	; CREATE TIME
-DIRDAT	#	2	; CREATE DATE
-DIRACC	#	2	; ACCESS DATE
-DIRCLUH	#	2	; CLUSTER MSB
-DIRTMOD	#	2	; MODIFY TIME
-DIRDMOD	#	2	; MODIFY DATE
-DIRSCLU	#	2	; STARTING CLUSTER
-DIRSIZ	#	4	; FILE SIZE
-DIRENTSZ	#
+ENTNAM	#	8	; NAME
+ENTEXT	#	3	; EXTENSION
+ENTATR	#	1	; ATTRIBUTES
+ENTLOW	#	1	; LOWERCASE FLAGS
+ENTC100	#	1	; 100TH OF SECOND
+ENTCTIM	#	2	; CREATE TIME
+ENTCDAT	#	2	; CREATE DATE
+ENTADAT	#	2	; ACCESS DATE
+ENTCLUH	#	2	; CLUSTER MSB
+ENTMTIM	#	2	; MODIFY TIME
+ENTMDAT	#	2	; MODIFY DATE
+ENTSCLU	#	2	; STARTING CLUSTER
+ENTFILSZ	#	4	; FILE SIZE
+ENTSZOF	#
 
 	ENDMAP
 
@@ -64,10 +64,12 @@ FATRESET	SUBRO /////////////////////////////////////////////////// SD CARD RESET
 	SCF
 	RET
 .FAT16
-;	CLUSTER SIZE
+;	CLUSTER SIZE & MASK
 
 	LD	A,(SECBUF+13)
 	LD	(CLUSIZ),A
+	DEC	A
+	LD	(CLUMSK),A
 
 ;	FAT START
 
@@ -161,6 +163,39 @@ FATRESET	SUBRO /////////////////////////////////////////////////// SD CARD RESET
 
 	RET
 
+FATLOAD	SUBRO //////////////////////////////////////////////////////// FAT LOAD
+
+	LD	(FILEAREA),DE
+	LD	(FILESIZE),BC
+
+	CALL	FATOPEN
+	RET	C
+
+	LD	BC,(FILESIZE)
+
+.SEC	PUSH	BC
+
+	CALL	FATREAD
+
+	LD	HL,(FILEAREA)
+	LD	DE,512
+	ADD	HL,DE
+	LD	(FILEAREA),HL
+
+	LDXY	0,23
+	LD	A,H
+	CALL	BCDPUTAT
+	LD	A,L
+	CALL	BCDPUT
+
+	POP	BC
+	DEC	BC
+	LD	A,B
+	OR	C
+	JR	NZ,.SEC
+
+	RET
+
 FATOPEN	SUBRO //////////////////////////////////////////////////////// FAT OPEN
 
 ;	STORE FILENAME POINTER
@@ -228,7 +263,7 @@ FATOPEN	SUBRO //////////////////////////////////////////////////////// FAT OPEN
 ;	NEXT DIRECTORY ENTRY
 
 	LD	HL,(SECPTR)
-	LD	DE,DIRENTSZ
+	LD	DE,ENTSZOF
 	ADD	HL,DE
 	LD	(SECPTR),HL
 .SKLD
@@ -243,7 +278,7 @@ FATOPEN	SUBRO //////////////////////////////////////////////////////// FAT OPEN
 
 ;	DISCARD VOLUMES & DIRECTORIES
 
-	LD	A,(IX+DIRATR)
+	LD	A,(IX+ENTATR)
 	AND	#18
 	JR	NZ,.SKENT
 
@@ -255,15 +290,36 @@ FATOPEN	SUBRO //////////////////////////////////////////////////////// FAT OPEN
 	LD	BC,11
 	CALL	COMPARE
 	JR	NZ,.SKENT
-/*
-         file->size = pEntry->FileSize;
-         file->cluster = pEntry->StartCluster + (fat32 ? ((unsigned long)(pEntry->HighCluster & 0x0FFF)) << 16 : 0);
-         file->sector = 0;
-*/
+
+;	GET FILE SIZE
+
+	LD	L,(IX+ENTFILSZ+0)
+	LD	H,(IX+ENTFILSZ+1)
+	LD	(FILSIZ+0),HL
+	LD	L,(IX+ENTFILSZ+2)
+	LD	H,(IX+ENTFILSZ+3)
+	LD	(FILSIZ+2),HL
+
+;	GET FILE CLUSTER
+
+	LD	L,(IX+ENTSCLU+0)
+	LD	H,(IX+ENTSCLU+1)
+	LD	(FILCLU),HL
+
+;	RESET FILE SECTOR
+
+	LD	HL,0
+	LD	(FILSEC+0),HL
+	LD	(FILSEC+2),HL
+
+;	BREAK LOOP
+
 	POP	BC
 	AND	A
 	RET
 .SKENT
+;	NEXT ENTRY
+
 	LD	HL,(ENTRY)
 	INC	HL
 	LD	(ENTRY),HL
@@ -274,18 +330,28 @@ FATOPEN	SUBRO //////////////////////////////////////////////////////// FAT OPEN
 	OR	C
 	JP	NZ,.LOOKUP
 
+;	NOT FOUND
+
 	SCF
 	RET
 
 FATREAD	SUBRO //////////////////////////////////////////////////////// FAT READ
 
-;	DE: START CLUSTER - 2 (FAT16 = 16-BIT)
+;	DATA START
 
-	LD	L,(IX+DIRSCLU+0)
-	LD	H,(IX+DIRSCLU+1)
+	LD	HL,(DATBAS+0)
+	LD	(SB+0),HL
+	LD	HL,(DATBAS+2)
+	LD	(SB+2),HL
+
+;	DE: CLUSTER - 2 (FAT16 = 16-BIT)
+
+	LD	HL,(FILCLU)
 	DEC	HL
 	DEC	HL
 	EX	DE,HL
+
+;	HL = DE * CLUSTER SIZE
 
 	LD	HL,0
 	EXX
@@ -300,22 +366,45 @@ FATREAD	SUBRO //////////////////////////////////////////////////////// FAT READ
 	EXX
 	DJNZ	.CLUMUL
 
-	LD	DE,(DATBAS+0)
+;	+
+
+	LD	DE,(SB+0)
 	ADD	HL,DE
-	LD	(FILSEC+0),HL
+	LD	(SB+0),HL
 	EXX
-	LD	DE,(DATBAS+2)
+	LD	DE,(SB+2)
 	ADC	HL,DE
-	LD	(FILSEC+2),HL
+	LD	(SB+2),HL
 	EXX
 
-	LD	DE,(FILSEC+0)
-	LD	BC,(FILSEC+2)
-	LD	HL,SECBUF
-	CALL	SDCREAD
+;	file->sector & cluster_mask
 
-;	LD	A,SPC
-;	OUT	(VDPDAT),A
+	LD	A,(FILSEC+0)
+	LD	HL,CLUMSK
+	AND	(HL)
+	LD	E,A
+	LD	D,0
+
+;	+
+
+	LD	HL,(SB+0)
+	ADD	HL,DE
+	LD	(SB+0),HL
+	LD	HL,(SB+2)
+	LD	DE,0
+	ADC	HL,DE
+	LD	(SB+2),HL
+
+;	READ SECTOR
+
+	LD	DE,(SB+0)
+	LD	BC,(SB+2)
+	LD	HL,(FILEAREA)
+	CALL	SDCREAD
+	RET	C
+/*
+	LD	A,SPC
+	OUT	(VDPDAT),A
 
 	LD	HL,SECBUF
 	LD	BC,#0000|VDPDAT
@@ -326,11 +415,65 @@ FATREAD	SUBRO //////////////////////////////////////////////////////// FAT READ
 	ADD	HL,DE
 	LD	(PNTPTR),HL
 .SKENT
-	LD	HL,(SECPTR)
-	LD	DE,DIRENTSZ
-	ADD	HL,DE
-	LD	(SECPTR),HL
+*/
+;	INCREMENT SECTOR INDEX
 
+	LD	HL,(FILSEC+0)
+	LD	DE,1
+	ADD	HL,DE
+	LD	(FILSEC+0),HL
+
+	LD	HL,(FILSEC+2)
+	LD	DE,0
+	ADC	HL,DE
+	LD	(FILSEC+2),HL
+
+;	CHECK CLUSTER BOUNDARY
+
+	LD	A,(FILSEC+0)
+	LD	HL,CLUMSK
+	AND	(HL)
+	RET	NZ
+
+;	GET CLUSTER
+/*
+	sb = cluster >> 8;   // calculate sector number containing FAT-link
+	i  = cluster & 0xFF; // calculate link offsset within sector
+
+	MMC_Read(fat_start + sb, fat_buffer)
+
+	i = fat_buffer.fat16[i];
+	return i;
+*/
+	LD	HL,(FATBAS+0)
+	LD	A,(FILCLU+1)
+	LD	E,A
+	LD	D,0
+	ADD	HL,DE
+	LD	(SB+0),HL
+
+	LD	HL,(FATBAS+2)
+	LD	E,0
+	ADC	HL,DE
+	LD	(SB+2),HL
+
+	LD	DE,(SB+0)
+	LD	BC,(SB+2)
+	LD	HL,SECBUF
+	CALL	SDCREAD
+	RET	C
+
+	LD	A,(FILCLU+0)
+	LD	L,A
+	LD	H,0
+	ADD	HL,HL	; X2 (16-BIT)
+	LD	DE,SECBUF
+	ADD	HL,DE
+
+	LD	DE,FILCLU
+[2]	LDI
+
+	AND	A
 	RET
 
 ////////////////////////////////////////////////////////////////////////////////
