@@ -285,6 +285,9 @@ begin
    --
    -- Z80 CPU, synchronous top level with clock enable
    --
+
+   -- TODO: switch back to async Z80 because it registers its outputs.
+
    inst_t80 : entity work.t80se
    port map (
       RESET_n  => reset_n_s,           -- in std_logic;
@@ -468,13 +471,30 @@ begin
    -- TODO: Logic for allowing BIOS to be written to.
    bios_we_s <= '0';
 
+   --
+   -- Internal 1K SRAM
+   --
+   sram : process ()
+   begin
+      if rising_edge(clock_i) then
+         if ram_we_s = '1' and then
+            sram_1k_r(to_integer(unsigned(sram_1k_addr_s))) <= d_from_cpu_s;
+         end if;
+         d_from_sram_s <= ram_q(to_integer(unsigned(sram_1k_addr_s)));
+   end process;
+
+   sram_1k_addr_s <= cpu_addr_s(9 downto 0);
 
    --
    -- External SRAM, 512Kx8, 10ns
    --
    -- TODO: Rewrite with simpler FSM and mux for multiple "ports".
    --
-   sram: entity work.dpSRAM_5128
+   -- When the SGM is enabled, the full 64K address space of the
+   -- Z80 will map to physical RAM.  The real SGM only provides
+   -- 24K to 32K of RAM in the lower 32K address space, but the
+   -- extra memory should not bother anything.
+   ext512 : entity work.dpSRAM_5128
    port map (
       clk_i          => clock_mem_i,
       -- Port 0
@@ -483,7 +503,7 @@ begin
       porta0_oe_i    => ram_oe_s,
       porta0_we_i    => ram_we_s,
       porta0_data_i  => d_from_cpu_s,
-      porta0_data_o  => d_from_sram_s,
+      porta0_data_o  => d_from_ext512_s,
       -- Port 1
       porta1_addr_i  => (others => '1'),
       porta1_ce_i    => '0',
@@ -547,16 +567,34 @@ begin
    --  8   4   2
    -- -----------
    --  0   0   0   >0000 .. >1FFF (8K)    BIOS, 8K
-   --  0   0   1   >2000 .. >3FFF (8K)    EXT_20
-   --  0   1   0   >4000 .. >5FFF (8K)    EXT_40
+   --  0   0   1   >2000 .. >3FFF (8K)    EXT_20, no physical memory
+   --  0   1   0   >4000 .. >5FFF (8K)    EXT_40, no physical memory
    --  0   1   1   >6000 .. >7FFF (8K)    RAM, 1K, appears at every 1K boundary
    --  1   0   0   >8000 .. >9FFF (8K)    ROM_80
    --  1   0   1   >A000 .. >BFFF (8K)    ROM_A0
    --  1   1   0   >C000 .. >DFFF (8K)    ROM_C0
    --  1   1   1   >E000 .. >FFFF (8K)    ROM_E0
+   --
+   -- SGM Memory Map
+   -- The SGM adds 24K of RAM in the unused extention area
+   -- of the CV, as well as expanding the standard 1K to a
+   -- full 8K bank.  The BIOS can also be swapped out for
+   -- an 8K bank of RAM.
+   --
+   -- A15 A14 A13
+   --  8   4   2                          CV      SGM EN
+   -- -----------                         --------------
+   --  0   0   0   >0000 .. >1FFF (8K)    BIOS    8K RAM
+   --  0   0   1   >2000 .. >3FFF (8K)    n/a     8K RAM
+   --  0   1   0   >4000 .. >5FFF (8K)    n/a     8K RAM
+   --  0   1   1   >6000 .. >7FFF (8K)    1K RAM  8K RAM
 
+   -- TODO: find out how the SGM is managing to take over
+   -- address space that has real ICs are the BIOS and 1K
+   -- RAM address spaces.
    process ( cpu_addr_s, mreq_n_s, rfsh_n_s,
-             d_from_bios_s, d_from_sram_s, cart_data_io )
+             d_from_bios_s, d_from_sram_s, cart_data_io,
+             d_from_ext512_s, sgm_bios_en_r, sgm_ram_en_r )
    begin
       bios_ce_s      <= '0';
       ram_ce_s       <= '0';
@@ -569,9 +607,23 @@ begin
       if mreq_n_s = '0' and rfsh_n_s = '1' then
          case cpu_addr_s(15 downto 13) is
          when "000" =>  bios_ce_s      <= '1';
+            if sgm_bios_en_r = '0' then
                         mem_data_mux_s <= d_from_bios_s;
+            else
+                        mem_data_mux_s <= d_from_ext512_s;
+            end if;
+         when "001" |
+              "010" =>
+            if sgm_ram_en_r = '1' then
+                        ram_ce_s       <= '1';
+                        mem_data_mux_s <= d_from_ext512_s;
+            end if;
          when "011" =>  ram_ce_s       <= '1';
+            if sgm_ram_en_r = '0' then
                         mem_data_mux_s <= d_from_sram_s;
+            else
+                        mem_data_mux_s <= d_from_ext512_s;
+            end if;
          when "100" =>  cart_en_80_n_s <= '0';
          when "101" =>  cart_en_A0_n_s <= '0';
          when "110" =>  cart_en_C0_n_s <= '0';
@@ -583,6 +635,9 @@ begin
 
    cart_oe_n_s <= cart_en_80_n_s and cart_en_A0_n_s and cart_en_C0_n_s and cart_en_E0_n_s;
 
+   signal sgm_ram_en_r        : std_logic;
+   signal sgm_bios_en_r       : std_logic;
+   signal d_from_ext512_s     : std_logic_vector( 7 downto 0);
 
    -- CV I/O Decode
    --
@@ -597,6 +652,15 @@ begin
    -- 1  1  0  1  >C0 .. >DF  (R) not connected
    -- 1  1  1  0  >E0 .. >FF  (W) sound chip (SN76489A)
    -- 1  1  1  1  >E0 .. >FF  (R) read controller data, A1=0 read controller 1, A1=1 read controller 2
+   --
+   -- SGM Ports
+   -- The SGM adds two ports:
+   --   53 to enable the 24K RAM
+   --   7F to enable the BIOS override with 8K RAM
+   --
+   -- TODO: document why these are different ports??
+   --
+   -- 0 1 0 1
 
    io_decode_s <= cpu_addr_s(6 downto 5) & wr_n_s;
 
@@ -622,6 +686,29 @@ begin
          end case;
       end if;
    end process;
+
+-- SPI (R/W)          => 56 to 57
+-- SGM 24k ram enable => 53
+-- Page port          => 54
+-- Config Port        => 55
+-- Machine ID read    => 58
+-- SGM BIOS ram bankswitch => 7F
+-- Controller key set => 80 to 9F
+-- VDP write          => A0 to BF
+-- VDP read           => A0 to BF
+-- Controller joy set => C0 to DF
+-- PSG write          => E0 to FF
+-- WSG (R/W)          => 60 to 63
+-- WSG write          => 60 to 61
+-- WSG write          => 60/62
+-- Controller read    => E0 to FF
+
+
+
+
+
+
+
 
 
 

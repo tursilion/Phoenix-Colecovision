@@ -13,8 +13,8 @@ use ieee.numeric_std.all;
 entity colecobios is
 	port (
 		clock_i		: in  std_logic;
-		we_i			: in  std_logic;
-		addr_i	   : in  std_logic_vector(12 downto 0);
+		we_i		: in  std_logic;
+		addr_i	   	: in  std_logic_vector(12 downto 0);
 		data_i		: in  std_logic_vector( 7 downto 0);
 		data_o		: out std_logic_vector( 7 downto 0)
 	);
