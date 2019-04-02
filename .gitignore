@@ -4,6 +4,7 @@ Thumbs.db
 *.bld
 *.gise
 *.xrpt
+*.yml
 **/ipcore_dir/*.asy
 **/ipcore_dir/*.cgc
 **/ipcore_dir/*.log

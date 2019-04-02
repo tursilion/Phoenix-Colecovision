@@ -1,0 +1,167 @@
+nCS	EQU	#01	; NOT CHIP SELECT
+SCLK	EQU	#02	; SLAVE CLOCK
+MOSI	EQU	#04	; MASTER OUT SLAVE IN
+nWP	EQU	#08	; NOT WRITE PROTECT
+nHOLD	EQU	#10	; NOT HOLD
+
+CS	EQU	#00
+nSCLK	EQU	#00
+nMOSI	EQU	#00
+WP	EQU	#00
+HOLD	EQU	#00
+
+FI_32KB_BLOCK_ERASE                          EQU	#52
+FI_64KB_BLOCK_ERASE                          EQU	#D8
+FI_PAGE_PROGRAM                              EQU	#02
+FI_READ_DATA                                 EQU	#03
+FI_READ_STATUS_REGISTER_1                    EQU	#05
+FI_READ_STATUS_REGISTER_2                    EQU	#35
+FI_READ_STATUS_REGISTER_3                    EQU	#15
+FI_SECTOR_ERASE                              EQU	#20
+FI_WRITE_DISABLE                             EQU	#04
+FI_WRITE_ENABLE                              EQU	#06
+FI_WRITE_ENABLE_FOR_VOLATILE_STATUS_REGISTER EQU	#50
+FI_WRITE_STATUS_REGISTER_1                   EQU	#01
+FI_WRITE_STATUS_REGISTER_2                   EQU	#31
+FI_WRITE_STATUS_REGISTER_3                   EQU	#11
+
+SPICOM	SUBRO ; ///////////////////////////////////////////// SPI FLASH COMMAND
+
+	LD	(SPICOMIR),A
+	LD	(SPICOMWC),BC
+	LD	(SPICOMH),DE
+	LD	(SPICOML),HL
+
+;	MODE 0 (DRIVE CLOCK LOW WHILE NOT CS) & WP
+
+	LD	A,nHOLD|WP|nMOSI|nSCLK|nCS
+	OUT	(SPIFLASH),A
+
+;	ASSERT CS
+
+	LD	A,nHOLD|WP|nMOSI|nSCLK|CS
+	OUT	(SPIFLASH),A
+
+;	1ST BYTE (INSTRUCTION)
+
+	LD	A,(SPICOMIR)
+	CALL	SPISER
+
+//	2ND BYTE
+
+	LD	A,(SPICOMWC)
+	CP	1
+	LD	A,(SPICOMH)
+	CALL	NC,SPISER
+
+//	3RD BYTE
+
+	LD	A,(SPICOMWC)
+	CP	2
+	LD	A,(SPICOMM)
+	CALL	NC,SPISER
+
+//	4TH BYTE
+
+	LD	A,(SPICOMWC)
+	CP	3
+	LD	A,(SPICOML)
+	CALL	NC,SPISER
+
+//	5TH BYTE
+
+	LD	A,(SPICOMWC)
+	CP	4
+	LD	A,(SPICOMD)
+	CALL	Z,SPISER
+
+//	BLOCK
+
+	LD	A,(SPICOMWC)
+	CP	255
+	JR	NZ,.NBLK
+
+	LD	B,0
+.BLK	PUSH	BC
+	LD	A,(IX)
+	CALL	SPISER
+	INC	IX
+	POP	BC
+	DJNZ	.BLK
+.NBLK
+//	RETURN CODE
+/*
+	if (rc == 1)
+	{
+		bi = 0;
+		for (i = 7; i >= 0; i--)
+		{
+			FLASH = nHOLD |  WP | nMOSI | nSCLK |  CS;
+			bi <<= 1;
+			bi |= FLASH & 1;
+			if (i) FLASH = nHOLD |  WP | nMOSI |  SCLK |  CS;
+		}
+	}
+*/
+	LD	A,(SPICOMRC)
+	AND	A
+	JR	Z,.NRC
+
+	LD	D,0
+	LD	B,8
+
+.RCBIT	LD	A,nHOLD|WP|nMOSI|nSCLK|CS
+	OUT	(SPIFLASH),A
+
+	SLA	D
+
+	IN	A,(SPIFLASH)
+	AND	1
+	OR	D
+	LD	D,A
+
+	LD	A,B
+	CP	1
+	JR	Z,.SK1
+
+	LD	A,nHOLD|WP|nMOSI|SCLK|CS
+	OUT	(SPIFLASH),A
+.SK1
+	DJNZ	.RCBIT
+.NRC
+/*
+	FLASH = nHOLD |  WP | bi | nSCLK |  CS;
+	FLASH = nHOLD |  WP | bi | nSCLK | nCS;
+
+	return bi;
+*/
+	LD	A,nHOLD|WP|nSCLK|CS
+	OUT	(SPIFLASH),A
+
+	LD	A,nHOLD|WP|nSCLK|nCS
+	OUT	(SPIFLASH),A
+
+	LD	A,D
+	RET
+
+SPISER	SUBRO ; /////////////////////////////////////////// SPI FLASH SERIALIZE
+
+	LD	D,A
+	LD	B,8
+
+.BIT	RLC	D
+	LD	A,D
+	AND	1
+[2]	ADD	A,A
+
+	OR	nHOLD|WP|nSCLK|CS
+	OUT	(SPIFLASH),A
+
+	OR	SCLK
+	OUT	(SPIFLASH),A
+
+	DJNZ	.BIT
+
+	RET
+
+; //////////////////////////////////////////////////////////////////////////////
