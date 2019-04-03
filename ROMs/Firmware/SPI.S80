@@ -25,6 +25,13 @@ FI_WRITE_STATUS_REGISTER_1                   EQU	#01
 FI_WRITE_STATUS_REGISTER_2                   EQU	#31
 FI_WRITE_STATUS_REGISTER_3                   EQU	#11
 
+	MACRO	SPIOUT
+
+	OUT	(SPIFLASH),A
+;[8]	NOP
+
+	ENDMACRO
+
 SPICOM	SUBRO ; ///////////////////////////////////////////// SPI FLASH COMMAND
 
 	LD	(SPICOMIR),A
@@ -35,47 +42,47 @@ SPICOM	SUBRO ; ///////////////////////////////////////////// SPI FLASH COMMAND
 ;	MODE 0 (DRIVE CLOCK LOW WHILE NOT CS) & WP
 
 	LD	A,nHOLD|WP|nMOSI|nSCLK|nCS
-	OUT	(SPIFLASH),A
+	SPIOUT
 
 ;	ASSERT CS
 
 	LD	A,nHOLD|WP|nMOSI|nSCLK|CS
-	OUT	(SPIFLASH),A
+	SPIOUT
 
 ;	1ST BYTE (INSTRUCTION)
 
 	LD	A,(SPICOMIR)
 	CALL	SPISER
 
-//	2ND BYTE
+;	2ND BYTE
 
 	LD	A,(SPICOMWC)
 	CP	1
 	LD	A,(SPICOMH)
 	CALL	NC,SPISER
 
-//	3RD BYTE
+;	3RD BYTE
 
 	LD	A,(SPICOMWC)
 	CP	2
 	LD	A,(SPICOMM)
 	CALL	NC,SPISER
 
-//	4TH BYTE
+;	4TH BYTE
 
 	LD	A,(SPICOMWC)
 	CP	3
 	LD	A,(SPICOML)
 	CALL	NC,SPISER
 
-//	5TH BYTE
+;	5TH BYTE
 
 	LD	A,(SPICOMWC)
 	CP	4
 	LD	A,(SPICOMD)
 	CALL	Z,SPISER
 
-//	BLOCK
+;	256-BYTE BLOCK
 
 	LD	A,(SPICOMWC)
 	CP	255
@@ -89,29 +96,18 @@ SPICOM	SUBRO ; ///////////////////////////////////////////// SPI FLASH COMMAND
 	POP	BC
 	DJNZ	.BLK
 .NBLK
-//	RETURN CODE
-/*
-	if (rc == 1)
-	{
-		bi = 0;
-		for (i = 7; i >= 0; i--)
-		{
-			FLASH = nHOLD |  WP | nMOSI | nSCLK |  CS;
-			bi <<= 1;
-			bi |= FLASH & 1;
-			if (i) FLASH = nHOLD |  WP | nMOSI |  SCLK |  CS;
-		}
-	}
-*/
+;	RETURN CODE
+
+	LD	D,0
+
 	LD	A,(SPICOMRC)
 	AND	A
 	JR	Z,.NRC
 
-	LD	D,0
 	LD	B,8
 
 .RCBIT	LD	A,nHOLD|WP|nMOSI|nSCLK|CS
-	OUT	(SPIFLASH),A
+	SPIOUT
 
 	SLA	D
 
@@ -125,21 +121,21 @@ SPICOM	SUBRO ; ///////////////////////////////////////////// SPI FLASH COMMAND
 	JR	Z,.SK1
 
 	LD	A,nHOLD|WP|nMOSI|SCLK|CS
-	OUT	(SPIFLASH),A
+	SPIOUT
 .SK1
 	DJNZ	.RCBIT
-.NRC
-/*
-	FLASH = nHOLD |  WP | bi | nSCLK |  CS;
-	FLASH = nHOLD |  WP | bi | nSCLK | nCS;
 
-	return bi;
-*/
+	LD	E,0
+.NRC
+;	FINISH
+
 	LD	A,nHOLD|WP|nSCLK|CS
-	OUT	(SPIFLASH),A
+	OR	E
+	SPIOUT
 
 	LD	A,nHOLD|WP|nSCLK|nCS
-	OUT	(SPIFLASH),A
+	OR	E
+	SPIOUT
 
 	LD	A,D
 	RET
@@ -153,14 +149,35 @@ SPISER	SUBRO ; /////////////////////////////////////////// SPI FLASH SERIALIZE
 	LD	A,D
 	AND	1
 [2]	ADD	A,A
+	LD	E,A
 
 	OR	nHOLD|WP|nSCLK|CS
-	OUT	(SPIFLASH),A
+	SPIOUT
 
 	OR	SCLK
-	OUT	(SPIFLASH),A
+	SPIOUT
 
 	DJNZ	.BIT
+
+	RET
+
+SPIWAIT	SUBRO ; //////////////////////////////////////////////// SPI FLASH WAIT
+
+;	LDXY	0,22
+;	CALL	VDPSETW
+
+	LD	A,FI_READ_STATUS_REGISTER_1
+	LD	BC,#0100
+	LD	DE,0
+	LD	HL,0
+	CALL	SPICOM
+
+;	PUSH	AF
+;	CALL	BCDPUT
+;	POP	AF
+
+	AND	1
+	JR	NZ,SPIWAIT
 
 	RET
 

@@ -34,7 +34,151 @@
 	IN	A,(JOY0DAT)
 	AND	#0F
 	CP	#0D
-	JR	NZ,.LDITEM
+	JP	NZ,.LDITEM
+/*
+	for (i = 0; i < 8; i++)
+	{
+		vdp_putchar('E');
+		fiWR(FI_WRITE_ENABLE    , 0, 0, 0, 0, 0, 0);
+		fiWR(FI_64KB_BLOCK_ERASE, 3, 0, i, 0, 0, 0);
+		fiWait();
+	}
+*/
+	LDXY	0,0
+	CALL	VDPSETW
+
+;	ERASE
+
+	LD	B,8
+	LD	IYL,0
+.SPIDEL	PUSH	BC
+
+	LD	A,'E'
+	OUT	(VDPDAT),A
+
+	LD	A,FI_WRITE_ENABLE
+	LD	BC,0
+	LD	DE,0
+	LD	HL,0
+	CALL	SPICOM
+
+	LD	A,FI_64KB_BLOCK_ERASE
+	LD	BC,3
+	LD	E,IYL
+	LD	D,0
+	LD	HL,0
+	CALL	SPICOM
+
+	CALL	SPIWAIT
+
+	INC	IYL
+	POP	BC
+	DJNZ	.SPIDEL
+
+;	WRITE
+/*
+	for (i16 = 0; i16 < 928; i16++)
+	{
+		pbios = (unsigned char *) 0x8000;
+		if (!FileRead(&file, pbios))
+			erro("READ ERR");
+
+		if ((i16 & 1) == 0) vdp_putchar('W');
+		fiWR(FI_WRITE_ENABLE,   0, 0, 0, 0, 0, 0);
+		fiWR(FI_PAGE_PROGRAM, 255, 0, (i16 << 1) >> 8, (i16 << 1) & 0xFF, 0, 0);
+		fiWait();
+		pbios = (unsigned char *) 0x8100;
+		fiWR(FI_WRITE_ENABLE,   0, 0, 0, 0, 0, 0);
+		fiWR(FI_PAGE_PROGRAM, 255, 0, (i16 << 1) >> 8, ((i16 << 1) & 0xFF) | 1, 0, 0);
+		fiWait();
+
+	}
+*/
+	LD	HL,STRCOR00
+	CALL	FATOPEN
+	JR	NC,.GOWR
+
+	HALT
+.GOWR
+	LDXY	0,2
+	CALL	VDPSETW
+
+	LD	BC,928
+	LD	IY,0
+.WRITE	PUSH	BC
+
+	LD	A,C
+	AND	1
+	JR	NZ,.NOPROG
+
+	LD	A,'W'
+	OUT	(VDPDAT),A
+.NOPROG
+	LD	HL,#8000
+	LD	(FILEAREA),HL
+
+	CALL	FATREAD
+/*
+		fiWR(FI_WRITE_ENABLE,   0, 0, 0, 0, 0, 0);
+		fiWR(FI_PAGE_PROGRAM, 255, 0, (i16 << 1) >> 8, (i16 << 1) & 0xFF, 0, 0);
+		fiWait();
+*/
+;	1ST SECTOR HALF
+
+	LD	A,FI_WRITE_ENABLE
+	LD	BC,0
+	LD	DE,0
+	LD	HL,0
+	CALL	SPICOM
+
+	LD	A,FI_PAGE_PROGRAM
+	POP	BC
+	PUSH	BC
+	LD	D,IYL
+	LD	E,IYH
+	LD	BC,255
+	LD	HL,0
+	LD	IX,#8000
+	CALL	SPICOM
+
+	CALL	SPIWAIT
+
+	INC	IY
+
+;	2ND SECTOR HALF
+
+	LD	A,FI_WRITE_ENABLE
+	LD	BC,0
+	LD	DE,0
+	LD	HL,0
+	CALL	SPICOM
+
+	LD	A,FI_PAGE_PROGRAM
+	POP	BC
+	PUSH	BC
+	LD	D,IYL
+	LD	E,IYH
+	LD	BC,255
+	LD	HL,0
+	LD	IX,#8100
+	CALL	SPICOM
+
+	CALL	SPIWAIT
+
+	INC	IY
+
+;	LOOP
+
+	POP	BC
+	DEC	BC
+	LD	A,B
+	OR	C
+	JR	NZ,.WRITE
+
+	LD	A,'D'
+	OUT	(VDPDAT),A
+
+	HALT
 
 	LD	HL,STRCART	; 1: BURGER TIME
 

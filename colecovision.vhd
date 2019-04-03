@@ -609,6 +609,7 @@ begin
                   d_from_wsg_s               when WSG_CS = '1'          else
                   machine_id_c               when machine_id_cs_s = '1' else
                   cfg_page_r                 when cfg_page_cs_s = '1'   else
+                  "0000000" & flash_miso_i   when flash_r_cs_s = '1'    else -- SPI FLASH
                   (others => '1');
 
    -- Debug
