@@ -27,6 +27,17 @@
 
 	PRINT	04,12,STRFAT2
 
+
+
+
+	LD	A,1
+INSIST	OUT	(#5A),A
+	JR	INSIST
+	HALT
+
+
+
+/*
 	LD	HL,STRMULT	; DEFAULT: MULTI CART
 
 	OUT	(JOYSET),A
@@ -35,14 +46,6 @@
 	AND	#0F
 	CP	#0D
 	JP	NZ,.LDITEM
-/*
-	for (i = 0; i < 8; i++)
-	{
-		vdp_putchar('E');
-		fiWR(FI_WRITE_ENABLE    , 0, 0, 0, 0, 0, 0);
-		fiWR(FI_64KB_BLOCK_ERASE, 3, 0, i, 0, 0, 0);
-		fiWait();
-	}
 */
 	LDXY	0,0
 	CALL	VDPSETW
@@ -50,7 +53,8 @@
 ;	ERASE
 
 	LD	B,8
-	LD	IYL,0
+;	LD	IYL,0
+	LD	IYL,8
 .SPIDEL	PUSH	BC
 
 	LD	A,'E'
@@ -76,25 +80,9 @@
 	DJNZ	.SPIDEL
 
 ;	WRITE
-/*
-	for (i16 = 0; i16 < 928; i16++)
-	{
-		pbios = (unsigned char *) 0x8000;
-		if (!FileRead(&file, pbios))
-			erro("READ ERR");
 
-		if ((i16 & 1) == 0) vdp_putchar('W');
-		fiWR(FI_WRITE_ENABLE,   0, 0, 0, 0, 0, 0);
-		fiWR(FI_PAGE_PROGRAM, 255, 0, (i16 << 1) >> 8, (i16 << 1) & 0xFF, 0, 0);
-		fiWait();
-		pbios = (unsigned char *) 0x8100;
-		fiWR(FI_WRITE_ENABLE,   0, 0, 0, 0, 0, 0);
-		fiWR(FI_PAGE_PROGRAM, 255, 0, (i16 << 1) >> 8, ((i16 << 1) & 0xFF) | 1, 0, 0);
-		fiWait();
-
-	}
-*/
-	LD	HL,STRCOR00
+;	LD	HL,STRCOR00
+	LD	HL,STRCOR01
 	CALL	FATOPEN
 	JR	NC,.GOWR
 
@@ -104,7 +92,8 @@
 	CALL	VDPSETW
 
 	LD	BC,928
-	LD	IY,0
+;	LD	IY,0
+	LD	IY,2048
 .WRITE	PUSH	BC
 
 	LD	A,C
@@ -118,11 +107,7 @@
 	LD	(FILEAREA),HL
 
 	CALL	FATREAD
-/*
-		fiWR(FI_WRITE_ENABLE,   0, 0, 0, 0, 0, 0);
-		fiWR(FI_PAGE_PROGRAM, 255, 0, (i16 << 1) >> 8, (i16 << 1) & 0xFF, 0, 0);
-		fiWait();
-*/
+
 ;	1ST SECTOR HALF
 
 	LD	A,FI_WRITE_ENABLE
@@ -179,8 +164,8 @@
 	OUT	(VDPDAT),A
 
 	HALT
-
-	LD	HL,STRCART	; 1: BURGER TIME
+/*
+	LD	HL,STRCART
 
 .LDITEM	LD	DE,#8000
 	LD	BC,#4000/512
@@ -200,6 +185,7 @@
 	LDIR
 
 	JP	RAMBAS
+*/
 /*
 .TSTJOY
 
