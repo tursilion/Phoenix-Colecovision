@@ -27,16 +27,14 @@
 
 	PRINT	04,12,STRFAT2
 
+;	TRIGGER 2ND CORE (SLOT 1)
 
+	LD	A,#81	; 0000 1--- ---- ---- ---- ---- #080000
+	OUT	(#5A),A
+	AND	#7F	; STROBE
+	OUT	(#5A),A
 
-
-	LD	A,1
-INSIST	OUT	(#5A),A
-	JR	INSIST
 	HALT
-
-
-
 /*
 	LD	HL,STRMULT	; DEFAULT: MULTI CART
 

@@ -212,8 +212,9 @@ architecture Behavior of colecovision is
 	signal flash_r          : std_logic_vector(7 downto 0);
    signal flash_r_cs_s     : std_logic;
 
-	-- MULTIBOOT
-	signal multiboot_cs_s   : std_logic;
+	-- CORELOAD
+	signal coreload_cs_s    : std_logic;
+	signal clock_half_s     : std_logic := '0';
 
    -- Cartridge
    signal d_from_cart_s    : std_logic_vector( 7 downto 0);
@@ -374,17 +375,22 @@ begin
    ;
 	
    -----------------------------------------------------------------------------
-   -- MULTIBOOT
+   -- CORELOAD
    -----------------------------------------------------------------------------
-	MB : ENTITY work.multiboot
+	clock_half_p: process(clock_i)
+	begin
+		if (rising_edge(clock_i)) then
+			clock_half_s <= not clock_half_s;
+		end if;
+	end process clock_half_p;
+
+	CLD : ENTITY work.CORELOAD
 	PORT MAP
 	(
-		clk         => clock_i       ,
-		clk_icap    => clock_i       ,
-      rst_n       => reset_n_s     ,
-      zxuno_addr  => X"FD"         ,
-      zxuno_regwr => multiboot_cs_s,
-      din         => d_from_cpu_s
+		 CLK   => clock_half_s ,
+		nRESET => reset_n_s    ,
+		 CS    => coreload_cs_s,
+		 DIN   => d_from_cpu_s
    )
 	;
 
@@ -534,7 +540,7 @@ begin
    cfg_port_cs_s     <= '1'   when io_write_s = '1'  and cpu_addr_s(7 downto 0) = X"55"      else '0';   -- Config Port        => 55
    machine_id_cs_s   <= '1'   when io_read_s = '1'   and cpu_addr_s(7 downto 0) = X"58"      else '0';   -- Machine ID read    => 58
    flash_r_cs_s      <= '1'   when io_access_s = '1' and cpu_addr_s(7 downto 0) = X"59"      else '0';   -- SPI FLASH          => 59
-   multiboot_cs_s    <= '1'   when io_write_s = '1'  and cpu_addr_s(7 downto 0) = X"5A"      else '0';   -- MULTIBOOT          => 5A
+   coreload_cs_s     <= '1'   when io_write_s = '1'  and cpu_addr_s(7 downto 0) = X"5A"      else '0';   -- CORELOAD           => 5A
    bios_ram_cs_s     <= '1'   when io_write_s = '1'  and cpu_addr_s(7 downto 0) = X"7F"      else '0';   -- SGM BIOS ram bankswitch => 7F
    ctrl_en_key_n_s   <= '0'   when io_write_s = '1'  and cpu_addr_s(7 downto 5) = "100"      else '1';   -- Controller key set => 80 to 9F
    vdp_w_n_s         <= '0'   when io_write_s = '1'  and cpu_addr_s(7 downto 5) = "101"      else '1';   -- VDP write          => A0 to BF
