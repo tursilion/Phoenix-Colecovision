@@ -1,0 +1,69 @@
+//////////////////////////////////////////////////////////////////////// OPTIONS
+
+OPTRUN	SUBRO ///////////////////////////////////////////////////// OPTIONS RUN
+
+	LD	HL,(OPTPTR)
+
+	CALL	VDPCLS
+
+	LDXY	0,0
+	CALL	VDPPRINT
+
+	LDXY	7,3
+	LD	BC,#0A00
+.OPT	PUSH	BC
+
+	LD	A,(HL)
+	AND	A
+	JR	Z,.RUN
+
+	LD	A,C
+	CALL	CHRPUTAT
+
+	LD	A,SPC
+	CHRPUT
+
+	CALL	VDPPRINT.CHR
+
+	PUSH	HL
+	LD	HL,64
+	ADD	HL,DE
+	EX	DE,HL
+	POP	HL
+
+	POP	BC
+	INC	C
+	DJNZ	.OPT
+	JR	.NOPOP
+
+.RUN	POP	BC
+
+.NOPOP	INC	HL
+	EX	DE,HL
+
+	OUT	(JOYSET),A
+[4]	NOP
+
+.PAUSE0	IN	A,(JOY0DAT)
+	AND	#0F
+	LD	HL,KEYLUT+9
+	LD	BC,10
+	CPDR
+	JR	NZ,.PAUSE0
+
+.RELEASE	IN	A,(JOY0DAT)
+	AND	#0F
+	CP	#0F
+	JR	NZ,.RELEASE
+
+	EX	DE,HL
+	SLA	C
+	ADD	HL,BC
+
+	LD	A,(HL)
+	INC	HL
+	LD	H,(HL)
+	LD	L,A
+	JP	(HL)
+
+////////////////////////////////////////////////////////////////////////////////
