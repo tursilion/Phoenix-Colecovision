@@ -166,10 +166,53 @@ module CORELOAD_SPARTAN6
 					end
 				GEN2_L:
 					begin
+						next_state = GEN3_H;
+						icap_ce    = 0;
+						icap_wr    = 0;
+//						icap_din   = {8'h6B, ADDRESS[23:16]}; // Read 4X opcode + Address high byte
+						icap_din   = {8'h03, ADDRESS[23:16]}; // Read 1X opcode + Address high byte
+					end
+				GEN3_H:
+					begin
+						next_state = GEN3_L;
+						icap_ce    = 0;
+						icap_wr    = 0;
+						icap_din   = 16'h32A1; // Write to GENERAL_3
+					end
+				GEN3_L:
+					begin
+						next_state = GEN4_H;
+						icap_ce    = 0;
+						icap_wr    = 0;
+						icap_din   = 16'h0000; // Address low word
+					end
+				GEN4_H:
+					begin
+						next_state = GEN4_L;
+						icap_ce    = 0;
+						icap_wr    = 0;
+						icap_din   = 16'h32C1; // Write to GENERAL_4
+					end
+				GEN4_L:
+					begin
+						next_state = GEN5_H;
+						icap_ce    = 0;
+						icap_wr    = 0;
+						icap_din   = 16'h0300; // Read 1X opcode + Address high byte
+					end
+				GEN5_H:
+					begin
+						next_state = GEN5_L;
+						icap_ce    = 0;
+						icap_wr    = 0;
+						icap_din   = 16'h32E1; // Write to GENERAL_5
+					end
+				GEN5_L:
+					begin
 						next_state = MOD_H;
 						icap_ce    = 0;
 						icap_wr    = 0;
-						icap_din   = {8'h6B, ADDRESS[23:16]}; // Read 4X opcode + Address high byte
+						icap_din   = 16'h0000;
 					end
 				MOD_H:
 					begin
@@ -183,7 +226,8 @@ module CORELOAD_SPARTAN6
 						next_state = NUL_L;
 						icap_ce    = 0;
 						icap_wr    = 0;
-						icap_din   = 16'h3100; // 4X config read
+//						icap_din   = 16'h3100; // 4X config read
+						icap_din   = 16'h2100; // 1X config read
 					end
 				NUL_L:
 					begin
