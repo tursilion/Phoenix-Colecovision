@@ -416,4 +416,28 @@ PGMVOID	RET
 	POP	HL
 	DJNZ	.ROW
 */
+/*
+	MF: #EF
+	9F: #7018 (#4018/#6018)
+*/
+SPIINF
+
+	CALL	VDPCLS
+
+	LD	HL,STRJEDEC
+	LDXY	8,4
+	CALL	VDPPRINT
+
+	LD	A,SPI_JEDEC_ID
+	LD	BC,#0100
+	LD	DE,0
+	LD	HL,0
+	CALL	SPICOM
+
+;	LD	A,#EF
+	LDXY	18,4
+	CALL	BCDPUTAT
+
+	HALT
+
 ////////////////////////////////////////////////////////////////////////////////
