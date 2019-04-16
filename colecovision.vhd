@@ -701,6 +701,7 @@ begin
 
       bios_ce_s      <= '0';  -- Used?
 
+      -- TODO: change to an enable and apply the CPU we_n directly to the 1K.
       cv_ram1k_we_s  <= '0';
 
       ext_ram_en_s   <= '0';  -- External 512K SRAM
@@ -720,7 +721,8 @@ begin
 
          when "000" =>                 -- 8K  >0000 .. >1FFF   BIOS or SGM RAM
 
-            if sgm_8k_en_r = '0' then
+            -- The SGM must be enabled to be able to switch the BIOS for 8K RAM.
+            if sgm_8k_en_r = '0' or sgm_24k_en_r = '0' then
                bios_ce_s      <= '1';
                mem_data_mux_s <= d_from_bios_s;
             else
@@ -882,12 +884,8 @@ begin
          sgm_8k_en_r    <= '0';
          sgm_24k_en_r   <= '0';
       elsif clk_en_3m58_i = '1' then
-         -- The SGM must be enabled to be able to switch the BIOS for 8K RAM.
-         if sgm_24k_en_r = '1' then
-            sgm_8k_en_r <= sgm_8k_en_x;
-         end if;
-
-         sgm_24k_en_r <= sgm_24k_en_x;
+         sgm_8k_en_r    <= sgm_8k_en_x;
+         sgm_24k_en_r   <= sgm_24k_en_x;
       end if;
    end if;
    end process;
