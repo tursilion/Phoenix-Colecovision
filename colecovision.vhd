@@ -190,12 +190,8 @@ architecture Behavior of colecovision is
 
 
    -- External SRAM
-   signal ram_ce_s         : std_logic;
-   signal ram_oe_s         : std_logic;
-   signal ram_we_s         : std_logic;
-
+   signal ext_ram_en_s                 : std_logic := '0';
    signal d_from_ext512_s              : std_logic_vector( 7 downto 0);
-
 
 
 
@@ -218,6 +214,9 @@ architecture Behavior of colecovision is
 
    signal AUDIO_WSG        : unsigned(7 downto 0);
    signal AUDIO_EX         : signed(7 downto 0);
+   signal AUDIO_EX_A			: signed(7 downto 0);
+   signal AUDIO_EX_B			: signed(7 downto 0);
+   signal AUDIO_EX_C			: signed(7 downto 0);
    signal AUDIO_SUM        : signed(8 downto 0);
    signal WSG_CS           : std_logic;
 
@@ -397,13 +396,16 @@ begin
    --audio_o         <= std_logic_vector(audio_s);
    --audio_signed_o  <= audio_s;
 
-   AUDIO_EX       <= signed(AUDIO_WSG - 128);
+   AUDIO_EX    <= signed(AUDIO_WSG - 128);
 --   AUDIO_SUM      <= (audio_s(7) & audio_s) + (AUDIO_EX(7) & AUDIO_EX);
+   AUDIO_EX_A	<= signed(unsigned(ay_ch_a_s) - 128);
+	AUDIO_EX_B	<= signed(unsigned(ay_ch_b_s) - 128);
+	AUDIO_EX_C	<= signed(unsigned(ay_ch_c_s) - 128);
 
-   AUDIO_SUM      <= (  audio_s(7) & audio_s) +
-                     signed(ay_ch_a_s(7) & ay_ch_a_s) +
-                     signed(ay_ch_b_s(7) & ay_ch_b_s) +
-                     signed(ay_ch_c_s(7) & ay_ch_c_s);
+   AUDIO_SUM   <= (   audio_s(7) & audio_s) +
+                  (AUDIO_EX_A(7) & AUDIO_EX_A(7) & AUDIO_EX_A(7) & AUDIO_EX_A(7 downto 2)) +
+                  (AUDIO_EX_B(7) & AUDIO_EX_B(7) & AUDIO_EX_B(7) & AUDIO_EX_B(7 downto 2)) +
+                  (AUDIO_EX_C(7) & AUDIO_EX_C(7) & AUDIO_EX_C(7) & AUDIO_EX_C(7 downto 2));
 
    audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
    audio_signed_o <= AUDIO_SUM(8 downto 1);
@@ -555,33 +557,23 @@ begin
    -- Z80 will map to physical RAM.  The real SGM only provides
    -- 24K to 32K of RAM in the lower 32K address space, but the
    -- extra memory should not bother anything.
-   ext512 : entity work.dpSRAM_5128
+   ext512 : entity work.ext512x8sram
    port map (
-      clk_i          => clock_mem_i,
-      -- Port 0
-      porta0_addr_i  => "000" & cpu_addr_s,
-      porta0_ce_i    => ram_ce_s,
-      porta0_oe_i    => ram_oe_s,
-      porta0_we_i    => ram_we_s,
-      porta0_data_i  => d_from_cpu_s,
-      porta0_data_o  => d_from_ext512_s,
-      -- Port 1
-      porta1_addr_i  => (others => '1'),
-      porta1_ce_i    => '0',
-      porta1_oe_i    => '0',
-      porta1_we_i    => '0',
-      porta1_data_i  => (others => '0'),
-      porta1_data_o  => open,
-      -- SRAM in board
+      clk_i          => clock_i,
+      -- Z80 CPU
+      cpu_addr_i     => "000" & cpu_addr_s,
+      cpu_en_i       => ext_ram_en_s,        -- Active high
+      cpu_we_n_i     => wr_n_s,              -- Active low
+      cpu_data_i     => d_from_cpu_s,
+      cpu_data_o     => d_from_ext512_s,
+
+      -- External SRAM Interface
       sram_addr_o    => sram_addr_o,
       sram_data_io   => sram_data_io,
       sram_ce_n_o    => sram_ce_n_o,
       sram_oe_n_o    => sram_oe_n_o,
       sram_we_n_o    => sram_we_n_o
    );
-
-   ram_we_s <= (not wr_n_s) and ram_ce_s;
-   ram_oe_s <= (not rd_n_s) and ram_ce_s;
 
 
    --
@@ -711,7 +703,7 @@ begin
 
       cv_ram1k_we_s  <= '0';
 
-      ram_ce_s       <= '0';  -- External 512K SRAM
+      ext_ram_en_s   <= '0';  -- External 512K SRAM
 
       cart_en_80_n_s <= '1';
       cart_en_A0_n_s <= '1';
@@ -732,7 +724,7 @@ begin
                bios_ce_s      <= '1';
                mem_data_mux_s <= d_from_bios_s;
             else
-              ram_ce_s        <= '1';
+              ext_ram_en_s    <= '1';
               mem_data_mux_s  <= d_from_ext512_s;
             end if;
 
@@ -740,7 +732,7 @@ begin
               "010" =>
 
             if sgm_24k_en_r = '1' then
-               ram_ce_s       <= '1';
+               ext_ram_en_s   <= '1';
                mem_data_mux_s <= d_from_ext512_s;
             end if;
 
@@ -750,7 +742,7 @@ begin
                cv_ram1k_we_s  <= not wr_n_s;
                mem_data_mux_s <= d_from_cv_ram1k_r;
             else
-               ram_ce_s       <= '1';
+               ext_ram_en_s   <= '1';
                mem_data_mux_s <= d_from_ext512_s;
             end if;
 
@@ -816,6 +808,12 @@ begin
    --  >51  xxxxxxxx (W) WSG / SGM-PSG Data Write
    --  >52  xxxxxxxx (R) WSG / SGM-PSG Data Read
    --  >53  xxxxxxxN (W) 0 = 1K CV RAM, 1 = 24K SGM RAM
+   --
+   --  >56  xxxxxxxN (W) SPI Control CE_n
+   --       xxxxxxxN (R) SPI Control SD-Card Detect input
+   --  >57  NNNNNNNN (W) SPI Data Write
+   --       xxxxxxxx (R) SPI Data Read
+   --
    --  >7F  xxxxxxNx (W) 0 = 8K SGM RAM, 1 = 8K CV BIOS
    --
    process ( cpu_addr_s, iorq_n_s, m1_n_s, wr_n_s, rd_n_s,
@@ -895,25 +893,10 @@ begin
 -- They are not MegaCarts (0xFFC0+page#) and not SGM multipage ROMs (page# written to 0xFFFF).
 -- EEPROM games use 0xFF80/0xFF90/0xFFA0/0xFFB0 to switch 4x16kB pages.
 
--- SPI (R/W)          => 56 to 57
--- SGM 24k ram enable => 53
 -- Page port          => 54
 -- Config Port        => 55
+-- SPI (R/W)          => 56 to 57
 -- Machine ID read    => 58
--- SGM BIOS ram bankswitch => 7F
--- Controller key set => 80 to 9F
--- VDP write          => A0 to BF
--- VDP read           => A0 to BF
--- Controller joy set => C0 to DF
--- PSG write          => E0 to FF
--- WSG (R/W)          => 60 to 63
--- WSG write          => 60 to 61
--- WSG write          => 60/62
--- Controller read    => E0 to FF
-
-
-
-
 
 
 
