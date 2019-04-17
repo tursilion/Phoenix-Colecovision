@@ -179,14 +179,13 @@ architecture Behavior of colecovision is
    type ram_1k_t is array (0 to 1023) of std_logic_vector(0 to 7);
 
    signal cv_ram_1k_r                  : ram_1k_t;
-   signal cv_ram1k_we_s                : std_logic;
+   signal cv_ram1k_en_s                : std_logic;
    signal cv_ram1k_addr_s              : std_logic_vector(9 downto 0);
    signal d_from_cv_ram1k_r            : std_logic_vector(7 downto 0);
 
    -- SGM RAM
    signal sgm_8k_en_r, sgm_8k_en_x     : std_logic;
    signal sgm_24k_en_r, sgm_24k_en_x   : std_logic;
-   signal sgm_32k_we_en_s              : std_logic;
 
 
    -- External SRAM
@@ -535,14 +534,16 @@ begin
    --
    -- CV Internal 1K RAM
    --
-   cv_ram_1k : process (clock_i, cv_ram1k_we_s, cv_ram1k_addr_s)
+   cv_ram_1k : process (clock_i, cv_ram1k_en_s, cv_ram1k_addr_s, we_n_s)
    begin
-      if rising_edge(clock_i) then
-         if cv_ram1k_we_s = '1' then
+   if rising_edge(clock_i) then
+      if cv_ram1k_en_s = '1' then
+         if we_n_s = '0' then
             cv_ram_1k_r(to_integer(unsigned(cv_ram1k_addr_s))) <= d_from_cpu_s;
          end if;
          d_from_cv_ram1k_r <= cv_ram_1k_r(to_integer(unsigned(cv_ram1k_addr_s)));
       end if;
+   end if;
    end process;
 
    cv_ram1k_addr_s <= cpu_addr_s(9 downto 0);
@@ -550,8 +551,6 @@ begin
 
    --
    -- External SRAM, 512Kx8, 10ns
-   --
-   -- TODO: Rewrite with simpler FSM and mux for multiple "ports".
    --
    -- When the SGM is enabled, the full 64K address space of the
    -- Z80 will map to physical RAM.  The real SGM only provides
@@ -575,6 +574,11 @@ begin
       sram_we_n_o    => sram_we_n_o
    );
 
+   -- Select between the SGM or cartridge bank select
+   ext_ram_mux_s <=
+      "0000" & cpu_addr_s(14 downto 0) when sgm_ram_en_s = '1' else
+      bank_sel_r & cpu_addr_s(14 downto 0);
+      
 
    --
    -- External Cartridge Interface
@@ -869,7 +873,7 @@ begin
          end case;
 
          if cpu_addr_s(7 downto 0) = x"7F" and wr_n_s = '0' then
-            -- The SGM 8K enable will be active high like the 24K enable.
+            -- The SGM 8K enable, active high.
             sgm_8k_en_x <= not d_from_cpu_s(1);
          end if;
       end if;
@@ -888,10 +892,20 @@ begin
    end if;
    end process;
 
+-- Power on or reset:
+-- Phoenix BIOS
+-- If a cart is present
 
 -- EEPROM-based games use an alternative ROM page switch.
 -- They are not MegaCarts (0xFFC0+page#) and not SGM multipage ROMs (page# written to 0xFFFF).
 -- EEPROM games use 0xFF80/0xFF90/0xFFA0/0xFFB0 to switch 4x16kB pages.
+
+-- WSG mode with SGM on/off in port >53
+
+-- Port >54
+-- BIOS write en
+-- 
+-- 
 
 -- Page port          => 54
 -- Config Port        => 55
