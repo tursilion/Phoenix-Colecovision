@@ -129,22 +129,80 @@ use std.textio.all;
 
 architecture Behavior of colecovision is
 
-   signal reset_n_s        : std_logic;
+   signal reset_n_s                       : std_logic;
 
-   -- CPU signals
-   signal clk_en_cpu_s     : std_logic;
-   signal nmi_n_s          : std_logic;
-   signal int_n_s          : std_logic;
-   signal iorq_n_s         : std_logic;
-   signal m1_n_s           : std_logic;
-   signal m1_wait_q        : std_logic;
-   signal rd_n_s           : std_logic;
-   signal wr_n_s           : std_logic;
-   signal mreq_n_s         : std_logic;
-   signal rfsh_n_s         : std_logic;
-   signal cpu_addr_s       : std_logic_vector(15 downto 0);
-   signal d_to_cpu_s       : std_logic_vector( 7 downto 0);
-   signal d_from_cpu_s     : std_logic_vector( 7 downto 0);
+   -- Z80 CPU
+   signal clk_en_cpu_s                    : std_logic;
+   signal nmi_n_s                         : std_logic;
+   signal int_n_s                         : std_logic;
+   signal iorq_n_s                        : std_logic;
+   signal m1_n_s                          : std_logic;
+   signal m1_wait_q                       : std_logic;
+   signal rd_n_s                          : std_logic;
+   signal wr_n_s                          : std_logic;
+   signal mreq_n_s                        : std_logic;
+   signal rfsh_n_s                        : std_logic;
+   signal cpu_addr_s                      : std_logic_vector(15 downto 0);
+   signal d_to_cpu_s                      : std_logic_vector( 7 downto 0);
+   signal d_from_cpu_s                    : std_logic_vector( 7 downto 0);
+
+   -- F18A VDP
+   signal d_from_vdp_s                    : std_logic_vector( 7 downto 0);
+   signal vdp_r_n_s                       : std_logic;
+   signal vdp_w_n_s                       : std_logic;
+
+   -- SN76489 Sound
+   signal audio_s                         : signed(7 downto 0);
+   signal sn489_ready_s                   : std_logic;
+   signal sn489_we_n_s                    : std_logic;
+
+   -- AY-8910 SGM Sound
+   signal d_from_wsg_s                    : std_logic_vector(7 downto 0);
+   signal wsg_bdir_s                      : std_logic;
+   signal wsg_bc_s                        : std_logic;
+
+   signal ay_ch_a_s                       : std_logic_vector( 7 downto 0);
+   signal ay_ch_b_s                       : std_logic_vector( 7 downto 0);
+   signal ay_ch_c_s                       : std_logic_vector( 7 downto 0);
+
+   -- Audio Mixing
+   signal AUDIO_WSG                       : unsigned(7 downto 0);
+   signal AUDIO_EX                        : signed(7 downto 0);
+   signal AUDIO_EX_A			               : signed(7 downto 0);
+   signal AUDIO_EX_B			               : signed(7 downto 0);
+   signal AUDIO_EX_C			               : signed(7 downto 0);
+   signal AUDIO_SUM                       : signed(8 downto 0);
+   signal WSG_CS                          : std_logic;
+
+   -- Internal 1K RAM
+   type ram_1k_t is array (0 to 1023) of std_logic_vector(0 to 7);
+
+   signal cv_ram_1k_r                     : ram_1k_t;
+   signal cv_ram1k_en_s                   : std_logic;
+   signal cv_ram1k_addr_s                 : std_logic_vector( 9 downto 0);
+   signal d_from_cv_ram1k_r               : std_logic_vector( 7 downto 0);
+
+   -- SGM RAM
+   signal sgm_en_r, sgm_en_x              : std_logic;
+   signal sgm_8k_en_r, sgm_8k_en_x        : std_logic;
+
+   -- External SRAM
+   signal ext_ram_addr_s                  : std_logic_vector(18 downto 0);
+   signal ext_ram_bank_r, ext_ram_bank_x  : std_logic_vector( 3 downto 0) := "0001";
+   signal ext_ram_en_s                    : std_logic := '0';
+   signal ext_ram_we_n_s                  : std_logic;
+   signal d_from_ext512_s                 : std_logic_vector( 7 downto 0);
+
+
+   -- Data and IO bus
+   signal io_decode_s                     : std_logic_vector( 2 downto 0);
+   signal cpu_data_mux_s                  : std_logic_vector( 7 downto 0);
+   signal io_data_mux_s                   : std_logic_vector( 7 downto 0);
+   signal ex_data_mux_s                   : std_logic_vector( 7 downto 0);
+
+
+
+
 
    -- Address Decoder
    signal mem_access_s     : std_logic;
@@ -154,12 +212,12 @@ architecture Behavior of colecovision is
 
    -- machine id
    signal machine_id_cs_s  : std_logic;
-   constant machine_id_c   : std_logic_vector(7 downto 0) := std_logic_vector(to_unsigned(num_maq_g, 8));
+   constant machine_id_c   : std_logic_vector( 7 downto 0) := std_logic_vector(to_unsigned(num_maq_g, 8));
 
    -- Config port
    signal cfg_port_cs_s    : std_logic;
    signal cfg_page_cs_s    : std_logic;
-   signal cfg_page_r       : std_logic_vector(7 downto 0);
+   signal cfg_page_r       : std_logic_vector( 7 downto 0);
 
    -- Loader
    signal bios_ram_cs_s    : std_logic;
@@ -175,22 +233,6 @@ architecture Behavior of colecovision is
    signal bios_oe_s        : std_logic;
    signal bios_we_s        : std_logic;
 
-   -- Internal 1K RAM
-   type ram_1k_t is array (0 to 1023) of std_logic_vector(0 to 7);
-
-   signal cv_ram_1k_r                  : ram_1k_t;
-   signal cv_ram1k_en_s                : std_logic;
-   signal cv_ram1k_addr_s              : std_logic_vector(9 downto 0);
-   signal d_from_cv_ram1k_r            : std_logic_vector(7 downto 0);
-
-   -- SGM RAM
-   signal sgm_8k_en_r, sgm_8k_en_x     : std_logic;
-   signal sgm_24k_en_r, sgm_24k_en_x   : std_logic;
-
-
-   -- External SRAM
-   signal ext_ram_en_s                 : std_logic := '0';
-   signal d_from_ext512_s              : std_logic_vector( 7 downto 0);
 
 
 
@@ -198,35 +240,12 @@ architecture Behavior of colecovision is
    signal exp_ram_bs_s     : std_logic;
    signal exp_ram_cs_s     : std_logic;
 
-   -- F18A signal
-   signal d_from_vdp_s     : std_logic_vector( 7 downto 0);
-   signal vdp_r_n_s        : std_logic;
-   signal vdp_w_n_s        : std_logic;
-
-   -- SN76489 signal
-   signal audio_s          : signed(7 downto 0);
-   signal sn489_ready_s    : std_logic;
-   signal sn489_we_n_s     : std_logic;
 
    -- COURTNEY signal
    signal wsg_native_q     : std_logic := '0';
 
-   signal AUDIO_WSG        : unsigned(7 downto 0);
-   signal AUDIO_EX         : signed(7 downto 0);
-   signal AUDIO_EX_A			: signed(7 downto 0);
-   signal AUDIO_EX_B			: signed(7 downto 0);
-   signal AUDIO_EX_C			: signed(7 downto 0);
-   signal AUDIO_SUM        : signed(8 downto 0);
-   signal WSG_CS           : std_logic;
 
 
-   signal d_from_wsg_s                 : std_logic_vector(7 downto 0);
-   signal wsg_bdir_s                   : std_logic;
-   signal wsg_bc_s                     : std_logic;
-
-   signal ay_ch_a_s                    : std_logic_vector( 7 downto 0);
-   signal ay_ch_b_s                    : std_logic_vector( 7 downto 0);
-   signal ay_ch_c_s                    : std_logic_vector( 7 downto 0);
 
 
    -- Controller signals
@@ -256,11 +275,6 @@ architecture Behavior of colecovision is
    signal cart_oe_s        : std_logic;
    signal cart_we_s        : std_logic;
 
-   -- Data and IO bus
-   signal io_decode_s      : std_logic_vector( 2 downto 0);
-   signal mem_data_mux_s   : std_logic_vector( 7 downto 0);
-   signal io_data_mux_s    : std_logic_vector( 7 downto 0);
-   signal ex_data_mux_s    : std_logic_vector( 7 downto 0);
 
 begin
 
@@ -333,6 +347,7 @@ begin
    );
 
 
+   -- TODO: hold the system reset longer than the F18A reset.
    --
    -- F18A VDP
    --
@@ -426,6 +441,7 @@ begin
 --       DIGITAL_MIX => AUDIO_WSG
 --   );
 
+   -- YM-2149, SGM Audio AY-8910 compatible
    ym2149_inst: entity work.YM2149
    port map (
       CLK         => clock_i,
@@ -534,11 +550,11 @@ begin
    --
    -- CV Internal 1K RAM
    --
-   cv_ram_1k : process (clock_i, cv_ram1k_en_s, cv_ram1k_addr_s, we_n_s)
+   cv_ram_1k : process (clock_i, cv_ram1k_en_s, cv_ram1k_addr_s, wr_n_s)
    begin
    if rising_edge(clock_i) then
       if cv_ram1k_en_s = '1' then
-         if we_n_s = '0' then
+         if wr_n_s = '0' then
             cv_ram_1k_r(to_integer(unsigned(cv_ram1k_addr_s))) <= d_from_cpu_s;
          end if;
          d_from_cv_ram1k_r <= cv_ram_1k_r(to_integer(unsigned(cv_ram1k_addr_s)));
@@ -560,9 +576,9 @@ begin
    port map (
       clk_i          => clock_i,
       -- Z80 CPU
-      cpu_addr_i     => "000" & cpu_addr_s,
+      cpu_addr_i     => ext_ram_addr_s,
       cpu_en_i       => ext_ram_en_s,        -- Active high
-      cpu_we_n_i     => wr_n_s,              -- Active low
+      cpu_we_n_i     => ext_ram_we_n_s,      -- Active low
       cpu_data_i     => d_from_cpu_s,
       cpu_data_o     => d_from_ext512_s,
 
@@ -574,11 +590,6 @@ begin
       sram_we_n_o    => sram_we_n_o
    );
 
-   -- Select between the SGM or cartridge bank select
-   ext_ram_mux_s <=
-      "0000" & cpu_addr_s(14 downto 0) when sgm_ram_en_s = '1' else
-      bank_sel_r & cpu_addr_s(14 downto 0);
-      
 
    --
    -- External Cartridge Interface
@@ -600,6 +611,7 @@ begin
    -- even when the cartridge is not being addressed.
    cart_oe_n_o    <= '0';
    cart_dir_o     <= rd_n_s;
+
    -- Only tri-state when reading, otherwise just drive whatever is on
    -- the CPU bus out to the cartridge.  This is what the real CV does.
    cart_data_io   <= (others => 'Z') when rd_n_s = '0' else d_from_cpu_s;
@@ -616,10 +628,10 @@ begin
 
 
    --
-   -- CPU Data In Mux
+   -- CPU Data-In Mux
    --
    d_to_cpu_s <=
-      mem_data_mux_s when (mreq_n_s = '0' and rfsh_n_s = '1') else
+      cpu_data_mux_s when (mreq_n_s = '0' and rfsh_n_s = '1') else
       io_data_mux_s when cpu_addr_s(7) = '1' else  -- Ports >80 .. >FF
       ex_data_mux_s;
 
@@ -665,34 +677,27 @@ begin
    --
    -- SGM Memory
    --
-   -- The SGM uses a modified version of the lower 32K option of the ADAM
-   -- memory map to provide either 8K BIOS + 24K RAM, or 32K RAM in the
-   -- lower 32K address range >0000 to >7FFF.
+   -- The SGM copies the ADAM Lower Internal RAM option to provide either
+   -- 8K BIOS + 24K RAM, or 32K RAM in the lower 32K address range >0000
+   -- to >7FFF.
    --
-   -- Unfortunately the SGM design uses a non-ADAM way to enable the 24K
-   -- RAM from >2000 to >7FFF independently from the 8K BIOS vs 8K RAM
-   -- selection from >0000 to >1FFF.
-   --
-   -- The 24K RAM from >2000 to >7FFF is enabled via port >53 bit >01:
-   --
-   --  0  1K CV RAM from >6000 .. >7FFF
-   --     Not fully decoded and appears at every 1K boundary.
-   --
-   --  1  24K SGM RAM from >2000 .. >7FFF
-   --
-   -- **Note that the original CV 1K RAM and the SGM RAM are *separate*
-   --   memories. Some software might rely on this trait.
+   -- The SGM is enabled via port >53 bit >01=1, and the BIOS+24K or full
+   -- 32K option is selected via the ADAM port >7F bit >02.
    --
    -- It is not clear if software on the CV written to use the SGM manages
    -- the 4-bits in port >7F correctly, i.e. as per the ADAM specification.
    -- To support poorly written software, only bit >02 of port >7F will be
-   -- used to select between the 8K BIOS or 8K RAM.
+   -- used to select between the BIOS or 8K RAM.
    --
-   -- Port >7F  CPU Address Space
-   --  8 4 2 1  >0000 .. >1FFF
-   --  --------------------------------
-   --  x x 0 x  8K SGM RAM
-   --  x x 1 x  8K CV BIOS
+   -- Port: >53   >7F   CPU Address Space
+   --  bit:   1   2 1   >0000 .. >7FFFF
+   --        ---------  ---------------------
+   --         0   x x   Original CV BIOS and 1K RAM
+   --         1   0 x   32K SGM RAM
+   --         1   1 x   CV 8K BIOS + 24K SGM RAM
+   --
+   -- **Note that the original CV 1K RAM and the SGM RAM are *separate*
+   --   memories. Some software might rely on this trait.
    --
    -- The CV has separate memory and I/O decode override inputs on the
    -- expansion port.  This allows expansion modules like the SGM to replace
@@ -700,15 +705,13 @@ begin
 
    process ( cpu_addr_s, mreq_n_s, rfsh_n_s, wr_n_s,
              d_from_bios_s, d_from_cv_ram1k_r, cart_data_io,
-             d_from_ext512_s, sgm_8k_en_r, sgm_24k_en_r )
+             d_from_ext512_s, sgm_en_r, sgm_8k_en_r,
+             ext_ram_bank_r )
    begin
 
       bios_ce_s      <= '0';  -- Used?
 
-      -- TODO: change to an enable and apply the CPU we_n directly to the 1K.
-      cv_ram1k_we_s  <= '0';
-
-      ext_ram_en_s   <= '0';  -- External 512K SRAM
+      cv_ram1k_en_s  <= '0';
 
       cart_en_80_n_s <= '1';
       cart_en_A0_n_s <= '1';
@@ -716,40 +719,59 @@ begin
       cart_en_E0_n_s <= '1';
 
       -- Default to data from a cartridge.
-      mem_data_mux_s <= cart_data_io;
+      cpu_data_mux_s <= cart_data_io;
+
+      -- TODO: possibly relocate SGM to the top of the external SRAM if it
+      --       makes supporting the MegaCart banking easier.
+      -- External 512K SRAM.  Select the SGM (bank 0000) or cartridge loaded
+      -- from the SD card.
+      if cpu_addr_s(15) = '0' then
+         ext_ram_addr_s <= "0000" & cpu_addr_s(14 downto 0);
+      else
+         ext_ram_addr_s <= ext_ram_bank_r & cpu_addr_s(14 downto 0);
+      end if;
+
+      ext_ram_en_s   <= '0';
+      ext_ram_we_n_s <= '1';
+
 
       -- Memory access that is not a refresh cycle.
       if mreq_n_s = '0' and rfsh_n_s = '1' then
+
+         -- TODO: Add enabled when loaded from SD card.
+         -- External SRAM is enabled during a memory cycle when the
+         -- SGM is enabled or the cartridge was loaded from the SD card.
+         ext_ram_en_s <= sgm_en_r; -- or cart_from_sd_en_r;
 
          case cpu_addr_s(15 downto 13) is
 
          when "000" =>                 -- 8K  >0000 .. >1FFF   BIOS or SGM RAM
 
             -- The SGM must be enabled to be able to switch the BIOS for 8K RAM.
-            if sgm_8k_en_r = '0' or sgm_24k_en_r = '0' then
+            if sgm_8k_en_r = '0' or sgm_en_r = '0' then
                bios_ce_s      <= '1';
-               mem_data_mux_s <= d_from_bios_s;
+               cpu_data_mux_s <= d_from_bios_s;
             else
-              ext_ram_en_s    <= '1';
-              mem_data_mux_s  <= d_from_ext512_s;
+               ext_ram_we_n_s <= wr_n_s;
+               cpu_data_mux_s <= d_from_ext512_s;
             end if;
 
          when "001" |                  -- 16K >2000 .. >5FFF   SGM 24K RAM, if enabled
               "010" =>
 
-            if sgm_24k_en_r = '1' then
-               ext_ram_en_s   <= '1';
-               mem_data_mux_s <= d_from_ext512_s;
+            if sgm_en_r = '1' then
+               ext_ram_we_n_s <= wr_n_s;
+               cpu_data_mux_s <= d_from_ext512_s;
             end if;
 
          when "011" =>                 -- 8K  >6000 .. >7FFF   CV 1K or SGM 24K RAM
 
-            if sgm_24k_en_r = '0' then
-               cv_ram1k_we_s  <= not wr_n_s;
-               mem_data_mux_s <= d_from_cv_ram1k_r;
+            if sgm_en_r = '0' then
+               cv_ram1k_en_s  <= '1';
+               cpu_data_mux_s <= d_from_cv_ram1k_r;
             else
-               ext_ram_en_s   <= '1';
-               mem_data_mux_s <= d_from_ext512_s;
+               ext_ram_we_n_s <= wr_n_s;
+               cpu_data_mux_s <= d_from_ext512_s;
             end if;
 
          when "100" =>  cart_en_80_n_s <= '0';           -- 8K  >8000 .. >9FFF
@@ -806,14 +828,15 @@ begin
    end process;
 
 
-   -- Non-CV I/O Ports
+   -- Extended I/O Ports
    --
    -- Port  CPU Data
    -- --------------
    --  >50  xxxxxxxx (W) WSG / SGM-PSG Address Write
    --  >51  xxxxxxxx (W) WSG / SGM-PSG Data Write
    --  >52  xxxxxxxx (R) WSG / SGM-PSG Data Read
-   --  >53  xxxxxxxN (W) 0 = 1K CV RAM, 1 = 24K SGM RAM
+   --  >53  xxxxxxxN (W) 0 = SGM disable, 1 = SGM enable
+   --       xxxxxxNx (W) 0 = SGM Sound AY-8910, 1 = SGM Sound SEX-7264
    --
    --  >56  xxxxxxxN (W) SPI Control CE_n
    --       xxxxxxxN (R) SPI Control SD-Card Detect input
@@ -823,10 +846,13 @@ begin
    --  >7F  xxxxxxNx (W) 0 = 8K SGM RAM, 1 = 8K CV BIOS
    --
    process ( cpu_addr_s, iorq_n_s, m1_n_s, wr_n_s, rd_n_s,
-             d_from_cpu_s, d_from_wsg_s, sgm_8k_en_r, sgm_24k_en_r )
+             d_from_cpu_s, d_from_wsg_s, sgm_en_r, sgm_8k_en_r,
+             ext_ram_bank_r )
    begin
-      sgm_8k_en_x    <= sgm_8k_en_r;
-      sgm_24k_en_x   <= sgm_24k_en_r;
+      sgm_en_x    <= sgm_en_r;
+      sgm_8k_en_x <= sgm_8k_en_r;
+
+      ext_ram_bank_x <= ext_ram_bank_r;
 
       wsg_bdir_s     <= '0';  -- bus direction
       wsg_bc_s       <= '0';  -- bus control
@@ -858,7 +884,7 @@ begin
 
             when x"3" =>
                if wr_n_s = '0' then
-                  sgm_24k_en_x <= d_from_cpu_s(0);
+                  sgm_en_x <= d_from_cpu_s(0);
                end if;
 
 -- TODO: ports 54 .. 58
@@ -885,11 +911,15 @@ begin
    begin
    if rising_edge(clock_i) then
       if reset_i = '1' then
+         sgm_en_r       <= '0';
          sgm_8k_en_r    <= '0';
-         sgm_24k_en_r   <= '0';
+         ext_ram_bank_r <= (others => '0');
+
       elsif clk_en_3m58_i = '1' then
+         sgm_en_r       <= sgm_en_x;
          sgm_8k_en_r    <= sgm_8k_en_x;
-         sgm_24k_en_r   <= sgm_24k_en_x;
+         ext_ram_bank_r <= ext_ram_bank_x;
+
       end if;
    end if;
    end process;
@@ -906,8 +936,8 @@ begin
 
 -- Port >54
 -- BIOS write en
--- 
--- 
+--
+--
 
 -- Page port          => 54
 -- Config Port        => 55
