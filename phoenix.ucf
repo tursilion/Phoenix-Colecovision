@@ -111,15 +111,15 @@ NET "flash_hold_o"      LOC="V14" | IOSTANDARD = LVCMOS33 | DRIVE = 8; # Ext pul
 
 # PS2 Keyboard
 #
-NET "ps2_clk_io"        LOC="A4"  | IOSTANDARD = LVCMOS33 | PULLUP | DRIVE = 8;
-NET "ps2_data_io"       LOC="B4"  | IOSTANDARD = LVCMOS33 | PULLUP | DRIVE = 8;
+NET "ps2_clk_io"        LOC="A4"  | IOSTANDARD = LVCMOS33 | DRIVE = 8; # Ext pullup
+NET "ps2_data_io"       LOC="B4"  | IOSTANDARD = LVCMOS33 | DRIVE = 8; # Ext pullup
 
 
 # SNES controller
 #
-NET "snesjoy_clock_o"   LOC="A2"  | IOSTANDARD = LVCMOS33 | PULLUP;
-NET "snesjoy_latch_o"   LOC="B3"  | IOSTANDARD = LVCMOS33 | PULLUP;
-NET "snesjoy_data_i"    LOC="A3"  | IOSTANDARD = LVCMOS33 | PULLUP;
+NET "snesjoy_clock_o"   LOC="A2"  | IOSTANDARD = LVCMOS33; # Ext pullup
+NET "snesjoy_latch_o"   LOC="B3"  | IOSTANDARD = LVCMOS33; # Ext pullup
+NET "snesjoy_data_i"    LOC="A3"  | IOSTANDARD = LVCMOS33; # Ext pullup
 
 
 # Joystick controllers

@@ -201,6 +201,8 @@ architecture Behavior of colecovision is
    signal ex_data_mux_s                   : std_logic_vector( 7 downto 0);
 
 
+   -- ROM BIOS and Loader
+   signal rom_loader_en_r, rom_loader_en_x: std_logic := '1';
 
 
 
@@ -468,6 +470,7 @@ begin
    );
 
 
+   -- TODO: Fix DigDug problem.  Not sure if it is a problem with the controller
    --
    -- Controller ports
    --
@@ -519,22 +522,40 @@ begin
    sd_wr_s <= not wr_n_s;
    sd_rd_s <= not rd_n_s;
 
+   --
+   -- The loader ROM and BIOS have different addresses at PoR to give the
+   -- loader extra room, contain interrupt vectors, and make development
+   -- easier.  Once the loader is done it will read port >55 which will
+   -- disable the loader and move the 8K BIOS to the original location.
+   -- The loader can also overwrite the BIOS with a file from SD.
+   --
+   -- NOTE: The code that reads port >55 better be in the 1K RAM!
+   --
+   --                       Loader
+   --  Address         Enabled  Disabled
+   -- ------------------------------------
+   -- >0000 .. >1FFF   Loader   BIOS
+   -- >2000 .. >3FFF   Loader   no memory
+   -- >4000 .. >5FFF   BIOS     no memory
+   --
 
    --
-   -- Loader ROM
+   -- 16K ROM Loader
    --
-   lr: entity work.loaderrom
+   loader: entity work.romloader
    port map (
-      clk      => clock_i,
-      addr     => cpu_addr_s(12 downto 0),
-      data     => d_from_loader_s
+      clock_i     => clock_i,
+      we_i        => '0',
+      addr_i      => cpu_addr_s(13 downto 0),
+      data_i      => x"00",
+      data_o      => d_from_loader_s
    );
 
 
    --
-   -- CV Internal BIOS
+   -- 8K ROM BIOS
    --
-   bios: entity work.colecobios
+   bios: entity work.rombios
    port map (
       clock_i     => clock_i,
       we_i        => bios_we_s,
@@ -651,6 +672,19 @@ begin
    --  1   1   1   >E000 .. >FFFF (8K)    ROM_E0
    --
    --
+   -- ROM Addressing During Loading
+   --
+   -- During PoR the ROM loader is mapped into memory and the BIOS is
+   -- relocated to a new location.  When the loader is disabled, the
+   -- BIOS is moved back to its normal location.
+   --
+   --                 Loader: Enabled  Disabled
+   --                 ---------------------------
+   --  >0000 .. >1FFF (8K)    Loader   BIOS
+   --  >2000 .. >3FFF (8K)    Loader   no memory
+   --  >4000 .. >5FFF (8K)    BIOS     no memory
+   --
+   --
    -- ADAM Memory Banking
    --
    -- The ADAM computer added a custom memory decode IC that allows for a
@@ -706,7 +740,7 @@ begin
    process ( cpu_addr_s, mreq_n_s, rfsh_n_s, wr_n_s,
              d_from_bios_s, d_from_cv_ram1k_r, cart_data_io,
              d_from_ext512_s, sgm_en_r, sgm_8k_en_r,
-             ext_ram_bank_r )
+             ext_ram_bank_r, rom_loader_en_r )
    begin
 
       bios_ce_s      <= '0';  -- Used?
@@ -745,21 +779,38 @@ begin
 
          case cpu_addr_s(15 downto 13) is
 
-         when "000" =>                 -- 8K  >0000 .. >1FFF   BIOS or SGM RAM
+         when "000" =>                 -- 8K  >0000 .. >1FFF   Loader, BIOS, or SGM RAM
+
+            -- The loader is priority.
+            if rom_loader_en_r = '1' then
+               cpu_data_mux_s <= d_from_loader_s;
 
             -- The SGM must be enabled to be able to switch the BIOS for 8K RAM.
-            if sgm_8k_en_r = '0' or sgm_en_r = '0' then
+            elsif sgm_8k_en_r = '0' or sgm_en_r = '0' then
                bios_ce_s      <= '1';
                cpu_data_mux_s <= d_from_bios_s;
+
             else
                ext_ram_we_n_s <= wr_n_s;
                cpu_data_mux_s <= d_from_ext512_s;
             end if;
 
-         when "001" |                  -- 16K >2000 .. >5FFF   SGM 24K RAM, if enabled
-              "010" =>
+         when "001" =>                 -- 8K >2000 .. >3FFF   Loader or SGM 24K RAM (if enabled)
 
-            if sgm_en_r = '1' then
+            if rom_loader_en_r = '1' then
+               cpu_data_mux_s <= d_from_loader_s;
+
+            elsif sgm_en_r = '1' then
+               ext_ram_we_n_s <= wr_n_s;
+               cpu_data_mux_s <= d_from_ext512_s;
+            end if;
+
+         when "010" =>                 -- 8K >4000 .. >5FFF   BIOS (during load) or SGM 24K RAM (if enabled)
+
+            if rom_loader_en_r = '1' then
+               cpu_data_mux_s <= d_from_bios_s;
+
+            elsif sgm_en_r = '1' then
                ext_ram_we_n_s <= wr_n_s;
                cpu_data_mux_s <= d_from_ext512_s;
             end if;
@@ -837,6 +888,7 @@ begin
    --  >52  xxxxxxxx (R) WSG / SGM-PSG Data Read
    --  >53  xxxxxxxN (W) 0 = SGM disable, 1 = SGM enable
    --       xxxxxxNx (W) 0 = SGM Sound AY-8910, 1 = SGM Sound SEX-7264
+   --  >55  xxxxxxxx (R) Loader disable, PoR re-enabled ROM loader
    --
    --  >56  xxxxxxxN (W) SPI Control CE_n
    --       xxxxxxxN (R) SPI Control SD-Card Detect input
@@ -847,17 +899,19 @@ begin
    --
    process ( cpu_addr_s, iorq_n_s, m1_n_s, wr_n_s, rd_n_s,
              d_from_cpu_s, d_from_wsg_s, sgm_en_r, sgm_8k_en_r,
-             ext_ram_bank_r )
+             ext_ram_bank_r, rom_loader_en_r )
    begin
-      sgm_en_x    <= sgm_en_r;
-      sgm_8k_en_x <= sgm_8k_en_r;
+      sgm_en_x          <= sgm_en_r;
+      sgm_8k_en_x       <= sgm_8k_en_r;
 
-      ext_ram_bank_x <= ext_ram_bank_r;
+      ext_ram_bank_x    <= ext_ram_bank_r;
 
-      wsg_bdir_s     <= '0';  -- bus direction
-      wsg_bc_s       <= '0';  -- bus control
+      rom_loader_en_x   <= rom_loader_en_r;
 
-      ex_data_mux_s  <= (others => '0');
+      wsg_bdir_s        <= '0';  -- bus direction
+      wsg_bc_s          <= '0';  -- bus control
+
+      ex_data_mux_s     <= (others => '0');
 
       if iorq_n_s = '0' and m1_n_s = '1' then
          case cpu_addr_s(7 downto 4) is
@@ -889,7 +943,11 @@ begin
 
 -- TODO: ports 54 .. 58
 --            when x"4" =>
---            when x"5" =>
+            when x"5" =>
+               if rd_n_s = '0' then
+                  rom_loader_en_x <= '0';
+               end if;
+
 --            when x"6" =>
 --            when x"7" =>
 --            when x"8" =>
@@ -911,14 +969,16 @@ begin
    begin
    if rising_edge(clock_i) then
       if reset_i = '1' then
-         sgm_en_r       <= '0';
-         sgm_8k_en_r    <= '0';
-         ext_ram_bank_r <= (others => '0');
+         sgm_en_r          <= '0';
+         sgm_8k_en_r       <= '0';
+         ext_ram_bank_r    <= (others => '0');
+         rom_loader_en_r   <= '1';
 
       elsif clk_en_3m58_i = '1' then
-         sgm_en_r       <= sgm_en_x;
-         sgm_8k_en_r    <= sgm_8k_en_x;
-         ext_ram_bank_r <= ext_ram_bank_x;
+         sgm_en_r          <= sgm_en_x;
+         sgm_8k_en_r       <= sgm_8k_en_x;
+         ext_ram_bank_r    <= ext_ram_bank_x;
+         rom_loader_en_r   <= rom_loader_en_x;
 
       end if;
    end if;
