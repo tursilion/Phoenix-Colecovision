@@ -114,25 +114,6 @@ ACMD41  = 41        ; R1  send op cond, send host capacity and activate card ini
 ;    7..0  check pattern
 
 
-clear screen
-display hello
-
-if sd_detect = 1 then
-   display sd found
-   call sd_spi_init
-   display sd init status
-   if success then
-     read 1 block and dump to screen
-   end if
-else
-   display no sd detected
-end if
-
-pause on controller fire button
-
-swap loader, jump to bios
-
-
 ; ========
 ; Equates
 STACK           EQU 63FFh       ; Stack location, bottom of 1K RAM
@@ -474,17 +455,20 @@ vdp_memcpy:
 
 
 
-
-LD HL,code
-LD DE,0x6000
-LD BC,endcode-code
+; ========
+; Quick and dirty loader to swap in the CV BIOS
+; Not part of the above blob of code.
+;
+LD HL, swapcode
+LD DE, 0x6000
+LD BC, end_swapcode - code
 LDIR
 JP 0x6000
 
-code:
-IN A,(0x55)
+swapcode:
+IN A, (0x55)
 JP 0x0000
-endcode:
+end_swapcode:
 DEFB 0
 
 
@@ -528,10 +512,3 @@ DEFB 0
 ;
 ; 5   if response: 0x0, you're OK; if it's 0x1, goto 3.
 
-
-
-;;
-; Send SD-card command
-;
-
-; Apply 0x40 to command byte

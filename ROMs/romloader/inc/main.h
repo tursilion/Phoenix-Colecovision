@@ -7,6 +7,10 @@
 
 #include <stdint.h>		// int8_t, uint8_t, int16_t, uint16_t
 
+
+#define GAME_NAME 		0x8024
+
+
 // ==========================================================================
 // Special Function Registers to designate IO Ports
 

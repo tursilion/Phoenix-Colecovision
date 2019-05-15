@@ -42,7 +42,7 @@ OBJS    = $(patsubst %,$(ODIR)/%,$(_OBJS))
 all: romloader
 
 clean:
-	$(RM) $(ODIR)/* *.map *.lk *.noi *.bin *.ihx *.mem *.rom *.vhd
+	$(RM) $(ODIR)/* *.map *.lk *.noi *.bin *.ihx *.mem *.rom *.vhd *.log
 
 romloader: romloader.mem romloader.vhd
 

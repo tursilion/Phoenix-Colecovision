@@ -486,7 +486,8 @@ main(void)
     uint8_t nmi_last_cnt = 0;
 	uint8_t frame_tick = 0;
 	uint8_t rtn;
-
+	uint8_t *bp;
+	
 	// TODO Set upper memory for external cartridge.
 
     // VR1=70h to enable the frame flag (triggers the NMI).
@@ -513,18 +514,20 @@ main(void)
         }
 
 		// Display cartridge status.
-		print_setxy(2, 1);
+		print_setxy(2, 2);
 		print_str_sp("CART  :");
 		rtn = cart_detect(frame_tick);
 		if ( rtn == 0 ) {
 			print_str("NONE");
+			vdp_memset(print_loc, ' ', 58);
 		}
 		else {
-			print_str("YES ");
+			bp = GAME_NAME;
+			vdp_memcpy(print_loc, bp, 62);
 		}
 
 		// Display SD-card status.
-		print_setxy(2, 2);
+		print_setxy(2, 1);
 		print_str_sp("SDCARD:");
 		rtn = sd_card_detect(frame_tick);
 		switch ( rtn ) {
