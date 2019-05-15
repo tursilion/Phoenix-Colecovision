@@ -37,9 +37,15 @@
 -- you have the latest version of this file.
 --
 -------------------------------------------------------------------------------
--- Brian board TOP
+
+
 --
+-- Retaining the above copyright for attribution.
 --
+-- April 2019: Heavily modified and adapted for the Phoenix system.
+--             Matthew Hagerty
+--
+
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -72,9 +78,9 @@ entity phoenix_top is
       -- SD Card
       sd_cs_n_o         : out    std_logic := '1';
       sd_sclk_o         : out    std_logic := '0';
-      sd_mosi_o         : out    std_logic := '0';
+      sd_mosi_o         : out    std_logic := 'Z';
       sd_miso_i         : in     std_logic;
-      sd_cd_n_i         : in     std_logic;           -- Card detect, active low
+      sd_cd_n_i         : in     std_logic;           -- Card detect, active low, ext pullup
 
       -- Flash
       flash_cs_n_o      : out    std_logic := '1';
@@ -342,8 +348,7 @@ begin
    --
    coleco : entity work.colecovision
    generic map (
-      num_maq_g         => 8,                -- Phoenix board machine ID for port read.
-      compat_rgb_g      => 0
+      mach_id_g         => 8                 -- Phoenix board machine ID for port read.
    )
    port map (
       clock_i           => clock_master_s,   --  21.47727 (21.739 PLL) MHz

@@ -45,8 +45,7 @@ use ieee.numeric_std.all;
 
 entity colecovision is
    generic (
-      num_maq_g      : integer := 0;
-      compat_rgb_g   : integer := 0
+      mach_id_g      : integer := 0
    );
    port (
       clock_i        : in  std_logic;        --  21.47727 (21.739 PLL) MHz
@@ -113,7 +112,7 @@ entity colecovision is
       sram_oe_n_o    : out    std_logic;
       sram_we_n_o    : out    std_logic;
 
-      -- SDcard SPI interface
+      -- SD-card SPI interface
       sd_miso_i      : in  std_logic;
       sd_mosi_o      : out std_logic;
       sd_sclk_o      : out std_logic;
@@ -127,7 +126,7 @@ end entity;
 use std.textio.all;
 -- pragma translate_on
 
-architecture Behavior of colecovision is
+architecture rtl of colecovision is
 
    signal reset_n_s                       : std_logic;
 
@@ -193,90 +192,42 @@ architecture Behavior of colecovision is
    signal ext_ram_we_n_s                  : std_logic;
    signal d_from_ext512_s                 : std_logic_vector( 7 downto 0);
 
-
    -- Data and IO bus
    signal io_decode_s                     : std_logic_vector( 2 downto 0);
    signal cpu_data_mux_s                  : std_logic_vector( 7 downto 0);
    signal io_data_mux_s                   : std_logic_vector( 7 downto 0);
    signal ex_data_mux_s                   : std_logic_vector( 7 downto 0);
 
+   -- BIOS
+   signal d_from_bios_s                   : std_logic_vector( 7 downto 0);
+   signal bios_we_s                       : std_logic;
 
-   -- ROM BIOS and Loader
-   signal rom_loader_en_r, rom_loader_en_x: std_logic := '1';
+   -- ROM Loader
+   signal rom_loader_en_r, rom_loader_en_x: std_logic := '1';  -- at power-up the loader is active.
+   signal d_from_loader_s                 : std_logic_vector( 7 downto 0);
 
+   -- SD-card support
+   signal d_from_sd_s                     : std_logic_vector( 7 downto 0);
+   signal sd_cs_n_s                       : std_logic;         -- SD-card selected
+   signal sd_wait_n_s                     : std_logic;         -- CPU should wait for SD-card
+   signal sd_detect_r                     : std_logic := '0';  -- default no card.
+   signal sd_slow_clk_r, sd_slow_clk_x    : std_logic := '1';  -- start SPI with slow clock
+   signal sd_spi_ss_n_r, sd_spi_ss_n_x    : std_logic := '1';  -- SD-card SPI device select
 
+   -- Machine ID
+   constant machine_id_c                  : std_logic_vector( 7 downto 0) := std_logic_vector(to_unsigned(mach_id_g, 8));
 
-   -- Address Decoder
-   signal mem_access_s     : std_logic;
-   signal io_access_s      : std_logic;
-   signal io_read_s        : std_logic;
-   signal io_write_s       : std_logic;
+   -- External cartridge
+   signal cart_en_80_n_s                  : std_logic;
+   signal cart_en_A0_n_s                  : std_logic;
+   signal cart_en_C0_n_s                  : std_logic;
+   signal cart_en_E0_n_s                  : std_logic;
 
-   -- machine id
-   signal machine_id_cs_s  : std_logic;
-   constant machine_id_c   : std_logic_vector( 7 downto 0) := std_logic_vector(to_unsigned(num_maq_g, 8));
-
-   -- Config port
-   signal cfg_port_cs_s    : std_logic;
-   signal cfg_page_cs_s    : std_logic;
-   signal cfg_page_r       : std_logic_vector( 7 downto 0);
-
-   -- Loader
-   signal bios_ram_cs_s    : std_logic;
-   signal loader_ce_s      : std_logic;
-   signal d_from_loader_s  : std_logic_vector( 7 downto 0);
-   signal loader_q         : std_logic;
-   signal multcart_q       : std_logic;
-
-   -- Internal BIOS
-   signal d_from_bios_s    : std_logic_vector( 7 downto 0);
-   signal bios_addr_s      : std_logic_vector(12 downto 0);
-   signal bios_ce_s        : std_logic;
-   signal bios_oe_s        : std_logic;
-   signal bios_we_s        : std_logic;
-
-
-
-
-   signal bios_ram_bs_s    : std_logic :='1';
-   signal exp_ram_bs_s     : std_logic;
-   signal exp_ram_cs_s     : std_logic;
-
-
-   -- COURTNEY signal
-   signal wsg_native_q     : std_logic := '0';
-
-
-
-
-
-   -- Controller signals
-   signal d_from_ctrl_s    : std_logic_vector( 7 downto 0);
-   signal ctrl_r_n_s       : std_logic;
-   signal ctrl_en_key_n_s  : std_logic;
-   signal ctrl_en_joy_n_s  : std_logic;
-   signal ctrl_int_n_s     : std_logic;
-
-   -- SDcard SPI
-   signal d_from_sd_s      : std_logic_vector( 7 downto 0);
-   signal sd_cs_s          : std_logic;
-   signal sd_wr_s          : std_logic;
-   signal sd_rd_s          : std_logic;
-
-   -- Cartridge
-   signal d_from_cart_s    : std_logic_vector( 7 downto 0);
-   signal cart_oe_n_s      : std_logic;
-
-   signal ext_cart_en_q    : std_logic;
-   signal cart_en_80_n_s   : std_logic;
-   signal cart_en_a0_n_s   : std_logic;
-   signal cart_en_c0_n_s   : std_logic;
-   signal cart_en_e0_n_s   : std_logic;
-   signal ext_cart_ce_s    : std_logic;
-   signal cart_ce_s        : std_logic;
-   signal cart_oe_s        : std_logic;
-   signal cart_we_s        : std_logic;
-
+   -- Controllers
+   signal d_from_ctrl_s                   : std_logic_vector( 7 downto 0);
+   signal ctrl_en_key_n_s                 : std_logic;
+   signal ctrl_en_joy_n_s                 : std_logic;
+   signal ctrl_int_n_s                    : std_logic;
 
 begin
 
@@ -315,7 +266,7 @@ begin
    --
    -- Modified CPU clock enable based on slow devices or the wait state.
 --   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and not m1_wait_q;
-   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s;
+   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and sd_wait_n_s;
 
    -- CPU maskable interrupt input, currently only the controllers.
    int_n_s <= ctrl_int_n_s;
@@ -497,30 +448,26 @@ begin
 
 
    --
-   -- SDcard SPI
+   -- SD-card SPI interface
    --
-   -- TODO: Really use the *enable* as the clock input?
-   --
-   sd: entity work.spi
+   sdcard: entity work.sdcard
    port map (
-      clock_i        => clk_en_3m58_i,
+      clk_21m74_i    => clock_i,
       reset_i        => reset_i,
-      addr_i         => cpu_addr_s(0),
-      cs_i           => sd_cs_s,
-      wr_i           => sd_wr_s,
-      rd_i           => sd_rd_s,
+      slow_clk_i     => sd_slow_clk_r, -- '1' = use slow SPI clock
+      spi_ss_n_i     => sd_spi_ss_n_r,
+      cs_n_i         => sd_cs_n_s,
+      wait_n_o       => sd_wait_n_s,
+      wr_n_i         => wr_n_s,        -- indicate a write operation
       data_i         => d_from_cpu_s,
       data_o         => d_from_sd_s,
       -- SD card interface
-      spi_cs_o       => sd_cs_n_o,
+      spi_cs_n_o     => sd_cs_n_o,
       spi_sclk_o     => sd_sclk_o,
       spi_mosi_o     => sd_mosi_o,
-      spi_miso_i     => sd_miso_i,
-      sd_cd_n_i      => sd_cd_n_i      -- Card detect, active low.
+      spi_miso_i     => sd_miso_i
    );
 
-   sd_wr_s <= not wr_n_s;
-   sd_rd_s <= not rd_n_s;
 
    --
    -- The loader ROM and BIOS have different addresses at PoR to give the
@@ -738,12 +685,10 @@ begin
    -- the system BIOS with RAM.
 
    process ( cpu_addr_s, mreq_n_s, rfsh_n_s, wr_n_s,
-             d_from_bios_s, d_from_cv_ram1k_r, cart_data_io,
+             d_from_loader_s, d_from_bios_s, d_from_cv_ram1k_r, cart_data_io,
              d_from_ext512_s, sgm_en_r, sgm_8k_en_r,
              ext_ram_bank_r, rom_loader_en_r )
    begin
-
-      bios_ce_s      <= '0';  -- Used?
 
       cv_ram1k_en_s  <= '0';
 
@@ -787,7 +732,6 @@ begin
 
             -- The SGM must be enabled to be able to switch the BIOS for 8K RAM.
             elsif sgm_8k_en_r = '0' or sgm_en_r = '0' then
-               bios_ce_s      <= '1';
                cpu_data_mux_s <= d_from_bios_s;
 
             else
@@ -835,8 +779,6 @@ begin
       end if;
    end process;
 
-   cart_oe_n_s <= cart_en_80_n_s and cart_en_A0_n_s and cart_en_C0_n_s and cart_en_E0_n_s;
-
 
    -- CV I/O Decode
    --
@@ -883,23 +825,25 @@ begin
    --
    -- Port  CPU Data
    -- --------------
-   --  >50  xxxxxxxx (W) WSG / SGM-PSG Address Write
-   --  >51  xxxxxxxx (W) WSG / SGM-PSG Data Write
-   --  >52  xxxxxxxx (R) WSG / SGM-PSG Data Read
-   --  >53  xxxxxxxN (W) 0 = SGM disable, 1 = SGM enable
-   --       xxxxxxNx (W) 0 = SGM Sound AY-8910, 1 = SGM Sound SEX-7264
+   --  >50  WWWWWWWW (W) WSG / SGM-PSG Address Write
+   --  >51  WWWWWWWW (W) WSG / SGM-PSG Data Write
+   --  >52  RRRRRRRR (R) WSG / SGM-PSG Data Read
+   --  >53  xxxxxx_W (W) 0 = SGM disable, 1 = SGM enable
+   --       xxxxxxW_  (W) 0 = SGM Sound AY-8910, 1 = SGM Sound SEX-7264
    --  >55  xxxxxxxx (R) Loader disable, PoR re-enabled ROM loader
    --
-   --  >56  xxxxxxxN (W) SPI Control CE_n
-   --       xxxxxxxN (R) SPI Control SD-Card Detect input
-   --  >57  NNNNNNNN (W) SPI Data Write
-   --       xxxxxxxx (R) SPI Data Read
+   --  >56  xxxxxx_W (W) SD Control SPI CE_n
+   --       xxxxxxW_ (W) SD Control SPI clock speed, 0 = slow clock
+   --       RxxxxxRR (R) SD Control bit >80 = card detect input
+   --  >57  WWWWWWWW (W) SD Data Write
+   --       RRRRRRRR (R) SD Data Read
    --
-   --  >7F  xxxxxxNx (W) 0 = 8K SGM RAM, 1 = 8K CV BIOS
+   --  >7F  xxxxxxWx (W) 0 = 8K SGM RAM, 1 = 8K CV BIOS
    --
    process ( cpu_addr_s, iorq_n_s, m1_n_s, wr_n_s, rd_n_s,
              d_from_cpu_s, d_from_wsg_s, sgm_en_r, sgm_8k_en_r,
-             ext_ram_bank_r, rom_loader_en_r )
+             ext_ram_bank_r, rom_loader_en_r,
+             d_from_sd_s, sd_detect_r, sd_slow_clk_r, sd_spi_ss_n_r )
    begin
       sgm_en_x          <= sgm_en_r;
       sgm_8k_en_x       <= sgm_8k_en_r;
@@ -911,6 +855,11 @@ begin
       wsg_bdir_s        <= '0';  -- bus direction
       wsg_bc_s          <= '0';  -- bus control
 
+      -- SD-card
+      sd_cs_n_s         <= '1';
+      sd_slow_clk_x     <= sd_slow_clk_r;
+      sd_spi_ss_n_x     <= sd_spi_ss_n_r;
+
       ex_data_mux_s     <= (others => '0');
 
       if iorq_n_s = '0' and m1_n_s = '1' then
@@ -919,38 +868,69 @@ begin
          when x"5" =>
             case cpu_addr_s(3 downto 0) is
 
-            when x"0" =>
+            when x"0" =>                  -- port >50 PSG address write
                if wr_n_s = '0' then
                   wsg_bdir_s  <= '1';
                   wsg_bc_s    <= '1';
                end if;
 
-            when x"1" =>
+            when x"1" =>                  -- port >51 PSG data write
                if wr_n_s = '0' then
                   wsg_bdir_s  <= '1';
                end if;
 
-            when x"2" =>
+            when x"2" =>                  -- port >52 PSG data read
                if rd_n_s = '0' then
                   wsg_bc_s       <= '1';
                   ex_data_mux_s  <= d_from_wsg_s;
                end if;
 
-            when x"3" =>
+            when x"3" =>                  -- port >53 SGM enable / disable
                if wr_n_s = '0' then
-                  sgm_en_x <= d_from_cpu_s(0);
+                  sgm_en_x       <= d_from_cpu_s(0);
                end if;
 
--- TODO: ports 54 .. 58
---            when x"4" =>
-            when x"5" =>
+            when x"4" =>                  -- port >54 external RAM bank select
+
+               if rd_n_s = '0' then
+                  ex_data_mux_s  <= "0000" & ext_ram_bank_r;
+               end if;
+
+               -- Page 0 is reserved for the SGM and cannot be
+               -- directly selected.
+               if wr_n_s = '0' and d_from_cpu_s(3 downto 0) /= "0000" then
+                  ext_ram_bank_x <= d_from_cpu_s(3 downto 0);
+               end if;
+
+            when x"5" =>                  -- port >55 ROM loader disable
                if rd_n_s = '0' then
                   rom_loader_en_x <= '0';
                end if;
 
---            when x"6" =>
---            when x"7" =>
---            when x"8" =>
+            when x"6" =>                  -- port >56 SD-card control
+               if rd_n_s = '0' then
+                  ex_data_mux_s  <= sd_detect_r & "00000" &
+                                    sd_slow_clk_r & sd_spi_ss_n_r;
+               end if;
+
+               if wr_n_s = '0' then
+                  sd_slow_clk_x <= d_from_cpu_s(1);
+                  sd_spi_ss_n_x <= d_from_cpu_s(0);
+               end if;
+
+            when x"7" =>                  -- port >57 SD-card data read / write
+
+               sd_cs_n_s <= '0';
+
+               if rd_n_s = '0' then
+                  ex_data_mux_s  <= d_from_sd_s;
+               end if;
+
+            when x"8" =>                  -- port >58 machine ID
+
+               if rd_n_s = '0' then
+                  ex_data_mux_s  <= machine_id_c;
+               end if;
 
             when others => null;
             end case;
@@ -958,6 +938,7 @@ begin
          when others => null;
          end case;
 
+         -- ADAM compatible selection for BIOS vs 8K RAM at >0000.
          if cpu_addr_s(7 downto 0) = x"7F" and wr_n_s = '0' then
             -- The SGM 8K enable, active high.
             sgm_8k_en_x <= not d_from_cpu_s(1);
@@ -969,221 +950,31 @@ begin
    begin
    if rising_edge(clock_i) then
       if reset_i = '1' then
-         sgm_en_r          <= '0';
-         sgm_8k_en_r       <= '0';
-         ext_ram_bank_r    <= (others => '0');
-         rom_loader_en_r   <= '1';
+         sgm_en_r          <= '0';           -- disable SGM on reset
+         sgm_8k_en_r       <= '0';           -- BIOS over SGM 8K RAM at >0000
+         ext_ram_bank_r    <= "0001";        -- external RAM bank select
+         rom_loader_en_r   <= '1';           -- enabled 16K ROM loader
+         sd_detect_r       <= '0';           -- no card until sampled
+         sd_slow_clk_r     <= '1';           -- fall-back to SD-card SPI slow clock
+         sd_spi_ss_n_r     <= '1';           -- deselect the SD-card device
 
       elsif clk_en_3m58_i = '1' then
          sgm_en_r          <= sgm_en_x;
          sgm_8k_en_r       <= sgm_8k_en_x;
          ext_ram_bank_r    <= ext_ram_bank_x;
          rom_loader_en_r   <= rom_loader_en_x;
+         sd_detect_r       <= not sd_cd_n_i; -- sample and invert input directly
+         sd_slow_clk_r     <= sd_slow_clk_x;
+         sd_spi_ss_n_r     <= sd_spi_ss_n_x;
 
       end if;
    end if;
    end process;
 
--- Power on or reset:
--- Phoenix BIOS
--- If a cart is present
 
 -- EEPROM-based games use an alternative ROM page switch.
 -- They are not MegaCarts (0xFFC0+page#) and not SGM multipage ROMs (page# written to 0xFFFF).
 -- EEPROM games use 0xFF80/0xFF90/0xFFA0/0xFFB0 to switch 4x16kB pages.
 
--- WSG mode with SGM on/off in port >53
 
--- Port >54
--- BIOS write en
---
---
-
--- Page port          => 54
--- Config Port        => 55
--- SPI (R/W)          => 56 to 57
--- Machine ID read    => 58
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--- synthesis translate_off
-
-   -- Memory
-   bios_addr_s <= ram_addr_s(12 downto 0);
-   bios_ce_s   <= '1' when ram_addr_s(16 downto 13) = "0000" and ram_ce_s = '1'  else '0';
-   bios_we_s   <= '1' when bios_ce_s = '1' and ram_we_s = '1'                    else '0';
-
-   d_to_cv_s   <= d_from_bios_s when bios_ce_s = '1' else d_from_ram_s;
-
-
-   -- MUX data CPU
-   d_to_cpu_s  <= -- Memory
-      d_from_loader_s   when loader_ce_s = '1'     else
-      ram_data_i        when bios_ce_s = '1'       else
-      ram_data_i        when ram_ce_s  = '1'       else
-      ram_data_i        when cart_ce_s = '1'       else
-      cart_data_io      when ext_cart_ce_s = '1'   else
-      -- I/O
-      d_from_vdp_s      when vdp_r_n_s = '0'       else
-      d_from_ctrl_s     when ctrl_r_n_s = '0'      else
-      d_from_sd_s       when sd_cs_s = '1'         else
-      d_from_wsg_s      when WSG_CS = '1'          else
-      machine_id_c      when machine_id_cs_s = '1' else
-      cfg_page_r        when cfg_page_cs_s = '1'   else
-      (others => '1');
-
-   -----------------------------------------------------------------------------
-   -- Misc outputs
-   -----------------------------------------------------------------------------
-   loader_ce_s    <= not rd_n_s and bios_ce_s   when loader_q = '1'  else '0';
-   bios_we_s      <= not wr_n_s and bios_ce_s   when loader_q = '1'  else '0';
-   bios_oe_s      <= not rd_n_s and bios_ce_s;
-
-   cart_ce_s      <= not (cart_en_80_n_s and cart_en_A0_n_s and cart_en_C0_n_s and cart_en_E0_n_s) and not ext_cart_en_q;
-   ext_cart_ce_s  <= not (cart_en_80_n_s and cart_en_A0_n_s and cart_en_C0_n_s and cart_en_E0_n_s) and     ext_cart_en_q;
-   cart_oe_s      <= (not rd_n_s) and cart_ce_s;
-   cart_we_s      <= (not wr_n_s) and cart_ce_s    when multcart_q = '1'   else '0';
-
-   -- RAM map
-   --                                 1 1111 11
-   --                                 6 5432 1098 7654 3210
-   --                                 - ---- ---- ---- ----
-   -- 00000 - 01FFF = SGM RAM   ( 8K) 0 000x xxxx xxxx xxxx
-   -- 02000 - 07FFF = RAM       (24K) 0 0ppp xxxx xxxx xxxx ppp = 010 to 111
-   -- 08000 - 0FFFF = Multicart (32K) 0 1xxx xxxx xxxx xxxx
-   -- 10000 - 17FFF = Cartridge (32K) 1 0xxx xxxx xxxx xxxx
-   -- 18000 - 19FFF = BIOS      ( 8K) 1 100x xxxx xxxx xxxx
-   --
-   ram_addr_o     <=
-   --  1111111
-   --  6543210
-      "1100"    & cpu_addr_s(12 downto 0) when bios_ce_s = '1'                               else  -- 0000-1FFF
---    "0001"    & cpu_addr_s(12 downto 0) when ram_ce_s = '1'  and multcart_q = '1' and exp_ram_bs_s = '0'        else  -- 8K linear RAM
-      "00"      & cpu_addr_s(14 downto 0) when ram_ce_s = '1'                                                     else  -- 24K linear RAM
-----  "000"     & cpu_addr_s(13 downto 0) when ram_ce_s = '1'                                                     else  -- 24K linear RAM
---    "0001100" & cpu_addr_s( 9 downto 0) when ram_ce_s = '1'  and multcart_q = '0' and exp_ram_bs_s = '0'        else  -- 1K mirrored RAM
-      "01"      & cpu_addr_s(14 downto 0) when cart_ce_s = '1' and loader_q = '1'                                 else
-      "01"      & cpu_addr_s(14 downto 0) when cart_ce_s = '1' and multcart_q = '1' and cart_oe_s = '1'           else
-      "10"      & cpu_addr_s(14 downto 0) when cart_ce_s = '1' and multcart_q = '1' and cart_we_s = '1'           else
-      "10"      & cpu_addr_s(14 downto 0) when cart_ce_s = '1' and multcart_q = '0'                               else
-      (others => '0');
-
-   ram_data_o     <= d_from_cpu_s;
-   ram_ce_o       <= ram_ce_s or bios_ce_s or cart_ce_s;
-   ram_we_o       <= (not wr_n_s and ram_ce_s) or bios_we_s or cart_we_s;
-   ram_oe_o       <= (not rd_n_s and ram_ce_s) or bios_oe_s or cart_oe_s;
-
-   cart_addr_o    <= cpu_addr_s(14 downto 0);
--- cart_oe_n_o    <= not cart_oe_s;
-   cart_oe_n_o    <= '0';
-   cart_dir_o     <= '0' when ext_cart_ce_s = '1' and rd_n_s  else '1';
-   cart_data_io   <= (others => 'Z') when cart_dir_o = '0' else d_from_cpu_s;
-   cart_en_80_n_o <= cart_en_80_n_s or rd_n_s   when ext_cart_en_q = '1'   else '1';
-   cart_en_a0_n_o <= cart_en_A0_n_s or rd_n_s   when ext_cart_en_q = '1'   else '1';
-   cart_en_c0_n_o <= cart_en_C0_n_s or rd_n_s   when ext_cart_en_q = '1'   else '1';
-   cart_en_e0_n_o <= cart_en_E0_n_s or rd_n_s   when ext_cart_en_q = '1'   else '1';
-
-   -- Address decoding
-   mem_access_s   <= '1'   when mreq_n_s = '0' and rfsh_n_s = '1'                   else '0';
-   io_access_s    <= '1'   when iorq_n_s = '0' and m1_n_s = '1'                     else '0';
-   io_read_s      <= '1'   when iorq_n_s = '0' and m1_n_s = '1' and rd_n_s = '0'    else '0';
-   io_write_s     <= '1'   when iorq_n_s = '0' and m1_n_s = '1' and wr_n_s = '0'    else '0';
-
-   -- memory
-   bios_ce_s      <= '1'   when mem_access_s = '1' and cpu_addr_s(15 downto 13) = "000" and bios_ram_bs_s = '1'   else '0';   -- BIOS         => 0000 to 1FFF
-   ram_ce_s       <= '1'   when mem_access_s = '1' and (cpu_addr_s(15 downto 14) = "01" or cpu_addr_s(15 downto 13) = "001" or (cpu_addr_s(15 downto 13) = "000" and bios_ram_bs_s = '0'))      else '0';   -- RAM          => 6000 to 7FFF
-   cart_en_80_n_s <= '0'   when mem_access_s = '1' and cpu_addr_s(15 downto 13) = "100"      else '1';   -- Cartridge 80 => 8000 to 9FFF
-   cart_en_a0_n_s <= '0'   when mem_access_s = '1' and cpu_addr_s(15 downto 13) = "101"      else '1';   -- Cartridge A0 => A000 to BFFF
-   cart_en_c0_n_s <= '0'   when mem_access_s = '1' and cpu_addr_s(15 downto 13) = "110"      else '1';   -- Cartridge C0 => C000 to DFFF
-   cart_en_e0_n_s <= '0'   when mem_access_s = '1' and cpu_addr_s(15 downto 13) = "111"      else '1';   -- Cartridge E0 => E000 to FFFF
-
-   -- I/O
-   sd_cs_s           <= '1'   when io_access_s = '1' and cpu_addr_s(7 downto 1) = "0101011"  else '0';   -- SPI (R/W)          => 56 to 57
--- exp_ram_cs_s      <= '1'   when io_write_s = '1'  and cpu_addr_s(7 downto 0) = X"53"      else '0';   -- SGM 24k ram enable => 53
-   cfg_page_cs_s     <= '1'   when io_access_s = '1' and cpu_addr_s(7 downto 0) = X"54"      else '0';   -- Page port          => 54
-   cfg_port_cs_s     <= '1'   when io_write_s = '1'  and cpu_addr_s(7 downto 0) = X"55"      else '0';   -- Config Port        => 55
-   machine_id_cs_s   <= '1'   when io_read_s = '1'   and cpu_addr_s(7 downto 0) = X"58"      else '0';   -- Machine ID read    => 58
-   bios_ram_cs_s     <= '1'   when io_write_s = '1'  and cpu_addr_s(7 downto 0) = X"7F"      else '0';   -- SGM BIOS ram bankswitch => 7F
-   ctrl_en_key_n_s   <= '0'   when io_write_s = '1'  and cpu_addr_s(7 downto 5) = "100"      else '1';   -- Controller key set => 80 to 9F
-   vdp_w_n_s         <= '0'   when io_write_s = '1'  and cpu_addr_s(7 downto 5) = "101"      else '1';   -- VDP write          => A0 to BF
-   vdp_r_n_s         <= '0'   when io_read_s = '1'   and cpu_addr_s(7 downto 5) = "101"      else '1';   -- VDP read           => A0 to BF
-   ctrl_en_joy_n_s   <= '0'   when io_write_s = '1'  and cpu_addr_s(7 downto 5) = "110"      else '1';   -- Controller joy set => C0 to DF
-   psg_we_n_s        <= '0'   when io_write_s = '1'  and cpu_addr_s(7 downto 5) = "111"      else '1';   -- PSG write          => E0 to FF
-   WSG_CS            <= '1'   when io_access_s = '1' and cpu_addr_s(7 downto 2) = "010100"   else '0';   -- WSG (R/W)          => 60 to 63
-   WSG_BDIR          <= '1'   when WSG_CS = '1'      and io_write_s = '1'                    else '0';   -- WSG write          => 60 to 61
-   WSG_BC1           <= '1'   when WSG_CS = '1'      and cpu_addr_s(0) = '0'                 else '0';   -- WSG write          => 60/62
-   ctrl_r_n_s        <= '0'   when io_read_s = '1'   and cpu_addr_s(7 downto 5) = "111"      else '1';   -- Controller read    => E0 to FF
-
-   -- Write I/O port 55
-   process (por_n_i, reset_i, clock_i)
-   begin
-      if por_n_i = '0' then
-         wsg_native_q <= '0';
-         ext_cart_en_q  <= '1';
-         multcart_q <= '1';
-         loader_q   <= '1';
-      elsif reset_i = '1' then
-         wsg_native_q <= '0';
-         multcart_q <= '1';
-      elsif rising_edge(clock_i) then
-         if clk_en_3m58_i = '1' and cfg_port_cs_s = '1' then
-            wsg_native_q   <= d_from_cpu_s(3);
-            ext_cart_en_q  <= d_from_cpu_s(2);
-            multcart_q <= d_from_cpu_s(1);
-            loader_q   <= d_from_cpu_s(0);
-         end if;
-      end if;
-   end process;
-
-   -- Write I/O port 53
-   --process (por_n_i, reset_i, clock_i)
-   --begin
-   -- if por_n_i = '0' then
-   --    exp_ram_bs_s   <= '0';
-   -- elsif rising_edge(clock_i) then
-   --    if clk_en_3m58_i = '1' and exp_ram_cs_s = '1' then
-   --       exp_ram_bs_s   <= d_from_cpu_s(0);
-   --    end if;
-   -- end if;
-   --end process;
-
-   -- Write I/O port 7F
-   process (por_n_i, reset_i, clock_i)
-   begin
-      if por_n_i = '0' then
-         bios_ram_bs_s  <= '1';
-      elsif rising_edge(clock_i) then
-         if clk_en_3m58_i = '1' and bios_ram_cs_s = '1' then
-            bios_ram_bs_s  <= d_from_cpu_s(1);
-         end if;
-      end if;
-   end process;
-
-   -- Write I/O port 54
-   process (por_n_i, clock_i)
-   begin
-      if por_n_i = '0' then
-         cfg_page_r <= (others => '0');
-      elsif rising_edge(clock_i) then
-         if clk_en_3m58_i = '1' and cfg_page_cs_s = '1' and wr_n_s = '0' then
-            cfg_page_r <= d_from_cpu_s;
-         end if;
-      end if;
-   end process;
-
- -- synthesis translate_on
-
-end architecture;
+end rtl;

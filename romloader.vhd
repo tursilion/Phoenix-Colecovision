@@ -23,6 +23,7 @@ architecture rtl of romloader is
 
    type ram_t is array(0 to 16383) of std_logic_vector(7 downto 0);
    signal ram_q : ram_t := (
+
       -- Set up the following program in RAM at >6000:
       --
       -- DB 55     IN   A,(0x55)
