@@ -10,6 +10,10 @@ SDIR   := src
 IDIR   := inc
 ODIR   := obj
 
+DIRGIT := ../..
+DIRPHX := ../../../ISE/Phoenix
+DIRZX1 := ../../../ISE/ZX-Uno
+
 CFLAGS  = -mz80 --opt-code-size --fomit-frame-pointer -I$(IDIR) -I..
 LDFLAGS = -mz80 --code-loc 0x0100 --data-loc 0x6000 --no-std-crt0
 
@@ -20,30 +24,30 @@ OBJS    = $(patsubst %,$(ODIR)/%,$(_OBJS))
 
 .PHONY: all clean loader merge merge-zxuno load load-zxuno
 
-load: jtag.phoenix CollectorvisionFPGA_top.merged.bit
+all: loader
+
+load: jtag.phoenix phoenix_top.merged.bit
 	sudo jtag $<
 
 load-zxuno: jtag.zxuno zxuno_top.merged.bit
 	sudo jtag $<
 
-all: loader
-
 clean:
 	$(RM) $(ODIR)/* *.map *.lk *.noi *.bin *.ihx *.mem
 
-loader: ../../src/rom/loaderrom.vhd loader.mem
+loader: $(DIRGIT)/loaderrom.vhd loader.mem
 
-merge: CollectorvisionFPGA_top.merged.bit
+merge: phoenix_top.merged.bit
 
 merge-zxuno: zxuno_top.merged.bit
 
-CollectorvisionFPGA_top.merged.bit: loader.mem
-	data2mem -bm ../../src/rom/loaderrom_bd.bmm -bt ../../synth/CollectorvisionFPGA/CollectorvisionFPGA_top.bit -bd $< tag avrmap.loaderrom -o b $@
+phoenix_top.merged.bit: loader.mem $(DIRPHX)/phoenix_top.bit
+	data2mem -bm $(DIRGIT)/loaderrom_bd.bmm -bt $(DIRPHX)/phoenix_top.bit -bd $< tag avrmap.loaderrom -o b $@
 
-zxuno_top.merged.bit: loader.mem
-	data2mem -bm ../../src/rom/loaderrom_bd.bmm -bt ../../synth/zxuno/zxuno_top.bit -bd $< tag avrmap.loaderrom -o b $@
+zxuno_top.merged.bit: loader.mem $(DIRZX1)/zxuno_top.bit
+	data2mem -bm $(DIRGIT)/loaderrom_bd.bmm -bt $(DIRZX1)/zxuno_top.bit -bd $< tag avrmap.loaderrom -o b $@
 
-../../src/rom/loaderrom.vhd: loader.pad.bin
+$(DIRGIT)/loaderrom.vhd: loader.pad.bin
 	$(ROMGEN) $< loaderrom 13 l r > $@
 
 loader.mem: loader.pad.bin
@@ -52,13 +56,10 @@ loader.mem: loader.pad.bin
 loader.pad.bin: loader.bin
 	pad $< $@ 8192 255
 
-loader.bin: loader.ihx
+#loader.bin: loader.ihx
 
 loader.ihx: $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS)
-
-#dir:
-#	if not exist obj mkdir obj
 
 $(ODIR)/%.rel: $(SDIR)/%.s
 	$(AS) -o $@ $<

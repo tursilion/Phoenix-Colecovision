@@ -92,12 +92,12 @@ void vdp_init()
 	for (c=0; c < 768; c++)
 		VDP_DATA = ' ';
 }
-
+/*
 void vdp_patchfont()
 {
 	memcpy((void *)0x15A3, font, 768);
 }
-
+*/
 //------------------------------------------------------------------------------
 void vdp_setcolor(uint8 border, uint8 background, uint8 foreground)
 {
