@@ -829,7 +829,7 @@ begin
    --  >51  WWWWWWWW (W) WSG / SGM-PSG Data Write
    --  >52  RRRRRRRR (R) WSG / SGM-PSG Data Read
    --  >53  xxxxxx_W (W) 0 = SGM disable, 1 = SGM enable
-   --       xxxxxxW_  (W) 0 = SGM Sound AY-8910, 1 = SGM Sound SEX-7264
+   --       xxxxxxW_ (W) 0 = SGM Sound AY-8910, 1 = SGM Sound SEX-7264
    --  >55  xxxxxxxx (R) Loader disable, PoR re-enabled ROM loader
    --
    --  >56  xxxxxx_W (W) SD Control SPI CE_n

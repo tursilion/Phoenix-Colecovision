@@ -28,8 +28,9 @@ IDIR	:= inc
 ODIR	:= obj
 
 # Sadly including the peephole optimization options allows bugs to happen.
+# Also, most of the other options seem to do absolutely nothing.
 #CFLAGS  = -mz80 --peep-file src/peep.txt --opt-code-speed --max-allocs-per-node 200000 --allow-unsafe-read --fomit-frame-pointer -I$(IDIR) -I..
-CFLAGS  = -mz80 --opt-code-speed --max-allocs-per-node 200000 --allow-unsafe-read --fomit-frame-pointer -I$(IDIR) -I..
+CFLAGS  = -mz80 --opt-code-speed --fomit-frame-pointer -I$(IDIR) -I..
 LDFLAGS = -mz80 --code-loc 0x0100 --data-loc 0x6000 --no-std-crt0
 
 _OBJS   = crt0.rel main.rel

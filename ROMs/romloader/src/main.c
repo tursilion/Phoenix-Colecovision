@@ -1,14 +1,13 @@
 /**
  *
- * sdcc -mz80 --peep-file src/peep.txt --opt-code-speed --max-allocs-per-node 200000 --allow-unsafe-read --fomit-frame-pointer -Iinc -I.. -c -o obj/main.rel src/main.c
+ * sdcc -mz80 --opt-code-speed --fomit-frame-pointer -Iinc -I.. -c -o obj/main.rel src/main.c
  * sdasz80 -o obj/crt0.rel src/crt0.s
  * sdcc -mz80 --code-loc 0x0100 --data-loc 0x6000 --no-std-crt0 -o romloader.ihx obj/crt0.rel obj/main.rel
  * makebin -s 8192 romloader.ihx romloader.rom
  */
 
 #include "main.h"
-
-//#include "vdp.h"
+#include "msx1_font.h"
 
 // ==========================================================================
 // Defines
@@ -480,6 +479,139 @@ cart_detect(uint8_t frame_tick)
 // cart_detect()
 
 
+
+enum {
+	JOY_ST_NONE = 0,
+	JOY_ST_SCAN,
+	JOY_ST_WAIT,
+	JOY_ST_UP,
+	JOY_ST_DN,
+	JOY_ST_LT,
+	JOY_ST_RT,
+	JOY_ST_FIRE
+};
+
+/**
+ * Read Joystick.
+ *
+ * Direction/Fire will only be valid for one tick, and the
+ * status must return to NONE before another direction/fire
+ * state will be returned again.
+ */
+uint8_t hex[] = {"0123456789ABCDEF"};
+uint8_t
+joystick_read(uint8_t frame_tick)
+{
+	static uint8_t state = JOY_ST_NONE;
+	static uint8_t delay = 0;
+
+	uint8_t sample = CONT1_DATA_PORT;
+	sample = ~sample;
+	sample &= 0x4F;
+
+	vdp_wr_addr(30);
+	VDP_DATA_PORT = hex[((sample&0xF0)>>4)];
+	VDP_DATA_PORT = hex[(sample&0x0F)];
+
+	// Controller Input Data Byte
+	// -------------------------------
+	//  7   6   5   4   3   2   1   0   bit
+	//  QA  FL  QB  IF  L   D   R   U   stick
+	//  !QA FR  Hi  IF  P3  P2  P4  P1  keypad
+
+	switch ( state ) {
+	case JOY_ST_NONE :
+		if ( sample != 0 )
+		{
+			// Joystick input is changing, so debounce ~64ms.
+			if ( frame_tick != 0 )
+			{
+				if ( delay > 4 ) {
+					delay = 0;
+					state = JOY_ST_SCAN;
+				}
+				else {
+					delay++;
+				}
+			}
+		}
+		
+		else {
+			// Any other values start the debounce count over.
+			delay = 0;
+		}
+
+		break;
+
+	case JOY_ST_SCAN :
+		// The joystick input is consistent, so decode the value.
+		// Creates a single-tick value, then waits for no input.
+		state = JOY_ST_WAIT;
+
+		if ( (sample & 0x01) != 0 ) {
+			state = JOY_ST_UP;
+		}
+		else if ( (sample & 0x04) != 0 ) {
+			state = JOY_ST_DN;
+		}
+		else if ( (sample & 0x08) != 0 ) {
+			state = JOY_ST_LT;
+		}
+		else if ( (sample & 0x02) != 0 ) {
+			state = JOY_ST_RT;
+		}
+		else if ( (sample & 0x40) != 0 ) {
+			state = JOY_ST_FIRE;
+		}
+
+		break;
+
+	case JOY_ST_WAIT :
+		// Wait for a neutral state before allowing another input.
+		// This prevents repeating input, which can be added later.
+		if ( sample == 0 ) {
+			delay = 0;
+			state = JOY_ST_NONE;
+		}
+
+		break;
+
+	default :
+		// All detected actions are only valid for as single tick.
+		state = JOY_ST_WAIT;
+		break;
+	}
+
+	return state;
+}
+// joystick_read()
+
+
+void
+swapin_real_cart(void)
+{
+	// Turn off the VDP interrupt so the NMI can't mess this up.
+    // VR1=E0h to enable the frame flag (triggers the NMI).
+    vdp_wtr(0x01, 0xC0);
+
+	// Write the Loader/BIOS swap trigger code to 0x6000 (RAM), and
+	// jump to the code.
+	__asm
+	ld hl, #001$
+	ld de, #0x6000
+	ld bc, #002$ - #001$
+	ldir
+	jp 0x6000
+
+	001$:
+	in a, (0x55)
+	jp 0x0000
+	002$:
+	nop
+	__endasm;
+}
+
+
 void
 main(void)
 {
@@ -487,17 +619,38 @@ main(void)
 	uint8_t frame_tick = 0;
 	uint8_t rtn;
 	uint8_t *bp;
-	
+	uint8_t cursor = 1;
+	uint8_t have_cart = 0;
+
 	// TODO Set upper memory for external cartridge.
 
-    // VR1=70h to enable the frame flag (triggers the NMI).
-    vdp_wtr(0x01, 0xE0);
+	// Set up the VDP registers, font, and colors.
+    vdp_wtr(0x00, 0x00);	// VR0 GM1
+    vdp_wtr(0x01, 0xC0);	// VR1 16K, not blanked, no interrupt, GM1
+    vdp_wtr(0x02, 0x00);	// VR2 ntba  @ >0000 for 768 bytes
+    vdp_wtr(0x03, 0x10);    // VR3 ctba  @ >0400 for 32 bytes for color sets
+    vdp_wtr(0x04, 0x01);    // VR4 pgtba @ >0800 for 2K bytes for patterns
+    vdp_wtr(0x05, 0x0A);    // VR5 satba @ >0500 for 128 bytes
+    vdp_wtr(0x06, 0x02);    // VR6 spgba @ >1000 for 2K bytes for patterns
+    vdp_wtr(0x07, 0x1A);    // FG/BG text color for text mode
+
+	// Color table, black on dark yellow.
+	vdp_memset(0x0400, 0x1A, 32);
+
+	// Load the font.
+	vdp_memcpy(0x0800, msx1_font, sizeof(msx1_font));
+
+	// Set controller to joystick mode
+	CONT_JOY_PORT = 0;	// Any write selects the joystick
 
     // Clear the screen.
     vdp_memset(0x0000, ' ', 32*24);
 
 	print_setxy(0, 0);
-	print_str_nl("DEVICES DETECTED:");
+	print_str_nl("Devices Detected:");
+
+    // VR1=E0h to enable the frame flag (triggers the NMI).
+    vdp_wtr(0x01, 0xE0);
 
     while ( 1 )
     {
@@ -512,6 +665,9 @@ main(void)
             nmi_last_cnt = nmi_count_g;
 			frame_tick = 1;
         }
+		else {
+			continue;
+		}
 
 		// Display cartridge status.
 		print_setxy(2, 2);
@@ -520,10 +676,12 @@ main(void)
 		if ( rtn == 0 ) {
 			print_str("NONE");
 			vdp_memset(print_loc, ' ', 58);
+			have_cart = 0;
 		}
 		else {
-			bp = GAME_NAME;
-			vdp_memcpy(print_loc, bp, 62);
+			bp = (uint8_t *)GAME_NAME;
+			vdp_memcpy(print_loc, bp, 54);
+			have_cart = 1;
 		}
 
 		// Display SD-card status.
@@ -539,6 +697,30 @@ main(void)
 			print_str("INIT FAILED"); break;
 		case SD_ST_FOUND :
 			print_str("YES        "); break;
+		}
+
+		// Read joystick and update cursor.
+		rtn = joystick_read(frame_tick);
+
+		if ( rtn == JOY_ST_UP ) {
+			cursor--;
+		}
+		else if ( rtn == JOY_ST_DN ) {
+			cursor++;
+		}
+		
+		if ( cursor > 2 ) { cursor = 1; }
+		if ( cursor < 1 ) { cursor = 2; }
+
+		vdp_wr_addr(32); VDP_DATA_PORT = ' ';
+		vdp_wr_addr(64); VDP_DATA_PORT = ' ';
+		vdp_wr_addr((32 * cursor)); VDP_DATA_PORT = '>';
+
+		if ( rtn == JOY_ST_FIRE )
+		{
+			if ( cursor == 2 && have_cart == 1 ) {
+				swapin_real_cart();
+			}
 		}
     }
 }
