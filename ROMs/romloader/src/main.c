@@ -281,24 +281,24 @@ print_setxy(uint8_t x, uint8_t y)
 //
 // ==========================================================================
 
-#define CK_SLOW  		0x00
-#define CK_FAST  		0x20
-#define CE_OFF   		0x01
-#define CE_ON    		0x00
-#define R1_IDLE  		0x01
-#define R1_READY 		0x00
-#define NODATA   		0xFF
-#define SD_BLK_START	0xFE
+#define CK_SLOW         0x00
+#define CK_FAST         0x20
+#define CE_OFF          0x01
+#define CE_ON           0x00
+#define R1_IDLE         0x01
+#define R1_READY        0x00
+#define NODATA          0xFF
+#define SD_BLK_START    0xFE
 
-// Command format: 01cccccc
-#define CMD0     0 | 0x40   // RESET_GO_IDLE    40 00 00 00 00 95
-#define CMD1     1 | 0x40   // SELF_INIT_MMC    41 00 00 00 00 01
-#define CMD8     8 | 0x40   // SEND_IF_COND     48 00 00 01 AA 87
-#define CMD16   16 | 0x40   // SET_BLK_SIZE     50  blk  len   01
-#define CMD17   17 | 0x40   // READ_SINGLE_BLK  51  data addr  01
-#define CMD55   55 | 0x40   // APP_CMD_NEXT     77 00 00 00 00 01
-#define CMD58   58 | 0x40   // READ_OCR         78 00 00 00 00 01
-#define ACMD41  41 | 0x40   // SELF_INIT_SD     69 00 00 00 00 01
+// Command format: 01cccccc  response
+#define CMD0     0 | 0x40   // R1   RESET_GO_IDLE    40 00 00 00 00 95
+#define CMD1     1 | 0x40   // R1   SELF_INIT_MMC    41 00 00 00 00 01
+#define CMD8     8 | 0x40   // R7   SEND_IF_COND     48 00 00 01 AA 87
+#define CMD16   16 | 0x40   // R1   SET_BLK_SIZE     50  blk  len   01
+#define CMD17   17 | 0x40   // R1   READ_SINGLE_BLK  51  data addr  01
+#define CMD55   55 | 0x40   // R1   APP_CMD_NEXT     77 00 00 00 00 01
+#define CMD58   58 | 0x40   // R3   READ_OCR         78 00 00 00 00 01
+#define ACMD41  41 | 0x40   // R1   SELF_INIT_SD     69 00 00 00 00 01
 
 #define CRC0    0x95
 #define CRC8    0x87
@@ -337,8 +337,8 @@ enum CARD_ERROR {
     SD_INIT_FAILED,
     SD_BAD_SSC_READ,
     SD_SET_BSIZE_FAILED,
-	SD_READ_BLOCK_FAILED,
-	SD_TOKEN_TIMEOUT
+    SD_READ_BLOCK_FAILED,
+    SD_TOKEN_TIMEOUT
 };
 
 #define ADDR_BYTE   0
@@ -356,17 +356,24 @@ uint8_t g_sd_status = SD_NO_CARD;
 // CMD |   ARGS   | CRC
 uint8_t CMDARGS[] = {0,0,0,0};
 
+
 /**
- * Sends a command to the SD-card.
+ * Sends a command to the SD-card without deselecting the
+ * Chip Enable.
  *
  * Any arguments have to be set up in CMDARGS before calling.
  * The CMDARGS bytes are zeroed after being sent.
  *
+ * @note The caller must turn the Chip Select off.  This allows
+ *       for commands that return data.
+ *
  * @return The result status byte from the SD-card
  */
 uint8_t
-sd_send_cmd(uint8_t cmd, uint8_t crc, uint8_t clk_speed)
+sd_send_cmd_ex(uint8_t cmd, uint8_t crc, uint8_t clk_speed)
 {
+    // Make sure any previous commands are deselected.
+    SD_CTRL_PORT = clk_speed | CE_OFF;
     SD_CTRL_PORT = clk_speed | CE_ON;
 
     // Send 8 clocks before commands.  Is this necessary?
@@ -394,8 +401,24 @@ sd_send_cmd(uint8_t cmd, uint8_t crc, uint8_t clk_speed)
         }
     }
 
-    SD_CTRL_PORT = clk_speed | CE_OFF;
+    return d;
+}
+// sd_send_cmd_ex()
 
+
+/**
+ * Sends a command to the SD-card.
+ *
+ * Any arguments have to be set up in CMDARGS before calling.
+ * The CMDARGS bytes are zeroed after being sent.
+ *
+ * @return The result status byte from the SD-card
+ */
+uint8_t
+sd_send_cmd(uint8_t cmd, uint8_t crc, uint8_t clk_speed)
+{
+    uint8_t d = sd_send_cmd_ex(cmd, crc, clk_speed);
+    SD_CTRL_PORT = clk_speed | CE_OFF;
     return d;
 }
 // sd_send_cmd()
@@ -519,13 +542,12 @@ sd_card_init(void)
 
     // Send CMD8 to suggest a voltage and test SD-card V2.x
     CMDARGS[2] = VHS; CMDARGS[3] = CKPTRN;
-    d = sd_send_cmd(CMD8, CRC8, CK_SLOW);
+    d = sd_send_cmd_ex(CMD8, CRC8, CK_SLOW);
     if ( d == R1_IDLE )
     {
         // V2.x SD-card
         // Read the CMD8 4 response bytes. Bytes 2 and 3 should
         // be echoes of what was sent, i.e. 0x01 and 0xAA.
-        SD_CTRL_PORT = CK_SLOW | CE_ON;
         d = SD_DATA_PORT; // don't care
         d = SD_DATA_PORT; // don't care
         i = SD_DATA_PORT; // echo VHS
@@ -542,8 +564,9 @@ sd_card_init(void)
         // V1.x SD-card or MMC
         // Since CMD8 failed, the voltage needs to be checked
         // via CMD58. Status 0x00 or 0x01 are fine.
-        d = sd_send_cmd(CMD58, CRCX, CK_SLOW);
+        d = sd_send_cmd_ex(CMD58, CRCX, CK_SLOW);
         if ( d > R1_IDLE ) {
+            SD_CTRL_PORT = CK_SLOW | CE_OFF;
             return SD_BAD_OCR_READ;
         }
 
@@ -552,7 +575,6 @@ sd_card_init(void)
         // Bits 14..0 are reserved and should be 0.
         // to indicate 2.7V to 3.6V
         // 00 FF 80 00
-        SD_CTRL_PORT = CK_SLOW | CE_ON;
         i = SD_DATA_PORT; // don't care
         i = SD_DATA_PORT; // bits 23..16
         d = SD_DATA_PORT; // bit 15, 0x80 or 0x00
@@ -625,13 +647,12 @@ sd_card_init(void)
     if ( g_sd_addr_size == ADDR_BLOCK )
     {
         // V2.x SD-cards might still be SDSC.
-        d = sd_send_cmd(CMD58, CRCX, CK_SLOW);
+        d = sd_send_cmd_ex(CMD58, CRCX, CK_SLOW);
         if ( d > R1_IDLE ) {
             return SD_BAD_SSC_READ;
         }
 
         // Read 4 bytes of response.
-        SD_CTRL_PORT = CK_SLOW | CE_ON;
         d = SD_DATA_PORT; // CSS is bit 0x40
         i = SD_DATA_PORT; // don't care
         i = SD_DATA_PORT; // don't care
@@ -666,66 +687,66 @@ sd_card_init(void)
 uint8_t
 sd_read_block_to_vram(uint32_t block_addr)
 {
-	if ( g_sd_addr_size == ADDR_BYTE ) {
-		block_addr *= 512;
-	}
+    if ( g_sd_addr_size == ADDR_BYTE ) {
+        block_addr *= 512;
+    }
 
     CMDARGS[0] = (block_addr >> 24) & 0xFF;
     CMDARGS[1] = (block_addr >> 16) & 0xFF;
     CMDARGS[2] = (block_addr >>  8) & 0xFF;
     CMDARGS[3] =  block_addr        & 0xFF;
 
-	uint8_t d;
-    d = sd_send_cmd(CMD17, CRCX, CK_FAST);
-	if ( d != R1_READY ) {
-		return SD_READ_BLOCK_FAILED;
-	}
+    uint8_t d;
+    d = sd_send_cmd_ex(CMD17, CRCX, CK_FAST);
+    if ( d != R1_READY ) {
+        SD_CTRL_PORT = CK_FAST | CE_OFF;
+        return SD_READ_BLOCK_FAILED;
+    }
 
-    SD_CTRL_PORT = CK_FAST | CE_ON;
 
-	// Block transfers begin with a Start Block Token, followed the data.
-	// So loop until the token is received.
-	// Measured times: 894 to 944
+    // Block transfers begin with a Start Block Token, followed the data.
+    // So loop until the token is received.
+    // Measured counts: 894 to 944
 
-	uint16_t wait;
-	d = NODATA;
-	for ( wait = 2000 ; wait > 0 && d != SD_BLK_START ; wait-- ) {
+    uint16_t wait;
+    d = NODATA;
+    for ( wait = 2000 ; wait > 0 && d != SD_BLK_START ; wait-- ) {
         d = SD_DATA_PORT;
-	}
+    }
 
-	if ( wait == 0 ) {
-	    SD_CTRL_PORT = CK_FAST | CE_OFF;
-		VDP_DATA_PORT = '!';
-		VDP_DATA_PORT = hex[((d&0xF0)>>4)];
-		VDP_DATA_PORT = hex[(d&0x0F)];
-		return SD_TOKEN_TIMEOUT;
-	}
+    if ( wait == 0 ) {
+        SD_CTRL_PORT = CK_FAST | CE_OFF;
+        VDP_DATA_PORT = '!';
+        VDP_DATA_PORT = hex[((d&0xF0)>>4)];
+        VDP_DATA_PORT = hex[(d&0x0F)];
+        return SD_TOKEN_TIMEOUT;
+    }
 
-	// Show the timeout value for knowledge purposes.
-	VDP_DATA_PORT = hex[((wait>>12)&0xF)];
-	VDP_DATA_PORT = hex[((wait>> 8)&0xF)];
-	VDP_DATA_PORT = hex[((wait>> 4)&0xF)];
-	VDP_DATA_PORT = hex[( wait     &0xF)];
-	VDP_DATA_PORT = ' ';
+    // Show the timeout value for knowledge purposes.
+    VDP_DATA_PORT = hex[((wait>>12)&0xF)];
+    VDP_DATA_PORT = hex[((wait>> 8)&0xF)];
+    VDP_DATA_PORT = hex[((wait>> 4)&0xF)];
+    VDP_DATA_PORT = hex[( wait     &0xF)];
+    VDP_DATA_PORT = ' ';
 
-	// Start token received, 512 data bytes follow.
-	for ( wait = 512 ; wait > 0 ; wait-- ) {
+    // Start token received, 512 data bytes follow.
+    for ( wait = 512 ; wait > 0 ; wait-- ) {
         d = SD_DATA_PORT;
-		
-		if ( wait > (512 - 128) ) {
-			VDP_DATA_PORT = hex[((d >> 4) & 0xF)];
-			VDP_DATA_PORT = hex[( d       & 0xF)];
-			VDP_DATA_PORT = ' ';
-		}
-	}
 
-	// Consume the 16-bit CRC from the card.
-	d = SD_DATA_PORT;
-	d = SD_DATA_PORT;
-	
+        if ( wait > (512 - 128) ) {
+            VDP_DATA_PORT = hex[((d >> 4) & 0xF)];
+            VDP_DATA_PORT = hex[( d       & 0xF)];
+            VDP_DATA_PORT = ' ';
+        }
+    }
+
+    // Consume the 16-bit CRC from the card.
+    d = SD_DATA_PORT;
+    d = SD_DATA_PORT;
+
     SD_CTRL_PORT = CK_FAST | CE_OFF;
-	
-	return SD_CARD_OK;
+
+    return SD_CARD_OK;
 }
 
 
@@ -781,7 +802,7 @@ sd_card_detect(uint8_t frame_tick)
         g_sd_status = sd_card_init();
         if ( g_sd_status == SD_CARD_OK ) {
             state = SD_ST_FOUND;
-			sd_read_block_to_vram(0);
+            sd_read_block_to_vram(0);
         }
         else {
             state = SD_ST_INITFAIL;
@@ -1083,7 +1104,7 @@ main(void)
 
 
         // Display SD-card status.
-		vdp_wr_addr(160);
+        vdp_wr_addr(160);
         rtn = sd_card_detect(frame_tick);
         print_setxy(2, 1);
         print_str_sp("SDCARD:");
@@ -1098,13 +1119,13 @@ main(void)
             print_str("YES    :"); break;
         }
 
-	    VDP_DATA_PORT = ' ';
-		VDP_DATA_PORT = hex[(g_sd_status&0x0F)];
-	    VDP_DATA_PORT = ' ';
-		VDP_DATA_PORT = hex[(g_sd_addr_size&0x0F)];
+        VDP_DATA_PORT = ' ';
+        VDP_DATA_PORT = hex[(g_sd_status&0x0F)];
+        VDP_DATA_PORT = ' ';
+        VDP_DATA_PORT = hex[(g_sd_addr_size&0x0F)];
 
 
-		// Display cartridge status.
+        // Display cartridge status.
         print_setxy(2, 2);
         print_str_sp("CART  :");
         rtn = cart_detect(frame_tick);
@@ -1119,7 +1140,7 @@ main(void)
             have_cart = 1;
         }
 
-		
+
         // Read joystick and update cursor.
         rtn = joystick_read(frame_tick);
 

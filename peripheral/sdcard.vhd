@@ -120,15 +120,16 @@
 -- -------X____________________________________________X-  Data Out /
 --  |         |         |         |         |         |
 -- VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV  21MHz clock
--- /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\  10MHz fast SPI clock
+-- \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/  10MHz fast SPI clock
 -- _|_________|_    | | | | | | | |         |_________|__
 --              \__________________________/               cs_n_i (IOR_n + IO decode)
 -- _|_________|___  | | | | | | | |  _______|_________|__
 --                \_________________/                      wait_n_o (to CPU)
 -- _|_________|_____|_|_|_|_|_|_|_|_________|_________|__
--- _________________X_X_X_X_X_X_X_X______________________  SPI 8-bit bidirectional transfer
---  |         |   __               _________|_________|__
--- XXXXXXXXXXXXXXX__XXXXXXXXXXXXXXX______________________  Data-in and data-out
+-- ________________X_X_X_X_X_X_X_X_______________________  SPI 8-bit bidirectional transfer
+--  |         |   _                 ________|_________|__
+-- XXXXXXXXXXXXXXX_XXXXXXXXXXXXXXXXX_____________________  Data-in and data-out
+--                ^                 ^
 --  CPU data-in latched          data valid for CPU read
 --  for SPI MOSI data            from SPI MISO data
 --
