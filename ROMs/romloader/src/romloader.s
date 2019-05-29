@@ -1,6 +1,50 @@
 ;
+; Not used, switched to C for speed and convenience.
+; Notes only.
+;
+
+
+
+; SD-cards power up in SD mode.  The card will enter SPI mode if the CS_n is
+; asserted low during the reception of CMD0.  If the card requires SD mode,
+; it will not respond to the command and remain in SD mode.
+
+; CMD8 is used to send the currently used voltage in the VHS field.
+; An error response means V1.x card.
+; Otherwise, V2.x card, if the card can use the specified voltage, is echoes back the arguments.
+
+; Reading the OCR (CMD58) is useful for V1.x cards to make sure they
+; support the Phoenix voltage (3.3V), since V1.x cards do not have CMD8.
+
+;
+; SD-card initialization
+;
+; 1. Send at least 74 clocks with CS_n high.
 ;
 ;
+
+; Between commands, send 8 clocks with CS_n high.
+
+; Spec says:
+;
+; 1. CMD0 + CS_n
+; 2. CMD8, send voltage, card will like it or indicate not valid
+; 3. CMD58, read OCR for supported voltage ranges the card supports
+; 4. ACMD41, until not busy
+; 5. CMD58, read CCS (card capacity info)
+
+
+; 1   CMD0 arg: 0x0, CRC: 0x95 (response: 0x01)
+;
+; 2   CMD8 arg: 0x000001AA, CRC: 0x87 (response: 0x01)
+;
+; 3   CMD55 arg: 0x0, CRC: any (CMD55 being the prefix to every ACMD)
+;
+; 4   ACMD41 , arg: 0x40000000, CRC: any
+;
+; 5   if response: 0x0, you're OK; if it's 0x1, goto 3.
+
+
 
 ; Used SD-card commands
 CMD0    = 0         ; R1  go idle state
@@ -470,45 +514,3 @@ IN A, (0x55)
 JP 0x0000
 end_swapcode:
 DEFB 0
-
-
-
-; SD-cards power up in SD mode.  The card will enter SPI mode if the CS_n is
-; asserted low during the reception of CMD0.  If the card requires SD mode,
-; it will not respond to the command and remain in SD mode.
-
-; CMD8 is used to send the currently used voltage in the VHS field.
-; An error response means V1.x card.
-; Otherwise, V2.x card, if the card can use the specified voltage, is echoes back the arguments.
-
-; Reading the OCR (CMD58) is useful for V1.x cards to make sure they
-; support the Phoenix voltage (3.3V), since V1.x cards do not have CMD8.
-
-;
-; SD-card initialization
-;
-; 1. Send at least 74 clocks with CS_n high.
-;
-;
-
-; Between commands, send 8 clocks with CS_n high.
-
-; Spec says:
-;
-; 1. CMD0 + CS_n
-; 2. CMD8, send voltage, card will like it or indicate not valid
-; 3. CMD58, read OCR for supported voltage ranges the card supports
-; 4. ACMD41, until not busy
-; 5. CMD58, read CCS (card capacity info)
-
-
-; 1   CMD0 arg: 0x0, CRC: 0x95 (response: 0x01)
-;
-; 2   CMD8 arg: 0x000001AA, CRC: 0x87 (response: 0x01)
-;
-; 3   CMD55 arg: 0x0, CRC: any (CMD55 being the prefix to every ACMD)
-;
-; 4   ACMD41 , arg: 0x40000000, CRC: any
-;
-; 5   if response: 0x0, you're OK; if it's 0x1, goto 3.
-

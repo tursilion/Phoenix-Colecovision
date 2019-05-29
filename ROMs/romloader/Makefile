@@ -24,7 +24,7 @@ MEMSIZE	:= 16384
 BMMDIR  := ../..
 BITDIR	:= ../../../collectorvision_ise
 SDIR	:= src
-IDIR	:= inc
+IDIR	:= src
 ODIR	:= obj
 
 # Sadly including the peephole optimization options allows bugs to happen.

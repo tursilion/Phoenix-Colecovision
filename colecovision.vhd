@@ -623,14 +623,17 @@ begin
    --
    -- During PoR the ROM loader is mapped into memory and the BIOS is
    -- relocated to a new location.  When the loader is disabled, the
-   -- BIOS is moved back to its normal location.
+   -- BIOS is moved back to its normal location.  Also, the 1K or RAM
+   -- is doubled to 2K of actual RAM when the loader is enabled to help
+   -- with providing buffers and such for SD-card operations, etc.
    --
    --                 Loader: Enabled  Disabled
    --                 ---------------------------
    --  >0000 .. >1FFF (8K)    Loader   BIOS
    --  >2000 .. >3FFF (8K)    Loader   no memory
    --  >4000 .. >5FFF (8K)    BIOS     no memory
-   --
+   --  >6000 .. >63FF (1K)    RAM      RAM
+   --  >6400 .. >67FF (1K)    RAM      mirror of >6000
    --
    -- ADAM Memory Banking
    --
