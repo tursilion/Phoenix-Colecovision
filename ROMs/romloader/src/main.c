@@ -289,16 +289,41 @@ disp_hex(uint8_t d)
 //
 // SD-card Support
 //
+// SD-card and MMC information taken from several sources:
+// 
+//   * SD-card SPI initialization from the "Simplified" Physical Layer V6.0 2018
+//   * SanDisk SD-card Product Manual V1.9 2019
+//   * MultiMediaCard MMC Specification
+//
+// Phoenix ports related to the SD-card:
+//
+//   >56  xxxxxx_W (W) SD-card CE_n (AKA SS_n), 0=enable
+//        xxxxxxW_ (W) SD-card speed, 1=400KHz, 0=12MHz
+//        RxxxxxRR (R) SD-card card-detect, bit >80 1=card inserted
+//   
+//   >57  WWWWWWWW (W) SD-card Data Write
+//        RRRRRRRR (R) SD-card Data Read
+//
 // ==========================================================================
 
-#define CK_SLOW         0x02
-#define CK_FAST         0x00
-#define CE_OFF          0x01
-#define CE_ON           0x00
-#define R1_IDLE         0x01
-#define R1_READY        0x00
-#define NODATA          0xFF
-#define SD_BLK_START    0xFE
+#define CK_SLOW                 0x02
+#define CK_FAST                 0x00
+#define CE_OFF                  0x01
+#define CE_ON                   0x00
+#define R1_IDLE                 0x01
+#define R1_READY                0x00
+#define NODATA                  0xFF
+#define SD_START_TOKEN          0xFE
+#define SD_ERROR_TOKEN          0x00
+#define SD_ERROR_TOKEN_TEST     0xF0
+
+// Data Error Token format:
+//   7 6 5 4 3 2 1 0
+//   0 0 0 0 R F C E
+//           | | | +-- Error
+//           | | +---- CC Error
+//           | +------ Card ECC Failed
+//           +-------- out of range
 
 // Command format: 01cccccc  response
 #define CMD0     0 | 0x40   // R1   RESET_GO_IDLE    40 00 00 00 00 95
@@ -310,9 +335,33 @@ disp_hex(uint8_t d)
 #define CMD58   58 | 0x40   // R3   READ_OCR         78 00 00 00 00 01
 #define ACMD41  41 | 0x40   // R1   SELF_INIT_SD     69 00 00 00 00 01
 
+// Response R1 format:
+//   7 6 5 4 3 2 1 0
+//   0 | | | | | | +-- in idle state
+//     | | | | | +---- erase reset
+//     | | | | +------ illegal command
+//     | | | +-------- com crc error
+//     | | +---------- erase sequence error
+//     | +------------ address error
+//     +-------------- parameter error
+
+// Response R3 format:
+//   39..32 | 31..0
+//     R1      OCR
+
+// Response R7 format:
+//   39..32 | 31..28 | 27..12 | 11..8 | 7..0
+//     R1        |        |        |      +--- echo-back check pattern
+//               |        |        +---------- voltage accepted
+//               |        +------------------- reserved
+//               +---------------------------- command version
+
+
+// CRC byte for specific commands and generic CRC.
 #define CRC0    0x95
 #define CRC8    0x87
 #define CRCX    0x01
+
 
 // When the card is in the idle state, the host shall issue CMD8 before
 // ACMD41.  The argument, 'voltage supplied' is set to the host supply
@@ -327,6 +376,23 @@ disp_hex(uint8_t d)
 #define HCS_YES 0x40    // V2.x or greater cards only
 #define HCS_NO  0x00
 #define CSS_BIT 0x40
+
+// OCR
+//   31     card power up status bit (busy=0)
+//   30     card capacity CCS (valid only if busy=1)
+//   29     UHS-II card status
+//   28..25 reserved
+//   24     switching to 1.8V accepted
+//   23     3.5V - 3.6V
+//   22     3.4V - 3.5V
+//   21     3.3V - 3.4V
+//   20     3.2V - 3.3V
+//   19     3.1V - 3.2V
+//   18     3.0V - 3.1V
+//   17     2.9V - 3.0V
+//   16     2.8V - 2.9V
+//   15     2.7V - 2.8V
+//   14..0  reserved
 
 
 enum CARD_TYPE {
@@ -374,16 +440,20 @@ uint8_t CMDARGS[] = {0,0,0,0};
  * Any arguments have to be set up in CMDARGS before calling.
  * The CMDARGS bytes are zeroed after being sent.
  *
- * @note The caller must turn the Chip Select off.  This allows
- *       for commands that return data.
+ * @note The caller must turn the Chip Select off *AND* send
+ *       the required end-of-operation 8-clocks.
  *
  * @return The result status byte from the SD-card
  */
 uint8_t
 sd_send_cmd_ex(uint8_t cmd, uint8_t crc, uint8_t clk_speed)
 {
-    // Make sure any previous commands are deselected.
+    // Straddle commands (sd_send_cmd() provides an additional 8-clocks) with
+    // 8-clocks while CS is off.  All operations require a trialing 8-clocks,
+    // so this provides that service in case the calling code failed to do so.
     SD_CTRL_PORT = clk_speed | CE_OFF;
+    uint8_t d = SD_DATA_PORT; // required end-of-op 8-clocks
+
     SD_CTRL_PORT = clk_speed | CE_ON;
 
     SD_DATA_PORT = cmd;
@@ -399,7 +469,6 @@ sd_send_cmd_ex(uint8_t cmd, uint8_t crc, uint8_t clk_speed)
 
     // Get the response.  Looking for != 0xFF.
     // Fail after 255 attempts.
-    uint8_t d;
     for ( i = 255 ; i > 0 ; i-- )
     {
         d = SD_DATA_PORT;
@@ -427,6 +496,11 @@ sd_send_cmd(uint8_t cmd, uint8_t crc, uint8_t clk_speed)
 {
     uint8_t d = sd_send_cmd_ex(cmd, crc, clk_speed);
     SD_CTRL_PORT = clk_speed | CE_OFF;
+
+    // The SD-cards requires 8-clocks after all commands and data transfers.
+    // The state of CE is irrevalent (see SanDisk Spec, section 5.1.8)
+    uint8_t eop = SD_DATA_PORT; // required end-of-op 8-clocks
+
     return d;
 }
 // sd_send_cmd()
@@ -440,23 +514,8 @@ sd_send_cmd(uint8_t cmd, uint8_t crc, uint8_t clk_speed)
 uint8_t
 sd_card_init(void)
 {
-    //  >56  xxxxxx_W (W) SD Control SPI CE_n
-    //       xxxxxxW_ (W) SD Control SPI clock speed, 0 = slow clock
-    //       RxxxxxRR (R) SD Control bit >80 = card detect input
-    //  >57  WWWWWWWW (W) SD Data Write
-    //       RRRRRRRR (R) SD Data Read, sends >FF to SD-card
-
-    // SD-card SPI initialization from the "Simplified" Physical Layer
-    // Specifications quickly found here:
-    // https://users.ece.utexas.edu/~valvano/EE345M/SD_Physical_Layer_Spec.pdf
-    //
-    // See Section 7 for SPI Mode
-    //
-    // MultiMediaCard MMC Specification quickly found here:
-    // http://www.files.e-shop.co.il/pdastore/Tech-mmc-samsung/SEC%20MMC%20SPEC%20ver09.pdf
-    //
-    // See Section 4.10 for SPI Mode
-    //
+	// Initialization flowchart summary from spec:
+	//
     // Power-on
     // Set SPI mode:
     //   Send CMD0 with CS = 0
@@ -527,15 +586,16 @@ sd_card_init(void)
     // CRC bytes are not calculated, and in SPI mode the default for SD-cards
     // is to have CRC disabled.
 
+    uint8_t i;
+    uint8_t d;
+    uint8_t eop;
 
     g_sd_addr_size = ADDR_BLOCK;
 
     // Slow clock, CS_n disable.
     SD_CTRL_PORT = CK_SLOW | CE_OFF;
 
-    // Send 80 clocks to train SD-card.
-    uint8_t i;
-    uint8_t d;
+    // Send 80 clocks to condition the SD-card.
     for ( i = 10 ; i > 0 ; i-- ) {
         d = SD_DATA_PORT;
     }
@@ -561,6 +621,7 @@ sd_card_init(void)
         i = SD_DATA_PORT; // echo VHS
         d = SD_DATA_PORT; // echo Check Pattern
         SD_CTRL_PORT = CK_SLOW | CE_OFF;
+        eop = SD_DATA_PORT; // required end-of-op 8-clocks
 
         if ( i != VHS || d != CKPTRN ) {
             return SD_BAD_CMD8_VOLTAGE;
@@ -575,6 +636,7 @@ sd_card_init(void)
         d = sd_send_cmd_ex(CMD58, CRCX, CK_SLOW);
         if ( d > R1_IDLE ) {
             SD_CTRL_PORT = CK_SLOW | CE_OFF;
+            eop = SD_DATA_PORT; // required end-of-op 8-clocks
             return SD_BAD_OCR_READ;
         }
 
@@ -592,6 +654,7 @@ sd_card_init(void)
         }
         i = SD_DATA_PORT; // don't care
         SD_CTRL_PORT = CK_SLOW | CE_OFF;
+        eop = SD_DATA_PORT; // required end-of-op 8-clocks
 
         if ( d != 0x81 ) {
             return SD_BAD_OCR_VOLTAGE;
@@ -666,6 +729,7 @@ sd_card_init(void)
         i = SD_DATA_PORT; // don't care
         i = SD_DATA_PORT; // don't care
         SD_CTRL_PORT = CK_SLOW | CE_OFF;
+        eop = SD_DATA_PORT; // required end-of-op 8-clocks
 
         if ( (d & CSS_BIT) == 0 ) {
             g_sd_addr_size = ADDR_BYTE;
@@ -705,25 +769,43 @@ sd_read_block_to_vram(uint32_t block_addr)
     CMDARGS[3] =  block_addr        & 0xFF;
 
     uint8_t d;
+    uint8_t eop;
     d = sd_send_cmd_ex(CMD17, CRCX, CK_SLOW);
     if ( d != R1_READY ) {
         SD_CTRL_PORT = CK_SLOW | CE_OFF;
+        eop = SD_DATA_PORT; // required end-of-op 8-clocks
         return SD_READ_BLOCK_FAILED;
     }
 
 
     // Block transfers begin with a Start Block Token, followed the data.
     // So loop until the token is received.
-    // Measured counts: 894 to 944
+    //
+    // The specifications indicate that reads will generally take between
+    // 100ms and 250ms (max).  It is possible to read the CSD register for
+    // the TAAC and NSAC values to calcuate the actual time; or just use a
+    // count value that is way bigger than will ever happen (which is what
+    // has been done here.)
+    //
+    // Measured counts have been around 300, but what that equates to in
+    // actual time depends on how long the loop actually takes to execute
+    // once, which is unknown.
 
-    uint16_t wait;
+    uint16_t count;
     d = NODATA;
-    for ( wait = 2000 ; wait > 0 && d != SD_BLK_START ; wait-- ) {
+    for ( count = 25000 ; count > 0 ; count-- )
+    {
         d = SD_DATA_PORT;
+
+        if ( d == SD_START_TOKEN ||
+        (d & SD_ERROR_TOKEN_TEST) == SD_ERROR_TOKEN ) {
+            break;
+        }
     }
 
-    if ( wait == 0 ) {
+    if ( d != SD_START_TOKEN ) {
         SD_CTRL_PORT = CK_SLOW | CE_OFF;
+        eop = SD_DATA_PORT; // required end-of-op 8-clocks
         VDP_DATA_PORT = '!';
         VDP_DATA_PORT = hex[((d >> 4) & 0xF)];
         VDP_DATA_PORT = hex[( d       & 0xF)];
@@ -731,17 +813,19 @@ sd_read_block_to_vram(uint32_t block_addr)
     }
 
     // Show the timeout value for knowledge purposes.
-    VDP_DATA_PORT = hex[((wait>>12)&0xF)];
-    VDP_DATA_PORT = hex[((wait>> 8)&0xF)];
-    VDP_DATA_PORT = hex[((wait>> 4)&0xF)];
-    VDP_DATA_PORT = hex[( wait     &0xF)];
+    count = 25000 - count;
+    VDP_DATA_PORT = hex[((count>>12)&0xF)];
+    VDP_DATA_PORT = hex[((count>> 8)&0xF)];
+    VDP_DATA_PORT = hex[((count>> 4)&0xF)];
+    VDP_DATA_PORT = hex[( count     &0xF)];
     VDP_DATA_PORT = ' ';
 
     // Start token received, 512 data bytes follow.
-    for ( wait = 512 ; wait > 0 ; wait-- ) {
+    for ( count = 512 ; count > 0 ; count-- )
+	{
         d = SD_DATA_PORT;
 
-        if ( wait > (512 - 128) ) {
+        if ( count > (512 - 128) ) {
             VDP_DATA_PORT = hex[((d >> 4) & 0xF)];
             VDP_DATA_PORT = hex[( d       & 0xF)];
             VDP_DATA_PORT = ' ';
@@ -753,6 +837,7 @@ sd_read_block_to_vram(uint32_t block_addr)
     d = SD_DATA_PORT;
 
     SD_CTRL_PORT = CK_SLOW | CE_OFF;
+    eop = SD_DATA_PORT; // required end-of-op 8-clocks
 
     return SD_CARD_OK;
 }
@@ -788,7 +873,7 @@ sd_card_detect(uint8_t frame_tick)
             // Looks like an SD-card may be inserted, so debounce.
             if ( frame_tick != 0 )
             {
-                if ( delay > 80 ) {	// original 20
+                if ( delay > 80 ) { // original 20
                     delay = 0;
                     state = SD_ST_INIT;
                 }
