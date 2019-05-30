@@ -833,13 +833,30 @@ begin
    --  >52  RRRRRRRR (R) WSG / SGM-PSG Data Read
    --  >53  xxxxxx_W (W) 0 = SGM disable, 1 = SGM enable
    --       xxxxxxW_ (W) 0 = SGM Sound AY-8910, 1 = SGM Sound SEX-7264
-   --  >55  xxxxxxxx (R) Loader disable, PoR re-enabled ROM loader
    --
-   --  >56  xxxxxx_W (W) SD Control SPI CE_n
-   --       xxxxxxW_ (W) SD Control SPI clock speed, 0 = slow clock
-   --       RxxxxxRR (R) SD Control bit >80 = card detect input
-   --  >57  WWWWWWWW (W) SD Data Write
-   --       RRRRRRRR (R) SD Data Read
+   --  >54  xxxxWWWW (W) 32K RAM bank select, 0000 and 0001 select 0001
+   --       xxxxRRRR (R) current bank
+   --
+   --  >55  xxxxxxxx (R) Loader disable, PoR re-enabled ROM loader
+   --       xx__xxWW (W) Banking scheme
+   --             00     None, physical cartridge, other bits ignored
+   --             01     MegaCart: bank is address access >FFC0+bank
+   --             10     SGM: Bank is data written to >FFFF
+   --             11     Atari: >FF80, >FF90, >FFA0, >FFB0 ???
+   --       xxWWxx__ (W) Select the upper memory operation:
+   --         00         32K Upper Internal RAM, ignores bank scheme
+   --         01         32K Expansion ROM, uses bank scheme
+   --         10         32K Upper Expansion RAM, uses bank scheme
+   --         11         32K Cartridge ROM, ignores bank scheme
+   --    
+   --  >56  xxxxxx_W (W) SD-card CE_n (AKA SS_n), 0=enable
+   --       xxxxxxW_ (W) SD-card speed, 1=400KHz, 0=12MHz
+   --       RxxxxxRR (R) SD-card card-detect, bit >80 1=card inserted
+   --
+   --  >57  WWWWWWWW (W) SD-card Data Write
+   --       RRRRRRRR (R) SD-card Data Read
+   --
+   --  >58  00001000 (R) Machine ID, Phoenix = 8
    --
    --  >7F  xxxxxxWx (W) 0 = 8K SGM RAM, 1 = 8K CV BIOS
    --

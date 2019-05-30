@@ -275,14 +275,24 @@ print_setxy(uint8_t x, uint8_t y)
 // print_setxy()
 
 
+void
+disp_hex(uint8_t d)
+{
+    VDP_DATA_PORT = hex[((d >> 4) & 0xF)];
+    VDP_DATA_PORT = hex[( d       & 0xF)];
+    VDP_DATA_PORT = ' ';
+}
+// disp_hex()
+
+
 // ==========================================================================
 //
 // SD-card Support
 //
 // ==========================================================================
 
-#define CK_SLOW         0x00
-#define CK_FAST         0x20
+#define CK_SLOW         0x02
+#define CK_FAST         0x00
 #define CE_OFF          0x01
 #define CE_ON           0x00
 #define R1_IDLE         0x01
@@ -376,12 +386,9 @@ sd_send_cmd_ex(uint8_t cmd, uint8_t crc, uint8_t clk_speed)
     SD_CTRL_PORT = clk_speed | CE_OFF;
     SD_CTRL_PORT = clk_speed | CE_ON;
 
-    // Send 8 clocks before commands.  Is this necessary?
-    uint8_t d = SD_DATA_PORT;
-
     SD_DATA_PORT = cmd;
 
-    // Send args buffer and zero.
+    // Send args buffer and zero each arg.
     uint8_t i;
     for ( i = 0 ; i < sizeof(CMDARGS) ; i++ ) {
         SD_DATA_PORT = CMDARGS[i];
@@ -392,6 +399,7 @@ sd_send_cmd_ex(uint8_t cmd, uint8_t crc, uint8_t clk_speed)
 
     // Get the response.  Looking for != 0xFF.
     // Fail after 255 attempts.
+    uint8_t d;
     for ( i = 255 ; i > 0 ; i-- )
     {
         d = SD_DATA_PORT;
@@ -697,9 +705,9 @@ sd_read_block_to_vram(uint32_t block_addr)
     CMDARGS[3] =  block_addr        & 0xFF;
 
     uint8_t d;
-    d = sd_send_cmd_ex(CMD17, CRCX, CK_FAST);
+    d = sd_send_cmd_ex(CMD17, CRCX, CK_SLOW);
     if ( d != R1_READY ) {
-        SD_CTRL_PORT = CK_FAST | CE_OFF;
+        SD_CTRL_PORT = CK_SLOW | CE_OFF;
         return SD_READ_BLOCK_FAILED;
     }
 
@@ -715,10 +723,10 @@ sd_read_block_to_vram(uint32_t block_addr)
     }
 
     if ( wait == 0 ) {
-        SD_CTRL_PORT = CK_FAST | CE_OFF;
+        SD_CTRL_PORT = CK_SLOW | CE_OFF;
         VDP_DATA_PORT = '!';
-        VDP_DATA_PORT = hex[((d&0xF0)>>4)];
-        VDP_DATA_PORT = hex[(d&0x0F)];
+        VDP_DATA_PORT = hex[((d >> 4) & 0xF)];
+        VDP_DATA_PORT = hex[( d       & 0xF)];
         return SD_TOKEN_TIMEOUT;
     }
 
@@ -744,7 +752,7 @@ sd_read_block_to_vram(uint32_t block_addr)
     d = SD_DATA_PORT;
     d = SD_DATA_PORT;
 
-    SD_CTRL_PORT = CK_FAST | CE_OFF;
+    SD_CTRL_PORT = CK_SLOW | CE_OFF;
 
     return SD_CARD_OK;
 }
@@ -780,7 +788,7 @@ sd_card_detect(uint8_t frame_tick)
             // Looks like an SD-card may be inserted, so debounce.
             if ( frame_tick != 0 )
             {
-                if ( delay > 20 ) {
+                if ( delay > 80 ) {	// original 20
                     delay = 0;
                     state = SD_ST_INIT;
                 }

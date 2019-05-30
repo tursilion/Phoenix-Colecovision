@@ -93,7 +93,7 @@ NET "sram_we_n_o"       LOC="M18" | IOSTANDARD = LVCMOS33;
 #
 NET "sd_cs_n_o"         LOC="C5"  | IOSTANDARD = LVCMOS33 | DRIVE = 8;
 NET "sd_sclk_o"         LOC="B6"  | IOSTANDARD = LVCMOS33 | DRIVE = 8;
-NET "sd_mosi_o"         LOC="A5"  | IOSTANDARD = LVCMOS33 | DRIVE = 8;
+NET "sd_mosi_o"         LOC="A5"  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
 NET "sd_miso_i"         LOC="A6"  | IOSTANDARD = LVCMOS33; # Ext pullup
 #Missing on board require jumper to D14 LED
 NET "sd_cd_n_i"			LOC="C6"  | IOSTANDARD = LVCMOS33; # Ext pullup
