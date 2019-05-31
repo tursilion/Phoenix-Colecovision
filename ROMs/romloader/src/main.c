@@ -688,11 +688,9 @@ sd_card_init(void)
     }
 
     // Send the ACMD41 or CMD1 to activate the card's self initialization.
-    // Repeat until the card is ready, or timeout.  A count of 8000 should
-    // be around 30ms to 80ms (this is a rough guess, as well as whether
-    // this is enough time to allow the card to finish initialization.)
+    // Repeat until the card is ready, or timeout.
     uint16_t wait;
-    for ( wait = 8000 ; wait > 0 && d == R1_IDLE ; wait-- )
+    for ( wait = 25000 ; wait > 0 && d == R1_IDLE ; wait-- )
     {
         if ( i == CARD_IS_SD ) {
             d = sd_send_cmd(CMD55, CRCX, CK_SLOW);
@@ -763,10 +761,20 @@ sd_read_block_to_vram(uint32_t block_addr)
         block_addr *= 512;
     }
 
-    CMDARGS[0] = (block_addr >> 24) & 0xFF;
-    CMDARGS[1] = (block_addr >> 16) & 0xFF;
-    CMDARGS[2] = (block_addr >>  8) & 0xFF;
-    CMDARGS[3] =  block_addr        & 0xFF;
+    CMDARGS[0] = (uint8_t)(block_addr >> 24);
+    CMDARGS[1] = (uint8_t)(block_addr >> 16);
+    CMDARGS[2] = (uint8_t)(block_addr >>  8);
+    CMDARGS[3] = (uint8_t) block_addr;
+
+    VDP_DATA_PORT = hex[((CMDARGS[0]>>4)&0xF)];
+    VDP_DATA_PORT = hex[((CMDARGS[0]   )&0xF)];
+    VDP_DATA_PORT = hex[((CMDARGS[1]>>4)&0xF)];
+    VDP_DATA_PORT = hex[((CMDARGS[1]   )&0xF)];
+    VDP_DATA_PORT = hex[((CMDARGS[2]>>4)&0xF)];
+    VDP_DATA_PORT = hex[((CMDARGS[2]   )&0xF)];
+    VDP_DATA_PORT = hex[((CMDARGS[3]>>4)&0xF)];
+    VDP_DATA_PORT = hex[((CMDARGS[3]   )&0xF)];
+    VDP_DATA_PORT = ' ';
 
     uint8_t d;
     uint8_t eop;
@@ -783,11 +791,11 @@ sd_read_block_to_vram(uint32_t block_addr)
     //
     // The specifications indicate that reads will generally take between
     // 100ms and 250ms (max).  It is possible to read the CSD register for
-    // the TAAC and NSAC values to calcuate the actual time; or just use a
+    // the TAAC and NSAC values to calculate the actual time; or just use a
     // count value that is way bigger than will ever happen (which is what
     // has been done here.)
     //
-    // Measured counts have been around 300, but what that equates to in
+    // Measured counts have been around 36, but what that equates to in
     // actual time depends on how long the loop actually takes to execute
     // once, which is unknown.
 
@@ -825,11 +833,11 @@ sd_read_block_to_vram(uint32_t block_addr)
 	{
         d = SD_DATA_PORT;
 
-        if ( count > (512 - 128) ) {
-            VDP_DATA_PORT = hex[((d >> 4) & 0xF)];
-            VDP_DATA_PORT = hex[( d       & 0xF)];
-            VDP_DATA_PORT = ' ';
-        }
+        //if ( count > (512 - 64) ) {
+        //    VDP_DATA_PORT = hex[((d >> 4) & 0xF)];
+        //    VDP_DATA_PORT = hex[( d       & 0xF)];
+        //}
+        VDP_DATA_PORT = d;
     }
 
     // Consume the 16-bit CRC from the card.
@@ -873,7 +881,7 @@ sd_card_detect(uint8_t frame_tick)
             // Looks like an SD-card may be inserted, so debounce.
             if ( frame_tick != 0 )
             {
-                if ( delay > 80 ) { // original 20
+                if ( delay > 20 ) {
                     delay = 0;
                     state = SD_ST_INIT;
                 }
@@ -895,7 +903,10 @@ sd_card_detect(uint8_t frame_tick)
         g_sd_status = sd_card_init();
         if ( g_sd_status == SD_CARD_OK ) {
             state = SD_ST_FOUND;
-            sd_read_block_to_vram(0);
+			
+            //sd_read_block_to_vram(0);
+			//sd_read_block_to_vram(263); // byte 0x20E00, sector 0x107 (263)
+			sd_read_block_to_vram(2048); // byte 0x100000, sector 0x800 (2048)
         }
         else {
             state = SD_ST_INITFAIL;
