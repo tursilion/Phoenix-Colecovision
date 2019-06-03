@@ -6,11 +6,36 @@
  * makebin -s 8192 romloader.ihx romloader.rom
  */
 
-#include "main.h"
+#include <stdint.h>		// (u)intXX_t
+
 #include "msx1_font.h"
 
 // ==========================================================================
 // Defines
+
+#define GAME_NAME 		0x8024	// Company name/game title address in a cartridge
+
+// Read / write memory via direct addresses, example:
+//   v = peek(8000);
+//   poke(8002, v);
+#define peek(A) (*(volatile uint16_t *)(A))
+#define poke(A,V) *(volatile uint16_t *)(A)=(V)
+
+
+// ==========================================================================
+// Special Function Registers to designate IO Ports
+
+
+__sfr __at 0x56 SD_CTRL_PORT;		// SC-card control port
+__sfr __at 0x57 SD_DATA_PORT;		// SC-card data port
+
+__sfr __at 0x80 CONT_KEY_PORT;		// Write port to select keypad
+__sfr __at 0xC0 CONT_JOY_PORT;		// Write port to select joystick
+__sfr __at 0xFC CONT1_DATA_PORT;	// Read data from controller
+__sfr __at 0xFF CONT2_DATA_PORT;	// Read data from controller
+
+__sfr __at 0xBE VDP_DATA_PORT;		// VDP data port
+__sfr __at 0xBF VDP_CTRL_PORT;		// VDP control port
 
 
 // ==========================================================================
@@ -32,6 +57,12 @@ volatile uint8_t nmi_count_g = 0;
 void
 nmi_handler(void) __critical __interrupt __naked
 {
+    // Save the AF pair so the NMI does not interfere with whatever it
+    // interrupted.  Increment the global counter so the NMI can be
+    // detected by the main application.
+    //
+    // There is NO VDP ACCESS in this NMI, which makes it safe to have
+    // enabled all the time.
     __asm
     push af
     ld a, (_nmi_count_g)
@@ -395,13 +426,22 @@ disp_hex(uint8_t d)
 //   14..0  reserved
 
 
-enum CARD_TYPE {
-    CARD_IS_SD = 0,
-    CARD_IS_MMC,
-    CARD_IS_UNKNOWN
+enum SD_CARD_TYPE {
+    SD_IS_SDSC = 0,
+    SD_IS_SDHC,
+    SD_IS_MMC,
+    SD_IS_UNKNOWN
 };
 
-enum CARD_ERROR {
+uint8_t *g_sd_type_name[] = {
+    "SDSC",
+    "SDHC",
+    "MMC ",
+    "????"
+};
+
+
+enum SD_CARD_ERROR {
     SD_NO_CARD = 0,
     SD_CARD_OK,
     SD_SPI_MODE_FAILED,
@@ -427,6 +467,9 @@ uint8_t g_sd_addr_size = ADDR_BLOCK;
 // SD-card status
 uint8_t g_sd_status = SD_NO_CARD;
 
+// SD-card type
+uint8_t g_sd_type = SD_IS_UNKNOWN;
+
 // All commands are 6 bytes, with 4-bytes for arguments.
 //  1   2  3  4  5   6
 // CMD |   ARGS   | CRC
@@ -449,7 +492,7 @@ uint8_t
 sd_send_cmd_ex(uint8_t cmd, uint8_t crc, uint8_t clk_speed)
 {
     // Straddle commands (sd_send_cmd() provides an additional 8-clocks) with
-    // 8-clocks while CS is off.  All operations require a trialing 8-clocks,
+    // 8-clocks while CS is off.  All operations require a trailing 8-clocks,
     // so this provides that service in case the calling code failed to do so.
     SD_CTRL_PORT = clk_speed | CE_OFF;
     uint8_t d = SD_DATA_PORT; // required end-of-op 8-clocks
@@ -498,7 +541,7 @@ sd_send_cmd(uint8_t cmd, uint8_t crc, uint8_t clk_speed)
     SD_CTRL_PORT = clk_speed | CE_OFF;
 
     // The SD-cards requires 8-clocks after all commands and data transfers.
-    // The state of CE is irrevalent (see SanDisk Spec, section 5.1.8)
+    // The state of CE is irrelevant (see SanDisk Spec, section 5.1.8)
     uint8_t eop = SD_DATA_PORT; // required end-of-op 8-clocks
 
     return d;
@@ -509,7 +552,7 @@ sd_send_cmd(uint8_t cmd, uint8_t crc, uint8_t clk_speed)
 /**
  * Initialize an SD-card or MMC.
  *
- * @return SD_CARD_OK on success, otherwise CARD_ERROR enum error value.
+ * @return SD_CARD_OK on success, otherwise SD_CARD_ERROR enum error value.
  */
 uint8_t
 sd_card_init(void)
@@ -591,6 +634,7 @@ sd_card_init(void)
     uint8_t eop;
 
     g_sd_addr_size = ADDR_BLOCK;
+    g_sd_type = SD_IS_UNKNOWN;
 
     // Slow clock, CS_n disable.
     SD_CTRL_PORT = CK_SLOW | CE_OFF;
@@ -626,6 +670,8 @@ sd_card_init(void)
         if ( i != VHS || d != CKPTRN ) {
             return SD_BAD_CMD8_VOLTAGE;
         }
+        
+        g_sd_type = SD_IS_SDHC;
     }
 
     else
@@ -661,6 +707,7 @@ sd_card_init(void)
         }
 
         g_sd_addr_size = ADDR_BYTE;
+        g_sd_type = SD_IS_SDSC;
     }
 
     // At this point the card is SD-card V1.x or V2.x, or an MMC card
@@ -682,9 +729,8 @@ sd_card_init(void)
         if ( d > R1_IDLE ) {
             return SD_MMC_FAILED;
         }
-        i = CARD_IS_MMC;
-    } else {
-        i = CARD_IS_SD;
+        
+        g_sd_type = SD_IS_MMC;
     }
 
     // Send the ACMD41 or CMD1 to activate the card's self initialization.
@@ -692,11 +738,11 @@ sd_card_init(void)
     uint16_t wait;
     for ( wait = 25000 ; wait > 0 && d == R1_IDLE ; wait-- )
     {
-        if ( i == CARD_IS_SD ) {
+        if ( g_sd_type == SD_IS_MMC ) {
+            d = sd_send_cmd(CMD1, CRCX, CK_SLOW);
+        } else {
             d = sd_send_cmd(CMD55, CRCX, CK_SLOW);
             d = sd_send_cmd(ACMD41, CRCX, CK_SLOW);
-        } else {
-            d = sd_send_cmd(CMD1, CRCX, CK_SLOW);
         }
     }
 
@@ -731,6 +777,7 @@ sd_card_init(void)
 
         if ( (d & CSS_BIT) == 0 ) {
             g_sd_addr_size = ADDR_BYTE;
+            g_sd_type = SD_IS_SDSC;
         }
     }
 
@@ -750,12 +797,24 @@ sd_card_init(void)
 
 
 /**
- * Read a 512 byte block from SD-card to VRAM
+ * Read a 512 byte block from SD-card to CPU RAM or VRAM.
+ *
+ * If the dst parameter is 0x0000, the destination will be VRAM.
+ *
+ * For a VRAM copy, the caller must set up the destination VRAM address prior
+ * to calling this function.
+ *
+ * @note This function uses the FAST clock speed, assuming that the card has
+ * been properly initialized.
+ *
+ * @param[in] block_addr    The 512-byte SD-card block address to read.
+ * @param[in] dst           The destination address to write the data, or NULL
+ *                          for a VRAM copy.
  *
  * @return SD_CARD_OK on success, otherwise CARD_ERROR enum error value.
  */
 uint8_t
-sd_read_block_to_vram(uint32_t block_addr)
+sd_read_block(uint32_t block_addr, uint8_t *dst)
 {
     if ( g_sd_addr_size == ADDR_BYTE ) {
         block_addr *= 512;
@@ -766,21 +825,11 @@ sd_read_block_to_vram(uint32_t block_addr)
     CMDARGS[2] = (uint8_t)(block_addr >>  8);
     CMDARGS[3] = (uint8_t) block_addr;
 
-    VDP_DATA_PORT = hex[((CMDARGS[0]>>4)&0xF)];
-    VDP_DATA_PORT = hex[((CMDARGS[0]   )&0xF)];
-    VDP_DATA_PORT = hex[((CMDARGS[1]>>4)&0xF)];
-    VDP_DATA_PORT = hex[((CMDARGS[1]   )&0xF)];
-    VDP_DATA_PORT = hex[((CMDARGS[2]>>4)&0xF)];
-    VDP_DATA_PORT = hex[((CMDARGS[2]   )&0xF)];
-    VDP_DATA_PORT = hex[((CMDARGS[3]>>4)&0xF)];
-    VDP_DATA_PORT = hex[((CMDARGS[3]   )&0xF)];
-    VDP_DATA_PORT = ' ';
-
     uint8_t d;
     uint8_t eop;
-    d = sd_send_cmd_ex(CMD17, CRCX, CK_SLOW);
+    d = sd_send_cmd_ex(CMD17, CRCX, CK_FAST);
     if ( d != R1_READY ) {
-        SD_CTRL_PORT = CK_SLOW | CE_OFF;
+        SD_CTRL_PORT = CK_FAST | CE_OFF;
         eop = SD_DATA_PORT; // required end-of-op 8-clocks
         return SD_READ_BLOCK_FAILED;
     }
@@ -812,58 +861,61 @@ sd_read_block_to_vram(uint32_t block_addr)
     }
 
     if ( d != SD_START_TOKEN ) {
-        SD_CTRL_PORT = CK_SLOW | CE_OFF;
+        SD_CTRL_PORT = CK_FAST | CE_OFF;
         eop = SD_DATA_PORT; // required end-of-op 8-clocks
-        VDP_DATA_PORT = '!';
-        VDP_DATA_PORT = hex[((d >> 4) & 0xF)];
-        VDP_DATA_PORT = hex[( d       & 0xF)];
         return SD_TOKEN_TIMEOUT;
     }
 
-    // Show the timeout value for knowledge purposes.
-    count = 25000 - count;
-    VDP_DATA_PORT = hex[((count>>12)&0xF)];
-    VDP_DATA_PORT = hex[((count>> 8)&0xF)];
-    VDP_DATA_PORT = hex[((count>> 4)&0xF)];
-    VDP_DATA_PORT = hex[( count     &0xF)];
-    VDP_DATA_PORT = ' ';
-
     // Start token received, 512 data bytes follow.
-    for ( count = 512 ; count > 0 ; count-- )
-	{
-        d = SD_DATA_PORT;
-
-        //if ( count > (512 - 64) ) {
-        //    VDP_DATA_PORT = hex[((d >> 4) & 0xF)];
-        //    VDP_DATA_PORT = hex[( d       & 0xF)];
-        //}
-        VDP_DATA_PORT = d;
+    // The C compiler does not do a very good job of using the CPU's block
+    // data movement instructions.  This loop could be much faster if it
+    // was optimized in assembly.
+    if ( dst == 0 )
+    {
+        // VRAM
+        for ( count = 512 ; count > 0 ; count-- )
+        {
+            d = SD_DATA_PORT;
+            VDP_DATA_PORT = d;
+        }
+    }
+    
+    else
+    {
+        // CPU RAM
+        for ( count = 512 ; count > 0 ; count--, dst++ )
+        {
+            d = SD_DATA_PORT;
+            *dst = d;
+        }
     }
 
     // Consume the 16-bit CRC from the card.
     d = SD_DATA_PORT;
     d = SD_DATA_PORT;
 
-    SD_CTRL_PORT = CK_SLOW | CE_OFF;
+    SD_CTRL_PORT = CK_FAST | CE_OFF;
     eop = SD_DATA_PORT; // required end-of-op 8-clocks
 
     return SD_CARD_OK;
 }
+// sd_read_block()
 
 
 enum SDCARD_ST {
     SD_ST_NOTFOUND = 0,
     SD_ST_INIT,
+    SD_ST_FOUND,
     SD_ST_INITFAIL,
-    SD_ST_FOUND
+    SD_ST_READY
 };
 
 
 /**
  * SD-card detection
  *
- * @note Call with VDP Write Address set to a location to
- *       dump 512 bytes from the SD-card on successful init.
+ * Debounces the SD-card detect input, and if an SD-card is found calls the
+ * initialization routine for the SD-card.
  */
 uint8_t
 sd_card_detect(uint8_t frame_tick)
@@ -903,10 +955,6 @@ sd_card_detect(uint8_t frame_tick)
         g_sd_status = sd_card_init();
         if ( g_sd_status == SD_CARD_OK ) {
             state = SD_ST_FOUND;
-			
-            //sd_read_block_to_vram(0);
-			//sd_read_block_to_vram(263); // byte 0x20E00, sector 0x107 (263)
-			sd_read_block_to_vram(2048); // byte 0x100000, sector 0x800 (2048)
         }
         else {
             state = SD_ST_INITFAIL;
@@ -914,15 +962,25 @@ sd_card_detect(uint8_t frame_tick)
 
         break;
 
+    case SD_ST_FOUND :
+
+        // Provide a one-time return state of success to allow the caller
+        // to do something once after card initialization, when a card is
+        // first inserted.
+        state = SD_ST_READY;
+        break;
+        
     case SD_ST_INITFAIL :
+
+        // **NOTE** This state MUST fall-through to SD_ST_READY.
 
         // If the card failed, it must be removed and reinserted before
         // another attempt will be made.
 
-        // fall-through.  This state is just to allow a return value other
-        // that success.
-
-    case SD_ST_FOUND :
+        // fall-through.  This state is to provide a return state other
+        // than success.
+    
+    case SD_ST_READY :
         if ( sample != 0x80 )
         {
             // The SD-card detect input went low, card was pulled out.
@@ -1121,7 +1179,8 @@ void
 swapin_real_cart(void)
 {
     // Turn off the VDP interrupt so the NMI can't mess this up.
-    // VR1=E0h to enable the frame flag (triggers the NMI).
+    // VR1 IE-bit is >02.
+    // VR1=C0h to disable the Interrupt Enable (stops the NMI routine).
     vdp_wtr(0x01, 0xC0);
 
     // Write the Loader/BIOS swap trigger code to 0x6000 (RAM), and
@@ -1186,7 +1245,8 @@ main(void)
     print_setxy(0, 0);
     print_str_nl("Devices Detected:");
 
-    // VR1=E0h to enable the frame flag (triggers the NMI).
+    // VR1 IE-bit is >02.
+    // VR1=E0h to enable the Interrupt Enable (triggers the NMI).
     vdp_wtr(0x01, 0xE0);
 
     while ( 1 )
@@ -1208,25 +1268,39 @@ main(void)
 
 
         // Display SD-card status.
-        vdp_wr_addr(160);
-        rtn = sd_card_detect(frame_tick);
         print_setxy(2, 1);
         print_str_sp("SDCARD:");
+        rtn = sd_card_detect(frame_tick);
+
         switch ( rtn ) {
         case SD_ST_NOTFOUND :
-            print_str("NONE   :"); break;
+            print_str("NONE     "); break;
         case SD_ST_INIT :
-            print_str("INIT... "); break;
+            print_str("INIT...  "); break;
         case SD_ST_INITFAIL :
-            print_str("ERROR  :"); break;
+            print_str("ERROR:  ");
+            // Display the status, which is the enum value returned and
+            // indicates the error.
+            VDP_DATA_PORT = hex[(g_sd_status&0x0F)];
+            break;
         case SD_ST_FOUND :
-            print_str("YES    :"); break;
+            print_str("READING.."); 
+            vdp_wr_addr(160);
+            //sd_read_block(0, 0);
+			//sd_read_block(263, 0); // sector 0x107 (263) == byte 0x20E00
+			uint8_t *src;
+			src = (uint8_t *)0x6400;
+			sd_read_block(2048, src); // sector 0x800 (2048) == byte 0x100000
+			uint16_t lp;
+			for ( lp = 512 ; lp > 0 ; lp--, src++ ) {
+				VDP_DATA_PORT = *src;
+			}
+            break;
+        case SD_ST_READY :
+            print_str("YES: ");
+            print_str(g_sd_type_name[g_sd_type]);
+            break;
         }
-
-        VDP_DATA_PORT = ' ';
-        VDP_DATA_PORT = hex[(g_sd_status&0x0F)];
-        VDP_DATA_PORT = ' ';
-        VDP_DATA_PORT = hex[(g_sd_addr_size&0x0F)];
 
 
         // Display cartridge status.

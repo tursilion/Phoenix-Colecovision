@@ -68,21 +68,6 @@ entity colecovision is
       ctrl_p8_o      : out std_logic;
       ctrl_p9_i      : in  std_logic_vector( 2 downto 1);
 
---      -- CPU RAM
---      ram_addr_o     : out std_logic_vector(16 downto 0);   -- 128K
---      ram_ce_o       : out std_logic;
---      ram_oe_o       : out std_logic;
---      ram_we_o       : out std_logic;
---      ram_data_i     : in  std_logic_vector( 7 downto 0);
---      ram_data_o     : out std_logic_vector( 7 downto 0);
---      -- Video RAM Interface
---      vram_addr_o    : out std_logic_vector(13 downto 0);   -- 16K
---      vram_ce_o      : out std_logic;
---      vram_oe_o      : out std_logic;
---      vram_we_o      : out std_logic;
---      vram_data_i    : in  std_logic_vector( 7 downto 0);
---      vram_data_o    : out std_logic_vector( 7 downto 0);
-
       -- Physical cartridge interface
       cart_addr_o    : out std_logic_vector(14 downto 0);   -- 32K
       cart_dir_o     : out std_logic;
@@ -121,10 +106,6 @@ entity colecovision is
    );
 
 end entity;
-
--- pragma translate_off
-use std.textio.all;
--- pragma translate_on
 
 architecture rtl of colecovision is
 
@@ -165,21 +146,22 @@ architecture rtl of colecovision is
    signal ay_ch_c_s                       : std_logic_vector( 7 downto 0);
 
    -- Audio Mixing
-   signal AUDIO_WSG                       : unsigned(7 downto 0);
-   signal AUDIO_EX                        : signed(7 downto 0);
-   signal AUDIO_EX_A			               : signed(7 downto 0);
-   signal AUDIO_EX_B			               : signed(7 downto 0);
-   signal AUDIO_EX_C			               : signed(7 downto 0);
-   signal AUDIO_SUM                       : signed(8 downto 0);
+   signal AUDIO_WSG                       : unsigned( 7 downto 0);
+   signal AUDIO_EX                        : signed( 7 downto 0);
+   signal AUDIO_EX_A			               : signed( 7 downto 0);
+   signal AUDIO_EX_B			               : signed( 7 downto 0);
+   signal AUDIO_EX_C			               : signed( 7 downto 0);
+   signal AUDIO_SUM                       : signed( 8 downto 0);
    signal WSG_CS                          : std_logic;
 
-   -- Internal 1K RAM
-   type ram_1k_t is array (0 to 1023) of std_logic_vector(0 to 7);
+   -- Internal 1K RAM + 1K Extra for loader
+   type ram2k_t is array (0 to 2047) of std_logic_vector( 7 downto 0);
 
-   signal cv_ram_1k_r                     : ram_1k_t;
-   signal cv_ram1k_en_s                   : std_logic;
-   signal cv_ram1k_addr_s                 : std_logic_vector( 9 downto 0);
-   signal d_from_cv_ram1k_r               : std_logic_vector( 7 downto 0);
+   signal cv_ram2k_r                      : ram2k_t;
+   signal cv_ram2k_en_s                   : std_logic;
+   signal cv_ram2k_bonus_s                : std_logic;
+   signal cv_ram2k_addr_s                 : std_logic_vector(10 downto 0);
+   signal d_from_cv_ram2k_r               : std_logic_vector( 7 downto 0);
 
    -- SGM RAM
    signal sgm_en_r, sgm_en_x              : std_logic;
@@ -511,26 +493,29 @@ begin
       data_o      => d_from_bios_s
    );
 
-   -- TODO: Logic for allowing BIOS to be written to.
+   -- TODO Maybe allow BIOS to be written to?
    bios_we_s <= '0';
 
 
    --
    -- CV Internal 1K RAM
    --
-   cv_ram_1k : process (clock_i, cv_ram1k_en_s, cv_ram1k_addr_s, wr_n_s)
+   -- When the loader is active, expanded to 2K for convenience.
+   --
+   cv_ram_2k : process (clock_i, cv_ram2k_en_s, cv_ram2k_addr_s, wr_n_s)
    begin
    if rising_edge(clock_i) then
-      if cv_ram1k_en_s = '1' then
+      if cv_ram2k_en_s = '1' then
          if wr_n_s = '0' then
-            cv_ram_1k_r(to_integer(unsigned(cv_ram1k_addr_s))) <= d_from_cpu_s;
+            cv_ram2k_r(to_integer(unsigned(cv_ram2k_addr_s))) <= d_from_cpu_s;
          end if;
-         d_from_cv_ram1k_r <= cv_ram_1k_r(to_integer(unsigned(cv_ram1k_addr_s)));
+         d_from_cv_ram2k_r <= cv_ram2k_r(to_integer(unsigned(cv_ram2k_addr_s)));
       end if;
    end if;
    end process;
 
-   cv_ram1k_addr_s <= cpu_addr_s(9 downto 0);
+   cv_ram2k_bonus_s <= '0' when rom_loader_en_r = '0' else cpu_addr_s(10);
+   cv_ram2k_addr_s <= cv_ram2k_bonus_s & cpu_addr_s(9 downto 0);
 
 
    --
@@ -623,7 +608,7 @@ begin
    --
    -- During PoR the ROM loader is mapped into memory and the BIOS is
    -- relocated to a new location.  When the loader is disabled, the
-   -- BIOS is moved back to its normal location.  Also, the 1K or RAM
+   -- BIOS is moved back to its normal location.  Also, the 1K of RAM
    -- is doubled to 2K of actual RAM when the loader is enabled to help
    -- with providing buffers and such for SD-card operations, etc.
    --
@@ -688,12 +673,12 @@ begin
    -- the system BIOS with RAM.
 
    process ( cpu_addr_s, mreq_n_s, rfsh_n_s, wr_n_s,
-             d_from_loader_s, d_from_bios_s, d_from_cv_ram1k_r, cart_data_io,
+             d_from_loader_s, d_from_bios_s, d_from_cv_ram2k_r, cart_data_io,
              d_from_ext512_s, sgm_en_r, sgm_8k_en_r,
              ext_ram_bank_r, rom_loader_en_r )
    begin
 
-      cv_ram1k_en_s  <= '0';
+      cv_ram2k_en_s  <= '0';
 
       cart_en_80_n_s <= '1';
       cart_en_A0_n_s <= '1';
@@ -762,11 +747,11 @@ begin
                cpu_data_mux_s <= d_from_ext512_s;
             end if;
 
-         when "011" =>                 -- 8K  >6000 .. >7FFF   CV 1K or SGM 24K RAM
+         when "011" =>                 -- 8K  >6000 .. >7FFF   CV 1K+1Kbonus or SGM 24K RAM
 
             if sgm_en_r = '0' then
-               cv_ram1k_en_s  <= '1';
-               cpu_data_mux_s <= d_from_cv_ram1k_r;
+               cv_ram2k_en_s  <= '1';
+               cpu_data_mux_s <= d_from_cv_ram2k_r;
             else
                ext_ram_we_n_s <= wr_n_s;
                cpu_data_mux_s <= d_from_ext512_s;

@@ -56,16 +56,15 @@
 	reti
 	.org	0x66
 	jp		_nmi_handler
-	retn
 
 	.org	0x80
 
 init:
-	;; Stack at the top of memory. Spack is decrement-first, which brings
-	;; the address into acutal memory (6000h to 63FFh) on first use.
+	;; Stack at the top of memory. Stack is decrement-first, which brings
+	;; the address into actual memory (6000h to 63FFh) on first use.
 	ld	sp, #0x6400
 
-	;; Initialise global variables
+	;; Initialize global variables
 	call    gsinit
 	call	_main
 	jp		_exit

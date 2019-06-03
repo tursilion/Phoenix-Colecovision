@@ -3,6 +3,9 @@
 
 #include <stdint.h>		// (u)intXX_t
 
+// Full 256 tile character set based on the MSX1 font.
+// Modifies the original set to have copyright and
+// trademark characters at the indexes expected by the CV.
 const static uint8_t msx1_font[] = {
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,	// 0
 	0x3C,0x42,0xA5,0x81,0xA5,0x99,0x42,0x3C,
@@ -263,4 +266,3 @@ const static uint8_t msx1_font[] = {
 };
 
 #endif /* _MSX1_FONT_H */
-
