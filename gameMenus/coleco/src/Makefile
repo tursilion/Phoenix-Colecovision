@@ -1,0 +1,107 @@
+# install SDCC 3.5.0 64-bit for Windows, and then in C:\program files\sdcc\bin,
+# replace sdldz80.exe with Tursi's version. use gnuwin32 or cygwin for Make, and
+# provide Tursi's "makeMegaCart.exe" for the linking.
+# This version runs as a Phoenix BIOS. Commented out code is for the cartridge
+
+CC = "c:/program files/sdcc/bin/sdcc"
+CFLAGS = -mz80 -c "-I../libti99coleco" --std-sdcc99 --vc -DENABLEFX --opt-code-speed
+AS = "c:/program files/sdcc/bin/sdasz80"
+AR = "c:/program files/sdcc/bin/sdcclib"
+AFLAGS = -plosgff
+RM = del /F 
+# might need to use o for older SDCC, rel for newer
+EXT=rel
+
+# make sure the crt0 is first!
+MAIN_OBJS =\
+    crt0_bios.$(EXT)  \
+    phoenixBoot.$(EXT)  \
+    newmap2.$(EXT)  \
+    f18a.$(EXT)  \
+    fatfont.$(EXT)  \
+    thinfont.$(EXT) \
+    menu.$(EXT)  \
+    memset.$(EXT)
+
+FAT_OBJS =\
+    fatFs\diskio_diskinit.$(EXT) \
+    fatFs\diskio_diskioctl.$(EXT) \
+    fatFs\diskio_diskread.$(EXT) \
+    fatFs\diskio_diskstatus.$(EXT) \
+    fatFs\diskio_dselect.$(EXT) \
+    fatFs\diskio_rcvrdatablock.$(EXT) \
+    fatFs\diskio_rcvrmmc.$(EXT) \
+    fatFs\diskio_select.$(EXT) \
+    fatFs\diskio_sendcmd.$(EXT) \
+    fatFs\diskio_waitready.$(EXT) \
+    fatFs\diskio_xmitdatablock.$(EXT) \
+    fatFs\diskio_xmitmmc.$(EXT) \
+    fatFs\ff_checkfs.$(EXT) \
+    fatFs\ff_chkchr.$(EXT) \
+    fatFs\ff_closedir.$(EXT) \
+    fatFs\ff_clst2sect.$(EXT) \
+    fatFs\ff_cmplfn.$(EXT) \
+    fatFs\ff_createname.$(EXT) \
+    fatFs\ff_dirfind.$(EXT) \
+    fatFs\ff_dirnext.$(EXT) \
+    fatFs\ff_dirread.$(EXT) \
+    fatFs\ff_dirsdi.$(EXT) \
+    fatFs\ff_fchdir.$(EXT) \
+    fatFs\ff_fchdrive.$(EXT) \
+    fatFs\ff_fclose.$(EXT) \
+    fatFs\ff_findvolume.$(EXT) \
+    fatFs\ff_fmount.$(EXT) \
+    fatFs\ff_followpath.$(EXT) \
+    fatFs\ff_fopen.$(EXT) \
+    fatFs\ff_fread.$(EXT) \
+    fatFs\ff_getfat.$(EXT) \
+    fatFs\ff_getfileinfo.$(EXT) \
+    fatFs\ff_getldnumber.$(EXT) \
+    fatFs\ff_ldclust.$(EXT) \
+    fatFs\ff_lddword.$(EXT) \
+    fatFs\ff_ldword.$(EXT) \
+    fatFs\ff_lseek.$(EXT) \
+    fatFs\ff_memcmp.$(EXT) \
+    fatFs\ff_movewindow.$(EXT) \
+    fatFs\ff_opendir.$(EXT) \
+    fatFs\ff_picklfn.$(EXT) \
+    fatFs\ff_pututf.$(EXT) \
+    fatFs\ff_readdir.$(EXT) \
+    fatFs\ff_sumsfn.$(EXT) \
+    fatFs\ff_tchar2uni.$(EXT) \
+    fatFs\ff_validate.$(EXT) \
+    fatFs\ff_vars.$(EXT) \
+    fatFs\ffunicode_cp.$(EXT) \
+    fatFs\ffunicode_ffoem2uni.$(EXT) \
+    fatFs\ffunicode_ffuni2oem.$(EXT) \
+    fatFs\ffunicode_ffwtoupper.$(EXT)
+
+# Recipe to compile the app
+all: bios fatfs
+	"../tursi_tools/makemegacart.exe" -bios phoenixBoot.ihx phoenixBoot.rom
+
+#bios: phoenixBoot.rel crt0_cart.rel newmap2.rel f18a.rel fatfont.rel thinfont.rel
+#	$(CC) -mz80 --no-std-crt0 --code-loc 0x8100 --data-loc 0x7000 -l../libti99coleco/libti99.a "./crt0_cart.$(EXT)" phoenixBoot.$(EXT) f18a.$(EXT) -o phoenixBoot.ihx
+
+#bios: phoenixBoot.rel crt0_bios.rel newmap2.rel f18a.rel fatfont.rel thinfont.rel 
+#	$(CC) -mz80 --no-std-crt0 --code-loc 0x0100 --data-loc 0x7000 -l../libti99coleco/libti99.a "./crt0_bios.$(EXT)" phoenixBoot.$(EXT) f18a.$(EXT) -o phoenixBoot.ihx
+
+bios: $(MAIN_OBJS) fatfs f18a.h memset.h phoenix.h
+	$(RM) phoenixBoot.ihx
+	$(CC) -mz80 --no-std-crt0 --code-loc 0x0100 --data-loc 0x7000 -l../libti99coleco/libti99.a -lfatfs.a $(MAIN_OBJS) -o phoenixBoot.ihx
+
+fatfs: $(FAT_OBJS) fatFs/ff.h fatFs/ffconf.h fatFs/diskio.h
+	$(AR) -r fatfs.a $(FAT_OBJS)
+
+# Recipe to clean all compiled objects
+.phony clean:
+	$(RM) *.rel *.map *.lst *.lnk *.sym *.asm *~ *.o *.obj *.ihx *.rom *.rel *.a *.lib
+	$(RM) fatFs\*.rel fatFs\*.map fatFs\*.lst fatFs\*.lnk fatFs\*.sym fatFs\*.asm fatFs\*~ fatFs\*.o fatFs\*.obj fatFs\*.ihx fatFs\*.rom fatFs\*.rel fatFs\*.a fatFs\*.lib
+
+# Recipe to compile all C files
+%.rel: %.c
+	$(CC) -c $< $(CFLAGS) -o $@
+
+# Recipe to compile all assembly files
+%.rel: %.s
+	$(AS) -o $@ $<
