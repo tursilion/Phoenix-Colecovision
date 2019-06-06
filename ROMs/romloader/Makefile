@@ -18,8 +18,8 @@ LD		:= sdcc
 H2B		:= makebin
 ROMGEN	:= romgen
 
-# 16K Loader from 0000h to 3FFFh
-MEMSIZE	:= 16384
+# 24K Loader from 0000h to 5FFFh
+MEMSIZE	:= 24576
 
 BMMDIR  := ../..
 BITDIR	:= ../../../collectorvision_ise

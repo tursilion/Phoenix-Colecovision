@@ -154,14 +154,13 @@ architecture rtl of colecovision is
    signal AUDIO_SUM                       : signed( 8 downto 0);
    signal WSG_CS                          : std_logic;
 
-   -- Internal 1K RAM + 1K Extra for loader
-   type ram2k_t is array (0 to 2047) of std_logic_vector( 7 downto 0);
+   -- Internal 1K RAM
+   type ram1k_t is array (0 to 1023) of std_logic_vector( 7 downto 0);
 
-   signal cv_ram2k_r                      : ram2k_t;
-   signal cv_ram2k_en_s                   : std_logic;
-   signal cv_ram2k_bonus_s                : std_logic;
-   signal cv_ram2k_addr_s                 : std_logic_vector(10 downto 0);
-   signal d_from_cv_ram2k_r               : std_logic_vector( 7 downto 0);
+   signal cv_ram1k_r                      : ram1k_t;
+   signal cv_ram1k_en_s                   : std_logic;
+   signal cv_ram1k_addr_s                 : std_logic_vector( 9 downto 0);
+   signal d_from_cv_ram1k_r               : std_logic_vector( 7 downto 0);
 
    -- SGM RAM
    signal sgm_en_r, sgm_en_x              : std_logic;
@@ -187,6 +186,7 @@ architecture rtl of colecovision is
    -- ROM Loader
    signal rom_loader_en_r, rom_loader_en_x: std_logic := '1';  -- at power-up the loader is active.
    signal d_from_loader_s                 : std_logic_vector( 7 downto 0);
+   signal rom_loader_we_n_s               : std_logic := '1';
 
    -- SD-card support
    signal d_from_sd_s                     : std_logic_vector( 7 downto 0);
@@ -469,14 +469,14 @@ begin
    --
 
    --
-   -- 16K ROM Loader
+   -- 24K ROM Loader
    --
    loader: entity work.romloader
    port map (
       clock_i     => clock_i,
-      we_i        => '0',
-      addr_i      => cpu_addr_s(13 downto 0),
-      data_i      => x"00",
+      we_n_i      => rom_loader_we_n_s,
+      addr_i      => cpu_addr_s(14 downto 0),
+      data_i      => d_from_cpu_s,
       data_o      => d_from_loader_s
    );
 
@@ -500,31 +500,24 @@ begin
    --
    -- CV Internal 1K RAM
    --
-   -- When the loader is active, expanded to 2K for convenience.
-   --
-   cv_ram_2k : process (clock_i, cv_ram2k_en_s, cv_ram2k_addr_s, wr_n_s)
+   cv_ram_1k : process (clock_i, cv_ram1k_en_s, cv_ram1k_addr_s, wr_n_s)
    begin
    if rising_edge(clock_i) then
-      if cv_ram2k_en_s = '1' then
+      if cv_ram1k_en_s = '1' then
          if wr_n_s = '0' then
-            cv_ram2k_r(to_integer(unsigned(cv_ram2k_addr_s))) <= d_from_cpu_s;
+            cv_ram1k_r(to_integer(unsigned(cv_ram1k_addr_s))) <= d_from_cpu_s;
          end if;
-         d_from_cv_ram2k_r <= cv_ram2k_r(to_integer(unsigned(cv_ram2k_addr_s)));
+         d_from_cv_ram1k_r <= cv_ram1k_r(to_integer(unsigned(cv_ram1k_addr_s)));
       end if;
    end if;
    end process;
-
-   cv_ram2k_bonus_s <= '0' when rom_loader_en_r = '0' else cpu_addr_s(10);
-   cv_ram2k_addr_s <= cv_ram2k_bonus_s & cpu_addr_s(9 downto 0);
+ 
+   cv_ram1k_addr_s <= cpu_addr_s(9 downto 0);
 
 
    --
    -- External SRAM, 512Kx8, 10ns
    --
-   -- When the SGM is enabled, the full 64K address space of the
-   -- Z80 will map to physical RAM.  The real SGM only provides
-   -- 24K to 32K of RAM in the lower 32K address space, but the
-   -- extra memory should not bother anything.
    ext512 : entity work.ext512x8sram
    port map (
       clk_i          => clock_i,
@@ -672,13 +665,14 @@ begin
    -- expansion port.  This allows expansion modules like the SGM to replace
    -- the system BIOS with RAM.
 
-   process ( cpu_addr_s, mreq_n_s, rfsh_n_s, wr_n_s,
-             d_from_loader_s, d_from_bios_s, d_from_cv_ram2k_r, cart_data_io,
-             d_from_ext512_s, sgm_en_r, sgm_8k_en_r,
-             ext_ram_bank_r, rom_loader_en_r )
+   memory_decode : process (
+      cpu_addr_s, mreq_n_s, rfsh_n_s, wr_n_s,
+      d_from_loader_s, d_from_bios_s, d_from_cv_ram1k_r, cart_data_io,
+      d_from_ext512_s, sgm_en_r, sgm_8k_en_r,
+      ext_ram_bank_r, rom_loader_en_r )
    begin
 
-      cv_ram2k_en_s  <= '0';
+      cv_ram1k_en_s  <= '0';
 
       cart_en_80_n_s <= '1';
       cart_en_A0_n_s <= '1';
@@ -698,16 +692,16 @@ begin
          ext_ram_addr_s <= ext_ram_bank_r & cpu_addr_s(14 downto 0);
       end if;
 
-      ext_ram_en_s   <= '0';
-      ext_ram_we_n_s <= '1';
+      ext_ram_en_s      <= '0';
+      ext_ram_we_n_s    <= '1';
+      -- Required to keep loader ROM from being removed by the synthesizer.
+      rom_loader_we_n_s <= '1';
 
 
       -- Memory access that is not a refresh cycle.
       if mreq_n_s = '0' and rfsh_n_s = '1' then
 
-         -- TODO: Add enabled when loaded from SD card.
-         -- External SRAM is enabled during a memory cycle when the
-         -- SGM is enabled or the cartridge was loaded from the SD card.
+         -- TODO: Update to include bank-switchers.
          ext_ram_en_s <= sgm_en_r; -- or cart_from_sd_en_r;
 
          case cpu_addr_s(15 downto 13) is
@@ -737,24 +731,46 @@ begin
                cpu_data_mux_s <= d_from_ext512_s;
             end if;
 
-         when "010" =>                 -- 8K >4000 .. >5FFF   BIOS (during load) or SGM 24K RAM (if enabled)
+         when "010" =>                 -- 8K >4000 .. >5FFF   Loader or SGM 24K RAM (if enabled)
 
             if rom_loader_en_r = '1' then
-               cpu_data_mux_s <= d_from_bios_s;
+               --cpu_data_mux_s <= d_from_bios_s;
+               cpu_data_mux_s <= d_from_loader_s;
 
             elsif sgm_en_r = '1' then
                ext_ram_we_n_s <= wr_n_s;
                cpu_data_mux_s <= d_from_ext512_s;
             end if;
 
-         when "011" =>                 -- 8K  >6000 .. >7FFF   CV 1K+1Kbonus or SGM 24K RAM
+         when "011" =>                 -- 8K  >6000 .. >7FFF   CV 1K and / or SGM 24K RAM
 
-            if sgm_en_r = '0' then
-               cv_ram2k_en_s  <= '1';
-               cpu_data_mux_s <= d_from_cv_ram2k_r;
-            else
+            if rom_loader_en_r = '1' or sgm_en_r = '1' then
+
+               ext_ram_en_s <= '1';
+
+               if cpu_addr_s(12 downto 10) = "000" then
+                  -- Enable the CV 1K RAM when memory at >6000 is addressed
+                  -- while the loader is active.  This allows the loader to
+                  -- set up the CV 1K the same as the original BIOS would
+                  -- prepare the RAM prior to jumping to a game.
+                  cv_ram1k_en_s <= rom_loader_en_r;
+               end if;
+
+               -- A write-enable is required to keep the synthesizer from
+               -- deciding that the loader ROM is redundant and removing parts
+               -- of it from the design.  This is only enabled in the address
+               -- range >6000 .. >7FFF when the loader module is internally
+               -- preventing the write enable.
+               rom_loader_we_n_s <= wr_n_s;
+
+               -- Enable writing to the SGM, and read data from the SGM.
                ext_ram_we_n_s <= wr_n_s;
                cpu_data_mux_s <= d_from_ext512_s;
+               
+            else
+               -- Normal CV 1K when the loader and SGM are disabled.
+               cv_ram1k_en_s  <= '1';
+               cpu_data_mux_s <= d_from_cv_ram1k_r;
             end if;
 
          when "100" =>  cart_en_80_n_s <= '0';           -- 8K  >8000 .. >9FFF
