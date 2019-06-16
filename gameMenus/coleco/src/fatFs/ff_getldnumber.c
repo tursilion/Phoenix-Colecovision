@@ -69,9 +69,11 @@ int get_ldnumber (	/* Returns logical drive number (-1:invalid drive number or n
 				sp = VolumeStr[i]; tp = *path;	/* This string volume ID and path name */
 				do {	/* Compare the volume ID with path name */
 					c = *sp++; tc = *tp++;
+#if FF_FS_CASESENSITIVE != 1
 					if (IsLower(c)) c -= 0x20;
 					if (IsLower(tc)) tc -= 0x20;
-				} while (c && (TCHAR)c == tc);
+#endif
+                } while (c && (TCHAR)c == tc);
 			} while ((c || tp != tt) && ++i < FF_VOLUMES);	/* Repeat for each id until pattern match */
 		}
 #endif
@@ -88,9 +90,11 @@ int get_ldnumber (	/* Returns logical drive number (-1:invalid drive number or n
 			sp = VolumeStr[i]; tp = *path;	/* This string volume ID and path name */
 			do {	/* Compare the volume ID with path name */
 				c = *sp++; tc = *(++tp);
+#if FF_FS_CASESENSITIVE != 1
 				if (IsLower(c)) c -= 0x20;
 				if (IsLower(tc)) tc -= 0x20;
-			} while (c && (TCHAR)c == tc);
+#endif
+            } while (c && (TCHAR)c == tc);
 		} while ((c || (tc != '/' && (UINT)tc >= (FF_USE_LFN ? ' ' : '!'))) && ++i < FF_VOLUMES);	/* Repeat for each ID until pattern match */
 		if (i < FF_VOLUMES) {	/* If a volume ID is found, get the drive number and strip it */
 			vol = i;		/* Drive number */

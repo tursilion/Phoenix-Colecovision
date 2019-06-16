@@ -21,7 +21,6 @@
 / The copyright owner or contributors be NOT LIABLE for any damages caused
 / by use of this software.
 */
- 
 
 #include "ff.h"
 
@@ -38,10 +37,19 @@
 /* Unicode up-case conversion                                             */
 /*------------------------------------------------------------------------*/
 
+// Tursi patch for my little hack
+#ifdef ff_wtoupper
+#undef ff_wtoupper
+#define ff_wtoupper ff_wtoupper_unused
+#endif
+
 DWORD ff_wtoupper (	/* Returns up-converted code point */
 	DWORD uni		/* Unicode code point to be up-converted */
 )
 {
+#if FF_FS_CASESENSITIVE == 1
+    return uni;
+#else
 	const WORD *p;
 	WORD uc, bc, nc, cmd;
 	static const WORD cvt1[] = {	/* Compressed up conversion table for U+0000 - U+0FFF */
@@ -164,6 +172,7 @@ DWORD ff_wtoupper (	/* Returns up-converted code point */
 	}
 
 	return uni;
+#endif
 }
 
 #endif /* #if FF_USE_LFN */

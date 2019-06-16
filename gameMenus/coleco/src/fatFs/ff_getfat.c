@@ -46,7 +46,9 @@ DWORD get_fat (		/* 0xFFFFFFFF:Disk error, 1:Internal error, 2..0x7FFFFFFF:Clust
 	DWORD clst		/* Cluster number to get the value */
 )
 {
+#if FF_FS_FAT12 == 1
 	UINT wc, bc;
+#endif
 	DWORD val;
 	FATFS *fs = obj->fs;
 
@@ -58,6 +60,7 @@ DWORD get_fat (		/* 0xFFFFFFFF:Disk error, 1:Internal error, 2..0x7FFFFFFF:Clust
 		val = 0xFFFFFFFF;	/* Default value falls on disk error */
 
 		switch (fs->fs_type) {
+#if FF_FS_FAT12 == 1
 		case FS_FAT12 :
 			bc = (UINT)clst; bc += bc / 2;
 			if (move_window(fs, fs->fatbase + (bc / SS(fs))) != FR_OK) break;
@@ -66,6 +69,7 @@ DWORD get_fat (		/* 0xFFFFFFFF:Disk error, 1:Internal error, 2..0x7FFFFFFF:Clust
 			wc |= fs->win[bc % SS(fs)] << 8;	/* Merge 2nd byte of the entry */
 			val = (clst & 1) ? (wc >> 4) : (wc & 0xFFF);	/* Adjust bit position */
 			break;
+#endif
 
 		case FS_FAT16 :
 			if (move_window(fs, fs->fatbase + (clst / (SS(fs) / 2))) != FR_OK) break;

@@ -59,6 +59,56 @@ static const char flicker[8] = {
 static volatile unsigned char * const pRom = (volatile unsigned char * const)0;	// access to memory
 static volatile __sfr __at 0xc0 port3;  // joystick reset strobe
 
+// unRLE CPU to VDP handler
+// Basic RLE compression applied to PAT0
+// top two msbits are flags:
+// 00 - run of zeros
+// 01 - run of 0xff
+// 10 - run of next char
+// 11 - inline string
+// least significant 6 bits are the length
+// Warning: No sanity checking takes place
+void unrle(unsigned int vdpAdr, unsigned char *pSrc, unsigned int rleCnt) {
+    unsigned char *pEnd;
+    
+    VDP_SET_ADDRESS_WRITE(vdpAdr);
+    pEnd = pSrc + rleCnt;
+
+    while (pSrc < pEnd) {
+        unsigned char cnt = *(pSrc++);
+        unsigned char byte = 0;
+        switch (cnt&0xc0) {
+            case 0x00:
+                // run of zeros
+                byte = 0;
+                break;
+
+            case 0x40:
+                // run of 0xffs
+                byte = 0xff;
+                break;
+
+            case 0x80:
+                // run of next byte
+                byte = *(pSrc++);
+                break;
+
+            case 0xc0:
+                // inline string (special case)
+                cnt = (cnt & 0x3f) + 1;
+                while (cnt--) {
+                    VDPWD = *(pSrc++);
+                }
+                continue;
+        }
+        // all other cases come down here to be a run of bytes
+        cnt = (cnt & 0x3f) + 1;
+        while (cnt--) {
+            VDPWD = byte;
+        }
+    }
+}
+
 // text out to the sprite layer at the bottom of the screen
 // VDP is the starting address in the sprite pattern table
 // Sprites are stacked 2 vertical before each column, and 8 bytes per char
@@ -119,7 +169,7 @@ void fadeInText() {
 	vdpmemset(gColor+3, 0x00, 10);
 	
 	// now copy the characters into place
-	vdpmemcpy(gImage+(18*32), MD0+(18*32), 4*32);
+	vdpmemcpy(gImage+(18*32), MD0+((18-1)*32), 4*32);
 
 	// now we can fade it in with normal interrupt polling
 	while (fadein[p++] != COLOR_WHITE) {
@@ -148,7 +198,7 @@ void fadeInTextF18A() {
 	vdpmemset(gColor+3, 0xf0, 10);
 	
 	// now copy the characters into place
-	vdpmemcpy(gImage+(18*32), MD0+(18*32), 4*32);
+	vdpmemcpy(gImage+(18*32), MD0+((18-1)*32), 4*32);
 
 	// now we can fade it in with normal interrupt polling
 	for (i=1; i<16; ++i) {
@@ -183,7 +233,7 @@ void displayLogo() {
 		VDP_CLEAR_VBLANK;
 		VDP_WAIT_VBLANK_CRU;
 		VDP_CLEAR_VBLANK;
-		off = idx*32;
+		off = (idx-1)*32;
 		vdpmemcpy(gImage+off, MD0+off, 32);
 	}
 }
@@ -783,8 +833,11 @@ int main() {
 	vdpmemset(gImage, 0x18, 768);
 	// set the color table to white on transparent
 	vdpmemset(gColor, 0xF0, 32);
+
 	// load the character patterns
-	vdpmemcpy(gPattern, PAT0, 8*256);
+	//vdpmemcpy(gPattern, PAT0, 8*256);                 // raw data
+    //unrle(gPattern, PAT0, SIZE_OF_PAT0RLE);           // RLE full character set
+    unrle(gPattern+25*8, PAT0, SIZE_OF_PAT0RLE-147);    // hand counted offsets to skip unused
 
 	// turn the screen on
 	VDP_SET_REGISTER(VDP_REG_MODE1, x);

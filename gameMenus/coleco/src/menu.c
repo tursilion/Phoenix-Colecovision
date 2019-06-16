@@ -114,9 +114,9 @@ nocard:
         //              off before inserting cartridge
         // -    Check for SD card periodically
         // -    When detected, jump back to the 'reading SD card' line
-        cleartextout();
-        textout(gSpritePat+(0*8)+(3*16), "Insert SD or turn system");
-        textout(gSpritePat+(1*8)+(0*16), "off before inserting cartridge");
+        cleartextout(); // row    col
+        textout(gSpritePat+(0*8)+(4*16), "Insert SD or turn system");
+        textout(gSpritePat+(1*8)+(1*16), "off before inserting cartridge");
         {
             dly_50us(254);
         }

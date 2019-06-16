@@ -79,6 +79,7 @@ FAT_OBJS =\
 # Recipe to compile the app
 all: bios fatfs
 	"../tursi_tools/makemegacart.exe" -bios phoenixBoot.ihx phoenixBoot.rom
+	"../tursi_tools/parseMap.exe" phoenixBoot.map
 
 #bios: phoenixBoot.rel crt0_cart.rel newmap2.rel f18a.rel fatfont.rel thinfont.rel
 #	$(CC) -mz80 --no-std-crt0 --code-loc 0x8100 --data-loc 0x7000 -l../libti99coleco/libti99.a "./crt0_cart.$(EXT)" phoenixBoot.$(EXT) f18a.$(EXT) -o phoenixBoot.ihx

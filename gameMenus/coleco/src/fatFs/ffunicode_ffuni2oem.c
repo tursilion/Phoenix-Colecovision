@@ -42,6 +42,13 @@ extern const WCHAR uc437[];
 /*------------------------------------------------------------------------*/
 
 #if FF_CODE_PAGE != 0 && FF_CODE_PAGE < 900
+
+// Tursi: undo the deletion hack
+#ifdef ff_uni2oem
+#undef ff_uni2oem
+#define ff_uni2oem ff_uni2oem_unused
+#endif
+
 WCHAR ff_uni2oem (	/* Returns OEM code character, zero on error */
 	DWORD	uni,	/* UTF-16 encoded character to be converted */
 	WORD	cp		/* Code page for the conversion */

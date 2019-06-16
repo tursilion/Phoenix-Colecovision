@@ -1,4 +1,23 @@
 /*---------------------------------------------------------------------------/
+/ Tursi's hacks here
+/---------------------------------------------------------------------------*/
+
+#define FF_FS_CASESENSITIVE 1
+/* Added by Tursi - turns on case sensitivity which really turns OFF
+/  character mapping to uppercase, which saves some space on the unicode
+/  handling for LFNs. For Phoenix we get all filenames from the device
+/  anyway, so we don't need tranlations */
+
+#define FF_IGNORE_CODE_PAGE 1
+/* added by Tursi to remove the unicode translation tables. You still need
+/  to define FF_CODE_PAGE and it will still be used in some places, but
+/  this turns off unicode <-> oem translation */
+
+#define FF_FS_FAT12     0
+/* Added by Tursi - allows to disable FAT12 support. Small gain, but a gain nontheless */
+
+
+/*---------------------------------------------------------------------------/
 /  FatFs Functional Configurations
 /  Configured for Phoenix BIOS - read only, LFN, small as possible within that!
 /---------------------------------------------------------------------------*/
@@ -152,7 +171,7 @@
 */
 
 
-#define FF_FS_RPATH		1
+#define FF_FS_RPATH		0
 /* This option configures support for relative path.
 /
 /   0: Disable relative path and remove related functions.
@@ -225,7 +244,7 @@
 / System Configurations
 /---------------------------------------------------------------------------*/
 
-#define FF_FS_TINY		1
+#define FF_FS_TINY		0
 /* This option switches tiny buffer configuration. (0:Normal or 1:Tiny)
 /  At the tiny configuration, size of file object (FIL) is shrinked FF_MAX_SS bytes.
 /  Instead of private sector buffer eliminated from the file object, common sector
@@ -236,7 +255,6 @@
 /* This option switches support for exFAT filesystem. (0:Disable or 1:Enable)
 /  To enable exFAT, also LFN needs to be enabled. (FF_USE_LFN >= 1)
 /  Note that enabling exFAT discards ANSI C (C89) compatibility. */
-
 
 #define FF_FS_NORTC		1
 #define FF_NORTC_MON	1

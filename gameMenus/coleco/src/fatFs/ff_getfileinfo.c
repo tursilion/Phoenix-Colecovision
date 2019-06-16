@@ -111,7 +111,9 @@ void get_fileinfo (
 		} else {
 			for (si = di = 0; fno->altname[si]; si++, di++) {	/* Copy altname[] to fname[] with case information */
 				wc = (WCHAR)fno->altname[si];
+#if FF_FS_CASESENSITIVE != 1
 				if (IsUpper(wc) && (dp->dir[DIR_NTres] & ((si >= 9) ? NS_EXT : NS_BODY))) wc += 0x20;
+#endif
 				fno->fname[di] = (TCHAR)wc;
 			}
 		}

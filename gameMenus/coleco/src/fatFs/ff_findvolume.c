@@ -41,10 +41,10 @@
 /* Determine logical drive number and mount the volume if needed         */
 /*-----------------------------------------------------------------------*/
 
-FRESULT find_volume (	/* FR_OK(0): successful, !=0: an error occurred */
-	const TCHAR** path,			/* Pointer to pointer to the path name (drive number) */
-	FATFS** rfs,				/* Pointer to pointer to the found filesystem object */
-	BYTE mode					/* !=0: Check write protection for write access */
+FRESULT find_volume (	    /* FR_OK(0): successful, !=0: an error occurred */
+	const TCHAR** path,		/* Pointer to pointer to the path name (drive number) */
+	FATFS** rfs,			/* Pointer to pointer to the found filesystem object */
+	BYTE mode				/* !=0: Check write protection for write access */
 )
 {
 	BYTE fmt, *pt;
@@ -211,7 +211,13 @@ FRESULT find_volume (	/* FR_OK(0): successful, !=0: an error occurred */
 		fmt = 0;
 		if (nclst <= MAX_FAT32) fmt = FS_FAT32;
 		if (nclst <= MAX_FAT16) fmt = FS_FAT16;
+#if FF_FS_FAT12 == 1
 		if (nclst <= MAX_FAT12) fmt = FS_FAT12;
+#else
+        // Tursi: we still have to check, otherwise the device
+        // will detect as FAT16 and all bad things will happen
+		if (nclst <= MAX_FAT12) fmt = 0;
+#endif
 		if (fmt == 0) return FR_NO_FILESYSTEM;
 
 		/* Boundaries and Limits */
@@ -227,8 +233,14 @@ FRESULT find_volume (	/* FR_OK(0): successful, !=0: an error occurred */
 		} else {
 			if (fs->n_rootdir == 0)	return FR_NO_FILESYSTEM;	/* (BPB_RootEntCnt must not be 0) */
 			fs->dirbase = fs->fatbase + fasize;			/* Root directory start sector */
+#if FF_FS_FAT12 == 1
 			szbfat = (fmt == FS_FAT16) ?				/* (Needed FAT size) */
 				fs->n_fatent * 2 : fs->n_fatent * 3 / 2 + (fs->n_fatent & 1);
+#else
+            // it MUST be FAT16, so save some code
+			szbfat = fs->n_fatent * 2;				/* (Needed FAT size) */
+#endif
+
 		}
 		if (fs->fsize < (szbfat + (SS(fs) - 1)) / SS(fs)) return FR_NO_FILESYSTEM;	/* (BPB_FATSz must not be less than the size needed) */
 

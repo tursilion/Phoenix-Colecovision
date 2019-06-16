@@ -41,9 +41,9 @@
 /* Pick a top segment and create the object name in directory form       */
 /*-----------------------------------------------------------------------*/
 
-FRESULT create_name (	/* FR_OK: successful, FR_INVALID_NAME: could not create */
-	DIR* dp,					/* Pointer to the directory object */
-	const TCHAR** path			/* Pointer to pointer to the segment in the path string */
+FRESULT create_name (	    /* FR_OK: successful, FR_INVALID_NAME: could not create */
+	DIR* dp,				/* Pointer to the directory object */
+	const TCHAR** path		/* Pointer to pointer to the segment in the path string */
 )
 {
 #if FF_USE_LFN		/* LFN configuration */
@@ -53,13 +53,16 @@ FRESULT create_name (	/* FR_OK: successful, FR_INVALID_NAME: could not create */
 	UINT i, ni, si, di;
 	const TCHAR *p;
 
-
 	/* Create LFN into LFN working buffer */
 	p = *path; lfn = dp->obj.fs->lfnbuf; di = 0;
 	for (;;) {
+#if FF_IGNORE_CODE_PAGE == 1
+        uc = *(p++);                /* get an ASCII character */
+#else
 		uc = tchar2uni(&p);			/* Get a character */
 		if (uc == 0xFFFFFFFF) return FR_INVALID_NAME;		/* Invalid code or UTF decode error */
 		if (uc >= 0x10000) lfn[di++] = (WCHAR)(uc >> 16);	/* Store high surrogate if needed */
+#endif
 		wc = (WCHAR)uc;
 		if (wc < ' ' || wc == '/' || wc == '\\') break;	/* Break if end of the path or a separator is found */
 		if (wc < 0x80 && chk_chr("\"*:<>\?|\x7F", wc)) return FR_INVALID_NAME;	/* Reject illegal characters for LFN */
@@ -146,7 +149,10 @@ FRESULT create_name (	/* FR_OK: successful, FR_INVALID_NAME: could not create */
 					b |= 2;
 				}
 				if (IsLower(wc)) {		/* ASCII lower case? */
-					b |= 1; wc -= 0x20;
+					b |= 1; 
+#if FF_FS_CASESENSITIVE != 1
+                    wc -= 0x20;
+#endif
 				}
 			}
 		}
@@ -217,7 +223,9 @@ FRESULT create_name (	/* FR_OK: successful, FR_INVALID_NAME: could not create */
 			sfn[i++] = d;
 		} else {						/* SBC */
 			if (chk_chr("\"*+,:;<=>\?[]|\x7F", c)) return FR_INVALID_NAME;	/* Reject illegal chrs for SFN */
+#if FF_FS_CASESENSITIVE != 1
 			if (IsLower(c)) c -= 0x20;	/* To upper */
+#endif
 			sfn[i++] = c;
 		}
 	}

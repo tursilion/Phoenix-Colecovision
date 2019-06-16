@@ -341,9 +341,21 @@ DWORD get_fattime (void);
 
 /* LFN support functions */
 #if FF_USE_LFN >= 1						/* Code conversion (defined in unicode.c) */
+
+#if FF_IGNORE_CODE_PAGE == 1
+#define ff_oem2uni(oem, cp) (oem)
+#define ff_uni2oem(uni, cp) ((WCHAR)uni)
+#else
 WCHAR ff_oem2uni (WCHAR oem, WORD cp);	/* OEM code to Unicode conversion */
 WCHAR ff_uni2oem (DWORD uni, WORD cp);	/* Unicode to OEM code conversion */
+#endif
+
+#if FF_FS_CASESENSITIVE == 1
+#define ff_wtoupper(uni) (uni)          /* no conversion */
+#else
 DWORD ff_wtoupper (DWORD uni);			/* Unicode upper-case conversion */
+#endif
+
 #endif
 #if FF_USE_LFN == 3						/* Dynamic memory allocation */
 void* ff_memalloc (UINT msize);			/* Allocate memory block */
