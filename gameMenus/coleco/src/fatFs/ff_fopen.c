@@ -18,9 +18,7 @@
 /
 /----------------------------------------------------------------------------*/
 
-// MB: with apologies, to make modifications simpler I've stripped out many of
-// the ifdefs, such that modifying ffconf.h may not allow you to easily enable
-// options. This just made it a lot easier to fit.
+// heavily modified by Tursi
 
 #include "ff.h"			/* Declarations of FatFs API */
 #include "ff_lcl.h"
@@ -62,7 +60,11 @@ FRESULT f_open (
 
 	/* Get logical drive number */
 	mode &= FF_FS_READONLY ? FA_READ : FA_READ | FA_WRITE | FA_CREATE_ALWAYS | FA_CREATE_NEW | FA_OPEN_ALWAYS | FA_OPEN_APPEND;
+#if FF_FS_ONEDRIVE != 1
 	res = find_volume(&path, &fs, mode);
+#else
+    res = find_volume(&fs, mode);
+#endif
 	if (res == FR_OK) {
 		dj.obj.fs = fs;
 		INIT_NAMBUF(fs);
@@ -209,7 +211,11 @@ FRESULT f_open (
 					} else {
 						fp->sect = sc + (DWORD)(ofs / SS(fs));
 #if !FF_FS_TINY
+#if FF_FS_ONEDRIVE != 1
 						if (disk_read(fs->pdrv, fp->buf, fp->sect, 1) != RES_OK) res = FR_DISK_ERR;
+#else
+						if (disk_read(fp->buf, fp->sect, 1) != RES_OK) res = FR_DISK_ERR;
+#endif
 #endif
 					}
 				}

@@ -18,9 +18,7 @@
 /
 /----------------------------------------------------------------------------*/
 
-// MB: with apologies, to make modifications simpler I've stripped out many of
-// the ifdefs, such that modifying ffconf.h may not allow you to easily enable
-// options. This just made it a lot easier to fit.
+// heavily modified by Tursi
 
 #include "ff.h"			/* Declarations of FatFs API */
 #include "ff_lcl.h"
@@ -52,7 +50,11 @@ FRESULT validate (	/* Returns FR_OK or FR_INVALID_OBJECT */
 	if (obj && obj->fs && obj->fs->fs_type && obj->id == obj->fs->id) {	/* Test if the object is valid */
 #if FF_FS_REENTRANT
 		if (lock_fs(obj->fs)) {	/* Obtain the filesystem object */
-			if (!(disk_status(obj->fs->pdrv) & STA_NOINIT)) { /* Test if the phsical drive is kept initialized */
+#if FF_FS_ONEDRIVE != 1
+            if (!(disk_status(obj->fs->pdrv) & STA_NOINIT)) { /* Test if the phsical drive is kept initialized */
+#else
+            if (!(disk_status() & STA_NOINIT)) { /* Test if the phsical drive is kept initialized */
+#endif
 				res = FR_OK;
 			} else {
 				unlock_fs(obj->fs, FR_OK);
@@ -61,7 +63,11 @@ FRESULT validate (	/* Returns FR_OK or FR_INVALID_OBJECT */
 			res = FR_TIMEOUT;
 		}
 #else
+#if FF_FS_ONEDRIVE != 1
 		if (!(disk_status(obj->fs->pdrv) & STA_NOINIT)) { /* Test if the phsical drive is kept initialized */
+#else
+		if (!(disk_status() & STA_NOINIT)) { /* Test if the phsical drive is kept initialized */
+#endif
 			res = FR_OK;
 		}
 #endif

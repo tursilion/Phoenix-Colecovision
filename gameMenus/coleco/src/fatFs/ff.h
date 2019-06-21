@@ -122,7 +122,9 @@ typedef DWORD FSIZE_t;
 
 typedef struct {
 	BYTE	fs_type;		/* Filesystem type (0:not mounted) */
+#if FF_FS_ONEDRIVE != 1
 	BYTE	pdrv;			/* Associated physical drive */
+#endif
 	BYTE	n_fats;			/* Number of FATs (1 or 2) */
 	BYTE	wflag;			/* win[] flag (b0:dirty) */
 	BYTE	fsi_flag;		/* FSINFO flags (b7:disabled, b0:dirty) */
@@ -237,9 +239,14 @@ typedef struct {
 
 typedef struct {
 	FSIZE_t	fsize;			/* File size */
+
+#if FF_FS_IGNORE_TIMESTAMP == 1
 	WORD	fdate;			/* Modified date */
 	WORD	ftime;			/* Modified time */
-	BYTE	fattrib;		/* File attribute */
+#endif
+
+    BYTE	fattrib;		/* File attribute */
+
 #if FF_USE_LFN
 	TCHAR	altname[FF_SFN_BUF + 1];/* Altenative file name */
 	TCHAR	fname[FF_LFN_BUF + 1];	/* Primary file name */
@@ -360,6 +367,10 @@ DWORD ff_wtoupper (DWORD uni);			/* Unicode upper-case conversion */
 #if FF_USE_LFN == 3						/* Dynamic memory allocation */
 void* ff_memalloc (UINT msize);			/* Allocate memory block */
 void ff_memfree (void* mblock);			/* Free memory block */
+#endif
+
+#if FF_FS_ONEDRIVE == 1
+#define get_ldnumber(x) (0)             /* always volume 0 */
 #endif
 
 /* Sync functions */

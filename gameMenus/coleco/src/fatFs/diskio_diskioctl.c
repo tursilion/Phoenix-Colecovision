@@ -34,7 +34,9 @@
 /* Miscellaneous Functions                                               */
 /*-----------------------------------------------------------------------*/
 DRESULT disk_ioctl (
+#if FF_FS_ONEDRIVE != 1
 	BYTE drv,		/* Physical drive nmuber (0) */
+#endif
 	BYTE ctrl,		/* Control code */
 	void *buff		/* Buffer to send/receive control data */
 )
@@ -42,8 +44,11 @@ DRESULT disk_ioctl (
 	DRESULT res;
 	BYTE n, csd[16];
 	DWORD cs;
-
+#if FF_FS_ONEDRIVE != 1
 	if (disk_status(drv) & STA_NOINIT) return RES_NOTRDY;	/* Check if card is in the socket */
+#else 
+	if (disk_status() & STA_NOINIT) return RES_NOTRDY;	/* Check if card is in the socket */
+#endif
 
 	res = RES_ERROR;
 	switch (ctrl) {

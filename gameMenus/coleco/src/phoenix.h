@@ -40,6 +40,10 @@ volatile __sfr __at 0x7f sgmBIOSMap;          // swaps RAM with the Coleco BIOS
 #endif
 
 // address that the Coleco BIOS font occurs, offset for the Phoenix memory map
-#define COLECO_FONT_ADR (0x158b + 0x4000)
+// TODO: I don't have access to this anymore, we'll use fatfont
+// That way SOME games will use it. ;) We don't have much choice
+// unless I ditch fatfont for thinfont, or get them both back in.
+// (thinfont is the actual Coleco/TI font)
+//#define COLECO_FONT_ADR (0x158b + 0x4000)
 
 void dly_50us(unsigned char n);

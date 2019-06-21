@@ -103,7 +103,7 @@ void readDir() {
                 pRom[lastFilename+127] = 0;
             }
             lastFilename += 128;
-            if (disk_status(0) == STA_NODISK) break;
+            if (disk_status() == STA_NODISK) break;
         }
     }
 }
@@ -115,7 +115,7 @@ void menu() {
 nocard:
     cleartextout();
     // TODO: remove the drive index from the commands that take one...
-    if (disk_status(0) == STA_NODISK) {
+    if (disk_status() == STA_NODISK) {
         int cntDown;    // used to count down to screen blank timeout
         unsigned char debounce; // make sure card detect is stable if we see insertion
 
@@ -150,7 +150,7 @@ nocard:
                     if (KSCAN_KEY != 0xff) break;
 
                     // even SD insert - no need to sleep here
-                    if (disk_status(0) != STA_NODISK) break;
+                    if (disk_status() != STA_NODISK) break;
                 }
 
                 // re-enable the screen
@@ -160,7 +160,7 @@ nocard:
             }
 
             // check for and debounce SD card detect
-            if (disk_status(0) == STA_NODISK) {
+            if (disk_status() == STA_NODISK) {
                 debounce = 0;
             } else {
                 ++debounce;
@@ -178,7 +178,7 @@ nocard:
 
     // - Read directory (with long filenames), store filenames in VDP
     readDir();
-    if (disk_status(0) == STA_NODISK) goto nocard;
+    if (disk_status() == STA_NODISK) goto nocard;
 
     // - Clear screen and sprites
     vdpmemset(0, ' ', 768);

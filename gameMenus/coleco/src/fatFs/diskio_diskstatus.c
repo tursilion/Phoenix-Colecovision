@@ -34,11 +34,15 @@
 /* Get Drive Status                                                      */
 /*-----------------------------------------------------------------------*/
 DSTATUS disk_status (
-	BYTE pdrv		/* Physical drive nmuber to identify the drive */
+#if FF_FS_ONEDRIVE != 1
+	BYTE pdrv		/* Physical drive nmuber (0) */
+#endif
 )
 {
+#if FF_FS_ONEDRIVE != 1
     // only drive 0 is valid
     if (pdrv) return STA_NOINIT;
+#endif
 
     // start by checking the hardware to see if the disk is present
     if (phSDControl & PH_SD_CARD_DETECT) {

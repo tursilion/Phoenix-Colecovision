@@ -18,9 +18,7 @@
 /
 /----------------------------------------------------------------------------*/
 
-// MB: with apologies, to make modifications simpler I've stripped out many of
-// the ifdefs, such that modifying ffconf.h may not allow you to easily enable
-// options. This just made it a lot easier to fit.
+// heavily modified by Tursi
 
 #include "ff.h"			/* Declarations of FatFs API */
 #include "ff_lcl.h"
@@ -42,7 +40,9 @@
 /*-----------------------------------------------------------------------*/
 
 FRESULT find_volume (	    /* FR_OK(0): successful, !=0: an error occurred */
+#if FF_FS_ONEDRIVE != 1
 	const TCHAR** path,		/* Pointer to pointer to the path name (drive number) */
+#endif
 	FATFS** rfs,			/* Pointer to pointer to the found filesystem object */
 	BYTE mode				/* !=0: Check write protection for write access */
 )
@@ -58,7 +58,12 @@ FRESULT find_volume (	    /* FR_OK(0): successful, !=0: an error occurred */
 
 	/* Get logical drive number */
 	*rfs = 0;
+#if FF_FS_ONEDRIVE != 1
 	vol = get_ldnumber(path);
+#else
+    vol = get_ldnumber(0);
+#endif
+
 	if (vol < 0) return FR_INVALID_DRIVE;
 
 	/* Check if the filesystem object is valid or not */
@@ -71,7 +76,11 @@ FRESULT find_volume (	    /* FR_OK(0): successful, !=0: an error occurred */
 
 	mode &= (BYTE)~FA_READ;				/* Desired access mode, write access or not */
 	if (fs->fs_type != 0) {				/* If the volume has been mounted */
-		stat = disk_status(fs->pdrv);
+#if FF_FS_ONEDRIVE != 1
+        stat = disk_status(fs->pdrv);
+#else
+        stat = disk_status();
+#endif
 		if (!(stat & STA_NOINIT)) {		/* and the physical drive is kept initialized */
 			if (!FF_FS_READONLY && mode && (stat & STA_PROTECT)) {	/* Check write protection if needed */
 				return FR_WRITE_PROTECTED;
@@ -84,8 +93,12 @@ FRESULT find_volume (	    /* FR_OK(0): successful, !=0: an error occurred */
 	/* Following code attempts to mount the volume. (analyze BPB and initialize the filesystem object) */
 
 	fs->fs_type = 0;					/* Clear the filesystem object */
-	fs->pdrv = LD2PD(vol);				/* Bind the logical drive and a physical drive */
+#if FF_FS_ONEDRIVE != 1
+    fs->pdrv = LD2PD(vol);				/* Bind the logical drive and a physical drive */
 	stat = disk_initialize(fs->pdrv);	/* Initialize the physical drive */
+#else
+	stat = disk_initialize();	        /* Initialize the physical drive */
+#endif
 	if (stat & STA_NOINIT) { 			/* Check if the initialization succeeded */
 		return FR_NOT_READY;			/* Failed to initialize due to no medium or hard error */
 	}
@@ -93,7 +106,11 @@ FRESULT find_volume (	    /* FR_OK(0): successful, !=0: an error occurred */
 		return FR_WRITE_PROTECTED;
 	}
 #if FF_MAX_SS != FF_MIN_SS				/* Get sector size (multiple sector size cfg only) */
+#if FF_FS_ONEDRIVE != 1
 	if (disk_ioctl(fs->pdrv, GET_SECTOR_SIZE, &SS(fs)) != RES_OK) return FR_DISK_ERR;
+#else
+	if (disk_ioctl(GET_SECTOR_SIZE, &SS(fs)) != RES_OK) return FR_DISK_ERR;
+#endif
 	if (SS(fs) > FF_MAX_SS || SS(fs) < FF_MIN_SS || (SS(fs) & (SS(fs) - 1))) return FR_DISK_ERR;
 #endif
 

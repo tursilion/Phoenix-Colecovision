@@ -18,9 +18,7 @@
 /
 /----------------------------------------------------------------------------*/
 
-// MB: with apologies, to make modifications simpler I've stripped out many of
-// the ifdefs, such that modifying ffconf.h may not allow you to easily enable
-// options. This just made it a lot easier to fit.
+// heavily modified by Tursi
 
 #include "ff.h"			/* Declarations of FatFs API */
 #include "ff_lcl.h"
@@ -50,7 +48,11 @@ FRESULT move_window (	/* Returns FR_OK or FR_DISK_ERR */
 		res = sync_window(fs);		/* Write-back changes */
 #endif
 		if (res == FR_OK) {			/* Fill sector window with new data */
+#if FF_FS_ONEDRIVE != 1
 			if (disk_read(fs->pdrv, fs->win, sector, 1) != RES_OK) {
+#else
+			if (disk_read(fs->win, sector, 1) != RES_OK) {
+#endif
 				sector = 0xFFFFFFFF;	/* Invalidate window if read data is not valid */
 				res = FR_DISK_ERR;
 			}

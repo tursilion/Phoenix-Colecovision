@@ -18,9 +18,7 @@
 /
 /----------------------------------------------------------------------------*/
 
-// MB: with apologies, to make modifications simpler I've stripped out many of
-// the ifdefs, such that modifying ffconf.h may not allow you to easily enable
-// options. This just made it a lot easier to fit.
+// heavily modified by Tursi
 
 #include "ff.h"			/* Declarations of FatFs API */
 #include "ff_lcl.h"
@@ -103,11 +101,19 @@ FRESULT f_lseek (
 #if !FF_FS_TINY
 #if !FF_FS_READONLY
 					if (fp->flag & FA_DIRTY) {		/* Write-back dirty sector cache */
+#if FF_FS_ONEDRIVE != 1
 						if (disk_write(fs->pdrv, fp->buf, fp->sect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);
+#else
+						if (disk_write(fp->buf, fp->sect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);
+#endif
 						fp->flag &= (BYTE)~FA_DIRTY;
 					}
 #endif
+#if FF_FS_ONEDRIVE != 1
 					if (disk_read(fs->pdrv, fp->buf, dsc, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);	/* Load current sector */
+#else
+					if (disk_read(fp->buf, dsc, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);	/* Load current sector */
+#endif
 #endif
 					fp->sect = dsc;
 				}
@@ -183,11 +189,19 @@ FRESULT f_lseek (
 #if !FF_FS_TINY
 #if !FF_FS_READONLY
 			if (fp->flag & FA_DIRTY) {			/* Write-back dirty sector cache */
+#if FF_FS_ONEDRIVE != 1
 				if (disk_write(fs->pdrv, fp->buf, fp->sect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);
+#else
+				if (disk_write(fp->buf, fp->sect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);
+#endif
 				fp->flag &= (BYTE)~FA_DIRTY;
 			}
 #endif
+#if FF_FS_ONEDRIVE != 1
 			if (disk_read(fs->pdrv, fp->buf, nsect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);	/* Fill sector cache */
+#else
+			if (disk_read(fp->buf, nsect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);	/* Fill sector cache */
+#endif
 #endif
 			fp->sect = nsect;
 		}

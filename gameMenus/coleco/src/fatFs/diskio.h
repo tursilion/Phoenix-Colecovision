@@ -21,10 +21,17 @@ typedef enum {
 /*---------------------------------------*/
 /* Prototypes for disk control functions */
 
+#if FF_FS_ONEDRIVE != 1
 DSTATUS disk_initialize (BYTE pdrv);
 DSTATUS disk_status (BYTE pdrv);
 DRESULT disk_read (BYTE pdrv, BYTE* buff, DWORD sector, UINT count);
 DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff);
+#else
+DSTATUS disk_initialize ();
+DSTATUS disk_status ();
+DRESULT disk_read (BYTE* buff, DWORD sector, UINT count);
+DRESULT disk_ioctl (BYTE cmd, void* buff);
+#endif
 
 // Internal
 void xmit_mmc(const BYTE* buff, UINT bc);

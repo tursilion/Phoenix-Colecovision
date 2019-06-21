@@ -18,9 +18,7 @@
 /
 /----------------------------------------------------------------------------*/
 
-// MB: with apologies, to make modifications simpler I've stripped out many of
-// the ifdefs, such that modifying ffconf.h may not allow you to easily enable
-// options. This just made it a lot easier to fit.
+// heavily modified by Tursi
 
 #include "ff.h"			/* Declarations of FatFs API */
 #include "ff_lcl.h"
@@ -53,11 +51,14 @@ FRESULT f_opendir (
 	FATFS *fs;
 	DEF_NAMBUF
 
-
 	if (!dp) return FR_INVALID_OBJECT;
 
 	/* Get logical drive */
+#if FF_FS_ONEDRIVE != 1
 	res = find_volume(&path, &fs, 0);
+#else
+	res = find_volume(&fs, 0);
+#endif
 	if (res == FR_OK) {
 		dp->obj.fs = fs;
 		INIT_NAMBUF(fs);

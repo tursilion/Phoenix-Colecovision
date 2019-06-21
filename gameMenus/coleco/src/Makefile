@@ -3,8 +3,15 @@
 # provide Tursi's "makeMegaCart.exe" for the linking.
 # This version runs as a Phoenix BIOS. Commented out code is for the cartridge
 
+# (free space)
+# 5967 pre-optimization
+# 6486 post-optimization (allow-unsafe-read (not okay for megacart!), opt-code-size, max-allocs 9000)
+# 6739 max-allocs 12000
+# 6579 max-allocs 15000
+# 6502 max-allocs 30000
+CFLAGS = -mz80 -c "-I../libti99coleco" --allow-unsafe-read --opt-code-size --max-allocs-per-node 12000 --std-sdcc99 --vc
+
 CC = "c:/program files/sdcc/bin/sdcc"
-CFLAGS = -mz80 -c "-I../libti99coleco" --std-sdcc99 --vc -DENABLEFX --opt-code-speed
 AS = "c:/program files/sdcc/bin/sdasz80"
 AR = "c:/program files/sdcc/bin/sdcclib"
 AFLAGS = -plosgff
@@ -13,13 +20,16 @@ RM = del /F
 EXT=rel
 
 # make sure the crt0 is first!
+# thinfont removed for now as we can't patch the original bios
+# we need it when we can as we want to allow the user to select
+# fat or thin when they start, and it will remember the last
+# one after reset.
 MAIN_OBJS =\
     crt0_bios.$(EXT)  \
     phoenixBoot.$(EXT)  \
     newmap2.$(EXT)  \
     f18a.$(EXT)  \
     fatfont.$(EXT)  \
-    thinfont.$(EXT) \
     menu.$(EXT)  \
     memset.$(EXT)
 

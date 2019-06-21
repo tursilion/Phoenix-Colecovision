@@ -141,3 +141,6 @@ gsinit::
 	ldir
 	.area _GSFINAL
 	ret
+	
+	.area _INITIALIZER
+

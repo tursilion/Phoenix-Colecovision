@@ -18,9 +18,7 @@
 /
 /----------------------------------------------------------------------------*/
 
-// MB: with apologies, to make modifications simpler I've stripped out many of
-// the ifdefs, such that modifying ffconf.h may not allow you to easily enable
-// options. This just made it a lot easier to fit.
+// heavily modified by Tursi
 
 #include "ff.h"			/* Declarations of FatFs API */
 #include "ff_lcl.h"
@@ -29,6 +27,11 @@
 
 #if FF_DEFINED != 86604	/* Revision ID */
 #error Wrong include file (ff.h).
+#endif
+
+#ifdef get_ldnumber
+#undef get_ldnumber
+#define get_ldnumber get_ldnumber_unused
 #endif
 
 /*--------------------------------------------------------------------------

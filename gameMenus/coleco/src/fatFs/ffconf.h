@@ -16,6 +16,16 @@
 #define FF_FS_FAT12     0
 /* Added by Tursi - allows to disable FAT12 support. Small gain, but a gain nontheless */
 
+#define FF_FS_ONEDRIVE  1
+/* added by Tursi - when set to 1, disables all drive indexes in functions */
+
+#define FF_FS_IGNORE_TIMESTAMP  1
+/* added by Tursi - when set to 1, timestamps on files are ignored */
+/* Note this may be incompatible with write access, but we don't check. Be careful! */
+
+// Matt had a good idea - if we stored directory entry cluster with the filename, we
+// could just load directly off the cluster, then filename translation would not
+// matter at all... but it's a big mod, so just keeping that in the back pocket for now.
 
 /*---------------------------------------------------------------------------/
 /  FatFs Functional Configurations

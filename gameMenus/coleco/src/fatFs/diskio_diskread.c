@@ -34,7 +34,9 @@
 /* Read Sector(s)                                                        */
 /*-----------------------------------------------------------------------*/
 DRESULT disk_read (
-	BYTE drv,			/* Physical drive nmuber (0) */
+#if FF_FS_ONEDRIVE != 1
+	BYTE drv,		/* Physical drive nmuber (0) */
+#endif
 	BYTE *buff,			/* Pointer to the data buffer to store read data */
 	DWORD sector,		/* Start sector number (LBA) */
 	UINT count			/* Sector count (1..128) */
@@ -42,7 +44,12 @@ DRESULT disk_read (
 {
 	BYTE cmd;
 
+#if FF_FS_ONEDRIVE != 1
 	if (disk_status(drv) & STA_NOINIT) return RES_NOTRDY;
+#else
+	if (disk_status() & STA_NOINIT) return RES_NOTRDY;
+#endif
+
 	if (!(CardType & CT_BLOCK)) sector *= 512;	/* Convert LBA to byte address if needed */
 
 	cmd = count > 1 ? CMD18 : CMD17;			/*  READ_MULTIPLE_BLOCK : READ_SINGLE_BLOCK */
@@ -57,3 +64,4 @@ DRESULT disk_read (
 
 	return count ? RES_ERROR : RES_OK;
 }
+

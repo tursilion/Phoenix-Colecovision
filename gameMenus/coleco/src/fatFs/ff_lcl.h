@@ -500,15 +500,19 @@ FRESULT follow_path (	/* FR_OK(0): successful, !=0: error code */
 	DIR* dp,					/* Directory object to return last directory and found object */
 	const TCHAR* path			/* Full-path string to find a file or directory */
 );
+#if FF_FS_ONEDRIVE != 1
 int get_ldnumber (	/* Returns logical drive number (-1:invalid drive number or null pointer) */
 	const TCHAR** path		/* Pointer to pointer to the path name */
 );
+#endif
 BYTE check_fs (	/* 0:FAT, 1:exFAT, 2:Valid BS but not FAT, 3:Not a BS, 4:Disk error */
 	FATFS* fs,			/* Filesystem object */
 	DWORD sect			/* Sector# (lba) to load and check if it is an FAT-VBR or not */
 );
-FRESULT find_volume (	/* FR_OK(0): successful, !=0: an error occurred */
+FRESULT find_volume (	/* FR_OK(0): successful, !=0: an error occurred - in 1-drive mode, do not include C:\ style paths */
+#if FF_FS_ONEDRIVE != 1
 	const TCHAR** path,			/* Pointer to pointer to the path name (drive number) */
+#endif
 	FATFS** rfs,				/* Pointer to pointer to the found filesystem object */
 	BYTE mode					/* !=0: Check write protection for write access */
 );

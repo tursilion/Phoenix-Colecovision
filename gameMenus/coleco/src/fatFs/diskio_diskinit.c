@@ -36,14 +36,17 @@ BYTE CardType;			    /* b0:MMC, b1:SDv1, b2:SDv2, b3:Block addressing */
 /* Initialize Disk Drive                                                 */
 /*-----------------------------------------------------------------------*/
 DSTATUS disk_initialize (
+#if FF_FS_ONEDRIVE != 1
 	BYTE drv		/* Physical drive nmuber (0) */
+#endif
 )
 {
 	BYTE n, ty, cmd, buf[4];
 	UINT tmr;
 	DSTATUS s;
-
+#if FF_FS_ONEDRIVE != 1
 	if (drv) return RES_NOTRDY;
+#endif
 
     // prepare low speed bus configuration
     csHigh = PH_SD_CE_OFF | PH_SD_LOW_SPEED;

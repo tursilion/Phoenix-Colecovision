@@ -18,9 +18,7 @@
 /
 /----------------------------------------------------------------------------*/
 
-// MB: with apologies, to make modifications simpler I've stripped out many of
-// the ifdefs, such that modifying ffconf.h may not allow you to easily enable
-// options. This just made it a lot easier to fit.
+// heavily modified by Tursi
 
 #include "ff.h"			/* Declarations of FatFs API */
 #include "ff_lcl.h"
@@ -78,6 +76,10 @@ FRESULT f_mount (
 
 	if (opt == 0) return FR_OK;			/* Do not mount now, it will be mounted later */
 
+#if FF_FS_ONEDRIVE != 1
 	res = find_volume(&path, &fs, 0);	/* Force mounted the volume */
+#else
+	res = find_volume(&fs, 0);	/* Force mounted the volume */
+#endif
 	LEAVE_FF(fs, res);
 }

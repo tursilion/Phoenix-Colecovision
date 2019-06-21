@@ -13,7 +13,10 @@
 #define HEADERS__
 #include "newmap2.c"
 #include "fatfont.c"
+#if 0
+// currently I am not able to hot-patch the Coleco BIOS at startup
 #include "thinfont.c"
+#endif
 #undef HEADERS__
 
 // we assume that the f18a exists...
@@ -28,6 +31,12 @@ extern void menu();
 // There is no explicit limit on the lengths of the first two strings
 #define CART_NAME_INFO 0x8024
 
+// Coleco color table at 0x2003
+static const unsigned char colorTable[] = {
+    0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 
+    0xf0, 0xd0, 0x80, 0x90, 0xb0, 0x30, 0x40
+};
+
 // trampoline to start the cart with the Coleco BIOS loaded
 // This area (0x6000) seems untouched by the Coleco BIOS
 static const unsigned char trampoline[] = {
@@ -38,21 +47,6 @@ static const unsigned char trampoline[] = {
 //    0xC3,0x00,0x00,      // JP 0x0000 (reboot bios)
 
     0xe9                // -        JP [HL]             E9
-};
-
-// fade in for font
-static const unsigned char fadein[] = { 
-	COLOR_TRANS,
-	COLOR_DKBLUE,
-	COLOR_DKGREEN,
-	COLOR_LTGREEN,
-	COLOR_GRAY,
-	COLOR_WHITE
-};
-static const char flicker[8] = {
-	-1,-1,
-	0,-1,0,-1,
-	0,0
 };
 
 // hardware control
@@ -141,10 +135,10 @@ void textout(unsigned int vdp, const char *p) {
 void textouthalf(unsigned int vdp, const char *p) {
     unsigned char first = 1;
 	while (*p) {
-        unsigned i;
+        unsigned char i;
         VDP_SET_ADDRESS_WRITE(vdp);
         for (i=0; i<8; ++i) {
-            unsigned c1,c2,out;
+            unsigned char c1,c2,out;
             unsigned int off1,off2;
 
             if (first) {
@@ -173,35 +167,9 @@ void textouthalf(unsigned int vdp, const char *p) {
 	}
 }
 
-// fade in the phoenix part of the logo
-void fadeInText() {
-	unsigned char p = 0;
-	unsigned char i;
-
-    // in VDP for debug
-    vdpmemcpy(0x1c18, "VDP", 3);
-
-	// first turn off the colors - phoenix color sets are 3-12
-	vdpmemset(gColor+3, 0x00, 10);
-	
-	// now copy the characters into place
-	vdpmemcpy(gImage+(18*32), MD0+((18-1)*32), 4*32);
-
-	// now we can fade it in with normal interrupt polling
-	while (fadein[p++] != COLOR_WHITE) {
-		// do a little interpolation with flicker
-		for (i=0; i<8; ++i) {
-            waitVblanks(1);
-			vdpmemset(gColor+3, fadein[p+flicker[i]]<<4, 10);
-		}
-	}
-}
 void fadeInTextF18A() {
 	unsigned char p = 0;
 	unsigned char i;
-
-    // in VDP for debug
-    vdpmemcpy(0x1c18, "F18A", 4);
 
 	// first set the color for white to black, we'll fade it in
 	VDP_SET_REGISTER(0x2f, 0x8f);	// Reg 47, value: 1000 1111, DPM = 1, AUTO INC = 0, palreg 15.
@@ -213,7 +181,7 @@ void fadeInTextF18A() {
 	vdpmemset(gColor+3, 0xf0, 10);
 	
 	// now copy the characters into place
-	vdpmemcpy(gImage+(18*32), MD0+((18-1)*32), 4*32);
+	vdpmemcpy(gImage+(18*32), MD0_PHOENIX, 4*32);
 
 	// now we can fade it in with normal interrupt polling
 	for (i=1; i<16; ++i) {
@@ -232,16 +200,24 @@ void fadeInTextF18A() {
 void displayLogo() {
 	int idx;
 	unsigned int off;
+    unsigned char const *p;
 	
 	// set the logo color to dark red - logo color sets are 13-31
 	vdpmemset(gColor+13, COLOR_DKRED<<4, 19);
 
 	// the logo graphics occupy from roms 1 to 16
+    // they are sorted from the bottom up, and use
+    // a very simple RLE format (more of an alignment tag)
+    // <#spaces>,<cnt>,<literal bytes>
 	// we'll just draw from bottom up
+    p = MD0_LOGO;
 	for (idx = 16; idx > 0; --idx) {
+        unsigned char len;
         waitVblanks(2);
-		off = (idx-1)*32;
-		vdpmemcpy(gImage+off, MD0+off, 32);
+		off = (idx-1)*32+(*(p++));
+        len = *(p++);
+		vdpmemcpy(gImage+off, p, len);
+        p+=len;
 	}
 }
 
@@ -512,7 +488,8 @@ void startTitle() {
         // -                LD A,3                      // table code (0=sprite name, 1=sprite gen, 2=pattern name, 3=pattern gen, 4=color)
         // -                CALL PUT_VRAM (0x1fbe->1C27)
         // -                    (This has lots of special cases, but I can just hard code the results)
-        vdpmemcpy(0x0000+0x1d*8, (void*)COLECO_FONT_ADR, 96*8);
+        //vdpmemcpy(0x0000+0x1d*8, (void*)COLECO_FONT_ADR, 96*8);
+        vdpmemcpy(0x0000+0x1d*8, (void*)FATFONT, 96*8);
 
         // -                LD HL,SPACE (0x15a3)        // also copies space into character #0
         // -                LD DE,0
@@ -520,7 +497,12 @@ void startTitle() {
         // -                LD A,3                      // pattern table
         // -                CALL PUT_VRAM
         // -                RET
-        vdpmemcpy(0x0000, (void*)(COLECO_FONT_ADR+3*8), 8);      // space is after copyright, T, and M
+        //vdpmemcpy(0x0000, (void*)(COLECO_FONT_ADR+3*8), 8);      // space is after copyright, T, and M
+        vdpmemcpy(0x0000, (void*)(FATFONT+3*8), 8);      // space is after copyright, T, and M
+
+        // and, although it's not in the startup code itself,
+        // the Coleco BIOS leaves a color table at 0x2000 that we need to drop in
+        vdpmemcpy(0x2003, colorTable, sizeof(colorTable));
     }
 
     // Don't use the stack or RAM variables anymore if we can help it. In particular there
@@ -538,10 +520,6 @@ void startTitle() {
 
     // TODO: game oddities
     // Cabbage Patch Kids hangs on player startup
-    // Illusions truncates the copyright part of the text
-    // Ken Unston Poker just hangs
-    // 
-
 
     // Coleco BIOS Startup (Donkey Kong):
     // af   8042   af_  FFFF    CPU
@@ -857,16 +835,8 @@ int main() {
 	// wait for the first two vblanks
     waitVblanks(2);
 
-	// enable the F18A here if we have it
-	if (f18a) {
-		// F18A available
-		fadeInTextF18A();
-	} else {
-		// no F18A (but we have a flicker fade)
-		// I'm not sure why we would do this non-F18A mode
-		// It's mostly for test purposes.
-		fadeInText();
-	}
+	// F18A available
+	fadeInTextF18A();
     displayLogo();
 
     // Now that the fancy part is done, we can get to work on the real stuff.
