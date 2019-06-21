@@ -72,7 +72,7 @@ start:
 	ld bc,#0x1fff			; set bytes to copy (1 less than size)
 	ld (hl),#0				; set initial value (this gets copied through)
 	ldir					; do it
-	
+
     ; we will have to fix the memory bank before we prepare the system RAM
 	ld  sp, #0x8000			; We have 8k to run stack in here - be aware of tables from 0x73B9-7x3FF!
 	call gsinit				; Initialize global variables

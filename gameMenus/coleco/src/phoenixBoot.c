@@ -109,6 +109,22 @@ void unrle(unsigned int vdpAdr, unsigned char *pSrc, unsigned int rleCnt) {
     }
 }
 
+// delay for 'x' vblanks - zero will just clear any pending
+// beware of calling this in a loop - if the time between calls
+// is longer than a frame you will clear the pending vblank on
+// entry and wait for another one (ie: you may wait a frame
+// longer than you expect).
+void waitVblanks(unsigned char cnt) {
+    // clear any vblank we may have missed
+    VDP_CLEAR_VBLANK;
+
+    while (cnt-- > 0) {
+    	// wait as instructed
+    	VDP_WAIT_VBLANK_CRU;
+    	VDP_CLEAR_VBLANK;
+    }
+}
+
 // text out to the sprite layer at the bottom of the screen
 // VDP is the starting address in the sprite pattern table
 // Sprites are stacked 2 vertical before each column, and 8 bytes per char
@@ -175,8 +191,7 @@ void fadeInText() {
 	while (fadein[p++] != COLOR_WHITE) {
 		// do a little interpolation with flicker
 		for (i=0; i<8; ++i) {
-			VDP_WAIT_VBLANK_CRU;
-			VDP_CLEAR_VBLANK;
+            waitVblanks(1);
 			vdpmemset(gColor+3, fadein[p+flicker[i]]<<4, 10);
 		}
 	}
@@ -209,12 +224,7 @@ void fadeInTextF18A() {
 		VDPWD = i;	// red
 		VDPWD = i | (i<<4);	// green and blue
 		
-		VDP_WAIT_VBLANK_CRU;
-		VDP_CLEAR_VBLANK;
-		VDP_WAIT_VBLANK_CRU;
-		VDP_CLEAR_VBLANK;
-		VDP_WAIT_VBLANK_CRU;
-		VDP_CLEAR_VBLANK;
+        waitVblanks(3);
 	}
 }
 
@@ -229,10 +239,7 @@ void displayLogo() {
 	// the logo graphics occupy from roms 1 to 16
 	// we'll just draw from bottom up
 	for (idx = 16; idx > 0; --idx) {
-		VDP_WAIT_VBLANK_CRU;
-		VDP_CLEAR_VBLANK;
-		VDP_WAIT_VBLANK_CRU;
-		VDP_CLEAR_VBLANK;
+        waitVblanks(2);
 		off = (idx-1)*32;
 		vdpmemcpy(gImage+off, MD0+off, 32);
 	}
@@ -765,9 +772,7 @@ void runCartHeader(void (*mycenter)(unsigned char, char*)) {
     while (cntdown-- > 0) {
         kscanfast(1);   // read left joystick fire button
         if (KSCAN_KEY == JOY_FIRE) break;
-
-	    VDP_WAIT_VBLANK_CRU;
-	    VDP_CLEAR_VBLANK;
+        waitVblanks(1);
     }
 
     // - start cartridge
@@ -777,6 +782,12 @@ void runCartHeader(void (*mycenter)(unsigned char, char*)) {
 // main loop
 int main() {
 	unsigned char x,idx,col;
+
+    // disable interrupt processing
+    VDP_INT_DISABLE;
+
+    // we expect VRAM to be cleared out
+    vdpmemset(0, 0, 16384);
 
     // I'm told we don't need to mute the AY or the SEX, and reset also turns off the SGM.
 
@@ -803,6 +814,7 @@ int main() {
 	
 	// set_graphics leaves the screen disabled so the user can load character sets,
 	// and returns the value to set in VDPR1 to enable it
+    // Warning: in the menu.c we assume this value is 0xE2
 	x = set_graphics(VDP_SPR_16x16);
 	col = (COLOR_GRAY<<4)|COLOR_BLACK;
 	VDP_SET_REGISTER(VDP_REG_COL, col);
@@ -842,14 +854,8 @@ int main() {
 	// turn the screen on
 	VDP_SET_REGISTER(VDP_REG_MODE1, x);
 
-    // clear any vblank we may have missed
-    VDP_CLEAR_VBLANK;
-
 	// wait for the first two vblanks
-	VDP_WAIT_VBLANK_CRU;
-	VDP_CLEAR_VBLANK;
-	VDP_WAIT_VBLANK_CRU;
-	VDP_CLEAR_VBLANK;
+    waitVblanks(2);
 
 	// enable the F18A here if we have it
 	if (f18a) {

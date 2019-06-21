@@ -120,7 +120,8 @@ extern volatile unsigned char VDP_STATUS_MIRROR;
 	// disable QUIT key testing
 	#define VDP_INT_CTRL_DISABLE_QUIT		0x10
 
-// wait for a vblank (interrupts disabled - will work unreliably if enabled)
+// wait for a vblank (limi interrupts disabled - will work unreliably if enabled)
+// VDP hardware interrupt must be enabled!!
 // there's no CRU on the Coleco, of course... but for compatibility..
 extern volatile unsigned char vdpLimi;
 #define VDP_WAIT_VBLANK_CRU	  while ((vdpLimi&0x80) == 0) { }

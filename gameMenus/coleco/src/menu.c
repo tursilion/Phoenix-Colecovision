@@ -20,6 +20,7 @@ extern const unsigned char FATFONT[];
 
 // hardware control
 static volatile unsigned char * const pRom = (volatile unsigned char * const)0;	// access to memory
+extern void waitVblanks(unsigned char cnt);  // clear and wait for blanks
 extern void startTitle();       // start with no init
 extern void runCartHeader(void (*mycenter)(unsigned char, char*));  // starts the cart with info
                                                                     // pass a center string function
@@ -33,6 +34,9 @@ FIL fil;
 DIR dir;
 FILINFO finfo;
 char path[128];     // max path of 128 chars
+
+// todo: filename length of 128 chars, max overall path of 512 chars
+// TODO: 24k not working right on hardware, wrong bitstream probably
 
 // structures for file access
 // Each entry has:
@@ -105,20 +109,62 @@ void readDir() {
 }
 
 // run the menu itself
+#define BLANK_TIME 5400    // about 3 minutes @ 30hz
 void menu() {
     // check if the SD card is present
 nocard:
-    while (disk_status(0) == STA_NODISK) {
+    cleartextout();
+    // TODO: remove the drive index from the commands that take one...
+    if (disk_status(0) == STA_NODISK) {
+        int cntDown;    // used to count down to screen blank timeout
+        unsigned char debounce; // make sure card detect is stable if we see insertion
+
         // - If card can't be accessed:
         // -    put up     Insert SD or turn system
         //              off before inserting cartridge
-        // -    Check for SD card periodically
-        // -    When detected, jump back to the 'reading SD card' line
-        cleartextout(); // row    col
+                            // row    col
         textout(gSpritePat+(0*8)+(4*16), "Insert SD or turn system");
         textout(gSpritePat+(1*8)+(1*16), "off before inserting cartridge");
-        {
-            dly_50us(254);
+
+        cntDown = BLANK_TIME;
+        debounce = 0;
+        while (debounce < 2) {
+            // -    Check for SD card periodically
+            // -    When detected, jump back to the 'reading SD card' line
+            waitVblanks(2);
+
+            // countdown screen timeout
+            if (--cntDown == 0) {
+                // blank the screen, cause all 9918 systems seem to
+                VDP_SET_REGISTER(VDP_REG_MODE1, 0xA2);  // 16k, int, 16x16 spr
+
+                // wait for any input to clear it
+                for (;;) {
+                    joystfast(1);
+                    if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
+
+                    joystfast(2);
+                    if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
+                    
+                    kscanfast(0);
+                    if (KSCAN_KEY != 0xff) break;
+
+                    // even SD insert - no need to sleep here
+                    if (disk_status(0) != STA_NODISK) break;
+                }
+
+                // re-enable the screen
+                VDP_SET_REGISTER(VDP_REG_MODE1, 0xE2);  // as above, plus unblank
+                cntDown = BLANK_TIME;
+                debounce = 0;
+            }
+
+            // check for and debounce SD card detect
+            if (disk_status(0) == STA_NODISK) {
+                debounce = 0;
+            } else {
+                ++debounce;
+            }
         }
     }
 
