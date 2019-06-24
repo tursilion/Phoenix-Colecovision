@@ -16,9 +16,9 @@ volatile __sfr __at 0x55 phBankingScheme;       // cartridge emulation control (
 #define PH_BANK_MEGACART    1
 #define PH_BANK_SGM         2
 #define PH_BANK_ATARI       3
-#define PH_UPPER_INTRAM     0x00              // non-banked
-#define PH_UPPER_EXPROM     0x10              // cartridge emulation?
-#define PH_UPPER_EXPRAM     0x20              // banked RAM
+#define PH_UPPER_INTRAM     0x00              // non-banked 32k
+#define PH_UPPER_EXPROM     0x10              // banked cartridge emulation
+#define PH_UPPER_EXPRAM     0x20              // banked RAM (same as cartridge emulation, I think, but RAM)
 #define PH_UPPER_CART       0x30              // 32k fixed ROM
 
 volatile __sfr __at 0x56 phSDControl;         // SD card control

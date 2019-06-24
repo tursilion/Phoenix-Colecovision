@@ -45,16 +45,24 @@ BYTE check_fs (	/* 0:FAT, 1:exFAT, 2:Valid BS but not FAT, 3:Not a BS, 4:Disk er
 )
 {
 	fs->wflag = 0; fs->winsect = 0xFFFFFFFF;		/* Invaidate window */
-	if (move_window(fs, sect) != FR_OK) return 4;	/* Load boot record */
+	if (move_window(fs, sect) != FR_OK) {
+        return 4;	/* Load boot record */
+    }
 
-	if (ld_word(fs->win + BS_55AA) != 0xAA55) return 3;	/* Check boot record signature (always here regardless of the sector size) */
+	if (ld_word(fs->win + BS_55AA) != 0xAA55) {
+        return 3;	/* Check boot record signature (always here regardless of the sector size) */
+    }
 
 #if FF_FS_EXFAT
 	if (!mem_cmp(fs->win + BS_JmpBoot, "\xEB\x76\x90" "EXFAT   ", 11)) return 1;	/* Check if exFAT VBR */
 #endif
 	if (fs->win[BS_JmpBoot] == 0xE9 || fs->win[BS_JmpBoot] == 0xEB || fs->win[BS_JmpBoot] == 0xE8) {	/* Valid JumpBoot code? */
-		if (!mem_cmp(fs->win + BS_FilSysType, "FAT", 3)) return 0;		/* Is it an FAT VBR? */
-		if (!mem_cmp(fs->win + BS_FilSysType32, "FAT32", 5)) return 0;	/* Is it an FAT32 VBR? */
+		if (!mem_cmp(fs->win + BS_FilSysType, "FAT", 3)) {
+            return 0;		/* Is it an FAT VBR? */
+        }
+		if (!mem_cmp(fs->win + BS_FilSysType32, "FAT32", 5)) {
+            return 0;	/* Is it an FAT32 VBR? */
+        }
 	}
 	return 2;	/* Valid BS but not FAT */
 }

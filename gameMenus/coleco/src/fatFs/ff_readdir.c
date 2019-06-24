@@ -51,7 +51,6 @@ FRESULT f_readdir (
 	FATFS *fs;
 	DEF_NAMBUF
 
-
 	res = validate(&dp->obj, &fs);	/* Check validity of the directory object */
 	if (res == FR_OK) {
 		if (!fno) {

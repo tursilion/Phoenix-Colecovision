@@ -61,7 +61,6 @@ FRESULT dir_sdi (	/* FR_OK(0):succeeded, !=0:error */
 	if (clst == 0) {	/* table (root-directory on the FAT volume) */
 		if (ofs / SZDIRE >= fs->n_rootdir) return FR_INT_ERR;	/* Is index out of range? */
 		dp->sect = fs->dirbase;
-
 	} else {			/* Dynamic table (sub-directory or root-directory on the FAT32/exFAT volume) */
 		csz = (DWORD)fs->csize * SS(fs);	/* Bytes per cluster */
 		while (ofs >= csz) {				/* Follow cluster chain */

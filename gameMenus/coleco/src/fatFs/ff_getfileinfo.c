@@ -25,6 +25,7 @@
 #include "diskio.h"		/* Declarations of device I/O functions */
 #include "../memset.h"
 
+
 #if FF_DEFINED != 86604	/* Revision ID */
 #error Wrong include file (ff.h).
 #endif
@@ -84,6 +85,7 @@ void get_fileinfo (
 
 	si = di = 0;
 	while (si < 11) {		/* Get SFN from SFN entry */
+
 		wc = dp->dir[si++];			/* Get a char */
 		if (wc == ' ') continue;	/* Skip padding spaces */
 		if (wc == RDDEM) wc = DDEM;	/* Restore replaced DDEM character */

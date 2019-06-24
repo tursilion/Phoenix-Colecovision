@@ -50,12 +50,16 @@ DRESULT disk_read (
 	if (disk_status() & STA_NOINIT) return RES_NOTRDY;
 #endif
 
-	if (!(CardType & CT_BLOCK)) sector *= 512;	/* Convert LBA to byte address if needed */
+	if (!(CardType & CT_BLOCK)) {
+        sector *= 512;	/* Convert LBA to byte address if needed */
+    }
 
 	cmd = count > 1 ? CMD18 : CMD17;			/*  READ_MULTIPLE_BLOCK : READ_SINGLE_BLOCK */
 	if (send_cmd(cmd, sector) == 0) {
 		do {
-			if (!rcvr_datablock(buff, 512)) break;
+			if (!rcvr_datablock(buff, 512)) {
+                break;
+            }
 			buff += 512;
 		} while (--count);
 		if (cmd == CMD18) send_cmd(CMD12, 0);	/* STOP_TRANSMISSION */

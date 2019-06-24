@@ -42,7 +42,6 @@ FRESULT move_window (	/* Returns FR_OK or FR_DISK_ERR */
 {
 	FRESULT res = FR_OK;
 
-
 	if (sector != fs->winsect) {	/* Window offset changed? */
 #if !FF_FS_READONLY
 		res = sync_window(fs);		/* Write-back changes */

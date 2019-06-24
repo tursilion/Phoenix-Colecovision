@@ -57,11 +57,15 @@ FRESULT dir_read (
 
 	while (dp->sect) {
 		res = move_window(fs, dp->sect);
-		if (res != FR_OK) break;
+		if (res != FR_OK) {
+            break;
+        }
 		b = dp->dir[DIR_Name];	/* Test for the entry type */
 		if (b == 0) {
-			res = FR_NO_FILE; break; /* Reached to end of the directory */
+			res = FR_NO_FILE; 
+            break; /* Reached to end of the directory */
 		}
+        
 #if FF_FS_EXFAT
 		if (fs->fs_type == FS_EXFAT) {	/* On the exFAT volume */
 			if (FF_USE_LABEL && vol) {
@@ -106,10 +110,14 @@ FRESULT dir_read (
 #endif
 		}
 		res = dir_next(dp, 0);		/* Next entry */
-		if (res != FR_OK) break;
+		if (res != FR_OK) {
+            break;
+        }
 	}
 
-	if (res != FR_OK) dp->sect = 0;		/* Terminate the read operation on error or EOT */
+	if (res != FR_OK) {
+        dp->sect = 0;		/* Terminate the read operation on error or EOT */
+    }
 	return res;
 }
 

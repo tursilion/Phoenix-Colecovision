@@ -53,6 +53,18 @@ static const unsigned char trampoline[] = {
 static volatile unsigned char * const pRom = (volatile unsigned char * const)0;	// access to memory
 static volatile __sfr __at 0xc0 port3;  // joystick reset strobe
 
+#if 1
+// debugger output for Classic99
+volatile __sfr __at 0x00 debugPort;
+// a full string MUST be written to be output
+void debug(const char *p) {
+    while (*p >= ' ') {
+        debugPort = *(p++);
+    }
+    debugPort=0;
+}
+#endif
+
 // unRLE CPU to VDP handler
 // Basic RLE compression applied to PAT0
 // top two msbits are flags:
@@ -587,9 +599,6 @@ void startCartridge() {
         memcpy((char*)COLECO_FONT_ADR, FATFONT, SIZE_OF_FATFONT);
     }
 #endif
-
-    // debug
-    vdpmemcpy(0x1c20, "starting cart", 13);
 
     // - set the mappers for real cart (should already be set)
     phBankingScheme = PH_BANK_CART | PH_UPPER_CART;
