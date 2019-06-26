@@ -19,13 +19,31 @@
 #include "fatFs/ff.h"			/* Obtains integer types */
 #include "fatFs/diskio.h"		/* Declarations of disk functions */
 
-// Color scheme
-#define COLORLINE1      COLOR_MEDGREEN
-#define COLORLINE2      COLOR_DKGREEN
-#define COLORTEXT       COLOR_WHITE
-#define COLORDIRECTORY  COLOR_LTBLUE
-#define COLORBG         COLOR_LTGREEN
-#define COLORHILITE     COLOR_MEDRED
+// color scheme for menu - this allows easy customization
+// we can use an F18A palette to make these any colors we want
+// COLORHILITE should pulse a little using palette color cycling
+// menu F18 palette values - 12 bit format 0000RRRR GGGGBBBB
+const unsigned int MENU_PALETTE[] = {
+	0x0000,0x0000,  // unchanged transparent and black just for comfort (white is also unchanged
+    0x0000,         // line 1
+    0x0010,         // line 2
+    0x0eee,         // text
+    0x044e,         // directory
+    0x0000,         // background
+    0x0900          // hilite
+    // we don't need to define the rest
+};
+
+// Color scheme - these will be redefined by palette above
+#define COLORLINE1      2
+#define COLORLINE2      3
+#define COLORTEXT       4
+#define COLORDIRECTORY  5
+#define COLORBG         6
+#define COLORHILITE     7
+
+// how long to sit idle before blanking (on no SD card or cartridge)
+#define BLANK_TIME 5400    // about 3 minutes @ 30hz
 
 // we assume that the f18a exists...
 extern unsigned char f18a;
@@ -37,9 +55,10 @@ extern void waitVblanks(unsigned char cnt);  // clear and wait for blanks
 extern void startTitle();       // start with no init
 extern void runCartHeader(void (*mycenter)(unsigned char, char*));  // starts the cart with info
                                                                     // pass a center string function
-// these are only valid until we take down the Phoenix screen - print on the sprite layer
+// sprite layer updates (yes, text mode sprites!)
 extern void textout(unsigned int vdp, const char *p);
 extern void textouthalf(unsigned int vdp, const char *p);
+extern void waitVblanks(unsigned char cnt);
 
 #if 1
 // debugger
@@ -58,6 +77,8 @@ char path[512];                     // current directory only
 unsigned char *sortedList[256];     // sorted pointers to filenames
 unsigned char listSize = 0;         // number of elements in sortedList
 unsigned char listOffset = 0;       // current list offset
+unsigned char listSelect = 0;       // current selection index
+unsigned char repeatTimeout = 45;   // number of frames before autorepeat
 
 volatile __sfr __at 0x00 debugPort;
 
@@ -196,65 +217,365 @@ void readDir() {
     }
 }
 
+// wait for joystick key to be released
+// there's a timeout to provide a crude auto-repeat
+void waitRelease(unsigned char j) {
+    for (;;) {
+        joystfast(j);
+        if ((KSCAN_JOYY == 0) && (KSCAN_JOYX == 0)) {
+            repeatTimeout = 45;     // hold this long before next repeat starts
+            break;
+        } else {
+            --repeatTimeout;
+            if (repeatTimeout == 0) {
+                repeatTimeout = 5;  // faster repeat if you keep holding
+                break;
+            }
+            // VDP vblank wait
+            waitVblanks(1);
+        }
+    }
+}
+
+// display the list of titles
+void drawTitles() {
+    unsigned char idx;
+    unsigned int vdp = gImage;
+    unsigned int atvdp = gColor;
+
+    for (idx = listOffset; idx < listOffset+24; ++idx) {
+        unsigned char *ptr;
+
+        if (idx >= listSize) {
+            // draw a blank line with text attribute
+            if (idx&1) {
+                vdpmemset(atvdp , (COLORTEXT<<4) | COLORLINE2, 40);
+            } else {
+                vdpmemset(atvdp , (COLORTEXT<<4) | COLORLINE1, 40);
+            }
+            atvdp+=40;
+            // write a blank line
+            VDP_SET_ADDRESS_WRITE(vdp);
+            vdp+=40;
+            vdpStrOut("", 40);
+        } else {
+            ptr = sortedList[idx];
+
+            if (ptr[127] != 0) {
+                // change the attributes to include directory
+                if (idx&1) {
+                    vdpmemset(atvdp , (COLORDIRECTORY<<4) | COLORLINE2, 40);
+                } else {
+                    vdpmemset(atvdp , (COLORDIRECTORY<<4) | COLORLINE1, 40);
+                }
+            } else {
+                // text attributes (we have to rewrite it in case it was previous a dir)
+                if (idx&1) {
+                    vdpmemset(atvdp , (COLORTEXT<<4) | COLORLINE2, 40);
+                } else {
+                    vdpmemset(atvdp , (COLORTEXT<<4) | COLORLINE1, 40);
+                }
+            }
+            atvdp+=40;
+
+            // this will stop at the directory flag byte or end of the line
+            // TODO: we should scroll the currently selected title so long filenames are readable
+            VDP_SET_ADDRESS_WRITE(vdp);  // 32 graphics mode, 40 text mode
+            vdp+=40;
+            vdpStrOut(ptr, 40);
+        }
+    }
+}
+
+void sortDir() {
+    // Hooray for lots of RAM all of a sudden!
+    // Since we are building the sort from scratch, we can
+    // use a per-element insertion rather than worrying about
+    // being fancy. Fast Z80 moves SHOULD be inserted by SDCC
+    // for the memmove calls.
+    // Extra rules: directories before non-directories
+    // The ".." folder is handled special and is not in the list.
+    unsigned char *ptr = (unsigned char*)0x8000;
+    listSize = 0;
+
+    debug("Sorting...");
+
+    while (ptr < lastFilename) {
+        unsigned char idx;
+        // whereever this loop exits, that's where we store it
+        for (idx = 0; idx < listSize; ++idx) {
+            unsigned char *ptr2;
+            ptr2 = sortedList[idx];
+
+            // if we are a file comparing to a directory, continue
+            if ((*(ptr+127) == 0) && (*(ptr2+127) != 0)) continue;
+
+            // if we are a directory comparing to a file, stop here
+            if ((*(ptr+127) != 0) && (*(ptr2+127) == 0)) break;
+
+            // otherwise, if we have a lower filename, stop here
+            // equal shouldn't happen, but if it does it will sort after
+            if (mystrcmp(ptr, ptr2) < 0) break;
+        }
+
+        // if necessary, move the data out of the way
+        if (idx < listSize) {
+            // overlapping move - can the Z80 solve that?
+            memmove(&sortedList[idx+1], &sortedList[idx], (listSize-idx)*2);
+        }
+            
+        // store this element
+        sortedList[idx] = ptr;
+
+        // the list will now be larger
+        ++listSize;
+
+        // next filename
+        ptr += 0x80;
+    }
+}
+
+// wait for an SD card to be inserted (with screen blank)
+void waitSDCard() {
+    int cntDown;    // used to count down to screen blank timeout
+    unsigned char debounce; // make sure card detect is stable if we see insertion
+
+    debug("No SD card");
+
+    // - If card can't be accessed:
+    // -    put up     Insert SD or turn system
+    //              off before inserting cartridge
+                    // row    col
+    cleartextout();
+    textout(gSpritePat+(0*8)+(4*16), "Insert SD or turn system");
+    textout(gSpritePat+(1*8)+(1*16), "off before inserting cartridge");
+
+    cntDown = BLANK_TIME;
+    debounce = 0;
+    while (debounce < 2) {
+        // -    Check for SD card periodically
+        // -    When detected, jump back to the 'reading SD card' line
+        waitVblanks(2);
+
+        // countdown screen timeout
+        if (--cntDown == 0) {
+            // blank the screen, cause all 9918 systems seem to
+            VDP_SET_REGISTER(VDP_REG_MODE1, 0xA2);  // 16k, int, 16x16 spr
+
+            // wait for any input to clear it
+            for (;;) {
+                joystfast(1);
+                if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
+
+                joystfast(2);
+                if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
+                    
+                kscanfast(0);
+                if (KSCAN_KEY != 0xff) break;
+
+                // even SD insert - no need to sleep here
+                if (disk_status() != STA_NODISK) break;
+            }
+
+            // re-enable the screen
+            VDP_SET_REGISTER(VDP_REG_MODE1, 0xE2);  // as above, plus unblank
+            cntDown = BLANK_TIME;
+            debounce = 0;
+        }
+
+        // check for and debounce SD card detect
+        if (disk_status() == STA_NODISK) {
+            debounce = 0;
+        } else {
+            ++debounce;
+        }
+    }
+}
+
+// draw the highlight on the current selection
+void drawSelect() {
+    unsigned int adr;
+    unsigned char attr;
+
+    adr = listSelect - listOffset;     // row on screen
+    adr *= 40;      // multiply for offset
+    adr += gColor;  // index into attribute table
+
+    attr = vdpreadchar(adr);            // get the current attribute (for text color)
+    attr = (attr&0xf0) | COLORHILITE;    // highlight the background
+    
+    vdpmemset(adr, attr, 40);           // write out the whole line the same
+}
+
+// erase the highlight on the current selection
+void undrawSelect() {
+    unsigned char bg;
+    unsigned int adr;
+    unsigned char attr;
+
+    adr = listSelect - listOffset;     // row on screen
+    // while we have the row, calculate which background to use
+    if (adr & 1) {
+        // odd row
+        bg = COLORLINE2;
+    } else {
+        bg = COLORLINE1;
+    }
+    adr *= 40;      // multiply for offset
+    adr += gColor;  // index into attribute table
+
+    attr = vdpreadchar(adr);   // get the current attribute (for text color)
+    attr = (attr&0xf0) | bg;    // highlight the background
+    vdpmemset(adr, attr, 40);  // write out the whole line the same
+}
+
+// handle the user input to the menu
+// returns:
+//   0 = card was removed
+//   1 = user made a selection
+//  -1  = user paged the directory (redraw needed)
+char getUserSelection() {
+    unsigned char j;
+    int cntDown = BLANK_TIME;
+
+    // draw the selection bar
+    drawSelect();
+    // make sure both joysticks are released
+    waitRelease(1);
+    waitRelease(2);
+
+    // start the loop
+    for (;;) {
+        // if we lose the SD card, abort
+        if (disk_status() == STA_NODISK) {
+            return 0;
+        }
+
+        // VDP vblank wait
+        waitVblanks(1);
+
+        // scan the joysticks (both work)
+        for (j=1; j<3; j++) {
+            joystfast(j);
+
+            if (KSCAN_JOYY == JOY_UP) {
+                if (listSelect > 0) {
+                    undrawSelect();     // clear the highlight
+                    --listSelect;       // count down
+                    if (listSelect < listOffset) {
+                        listOffset--;
+                        return -1;      // request redraw
+                    }
+                    drawSelect();
+                }
+                waitRelease(j);
+                cntDown = BLANK_TIME;
+                continue;
+            }
+
+            if (KSCAN_JOYY == JOY_DOWN) {
+                if (listSelect < listSize-1) {
+                    undrawSelect();
+                    ++listSelect;
+                    if (listSelect > listOffset+23) {
+                        listOffset++;
+                        return -1;      // request redraw
+                    }
+                    drawSelect();
+                }
+                waitRelease(j);
+                cntDown = BLANK_TIME;
+                continue;
+            }
+
+            if (KSCAN_JOYX == JOY_RIGHT) {
+                if (listOffset+23 < listSize-1) {
+                    // page ahead, restrict to 8-bits
+                    unsigned char add = listSize-1-listOffset;
+                    if (add < 24) {
+                        listOffset += add;
+                        listSelect = listOffset;
+                    } else {
+                        listOffset += 24;
+                        listSelect += 24;
+                    }
+                    return -1;          // request redraw
+                } else {
+                    undrawSelect();
+                    listSelect = listSize-1;
+                    drawSelect();
+                }
+                waitRelease(j);
+                cntDown = BLANK_TIME;
+                continue;
+            }
+            if (KSCAN_JOYX == JOY_LEFT) {
+                if (listOffset > 0) {
+                    // page back, restrict to 8 bits
+                    if (listOffset < 24) {
+                        listOffset = 0;
+                        listSelect = 0;
+                    } else {
+                        listOffset -=24;
+                        listSelect -=24;
+                    }
+                    return -1;          // request redraw
+                } else {
+                    undrawSelect();
+                    listSelect = 0;
+                    drawSelect();
+                }
+                waitRelease(j);
+                cntDown = BLANK_TIME;
+                continue;
+            }
+
+            // check fire button
+            kscanfast(j);
+            if (KSCAN_KEY != 0xff) {
+                return 1;   // selected
+            }
+        }   // next joystick
+
+        // check if it's time to blank the screen
+        --cntDown;
+        if (cntDown <= 0) {
+            // yes, it is
+            VDP_SET_REGISTER(1, 0xb2);    // disable video
+
+            // any keypress to clear it
+            for (;;) {
+                joystfast(1);
+                if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
+
+                joystfast(2);
+                if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
+                    
+                kscanfast(0);
+                if (KSCAN_KEY != 0xff) break;
+            }
+
+            VDP_SET_REGISTER(1, 0xf2);    // restore video
+            cntDown = BLANK_TIME;
+            continue;
+        }
+
+        // and repeat
+    }
+}
+
+
+
 // run the menu itself
-#define BLANK_TIME 5400    // about 3 minutes @ 30hz
+// this function is long and uses gotos. Don't look if you're academic in nature :)
 void menu() {
     // check if the SD card is present
 nocard:
     cleartextout();
+
     if (disk_status() == STA_NODISK) {
-        int cntDown;    // used to count down to screen blank timeout
-        unsigned char debounce; // make sure card detect is stable if we see insertion
-
-        debug("No SD card");
-
-        // - If card can't be accessed:
-        // -    put up     Insert SD or turn system
-        //              off before inserting cartridge
-                            // row    col
-        textout(gSpritePat+(0*8)+(4*16), "Insert SD or turn system");
-        textout(gSpritePat+(1*8)+(1*16), "off before inserting cartridge");
-
-        cntDown = BLANK_TIME;
-        debounce = 0;
-        while (debounce < 2) {
-            // -    Check for SD card periodically
-            // -    When detected, jump back to the 'reading SD card' line
-            waitVblanks(2);
-
-            // countdown screen timeout
-            if (--cntDown == 0) {
-                // blank the screen, cause all 9918 systems seem to
-                VDP_SET_REGISTER(VDP_REG_MODE1, 0xA2);  // 16k, int, 16x16 spr
-
-                // wait for any input to clear it
-                for (;;) {
-                    joystfast(1);
-                    if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
-
-                    joystfast(2);
-                    if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
-                    
-                    kscanfast(0);
-                    if (KSCAN_KEY != 0xff) break;
-
-                    // even SD insert - no need to sleep here
-                    if (disk_status() != STA_NODISK) break;
-                }
-
-                // re-enable the screen
-                VDP_SET_REGISTER(VDP_REG_MODE1, 0xE2);  // as above, plus unblank
-                cntDown = BLANK_TIME;
-                debounce = 0;
-            }
-
-            // check for and debounce SD card detect
-            if (disk_status() == STA_NODISK) {
-                debounce = 0;
-            } else {
-                ++debounce;
-            }
-        }
+        waitSDCard();
+        // on return, we must have an SD card to read!
     }
 
     // - put up 'reading SD card' on status line
@@ -273,8 +594,6 @@ nocard:
     // select the first non-SGM RAM page
     phRAMBankSelect = 2;    // first 32k bank
 
-    // TODO: how do we do a 32k cartridge ROM? We need a non-banked ROM. Maybe replace the RAM mode?
-
 dirLoop:
     // - Read directory (with long filenames), store filenames in VDP
     readDir();
@@ -282,155 +601,78 @@ dirLoop:
     debug("Finished read dir...");
 
     // - Clear sprites
-    vdpchar(0x300, 0xd0);
+    cleartextout();
 
-    // - Sort list (or just create a sorted index for speed?)
-    // Hooray for lots of RAM all of a sudden!
-    // Since we are building the sort from scratch, we can
-    // use a per-element insertion rather than worrying about
-    // being fancy. Fast Z80 moves SHOULD be inserted by SDCC
-    // for the memmove calls.
-    // Extra rules: directories before non-directories
-    // The ".." folder is handled special and is not in the list.
-    debug("Sorting...");
-    {
-        unsigned char *ptr = (unsigned char*)0x8000;
-        listSize = 0;
-        while (ptr < lastFilename) {
-            unsigned char idx;
-            // whereever this loop exits, that's where we store it
-            for (idx = 0; idx < listSize; ++idx) {
-                unsigned char *ptr2;
-                ptr2 = sortedList[idx];
+    // - Sort list
+    sortDir();
 
-                // if we are a file comparing to a directory, continue
-                if ((*(ptr+127) == 0) && (*(ptr2+127) != 0)) continue;
-
-                // if we are a directory comparing to a file, stop here
-                if ((*(ptr+127) != 0) && (*(ptr2+127) == 0)) break;
-
-                // otherwise, if we have a lower filename, stop here
-                // equal shouldn't happen, but if it does it will sort after
-                if (mystrcmp(ptr, ptr2) < 0) break;
-            }
-
-            // if necessary, move the data out of the way
-            if (idx < listSize) {
-                // overlapping move - can the Z80 solve that?
-                memmove(&sortedList[idx+1], &sortedList[idx], (listSize-idx)*2);
-            }
-            
-            // store this element
-            sortedList[idx] = ptr;
-
-            // the list will now be larger
-            ++listSize;
-
-            // next filename
-            ptr += 0x80;
-        }
-    }
-
-#if 0
-    // - Load arcade font (looks bad in text mode)
-    //    vdpmemcpy(0x0800+29*8, FATFONT, 94*8);
-#endif
-
-#if 1
-    // we need to hack the font a bit for text mode
-    // is readable but very square and runs together
-    {
-        int idx;
-        const unsigned char *p = FATFONT;   // CPU font address
-        VDP_SET_ADDRESS_WRITE(0x800+29*8);  // start of VDP address
-        idx = 94*8;
-        while (idx-- > 0) {
-            unsigned char c = *(p++);
-            // make it 6 pixels wide (this pattern took a lot of experimentation, but came out!)
-            c = ((c&0x70)<<1) | ((c&0x0c)<<1);
-            VDPWD = c;
-        }
-        // lowercase m is the only character that doesn't work, so we do it manually
-        vdpmemcpy(0xb68, thinm, 8);
-    }
-#endif
-    // TODO: just use the TI font with lowercase from libti99Coleco?
+    // - Load default font
+    vdpmemcpy(0x0800+29*8, FATFONT, 94*8);
 
     // start at the top
-    listOffset = 0;
+    listOffset = 0;     // top of display
+    listSelect = 0;     // user selected index
 
     // turn off the screen
     VDP_SET_REGISTER(1, 0x80);
 
     // set up for per-character attributes (the color table is now a per-character color in text mode)
     VDP_SET_REGISTER(50,0x02);
-    // Move the sprite table to 0x700
-    VDP_SET_REGISTER(5, 14);
-    gSprite = 0x700;
+#if 0
+    // (these are the same as the main screen)
     // Move the color table to 0x1000
     VDP_SET_REGISTER(3, 64);
     gColor = 0x1000;
+    // Move the sprite table to 0x700
+    VDP_SET_REGISTER(5, 14);
+    gSprite = 0x700;
+    // Move the sprite descriptor table to 0x1800
+    VDP_SET_REGISTER(6, 3);
+    gSpritePat = 0x1800;
+#endif
 
     // background color to match the color scheme
     VDP_SET_REGISTER(7, COLORBG);
 
-    // - make sure sprites are disabled (just in case)
-    vdpchar(gSprite, 0xd0);
-
-listLoop:
     debug("Drawing...");
 
     // turn off the screen (again on first entry)
     VDP_SET_REGISTER(1, 0x80);
 
-    // - Clear screen (including extra for text mode)
+    // - Clear screen (for text mode)
     vdpmemset(gImage, ' ', 960);
-    // - set up the text mode attributes (white on striped)
 
-    {
-        unsigned char idx;
-        int vdp = gColor;
-        for (idx = 0; idx<24; idx+=2) {
-            vdpmemset(vdp, (COLORTEXT<<4) | COLORLINE1, 40);
-            vdp+=40;
-            vdpmemset(vdp, (COLORTEXT<<4) | COLORLINE2, 40);
-            vdp+=40;
-        }
-    }
+    // load the new palette
+    loadpal_f18a(MENU_PALETTE, 8);
 
     // set text mode
     VDP_SET_REGISTER(1,0xf2);
 
     // - Display list of titles
-    {
-        unsigned char idx;
-        unsigned int vdp = 0;
-        for (idx = listOffset; idx < listOffset+24; ++idx) {
-            unsigned char *ptr;
-
-            if (idx >= listSize) break;
-
-            ptr = sortedList[idx];
-
-            if (ptr[127] != 0) {
-                // change the attributes to include directory
-                int vdp = gColor + idx*40;
-                if (idx&1) {
-                    vdpmemset(vdp, (COLORDIRECTORY<<4) | COLORLINE2, 40);
-                } else {
-                    vdpmemset(vdp, (COLORDIRECTORY<<4) | COLORLINE1, 40);
-                }
-            }
-
-            // this will stop at the directory flag byte or end of the line
-            // TODO: we should scroll the currently selected title so long filenames are readable
-            VDP_SET_ADDRESS_WRITE(vdp);  // 32 graphics mode, 40 text mode
-            vdp+=40;
-            vdpStrOut(ptr, 40);
-        }
-    }
+    drawTitles();
 
     // - wait for user selection (up/down move, left/right page, fire select)
+    for (;;) {
+        if (getUserSelection() >= 0) {
+            // either user selected, or card was removed
+            break;
+        }
+
+        // and if the user paged (or scrolled), then redraw
+        drawTitles();
+    }
+
+    // in the event that the SD card was removed, jump back up
+    if (disk_status() == STA_NODISK) {
+        // - Clear screen (for text mode)
+        vdpmemset(gImage, ' ', 960);
+        // go back to nocard loop
+        goto nocard;
+    }
+
+
+
+
     // - if selection is directory:
     // -    clear screen
     // -    display 'reading SD card' in center of screen

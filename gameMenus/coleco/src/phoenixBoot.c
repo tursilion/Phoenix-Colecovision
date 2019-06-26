@@ -12,7 +12,8 @@
 
 #define HEADERS__
 #include "newmap2.c"
-#include "fatfont.c"
+//#include "fatfont.c"  // if enabling, re-enable the text mode font hack in menu.c
+#include "mattfont.c"
 #if 0
 // currently I am not able to hot-patch the Coleco BIOS at startup
 #include "thinfont.c"
@@ -807,8 +808,15 @@ int main() {
 	VDP_SET_REGISTER(VDP_REG_COL, col);
      
 	// move the sprite pattern table so it does not overlap the character patterns
-	VDP_SET_REGISTER(VDP_REG_SDT, 0x02);
-	gSpritePat = 0x1000;
+	VDP_SET_REGISTER(VDP_REG_SDT, 0x03);
+	gSpritePat = 0x1800;
+    // Move the sprite attribute table to 0x700
+    VDP_SET_REGISTER(VDP_REG_SAL, 14);
+    gSprite = 0x700;
+    // Move the color table to 0x1000
+    VDP_SET_REGISTER(3, 64);
+    gColor = 0x1000;
+
     // clear the sprite pattern table
     vdpmemset(gSpritePat, 0, 256*8);
 	// set up 16 mag 3 sprites to give us two lines of bitmapped text at the bottom of the screen

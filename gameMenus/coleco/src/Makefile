@@ -29,7 +29,7 @@ MAIN_OBJS =\
     phoenixBoot.$(EXT)  \
     newmap2.$(EXT)  \
     f18a.$(EXT)  \
-    fatfont.$(EXT)  \
+    mattfont.$(EXT)  \
     menu.$(EXT)  \
     memset.$(EXT)
 
@@ -90,12 +90,6 @@ FAT_OBJS =\
 all: bios fatfs
 	"../tursi_tools/makemegacart.exe" -bios phoenixBoot.ihx phoenixBoot.rom
 	"../tursi_tools/parseMap.exe" phoenixBoot.map
-
-#bios: phoenixBoot.rel crt0_cart.rel newmap2.rel f18a.rel fatfont.rel thinfont.rel
-#	$(CC) -mz80 --no-std-crt0 --code-loc 0x8100 --data-loc 0x7000 -l../libti99coleco/libti99.a "./crt0_cart.$(EXT)" phoenixBoot.$(EXT) f18a.$(EXT) -o phoenixBoot.ihx
-
-#bios: phoenixBoot.rel crt0_bios.rel newmap2.rel f18a.rel fatfont.rel thinfont.rel 
-#	$(CC) -mz80 --no-std-crt0 --code-loc 0x0100 --data-loc 0x7000 -l../libti99coleco/libti99.a "./crt0_bios.$(EXT)" phoenixBoot.$(EXT) f18a.$(EXT) -o phoenixBoot.ihx
 
 bios: $(MAIN_OBJS) fatfs f18a.h memset.h phoenix.h
 	$(RM) phoenixBoot.ihx
