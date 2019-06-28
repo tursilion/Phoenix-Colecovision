@@ -58,7 +58,6 @@ extern void runCartHeader(void (*mycenter)(unsigned char, char*));  // starts th
 // sprite layer updates (yes, text mode sprites!)
 extern void textout(unsigned int vdp, const char *p);
 extern void textouthalf(unsigned int vdp, const char *p);
-extern void waitVblanks(unsigned char cnt);
 
 #if 1
 // debugger
@@ -72,13 +71,7 @@ DIR dir;
 FILINFO finfo;
 // I'm not sure if we need to reflect this in fatfs or if the working buffer
 // is only per filename part...
-char fullpath[512];                 // max path of 512 chars (folders + filename)
-char path[512];                     // current directory only
-unsigned char *sortedList[256];     // sorted pointers to filenames
-unsigned char listSize = 0;         // number of elements in sortedList
-unsigned char listOffset = 0;       // current list offset
-unsigned char listSelect = 0;       // current selection index
-unsigned char repeatTimeout = 45;   // number of frames before autorepeat
+char path[512];
 
 volatile __sfr __at 0x00 debugPort;
 
@@ -100,7 +93,12 @@ const unsigned char thinm[8] = {
 // them out 128 bytes each. (We could store a lookup
 // table in VDP). But for now we'll just enforce the
 // upper limit as a count.
-unsigned char *lastFilename=0;  // using RAM version
+unsigned char *lastFilename=0;      // using RAM version
+unsigned char *sortedList[256];     // sorted pointers to filenames
+unsigned char listSize = 0;         // number of elements in sortedList
+unsigned char listOffset = 0;       // current list offset
+unsigned char listSelect = 0;       // current selection index
+unsigned char repeatTimeout;        // number of frames before autorepeat
 
 // each index is about 50us
 void dly_50us(unsigned char n)
@@ -115,19 +113,31 @@ void cleartextout() {
     vdpmemset(gSpritePat, 0, 16*4*8);
 }
 
+// clear the text screen
+void clrscr() {
+    // - Clear screen (for text mode)
+    vdpmemset(gImage, ' ', 960);
+}
+
 // output a string at current location, stopping at end of string or end of cnt
-void vdpStrOut(const char *p, unsigned cnt) {
+void vdpStrOut(const char *p, unsigned char cnt) {
     while ((*p >= ' ') && (cnt--)) {
         VDPWD = *(p++);
     }
+    if (cnt) {
+        while (cnt--) {
+            VDPWD = ' ';
+        }
+    }
 }
 
-// it's a strcpy that does NOT nul terminate, and stops at 127
+// it's a strcpy that does NOT nul terminate, and stops at 0 or 1
 // it DOES fill unused spots with NUL though
 void mystrcpy(char *pDest, char *pSrc) {
-    unsigned char cnt=127;
-    while ((*pSrc)&&(cnt--)) {
+    unsigned char cnt = 40;
+    while ((*pSrc) > 1) {
         *(pDest++)=*(pSrc++);
+        --cnt;
     }
     while (cnt-- > 0) {
         *(pDest++) = 0;
@@ -135,12 +145,10 @@ void mystrcpy(char *pDest, char *pSrc) {
 }
 
 // simple strcmp (char return instead of int cause z80)
-// this one also stops at 127 characters, since we allow
-// for an unterminated name, and is case insensitive
+// we check for 0 or 1 to terminate for the end of directory marker
 char mystrcmp(const char *s1, const char *s2) {
-    unsigned char cnt = 127;
     unsigned char c1,c2;
-    while (cnt--) { 
+    for (;;) { 
         c1 = *s1;
         c2 = *s2;
 
@@ -154,7 +162,7 @@ char mystrcmp(const char *s1, const char *s2) {
 
         // compare
         if (c1!=c2) break;
-        if (!(*s1)) break;  // only need this test if they are BOTH NUL
+        if (c1 < 2) break;  // only need this test if they are BOTH NUL
 
         // next character
         ++s1; 
@@ -179,6 +187,15 @@ void readDir() {
     if (FR_OK == f_opendir(&dir, path)) {
         debug("Opened directory...");
         debug(path);
+
+        if (path[1] != 0) {
+            // in a subfolder, so add the ..
+            memset(lastFilename, 0, 128);
+            lastFilename[0]='.';
+            lastFilename[1]='.';
+            lastFilename[127]=1;
+            lastFilename+=128;
+        }
 
         while (FR_OK == f_readdir(&dir, &finfo)) {
             // just in case the return code wasn't enough
@@ -280,7 +297,7 @@ void drawTitles() {
 
             // this will stop at the directory flag byte or end of the line
             // TODO: we should scroll the currently selected title so long filenames are readable
-            VDP_SET_ADDRESS_WRITE(vdp);  // 32 graphics mode, 40 text mode
+            VDP_SET_ADDRESS_WRITE(vdp);
             vdp+=40;
             vdpStrOut(ptr, 40);
         }
@@ -303,20 +320,75 @@ void sortDir() {
     while (ptr < lastFilename) {
         unsigned char idx;
         // whereever this loop exits, that's where we store it
+#if 1
+        // This is orders of magnitude faster on a mostly-sorted folder
+        // Two loops here - if we are a file, we work backwards,
+        // and a directory, we work forwards. This is just to optimize
+        // the search performance a little. Files are generally
+        // mostly sorted.
+        if (*(ptr+127)) {
+            // directory, so work from the beginning
+            for (idx = 0; idx < listSize; ++idx) {
+                unsigned char *ptr2;
+
+                // check against the already sorted code
+                ptr2 = sortedList[idx];
+
+                // if we are a directory comparing to a file, stop here
+                if ((*(ptr2+127)) == 0) break;
+
+                // otherwise, if we have a lower filename, stop here
+                // equal shouldn't happen, but if it does it will sort after
+                if (mystrcmp(ptr, ptr2) < 0) break;
+            }
+        } else {
+            // file, so work from the end
+            for (idx = listSize-1; idx != 255; --idx) {
+                unsigned char *ptr2;
+
+                // check against the already sorted code
+                ptr2 = sortedList[idx];
+
+                // if we are a file comparing to a directory, break
+                if ((*(ptr2+127)) != 0) {
+                    ++idx;
+                    break;
+                }
+
+                // otherwise, if we have a higher filename, continue
+                // equal shouldn't happen, but if it does it will sort after
+                if (mystrcmp(ptr, ptr2) < 0) {
+                    continue;
+                }
+
+                // we're done!
+                ++idx;
+                break;
+            }
+        }
+#else
+        // simple search
         for (idx = 0; idx < listSize; ++idx) {
             unsigned char *ptr2;
+            unsigned char t1,t2;
+
+            // check against the already sorted code
             ptr2 = sortedList[idx];
 
+            t1 = *(ptr+127);
+            t2 = *(ptr2+127);
+
             // if we are a file comparing to a directory, continue
-            if ((*(ptr+127) == 0) && (*(ptr2+127) != 0)) continue;
+            if ((t1 == 0) && (t2 != 0)) continue;
 
             // if we are a directory comparing to a file, stop here
-            if ((*(ptr+127) != 0) && (*(ptr2+127) == 0)) break;
+            if ((t1 != 0) && (t2 == 0)) break;
 
             // otherwise, if we have a lower filename, stop here
             // equal shouldn't happen, but if it does it will sort after
             if (mystrcmp(ptr, ptr2) < 0) break;
         }
+#endif
 
         // if necessary, move the data out of the way
         if (idx < listSize) {
@@ -397,6 +469,10 @@ void drawSelect() {
     unsigned int adr;
     unsigned char attr;
 
+    if (listSelect > listSize-1) {
+        listSelect = listSize-1;
+    }
+
     adr = listSelect - listOffset;     // row on screen
     adr *= 40;      // multiply for offset
     adr += gColor;  // index into attribute table
@@ -433,19 +509,17 @@ void undrawSelect() {
 // returns:
 //   0 = card was removed
 //   1 = user made a selection
-//  -1  = user paged the directory (redraw needed)
+//  -1/-2  = user paged the directory (redraw needed, indicates which stick)
 char getUserSelection() {
     unsigned char j;
     int cntDown = BLANK_TIME;
 
     // draw the selection bar
     drawSelect();
-    // make sure both joysticks are released
-    waitRelease(1);
-    waitRelease(2);
 
     // start the loop
     for (;;) {
+        unsigned char oldSelect;
         // if we lose the SD card, abort
         if (disk_status() == STA_NODISK) {
             return 0;
@@ -453,6 +527,9 @@ char getUserSelection() {
 
         // VDP vblank wait
         waitVblanks(1);
+
+        // so we can check if we moved
+        oldSelect = listSelect;
 
         // scan the joysticks (both work)
         for (j=1; j<3; j++) {
@@ -464,7 +541,7 @@ char getUserSelection() {
                     --listSelect;       // count down
                     if (listSelect < listOffset) {
                         listOffset--;
-                        return -1;      // request redraw
+                        return -j;      // request redraw
                     }
                     drawSelect();
                 }
@@ -479,7 +556,7 @@ char getUserSelection() {
                     ++listSelect;
                     if (listSelect > listOffset+23) {
                         listOffset++;
-                        return -1;      // request redraw
+                        return -j;      // request redraw
                     }
                     drawSelect();
                 }
@@ -499,7 +576,7 @@ char getUserSelection() {
                         listOffset += 24;
                         listSelect += 24;
                     }
-                    return -1;          // request redraw
+                    return -j;          // request redraw
                 } else {
                     undrawSelect();
                     listSelect = listSize-1;
@@ -509,6 +586,7 @@ char getUserSelection() {
                 cntDown = BLANK_TIME;
                 continue;
             }
+
             if (KSCAN_JOYX == JOY_LEFT) {
                 if (listOffset > 0) {
                     // page back, restrict to 8 bits
@@ -519,7 +597,7 @@ char getUserSelection() {
                         listOffset -=24;
                         listSelect -=24;
                     }
-                    return -1;          // request redraw
+                    return -j;          // request redraw
                 } else {
                     undrawSelect();
                     listSelect = 0;
@@ -536,6 +614,12 @@ char getUserSelection() {
                 return 1;   // selected
             }
         }   // next joystick
+
+        if (oldSelect == listSelect) {
+            // no joystick move, so reset the auto-repeat
+            // a little hacky here, but it will work.
+            repeatTimeout = 45;
+        }
 
         // check if it's time to blank the screen
         --cntDown;
@@ -569,6 +653,8 @@ char getUserSelection() {
 // run the menu itself
 // this function is long and uses gotos. Don't look if you're academic in nature :)
 void menu() {
+    unsigned char *p;
+
     // check if the SD card is present
 nocard:
     cleartextout();
@@ -578,33 +664,34 @@ nocard:
         // on return, we must have an SD card to read!
     }
 
-    // - put up 'reading SD card' on status line
-    cleartextout();
-	textouthalf(gSpritePat+(1*8)+(8*16), "READING SD CARD");
-    debug("Reading SD Card");
-	
     // - Set directory to root (note there are no relative directories!)
     path[0]='/';
     path[1]=0;
     if (FR_OK != f_mount(&fatFs, "", 1)) goto nocard;
     debug("Finished mount...");
 
+dirLoop:
+    // - put up 'reading SD card' on status line
+    cleartextout();
+	textouthalf(gSpritePat+(1*8)+(8*16), "READING SD CARD");
+    debug("Reading SD Card");
+	
     // activate RAM at the cartridge space so we have somewhere to store data
     phBankingScheme = PH_BANK_MEGACART | PH_UPPER_INTRAM;
     // select the first non-SGM RAM page
     phRAMBankSelect = 2;    // first 32k bank
 
-dirLoop:
     // - Read directory (with long filenames), store filenames in VDP
     readDir();
     if (disk_status() == STA_NODISK) goto nocard;
     debug("Finished read dir...");
 
     // - Clear sprites
-    cleartextout();
-
     // - Sort list
+    cleartextout();
+	textouthalf(gSpritePat+(1*8)+(11*16), "Sorting...");
     sortDir();
+    cleartextout();
 
     // - Load default font
     vdpmemcpy(0x0800+29*8, FATFONT, 94*8);
@@ -640,7 +727,7 @@ dirLoop:
     VDP_SET_REGISTER(1, 0x80);
 
     // - Clear screen (for text mode)
-    vdpmemset(gImage, ' ', 960);
+    clrscr();
 
     // load the new palette
     loadpal_f18a(MENU_PALETTE, 8);
@@ -648,36 +735,115 @@ dirLoop:
     // set text mode
     VDP_SET_REGISTER(1,0xf2);
 
+drawLoop:
     // - Display list of titles
     drawTitles();
 
     // - wait for user selection (up/down move, left/right page, fire select)
     for (;;) {
-        if (getUserSelection() >= 0) {
+        char ret = getUserSelection();
+        if (ret >= 0) {
             // either user selected, or card was removed
             break;
         }
 
         // and if the user paged (or scrolled), then redraw
         drawTitles();
+
+        // and then wait for the autorepeat
+        waitRelease(-ret);
     }
 
     // in the event that the SD card was removed, jump back up
     if (disk_status() == STA_NODISK) {
         // - Clear screen (for text mode)
-        vdpmemset(gImage, ' ', 960);
+        clrscr();
         // go back to nocard loop
         goto nocard;
     }
 
-
-
+    // We now have a selection index in listSelect
+    // listSize is the number of entries, and lastFilename
+    // points after the last entry
+    p = sortedList[listSelect];
 
     // - if selection is directory:
-    // -    clear screen
-    // -    display 'reading SD card' in center of screen
-    // -    jump back to directory read
-    // - if selection is file:
+    if (*(p+127)) {
+        unsigned char *pp;
+        unsigned char *originalP;
+
+        // - set new path
+        pp = path;
+        while (*pp) ++pp;   // find the end of the current string
+        originalP = pp;     // in case we need to undo it
+
+        // check for '..' and go back a directory if it's that
+        if ((p[0]=='.')&&(p[1]=='.')) {
+            while ((*pp != '/') && (pp > path)) --pp;
+            if (pp == path) {
+                // something went wrong, so rewrite the root dir
+                path[0]='/';
+                path[1]=0;
+            } else {
+                // NUL terminate after the /
+                ++pp;
+                *pp = 0;
+            }
+        } else {
+            // - copy the path in - watch for the end
+            if (pp > path+1) {
+                *(pp++) = '/';
+            }
+
+            // The path may not be NUL terminated, but the last byte IS
+            // guaranteed to be either 0 or 1
+            // We probably need to use a shorter length here, since there's no filename room...
+            while ((*p > 1) && (pp-path < 510)) {   // this 510 means we always have room for the '/'
+                *(pp++) = *(p++);
+            }
+
+            // see if we ran out of space
+            if (*p > 1) {
+                // we need to tell the user some how, and revert to the original path
+                pp = originalP;
+                *pp = 0;
+                // - Clear screen (for text mode)
+                clrscr();
+                textout(gSpritePat+(0*8)+(2*16), "Path too long... press fire.");
+                // make sure both fires are released
+                for (;;) {
+                    kscanfast(1);
+                    if (KSCAN_KEY == 0xff) break;
+                }
+                for (;;) {
+                    kscanfast(2);
+                    if (KSCAN_KEY == 0xff) break;
+                }
+                // wait for a new fire button
+                for (;;) {
+                    kscanfast(1);
+                    if (KSCAN_KEY != 0xff) break;
+                    kscanfast(2);
+                    if (KSCAN_KEY != 0xff) break;
+                }
+                // go back and redraw the current directory
+                cleartextout();
+                goto drawLoop;
+            }
+
+            // and then NUL terminate it
+            *(pp++) = 0;
+        }
+
+        // - Clear screen (for text mode)
+        clrscr();
+
+        // - display 'reading SD card' in center of screen
+        // - jump back to directory read
+        goto dirLoop;
+    }
+
+    // if we get here, then we're selecting a file
     // -    read first block into cartridge space
     // -    if 55AA or AA55 is detected, we have a valid ROM:
     // -        read in the rest
