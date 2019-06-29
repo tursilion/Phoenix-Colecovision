@@ -1075,7 +1075,7 @@ drawLoop:
         res = f_read(&fil, (unsigned char*)0x8000, 512, &br);
         if ((res != FR_OK) || (br != 512)) {
             f_close(&fil);
-            displayErrorString("Failed to read file.", res);
+            displayErrorString("Unrecognized file type.", res);
             phRAMBankSelect = DIRECTORY_PAGE;
             goto drawLoop;
         }
