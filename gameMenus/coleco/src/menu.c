@@ -42,6 +42,24 @@ const unsigned int MENU_PALETTE[] = {
 #define COLORBG         6
 #define COLORHILITE     7
 
+// hex conversion
+const char hex[16] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
+
+// working RAM bank for directory - 0 is the SGM bank and can not
+// be selected. 1 through 15 are the cartridge banks. However, this
+// only gives us 480k. Unfortunately, Megacarts are powers of two,
+// meaning we are restricted to 256k megacarts unless we can get
+// that first 32k back.
+// I want to put the directory out of the way of file load, so that
+// if an error occurs, we can go back to the directory without re-reading
+// the SD card. So in case we do solve the above, I'll store the data
+// at page 14. (Since we load pages 1 and 15 during image detection).
+#define DIRECTORY_PAGE 14
+// cartridge pages (we need this stuff for the loader, defining it lets us
+// change it easier later if we resolve the issue)
+#define CART_FIRST_PAGE 1       // 0 is SGM, 1 is cart memory
+#define CART_LAST_PAGE 8        // for 256k megacart. We can't make it to 512k with the SGM page there
+
 // how long to sit idle before blanking (on no SD card or cartridge)
 #define BLANK_TIME 5400    // about 3 minutes @ 30hz
 
@@ -53,15 +71,17 @@ extern const unsigned char FATFONT[];
 static volatile unsigned char * const pRom = (volatile unsigned char * const)0;	// access to memory
 extern void waitVblanks(unsigned char cnt);  // clear and wait for blanks
 extern void startTitle();       // start with no init
-extern void runCartHeader(void (*mycenter)(unsigned char, char*));  // starts the cart with info
-                                                                    // pass a center string function
+
 // sprite layer updates (yes, text mode sprites!)
 extern void textout(unsigned int vdp, const char *p);
 extern void textouthalf(unsigned int vdp, const char *p);
+void centerString(unsigned char line, char *p);
 
 #if 1
 // debugger
 extern void debug(const char *p);
+#else
+#define debug(x)
 #endif
 
 // File structures
@@ -72,22 +92,18 @@ FILINFO finfo;
 // I'm not sure if we need to reflect this in fatfs or if the working buffer
 // is only per filename part...
 char path[512];
-
-volatile __sfr __at 0x00 debugPort;
+char path2[512];    // temporary ram for the load, since we can afford it... (size assumed by copypage() )
 
 // the thin lowercase m doesn't work, so this is a manual replacement
 const unsigned char thinm[8] = {
     0,0, 0xf8, 0xa8, 0xa8, 0xa8, 0xa8, 0
 };
 
-// TODO: 24k not working right on hardware? Needs testing.
-
 // structures for file access
 // Each entry has:
 //      Filename[127]
-//      Byte for directory flag
-// Note this is only enough room for 80 files in VDP,
-// but if we use the 32k of RAM at 0x8000, we can fit 256. (32k/128)
+//      Number of 16k pages (or 0 for directory)
+// Using the 32k of RAM at 0x8000, we can fit 256. (32k/128)
 // Alternate plans could be to use more than one page of
 // data, or to pack the filenames rather than spacing
 // them out 128 bytes each. (We could store a lookup
@@ -115,8 +131,12 @@ void cleartextout() {
 
 // clear the text screen
 void clrscr() {
-    // - Clear screen (for text mode)
     vdpmemset(gImage, ' ', 960);
+}
+
+// clear the text screen bottom three rows
+void clrscrbottom() {
+    vdpmemset(gImage+(40*21), ' ', (40*3));
 }
 
 // output a string at current location, stopping at end of string or end of cnt
@@ -131,21 +151,51 @@ void vdpStrOut(const char *p, unsigned char cnt) {
     }
 }
 
-// it's a strcpy that does NOT nul terminate, and stops at 0 or 1
-// it DOES fill unused spots with NUL though
+// strcpy with max length for our directory entries
 void mystrcpy(char *pDest, char *pSrc) {
-    unsigned char cnt = 40;
-    while ((*pSrc) > 1) {
+    unsigned char cnt = 126;
+    while ((*pSrc) && (cnt--)) {
         *(pDest++)=*(pSrc++);
-        --cnt;
     }
-    while (cnt-- > 0) {
-        *(pDest++) = 0;
+    *(pDest) = 0;
+}
+
+// use the sprite layer to display an error at the bottom of the screen
+void displayErrorString(char *pstr, unsigned char x) {
+    // - Clear bottom of screen (for text mode)
+    clrscrbottom();
+    cleartextout();
+    centerString(0, pstr);
+    centerString(1, "Press fire...");
+
+    // write the code 'x' to top left
+    VDP_SET_ADDRESS_WRITE(gImage + 38);
+    VDPWD = hex[(x>>4)];
+    VDPWD = hex[(x&0xf)];
+
+    // make sure both fires are released
+    for (;;) {
+        kscanfast(1);
+        if (KSCAN_KEY == 0xff) break;
     }
+    for (;;) {
+        kscanfast(2);
+        if (KSCAN_KEY == 0xff) break;
+    }
+
+    // wait for a new fire button
+    for (;;) {
+        kscanfast(1);
+        if (KSCAN_KEY != 0xff) break;
+        kscanfast(2);
+        if (KSCAN_KEY != 0xff) break;
+    }
+
+    // clear sprites - caller should redraw the text layer
+    cleartextout();
 }
 
 // simple strcmp (char return instead of int cause z80)
-// we check for 0 or 1 to terminate for the end of directory marker
 char mystrcmp(const char *s1, const char *s2) {
     unsigned char c1,c2;
     for (;;) { 
@@ -153,16 +203,23 @@ char mystrcmp(const char *s1, const char *s2) {
         c2 = *s2;
 
         // make uppercase (with some sideeffects, but not in the valid charset)
-        if (c1&0x40) c1&=0xdf;
-        if (c2&0x40) c2&=0xdf;
+        // and turn underscores into spaces for better sorting
 
-        // turn underscore into a space for sorting
-        if (c1 == '_') c1=' ';
-        if (c2 == '_') c2=' ';
+        if (c1&0x40) {
+            c1&=0xdf;
+        } else if (c1 == '_') { // if it's a letter, it can't be an underscore, so 'else'
+            c1=' ';
+        }
+
+        if (c2&0x40) {
+            c2&=0xdf;
+        } else if (c2 == '_') {
+            c2=' ';
+        }
 
         // compare
-        if (c1!=c2) break;
-        if (c1 < 2) break;  // only need this test if they are BOTH NUL
+        if (c1 != c2) break;
+        if (c1 == 0) break;  // only need this test if they are BOTH NUL
 
         // next character
         ++s1; 
@@ -173,10 +230,12 @@ char mystrcmp(const char *s1, const char *s2) {
 
 // read the directory ('path') into expansion RAM starting at 0x8000
 // this RAM is currently free for use, when we load a cartridge, then
-// it will get overwritten
+// it will get overwritten. We use a page that isn't overwritten until
+// the cartridge load is successful.
+// The first 126 bytes are the filename, always followed by a NUL byte,
+// then one byte for the number of 16k pages in the file, which is
+// zero if it's a directory.
 void readDir() {
-    debug("Reading dir...");
-
     lastFilename = (unsigned char*)0x8000;  // no files loaded yet
 
     // Each entry has:
@@ -185,7 +244,6 @@ void readDir() {
     // TODO: we can free some space if we remove altname[] from finfo (and most of the other parameters)
     //       in ff_getfileinfo this is done, we can just only populate the long name, altname is the short
     if (FR_OK == f_opendir(&dir, path)) {
-        debug("Opened directory...");
         debug(path);
 
         if (path[1] != 0) {
@@ -193,34 +251,29 @@ void readDir() {
             memset(lastFilename, 0, 128);
             lastFilename[0]='.';
             lastFilename[1]='.';
-            lastFilename[127]=1;
+            lastFilename[127]=0;    // directory flag
             lastFilename+=128;
         }
 
         while (FR_OK == f_readdir(&dir, &finfo)) {
             // just in case the return code wasn't enough
             if (disk_status() == STA_NODISK) {
-                debug("Exitting directory because SD removed");
                 return;
             }
 
             // parse the file information
             if (finfo.fname[0] == '\0') {
-                debug("Empty filename received, end of directory");
                 break;      // end of directory
             }
 
             // save it off
-            memset(lastFilename, ' ', 127);
-            mystrcpy(lastFilename, finfo.fname);
+            memset(lastFilename, 0, 127);
+            mystrcpy(lastFilename, finfo.fname);    // will truncate to 126 characters
             if (finfo.fattrib & AM_DIR) {
-                debugPort='*';
-                *(lastFilename+127) = 1;
+                *(lastFilename+127) = 0;    // 0 size for directory
             } else {
-                *(lastFilename+127) = 0;
-                debugPort=' ';
+                *(lastFilename+127) = (finfo.fsize + 16383) >> 14;  // number of 16384 pages, rounded up
             }
-            debug(finfo.fname);
             lastFilename += 128;
             // we can go up to 0xffff, but if we wrap around we're done
             // to be paranoid for now, I'm going to stop at 255
@@ -278,7 +331,7 @@ void drawTitles() {
         } else {
             ptr = sortedList[idx];
 
-            if (ptr[127] != 0) {
+            if (ptr[127] == 0) {
                 // change the attributes to include directory
                 if (idx&1) {
                     vdpmemset(atvdp , (COLORDIRECTORY<<4) | COLORLINE2, 40);
@@ -286,7 +339,7 @@ void drawTitles() {
                     vdpmemset(atvdp , (COLORDIRECTORY<<4) | COLORLINE1, 40);
                 }
             } else {
-                // text attributes (we have to rewrite it in case it was previous a dir)
+                // text attributes (we have to rewrite it in case it was previously a dir)
                 if (idx&1) {
                     vdpmemset(atvdp , (COLORTEXT<<4) | COLORLINE2, 40);
                 } else {
@@ -315,8 +368,6 @@ void sortDir() {
     unsigned char *ptr = (unsigned char*)0x8000;
     listSize = 0;
 
-    debug("Sorting...");
-
     while (ptr < lastFilename) {
         unsigned char idx;
         // whereever this loop exits, that's where we store it
@@ -326,7 +377,7 @@ void sortDir() {
         // and a directory, we work forwards. This is just to optimize
         // the search performance a little. Files are generally
         // mostly sorted.
-        if (*(ptr+127)) {
+        if (*(ptr+127) == 0) {
             // directory, so work from the beginning
             for (idx = 0; idx < listSize; ++idx) {
                 unsigned char *ptr2;
@@ -335,7 +386,7 @@ void sortDir() {
                 ptr2 = sortedList[idx];
 
                 // if we are a directory comparing to a file, stop here
-                if ((*(ptr2+127)) == 0) break;
+                if ((*(ptr2+127)) != 0) break;
 
                 // otherwise, if we have a lower filename, stop here
                 // equal shouldn't happen, but if it does it will sort after
@@ -350,7 +401,7 @@ void sortDir() {
                 ptr2 = sortedList[idx];
 
                 // if we are a file comparing to a directory, break
-                if ((*(ptr2+127)) != 0) {
+                if ((*(ptr2+127)) == 0) {
                     ++idx;
                     break;
                 }
@@ -379,10 +430,10 @@ void sortDir() {
             t2 = *(ptr2+127);
 
             // if we are a file comparing to a directory, continue
-            if ((t1 == 0) && (t2 != 0)) continue;
+            if ((t1 != 0) && (t2 == 0)) continue;
 
             // if we are a directory comparing to a file, stop here
-            if ((t1 != 0) && (t2 == 0)) break;
+            if ((t1 == 0) && (t2 != 0)) break;
 
             // otherwise, if we have a lower filename, stop here
             // equal shouldn't happen, but if it does it will sort after
@@ -411,8 +462,6 @@ void sortDir() {
 void waitSDCard() {
     int cntDown;    // used to count down to screen blank timeout
     unsigned char debounce; // make sure card detect is stable if we see insertion
-
-    debug("No SD card");
 
     // - If card can't be accessed:
     // -    put up     Insert SD or turn system
@@ -462,6 +511,161 @@ void waitSDCard() {
             ++debounce;
         }
     }
+}
+
+// read the rest of a 32k cart (The first 512 bytes are loaded)
+// any return is an error. FILE object is in global fil.
+void loadCartridgeRom() {
+    unsigned char *p = (unsigned char*)(0x8000+512);
+    UINT br;
+
+    clrscrbottom();
+    centerString(0, "reading cart...");
+
+    // - read in the rest
+    for (;;) {
+        FRESULT res;
+
+        res = f_read(&fil, p, 512, &br);
+        if (res != FR_OK) {
+            f_close(&fil);
+            displayErrorString("Cartridge load failed.", res);
+            return;
+        }
+        if (br < 512) {
+            // end of file
+            break;
+        }
+        // else, keep reading
+        p+=512;
+        if (p < (unsigned char*)0x8000) {
+            // if it's exactly 32k, we get here. 
+            if (f_eof(&fil)) {
+                break;
+            } else {
+                f_close(&fil);
+                displayErrorString("Unrecognized >32k Cart", 1);
+                return;
+            }
+        }
+    }
+    f_close(&fil);
+
+    // - set the mappers appropriately
+    phBankingScheme = PH_BANK_MEGACART | PH_UPPER_CART;     // the megacart banking is ignored for upper type cart
+
+    // - jump to "execute title" as above
+    startTitle();   // never returns
+}
+
+// copy 32k from phoenix page a to phoenix page b
+void copyPage(unsigned char a, unsigned char b) {
+    // since we already have loaded the program by this point,
+    // let's reuse path2 as a 512 byte buffer
+    unsigned char *off = (unsigned char*)0x8000;
+    while (off > 0) {   // watch for wrap around
+        phRAMBankSelect = a;
+        memcpy(path2, off, 512);
+        phRAMBankSelect = b;
+        memcpy(off, path2, 512);
+        off += 512;
+    }
+}
+
+// reads the rest of a Megacart into memory
+void loadMegacartRom() {
+    unsigned char *p = (unsigned char*)(0x8000+512);
+    unsigned char page = CART_FIRST_PAGE;
+    UINT br;
+    FSIZE_t ofs;
+
+    clrscrbottom();
+    centerString(0, "reading megacart...");
+
+    // seek back to second 512 byte page
+    ofs = 512;
+    if (FR_OK != f_lseek(&fil, ofs)) {
+        f_close(&fil);
+        displayErrorString("Failed to identify file.", 2);
+        return;
+    }
+
+    // - read in the rest
+    for (;;) {
+        FRESULT res;
+
+        res = f_read(&fil, p, 512, &br);
+        if (res != FR_OK) {
+            f_close(&fil);
+            displayErrorString("Cartridge load failed.", res);
+            return;
+        }
+        if (br < 512) {
+            // end of file
+            break;
+        }
+        // else, keep reading
+        p+=512;
+        if (p < (unsigned char*)0x8000) {
+            // time for the next page!
+            ++page;
+            if (page > CART_LAST_PAGE) {
+                // if it's exactly 256k, we get here.
+                if (f_eof(&fil)) {
+                    // end of file
+                    break;
+                } else {
+                    // we ran out of space
+                    f_close(&fil);
+                    displayErrorString("Megacart ROM too large", 0);
+                    return;
+                }
+            }
+            // else, reset the pointer and keep reading
+            p = (unsigned char*)0x8000;
+            phRAMBankSelect = page;
+        }
+    }
+
+    f_close(&fil);
+
+    // - duplicate in memory to reach 256k, for simplicity the core just assumes
+    // This is kind of annoying, so we'll just check it's a valid size to be duplicated
+    // Valid sizes then are 32k, 64k, 128, 256k, which in Phoenix 32k page counts, is 
+    // 1, 2, 4, or 8. Furthermore, we can't get here if it's 8 cause we had to early out above.
+    // The copy isn't quite as awesome as I'd like due to paging...
+    switch (page-CART_FIRST_PAGE) {
+        case 1: 
+            debug("Megacart size 1"); 
+            copyPage(CART_FIRST_PAGE, CART_FIRST_PAGE+1);
+            // fall through
+
+        case 2: 
+            debug("Megacart size 2"); 
+            copyPage(CART_FIRST_PAGE, CART_FIRST_PAGE+2);
+            copyPage(CART_FIRST_PAGE+1, CART_FIRST_PAGE+3);
+            // fall through
+
+        case 4: 
+            debug("Megacart size 4");
+            copyPage(CART_FIRST_PAGE, CART_FIRST_PAGE+4);
+            copyPage(CART_FIRST_PAGE+1, CART_FIRST_PAGE+5);
+            copyPage(CART_FIRST_PAGE+2, CART_FIRST_PAGE+6);
+            copyPage(CART_FIRST_PAGE+3, CART_FIRST_PAGE+7);
+            break;
+
+        default:
+            f_close(&fil);
+            displayErrorString("Megacart images must be padded", 0);
+            return;
+    }
+
+    // - set the mappers appropriately
+    phBankingScheme = PH_BANK_MEGACART | PH_UPPER_EXPROM;
+    phRAMBankSelect = CART_FIRST_PAGE;  // this is not necessarily enforced on real megacarts
+
+    // - jump to "execute title" as above
+    startTitle();   // never returns
 }
 
 // draw the highlight on the current selection
@@ -649,7 +853,6 @@ char getUserSelection() {
 }
 
 
-
 // run the menu itself
 // this function is long and uses gotos. Don't look if you're academic in nature :)
 void menu() {
@@ -668,33 +871,30 @@ nocard:
     path[0]='/';
     path[1]=0;
     if (FR_OK != f_mount(&fatFs, "", 1)) goto nocard;
-    debug("Finished mount...");
 
 dirLoop:
     // - put up 'reading SD card' on status line
     cleartextout();
 	textouthalf(gSpritePat+(1*8)+(8*16), "READING SD CARD");
-    debug("Reading SD Card");
 	
     // activate RAM at the cartridge space so we have somewhere to store data
     phBankingScheme = PH_BANK_MEGACART | PH_UPPER_INTRAM;
-    // select the first non-SGM RAM page
-    phRAMBankSelect = 2;    // first 32k bank
+    // select the working memory for the directory
+    phRAMBankSelect = DIRECTORY_PAGE;
 
     // - Read directory (with long filenames), store filenames in VDP
     readDir();
     if (disk_status() == STA_NODISK) goto nocard;
-    debug("Finished read dir...");
 
     // - Clear sprites
     // - Sort list
+    // Sort is so fast now that we don't need to display anything
+#if 0
     cleartextout();
 	textouthalf(gSpritePat+(1*8)+(11*16), "Sorting...");
+#endif
     sortDir();
     cleartextout();
-
-    // - Load default font
-    vdpmemcpy(0x0800+29*8, FATFONT, 94*8);
 
     // start at the top
     listOffset = 0;     // top of display
@@ -702,6 +902,9 @@ dirLoop:
 
     // turn off the screen
     VDP_SET_REGISTER(1, 0x80);
+
+    // - Load default font
+    vdpmemcpy(0x0800+29*8, FATFONT, 94*8);
 
     // set up for per-character attributes (the color table is now a per-character color in text mode)
     VDP_SET_REGISTER(50,0x02);
@@ -720,11 +923,6 @@ dirLoop:
 
     // background color to match the color scheme
     VDP_SET_REGISTER(7, COLORBG);
-
-    debug("Drawing...");
-
-    // turn off the screen (again on first entry)
-    VDP_SET_REGISTER(1, 0x80);
 
     // - Clear screen (for text mode)
     clrscr();
@@ -768,7 +966,7 @@ drawLoop:
     p = sortedList[listSelect];
 
     // - if selection is directory:
-    if (*(p+127)) {
+    if (*(p+127) == 0) {
         unsigned char *pp;
         unsigned char *originalP;
 
@@ -795,39 +993,17 @@ drawLoop:
                 *(pp++) = '/';
             }
 
-            // The path may not be NUL terminated, but the last byte IS
-            // guaranteed to be either 0 or 1
             // We probably need to use a shorter length here, since there's no filename room...
-            while ((*p > 1) && (pp-path < 510)) {   // this 510 means we always have room for the '/'
+            while ((*p) && (pp-path < 510)) {   // this 510 means we always have room for the '/'
                 *(pp++) = *(p++);
             }
 
             // see if we ran out of space
-            if (*p > 1) {
+            if (*p) {
                 // we need to tell the user some how, and revert to the original path
                 pp = originalP;
                 *pp = 0;
-                // - Clear screen (for text mode)
-                clrscr();
-                textout(gSpritePat+(0*8)+(2*16), "Path too long... press fire.");
-                // make sure both fires are released
-                for (;;) {
-                    kscanfast(1);
-                    if (KSCAN_KEY == 0xff) break;
-                }
-                for (;;) {
-                    kscanfast(2);
-                    if (KSCAN_KEY == 0xff) break;
-                }
-                // wait for a new fire button
-                for (;;) {
-                    kscanfast(1);
-                    if (KSCAN_KEY != 0xff) break;
-                    kscanfast(2);
-                    if (KSCAN_KEY != 0xff) break;
-                }
-                // go back and redraw the current directory
-                cleartextout();
+                displayErrorString("Path too long...", 0);
                 goto drawLoop;
             }
 
@@ -844,19 +1020,124 @@ drawLoop:
     }
 
     // if we get here, then we're selecting a file
-    // -    read first block into cartridge space
-    // -    if 55AA or AA55 is detected, we have a valid ROM:
-    // -        read in the rest
-    // -        set the mappers appropriately
-    // -        jump to "execute title" as above
-    // -    read EOF-16k block to next free memory, as test
-    // -    if 55AA or AA55 is detected, we have a megacart:
-    // -        read in the rest
-    // -        set the mappers appropriately
-    // -        jump to "execute title" as above
-    
+    // first switch to the first cartridge 32k bank -
+    // if we fail to load, we can switch back to the
+    // directory bank and keep working without a reload
+
+    {
+        // first create a filename to open
+        FRESULT res;
+        UINT br;
+        char *s1, *s2;
+        char fsize = *(p+127);  // save off the size (16k chunks)
+
+        // create the filename
+        s1 = path2;
+        s2 = path;
+        
+        // we know the first one must fit, they are the same size
+        while (*s2) {
+            *(s1++) = *(s2++);
+        }
+        
+        // also, the directory code guarantees room for the '/'
+        // don't add it if we're in the root directory though
+        if (path[1] != 0) {
+            *(s1++) = '/';
+        }
+        
+        // now, for the actual filename we have to watch length
+        while ((*p) && (s1-path2 < 127)) {
+            *(s1++) = *(p++);
+        }
+        *s1 = 0;
+
+        // did we run out of room?
+        if (*p) {
+            displayErrorString("Path too long...", 1);
+            goto drawLoop;
+        }
+
+        // all right, we have a full path, try to open it
+        debug(path2);
+
+        res = f_open(&fil, path2, FA_READ);
+        if (FR_OK != res) {
+            displayErrorString("Failed to open file.", res);
+            goto drawLoop;
+        }
+
+        // -    read first block into cartridge space
+        // Remember after this point to restore the bank select before
+        // looping back to drawLoop.
+        phRAMBankSelect = CART_FIRST_PAGE;
+
+        res = f_read(&fil, (unsigned char*)0x8000, 512, &br);
+        if ((res != FR_OK) || (br != 512)) {
+            f_close(&fil);
+            displayErrorString("Failed to read file.", res);
+            phRAMBankSelect = DIRECTORY_PAGE;
+            goto drawLoop;
+        }
+
+        // -    if 55AA or AA55 is detected, we have a valid ROM:
+        if ( ((pRom[0x8000] == 0xaa) && (pRom[0x8001] == 0x55)) ||
+             ((pRom[0x8000] == 0x55) && (pRom[0x8001] == 0xaa)) ) {
+            loadCartridgeRom();
+            // if we return, then the cartridge load failed
+            // 32k carts can't overwrite our directory, so just resume!
+            phRAMBankSelect = DIRECTORY_PAGE;
+            goto drawLoop;
+        }
+
+        // -    read EOF-16k block to next free memory, as test
+        // Note that if the ROM is not a multiple of 16k, this test
+        // probably won't work
+        {
+            FSIZE_t ofs;
+
+            ofs = fsize - 1;    // get the size in blocks, minus 1
+            ofs <<= 14;         // times 16384 for offset
+            if (FR_OK != f_lseek(&fil, ofs)) {
+                debug("Seek failed - disk error?");
+                f_close(&fil);
+                displayErrorString("Failed to identify file.", res);
+                phRAMBankSelect = DIRECTORY_PAGE;
+                goto drawLoop;
+            }
+
+            // this becomes a redundant read, but it's quick enough to be ok
+            res = f_read(&fil, (unsigned char*)0x8200, 512, &br);
+            if ((res != FR_OK) || (br != 512)) {
+                // the br != 512 MIGHT be legal, but I'm going to say it should be padded to 16384!
+                f_close(&fil);
+                displayErrorString("Failed to read block.", res);
+                phRAMBankSelect = DIRECTORY_PAGE;
+                goto drawLoop;
+            }
+
+            // -    if 55AA or AA55 is detected, we have a megacart:
+            if ( ((pRom[0x8200] == 0xaa) && (pRom[0x8201] == 0x55)) ||
+                 ((pRom[0x8200] == 0x55) && (pRom[0x8201] == 0xaa)) ) {
+                loadMegacartRom();
+                // if we return, then the cartridge load failed
+                // Megacarts today can't overwrite our directory, so
+                // just resume. But if we expand to 256k then
+                // we need to put some extra code in here...
+#if CART_LAST_PAGE > 8
+#error Megacart needs to reload directory on failure
+#endif
+                phRAMBankSelect = DIRECTORY_PAGE;
+                goto drawLoop;
+            }
+        }
+
+        // we don't know what we found!
+        f_close(&fil);
+        displayErrorString("Unrecognized file type.", 0);
+        phRAMBankSelect = DIRECTORY_PAGE;
+        goto drawLoop;
+    }
+
     // TODO: other cartridge banking types? Megacart only for now.
-
-    debug("Nothing else coded yet...\x7f"); // 7f triggers a breakpoint
 }
-

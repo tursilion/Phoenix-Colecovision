@@ -12,11 +12,11 @@ volatile __sfr __at 0x53 sgmConfig;             // configuration
 volatile __sfr __at 0x54 phRAMBankSelect;       // 32k RAM bank select. 0 and 1 are both 1.
 
 volatile __sfr __at 0x55 phBankingScheme;       // cartridge emulation control (also read it to disable Phoenix BIOS)
-#define PH_BANK_CART        0
-#define PH_BANK_MEGACART    1
-#define PH_BANK_SGM         2
-#define PH_BANK_ATARI       3
-#define PH_UPPER_INTRAM     0x00              // non-banked 32k
+#define PH_BANK_CART        0                 // hardware physical cart port (any other disables)
+#define PH_BANK_MEGACART    1                 // banking scheme megacart
+#define PH_BANK_SGM         2                 // banking scheme SGM (?)
+#define PH_BANK_ATARI       3                 // banking scheme Atari (?)
+#define PH_UPPER_INTRAM     0x00              // 32k RAM, banking ignored (uses port 0x54)
 #define PH_UPPER_EXPROM     0x10              // banked cartridge emulation
 #define PH_UPPER_EXPRAM     0x20              // banked RAM (same as cartridge emulation, I think, but RAM)
 #define PH_UPPER_CART       0x30              // 32k fixed ROM
@@ -40,10 +40,6 @@ volatile __sfr __at 0x7f sgmBIOSMap;          // swaps RAM with the Coleco BIOS
 #endif
 
 // address that the Coleco BIOS font occurs, offset for the Phoenix memory map
-// TODO: I don't have access to this anymore, we'll use fatfont
-// That way SOME games will use it. ;) We don't have much choice
-// unless I ditch fatfont for thinfont, or get them both back in.
-// (thinfont is the actual Coleco/TI font)
 //#define COLECO_FONT_ADR (0x158b + 0x4000)
 
 void dly_50us(unsigned char n);

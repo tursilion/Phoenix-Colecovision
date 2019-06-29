@@ -130,6 +130,34 @@ clrup:
 	pop af
 	retn
 
+; void *memcpy(void *dest, const void *source, int count)
+; stack has return, dest, src, count
+; for LDIR, we need destination in DE, src in HL, and count in BC
+_memcpy::
+; be nice and save regs
+    push hl
+    push bc
+    push de
+
+    ld hl,#8
+    add hl,sp
+    ld sp,hl
+
+    pop de
+    pop hl
+    pop bc
+
+	ldir
+
+    ld hl,#-14
+    add hl,sp
+    ld sp,hl
+
+    pop de
+	pop	bc
+	pop	hl
+	ret
+
 	.area _GSINIT
 gsinit::
     ld	bc, #l__INITIALIZER

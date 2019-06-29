@@ -62,12 +62,18 @@ FRESULT create_name (	    /* FR_OK: successful, FR_INVALID_NAME: could not creat
 		if (uc >= 0x10000) lfn[di++] = (WCHAR)(uc >> 16);	/* Store high surrogate if needed */
 #endif
 		wc = (WCHAR)uc;
+#if FF_FS_STRICT_PATHNAME == 1
+		if (wc < ' ' || wc == '/') break;	/* Break if end of the path or a separator is found */
+#else
 		if (wc < ' ' || wc == '/' || wc == '\\') break;	/* Break if end of the path or a separator is found */
 		if (wc < 0x80 && chk_chr("\"*:<>\?|\x7F", wc)) return FR_INVALID_NAME;	/* Reject illegal characters for LFN */
+#endif
 		if (di >= FF_MAX_LFN) return FR_INVALID_NAME;	/* Reject too long name */
 		lfn[di++] = wc;					/* Store the Unicode character */
 	}
+#if FF_FS_STRICT_PATHNAME != 1
 	while (*p == '/' || *p == '\\') p++;	/* Skip duplicated separators if exist */
+#endif
 	*path = p;							/* Return pointer to the next segment */
 	cf = (wc < ' ') ? NS_LAST : 0;		/* Set last segment flag if end of the path */
 

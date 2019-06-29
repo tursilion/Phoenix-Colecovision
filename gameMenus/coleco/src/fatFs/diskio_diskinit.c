@@ -52,7 +52,6 @@ DSTATUS disk_initialize (
     csHigh = PH_SD_CE_OFF | PH_SD_LOW_SPEED;
     csLow = PH_SD_LOW_SPEED;
 
-    // TODO: in here somewhere we need to deal with the clock speed update
 	dly_50us(200);			/* 10ms */
 	CS_H();		            /* Deselect CS */
 

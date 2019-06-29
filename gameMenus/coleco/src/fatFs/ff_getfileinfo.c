@@ -84,31 +84,52 @@ void get_fileinfo (
 	}
 
 	si = di = 0;
+#if FF_FS_REMOVE_ALTNAME == 1
+    if (fno->fname[0] == 0) {
+#endif
 	while (si < 11) {		/* Get SFN from SFN entry */
 
 		wc = dp->dir[si++];			/* Get a char */
 		if (wc == ' ') continue;	/* Skip padding spaces */
 		if (wc == RDDEM) wc = DDEM;	/* Restore replaced DDEM character */
+#if FF_FS_REMOVE_ALTNAME == 1
+		if (si == 9 && di < FF_SFN_BUF) fno->fname[di++] = (TCHAR)'.';	/* Insert a . if extension is exist */
+#else
 		if (si == 9 && di < FF_SFN_BUF) fno->altname[di++] = '.';	/* Insert a . if extension is exist */
+#endif
 #if FF_LFN_UNICODE >= 1	/* Unicode output */
 		if (dbc_1st((BYTE)wc) && si != 8 && si != 11 && dbc_2nd(dp->dir[si])) {	/* Make a DBC if needed */
 			wc = wc << 8 | dp->dir[si++];
 		}
 		wc = ff_oem2uni(wc, CODEPAGE);		/* ANSI/OEM -> Unicode */
 		if (wc == 0) { di = 0; break; }		/* Wrong char in the current code page? */
+#if FF_FS_REMOVE_ALTNAME == 1
+		wc = put_utf(wc, &fno->fname[di], FF_SFN_BUF - di);	/* Store it in Unicode */
+#else
 		wc = put_utf(wc, &fno->altname[di], FF_SFN_BUF - di);	/* Store it in Unicode */
+#endif
 		if (wc == 0) { di = 0; break; }		/* Buffer overflow? */
 		di += wc;
 #else					/* ANSI/OEM output */
+#if FF_FS_REMOVE_ALTNAME == 1
+		fno->fname[di++] = (TCHAR)wc;	/* Store it without any conversion */
+#else
 		fno->altname[di++] = (TCHAR)wc;	/* Store it without any conversion */
 #endif
+#endif
 	}
+#if FF_FS_REMOVE_ALTNAME == 1
+	fno->fname[di] = 0;	/* Terminate the SFN  (null string means SFN is invalid) */
+    }   // if fname[0] == 0
+#else
 	fno->altname[di] = 0;	/* Terminate the SFN  (null string means SFN is invalid) */
+#endif
 
 	if (fno->fname[0] == 0) {	/* If LFN is invalid, altname[] needs to be copied to fname[] */
 		if (di == 0) {	/* If LFN and SFN both are invalid, this object is inaccesible */
 			fno->fname[di++] = '?';
-		} else {
+#if FF_FS_REMOVE_ALTNAME != 1
+        } else {
 			for (si = di = 0; fno->altname[si]; si++, di++) {	/* Copy altname[] to fname[] with case information */
 				wc = (WCHAR)fno->altname[si];
 #if FF_FS_CASESENSITIVE != 1
@@ -116,9 +137,12 @@ void get_fileinfo (
 #endif
 				fno->fname[di] = (TCHAR)wc;
 			}
+#endif
 		}
 		fno->fname[di] = 0;	/* Terminate the LFN */
+#if FF_FS_REMOVE_ALTNAME != 1
 		if (!dp->dir[DIR_NTres]) fno->altname[0] = 0;	/* Altname is not needed if neither LFN nor case info is exist. */
+#endif
 	}
 
 #else	/* Non-LFN configuration */

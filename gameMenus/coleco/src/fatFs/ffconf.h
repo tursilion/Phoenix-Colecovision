@@ -23,6 +23,13 @@
 /* added by Tursi - when set to 1, timestamps on files are ignored */
 /* Note this may be incompatible with write access, but we don't check. Be careful! */
 
+#define FF_FS_REMOVE_ALTNAME 1
+/* added by Tursi - removes the altname (short name) from the structures */
+
+#define FF_FS_STRICT_PATHNAME 1
+/* added by Tursi - removes the code to allow either slash ('/' only now) and various */
+/* other 'just to be nice' checks, like duplicated separators */
+
 // Matt had a good idea - if we stored directory entry cluster with the filename, we
 // could just load directly off the cluster, then filename translation would not
 // matter at all... but it's a big mod, so just keeping that in the back pocket for now.

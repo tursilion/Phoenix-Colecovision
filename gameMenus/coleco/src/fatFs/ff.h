@@ -248,7 +248,9 @@ typedef struct {
     BYTE	fattrib;		/* File attribute */
 
 #if FF_USE_LFN
+#if FF_FS_REMOVE_ALTNAME != 1
 	TCHAR	altname[FF_SFN_BUF + 1];/* Altenative file name */
+#endif
 	TCHAR	fname[FF_LFN_BUF + 1];	/* Primary file name */
 #else
 	TCHAR	fname[12 + 1];	/* File name */

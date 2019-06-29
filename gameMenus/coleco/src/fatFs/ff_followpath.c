@@ -55,7 +55,11 @@ FRESULT follow_path (	/* FR_OK(0): successful, !=0: error code */
 	} else
 #endif
 	{										/* With heading separator */
+#if FF_FS_STRICT_PATHNAME == 1
+		while (*path == '/') path++;	/* Strip heading separator */
+#else
 		while (*path == '/' || *path == '\\') path++;	/* Strip heading separator */
+#endif
 		dp->obj.sclust = 0;					/* Start from root directory */
 	}
 #if FF_FS_EXFAT
