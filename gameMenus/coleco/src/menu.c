@@ -160,6 +160,51 @@ void mystrcpy(char *pDest, char *pSrc) {
     *(pDest) = 0;
 }
 
+void waitBothFireClear() {
+    for (;;) {
+        kscanfast(1);
+        if (KSCAN_KEY == 0xff) break;
+    }
+    for (;;) {
+        kscanfast(2);
+        if (KSCAN_KEY == 0xff) break;
+    }
+}
+
+void waitAnyFirePressed() {
+    for (;;) {
+        kscanfast(1);
+        if (KSCAN_KEY != 0xff) break;
+        kscanfast(2);
+        if (KSCAN_KEY != 0xff) break;
+    }
+}
+
+void handleBlanking(unsigned char mode) {
+    unsigned char disk = disk_status();
+
+    // blank the screen, cause all 9918 systems seem to
+    VDP_SET_REGISTER(VDP_REG_MODE1, mode&(~0x40));
+
+    // wait for any input to clear it
+    for (;;) {
+        joystfast(1);
+        if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
+
+        joystfast(2);
+        if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
+                    
+        kscanfast(0);
+        if (KSCAN_KEY != 0xff) break;
+
+        // even SD insert or remove - no need to sleep here
+        if (disk_status() != disk) break;
+    }
+
+    // re-enable the screen
+    VDP_SET_REGISTER(VDP_REG_MODE1, mode);  // as above, plus unblank
+}
+
 // use the sprite layer to display an error at the bottom of the screen
 void displayErrorString(char *pstr, unsigned char x) {
     // - Clear bottom of screen (for text mode)
@@ -174,25 +219,16 @@ void displayErrorString(char *pstr, unsigned char x) {
     VDPWD = hex[(x&0xf)];
 
     // make sure both fires are released
-    for (;;) {
-        kscanfast(1);
-        if (KSCAN_KEY == 0xff) break;
-    }
-    for (;;) {
-        kscanfast(2);
-        if (KSCAN_KEY == 0xff) break;
-    }
+    waitBothFireClear();
 
     // wait for a new fire button
-    for (;;) {
-        kscanfast(1);
-        if (KSCAN_KEY != 0xff) break;
-        kscanfast(2);
-        if (KSCAN_KEY != 0xff) break;
-    }
+    waitAnyFirePressed();
 
     // clear sprites - caller should redraw the text layer
     cleartextout();
+
+    // make sure both fires are released
+    waitBothFireClear();
 }
 
 // simple strcmp (char return instead of int cause z80)
@@ -480,26 +516,7 @@ void waitSDCard() {
 
         // countdown screen timeout
         if (--cntDown == 0) {
-            // blank the screen, cause all 9918 systems seem to
-            VDP_SET_REGISTER(VDP_REG_MODE1, 0xA2);  // 16k, int, 16x16 spr
-
-            // wait for any input to clear it
-            for (;;) {
-                joystfast(1);
-                if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
-
-                joystfast(2);
-                if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
-                    
-                kscanfast(0);
-                if (KSCAN_KEY != 0xff) break;
-
-                // even SD insert - no need to sleep here
-                if (disk_status() != STA_NODISK) break;
-            }
-
-            // re-enable the screen
-            VDP_SET_REGISTER(VDP_REG_MODE1, 0xE2);  // as above, plus unblank
+            handleBlanking(0xe2);
             cntDown = BLANK_TIME;
             debounce = 0;
         }
@@ -829,21 +846,7 @@ char getUserSelection() {
         --cntDown;
         if (cntDown <= 0) {
             // yes, it is
-            VDP_SET_REGISTER(1, 0xb2);    // disable video
-
-            // any keypress to clear it
-            for (;;) {
-                joystfast(1);
-                if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
-
-                joystfast(2);
-                if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
-                    
-                kscanfast(0);
-                if (KSCAN_KEY != 0xff) break;
-            }
-
-            VDP_SET_REGISTER(1, 0xf2);    // restore video
+            handleBlanking(0xf2);
             cntDown = BLANK_TIME;
             continue;
         }

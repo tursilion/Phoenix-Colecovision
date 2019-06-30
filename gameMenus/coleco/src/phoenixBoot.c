@@ -211,7 +211,7 @@ void fadeInTextF18A() {
 
 // animate the Phoenix logo up
 void displayLogo() {
-	int idx;
+    int idx;
 	unsigned int off;
     unsigned char const *p;
 	
