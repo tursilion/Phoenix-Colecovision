@@ -17,10 +17,29 @@ const unsigned char GPUTEST[] = {
 	0x00,0x00				//	DATA 0x0000
 };
 
+// you should use test_f18a rather than call this directly
+void unlock_f18a() {
+	VDP_SET_REGISTER(0x39, 0x1c);	// VR1/57, value 00011100, write once (corrupts VDPR1)
+	VDP_SET_REGISTER(0x39, 0x1c);	// write again (unlocks enhanced mode)
+}
+
+// lock F18A if unlocked (1.6 or later)
+void lock_f18a() {
+	// reset the F18A to defaults (except palette, requires 1.6)
+	VDP_SET_REGISTER(0x32, 0x80); 	// VR2/50, value 10000000
+									// reset and lock F18A, or corrupt R2
+	VDP_SET_REGISTER(0x39, 0x00);	// VR1/57, value 00000000
+									// write once (corrupts VDPR1)
+}
+
 // This will corrupt the registers if it's not
-// an F18A, so after calling this, reset the VDP
+// an F18A, so after calling this, reset the VDP with lock_f18a
+// Note that this, by necessity, unlocks the F18A if it was locked.
 void reset_f18a() {
-	// stop the GPU and then Reset (no harm if it's not F18)
+    // If for nothing else, the palette reset requires us to be unlocked
+    unlock_f18a();
+
+    // stop the GPU and then Reset (no harm if it's not F18)
 	VDP_SET_REGISTER(0x38, 0);	// stop the GPU -- this does stop the GPU
 
 	// force F18A back to palette number 0
@@ -42,22 +61,13 @@ void reset_f18a() {
     VDP_SET_REGISTER(0x32, 0x80);
 }
 
-// lock F18A if unlocked (1.6 or later)
-void lock_f18a() {
-	// reset the F18A to defaults (except palette, requires 1.6)
-	VDP_SET_REGISTER(0x32, 0x80); 	// VR2/50, value 10000000
-									// reset and lock F18A, or corrupt R2
-	VDP_SET_REGISTER(0x39, 0x00);	// VR1/57, value 00000000
-									// write once (corrupts VDPR1)
-}
-
 // load a small test program and see if the GPU is available
 // corrupts 12 bytes at 0x1c00
+// This does the unlock for you!
 unsigned char test_f18a() {
 	VDP_SET_REGISTER(0x32, 0x80);	// VR2/50, value 10000000
 									// reset and lock F18A, or corrupt R2
-	VDP_SET_REGISTER(0x39, 0x1c);	// VR1/57, value 00011100, write once (corrupts VDPR1)
-	VDP_SET_REGISTER(0x39, 0x1c);	// write again (unlocks enhanced mode)
+    unlock_f18a();
 
 	// If we are not on the F18A, then R1 is screwed up now, that's okay
 	vdpmemcpy(0x1c00, GPUTEST, 12);	// copy program (and zero 0x1c10)

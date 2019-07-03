@@ -1,8 +1,8 @@
 // New Phoenix boot BIOS
 // Created by Tursi/M.Brent
 // Boot logo and SD menu
-// Uses libti99Coleco
-// Note: we have 16k now per the new memory layout, and 2k RAM at 0x6000 (during loader only)
+// Uses libti99Coleco - https://github.com/tursilion/libti99coleco - cef5a4dbef4bb873b088ca290c3592be8ebb69c4
+// Note: we have 24k now per the new memory layout, and 8k RAM at 0x6000 (First 1k is true Coleco RAM)
 
 #include "memset.h"
 #include "vdp.h"
@@ -12,7 +12,6 @@
 
 #define HEADERS__
 #include "newmap2.c"
-//#include "fatfont.c"  // if enabling, re-enable the text mode font hack in menu.c
 #include "mattfont.c"
 #if 0
 // currently I am not able to hot-patch the Coleco BIOS at startup
@@ -38,6 +37,22 @@ static const unsigned char colorTable[] = {
     0xf0, 0xd0, 0x80, 0x90, 0xb0, 0x30, 0x40
 };
 
+// Coleco VDP register table at 0x63f2
+//pRom(0x63f2+0*2)   = 0x00;
+//pRom(0x63f2+0*2+1) = 0x1B;
+//pRom(0x63f2+1*2)   = 0x00;
+//pRom(0x63f2+1*2+1) = 0x38;
+//pRom(0x63f2+2*2)   = 0x00;
+//pRom(0x63f2+2*2+1) = 0x18;
+//pRom(0x63f2+3*2)   = 0x00;
+//pRom(0x63f2+3*2+1) = 0x00;
+//pRom(0x63f2+4*2)   = 0x00;
+//pRom(0x63f2+4*2+1) = 0x20;
+static const unsigned char regTable[] = {
+    0x00, 0x1b, 0x00, 0x38, 0x00, 0x18,
+    0x00, 0x00, 0x00, 0x20
+};
+
 // trampoline to start the cart with the Coleco BIOS loaded
 // This area (0x6000) seems untouched by the Coleco BIOS
 static const unsigned char trampoline[] = {
@@ -45,26 +60,29 @@ static const unsigned char trampoline[] = {
     0x31,0xb9,0x73,     // -        LD SP,0x73B9        31B973
     0x2a, 0x0a, 0x80,   // -        LD HL,[0x800A]      2A800A
 
-//    0xC3,0x00,0x00,      // JP 0x0000 (reboot bios)
+//  0xC3,0x00,0x00,      // JP 0x0000 (reboot bios)
 
     0xe9                // -        JP [HL]             E9
 };
 
 // hardware control
-static volatile unsigned char * const pRom = (volatile unsigned char * const)0;	// access to memory
 static volatile __sfr __at 0xc0 port3;  // joystick reset strobe
 
-#if 1
+// This doesn't optimize correctly (it's always a calculated lookup), so just use a macro
+//static volatile unsigned char * const pRom = (volatile unsigned char * const)0;	// access to memory
+#define pRom(x) *((volatile unsigned char*)(x))
+
 // debugger output for Classic99
 volatile __sfr __at 0x00 debugPort;
 // a full string MUST be written to be output
 void debug(const char *p) {
+#if 1
     while (*p >= ' ') {
         debugPort = *(p++);
     }
     debugPort=0;
-}
 #endif
+}
 
 // unRLE CPU to VDP handler
 // Basic RLE compression applied to PAT0
@@ -270,6 +288,7 @@ void startTitle() {
 
     // -    reset F18A
     reset_f18a();
+    lock_f18a();
 
     // the RAM located at 0x6000 is the original ColecoVision 1k
     // but unlike the Coleco BIOS, we /must/ access at 0x6000, not
@@ -278,14 +297,14 @@ void startTitle() {
     // -    prepare system as per original BIOS:
     // -        In test mode, it doesn't do ANYTHING, it just jumps to the cart immediately (must honor to avoid pointers)
     // We don't have to check both bytes because we already did that
-    if (pRom[0x8000] == 0xaa) {
+    if (pRom(0x8000) == 0xaa) {
         // do the system init
 
         // -        Otherwise, it turns off the sound chip (already done)
         // -        Init the random number generator
         // -            LD HL, 0x33
         // -            LD [RAND_NUM], HL  (0x73c8)
-        pRom[0x63c8] = 0x33;
+        pRom(0x63c8) = 0x33;
 
         // -        Init the controller BIOS
         // -            CALL CONTROLLER_INIT (0x1105)
@@ -311,7 +330,7 @@ void startTitle() {
         // -                DEC B
         // -                JR NZ,CINIT1
         {
-            unsigned int *pDst = (unsigned int*)(*((unsigned int*)0x8008));
+            unsigned char *pDst = (unsigned char*)(*((unsigned int*)0x8008)) + 2;
             memset(pDst, 0, 10);
             memset((void*)0x7307, 0, 20);
         }
@@ -329,11 +348,11 @@ void startTitle() {
         // -        Clear defer writes
         // -            LD A,FALSE
         // -            LD [DEFER_WRITES],A  (0x73c6)
-        pRom[0x63c6] = 0;
+        pRom(0x63c6) = 0;
 
         // -        Disable sprite mux
         // -            LD [MUX_SPRITES],A  (0x73c7)
-        pRom[0x63c7] = 0;
+        pRom(0x63c7) = 0;
 
         // -        Clear Video RAM
         // -            LD HL,0
@@ -386,13 +405,13 @@ void startTitle() {
         // -                  NOT_REG_1:
         // -                    RET
         VDP_SET_REGISTER(0, 0);
-        pRom[0x63c3] = 0;
+        pRom(0x63c3) = 0;
 
         // -                LD B,1
         // -                LD C,0x80
         // -                CALL WRITE_REGISTER (0x1fd9->1CCA)
         VDP_SET_REGISTER(1, 0x80);
-        pRom[0x63c4] = 0x80;
+        pRom(0x63c4) = 0x80;
 
         // -                LD A,2          // (SIT) table code (0=sprite name, 1=sprite gen, 2=pattern name, 3=pattern gen, 4=color)
         // -                LD HL,0x1800    // VRAM address
@@ -451,41 +470,45 @@ void startTitle() {
         // -                  BASE_FACTORS:
         // -                    DEFB 7,5,11,6,10,2,11,4,6,3
         // (So, SIT = 0x1800, and store at 73F2+2*2
+        // the memory writes are deferred to a single memcpy below
         VDP_SET_REGISTER(VDP_REG_SIT, 0x1800/0x400);
-        pRom[0x63f2+2*2] = 0x00;
-        pRom[0x63f2+2*2+1] = 0x18;
+//        pRom(0x63f2+2*2) = 0x00;
+//        pRom(0x63f2+2*2+1) = 0x18;
 
         // -                LD A,4          // color table
         // -                LD HL,0x2000
         // -                CALL INIT_TABLE  (0x1fb8)
         // (So, CT = 0x2000, and store at 73F2+4*2
         VDP_SET_REGISTER(VDP_REG_CT, 0x2000/0x40);
-        pRom[0x63f2+4*2] = 0x00;
-        pRom[0x63f2+4*2+1] = 0x20;
+//        pRom(0x63f2+4*2) = 0x00;
+//        pRom(0x63f2+4*2+1) = 0x20;
 
         // -                LD A,3          // pattern generator (PDT)
         // -                LD HL,0
         // -                CALL INIT_TABLE  (0x1fb8)
         // (So, PDT = 0x0000, and store at 73F2+3*2
         VDP_SET_REGISTER(VDP_REG_PDT, 0x0000/0x800);
-        pRom[0x63f2+3*2] = 0x00;
-        pRom[0x63f2+3*2+1] = 0x00;
+//        pRom(0x63f2+3*2) = 0x00;
+//        pRom(0x63f2+3*2+1) = 0x00;
 
         // -                LD A,0          // sprite name table (SAL)
         // -                LD HL,0x1B00
         // -                CALL INIT_TABLE  (0x1fb8)
         // (So, SAL = 0x1B00, and store at 73F2+0*2
         VDP_SET_REGISTER(VDP_REG_SAL, 0x1B00/0x80);
-        pRom[0x63f2+0*2] = 0x00;
-        pRom[0x63f2+0*2+1] = 0x1B;
+//        pRom(0x63f2+0*2) = 0x00;
+//        pRom(0x63f2+0*2+1) = 0x1B;
 
         // -                LD A,1          // sprite generator (SDT)
         // -                LD HL,0x3800
         // -                CALL INIT_TABLE  (0x1fb8)
         // (So, SDT = 0x3800, and store at 73F2+1*2
         VDP_SET_REGISTER(VDP_REG_SDT, 0x3800/0x800);
-        pRom[0x63f2+1*2] = 0x00;
-        pRom[0x63f2+1*2+1] = 0x38;
+//        pRom(0x63f2+1*2) = 0x00;
+//        pRom(0x63f2+1*2+1) = 0x38;
+
+        // doing the deferred table update all at once here
+        memcpy((unsigned char*)0x63f2, regTable, 10);
 
         // -                LD B,7
         // -                LD C,0
@@ -530,77 +553,10 @@ void startTitle() {
     // -        JP [HL]             E9
     memcpy((void*)0x6000, trampoline, sizeof(trampoline));
     ((void(*)())0x6000)();  // never returns
-
-    // TODO: game oddities
-    // Cabbage Patch Kids hangs on player startup
-
-    // Coleco BIOS Startup (Donkey Kong):
-    // af   8042   af_  FFFF    CPU
-    // bc   0180   bc_  FFFF
-    // de   0000   de_  FFFF
-    // hl   8048   hl_  FFFF
-    // ix   73F6   iy   1C01
-    // r    10     i    00
-    // memp 0000   pc   8048
-    //
-    //VDP0  00     VDP  0180
-    //VDP1  80     GROM 0000 (0000.0)
-    //VDP2  06    VDPST C4
-    //VDP3  80      PC  8048
-    //VDP4  00      SP  73B9
-    //VDP5  36      F   42
-    //VDP6  07     Bank 00030003
-    //VDP7  00     DSR  FFFF
-    //
-    // SIT  1800
-    // SDT  3800   SAL  1B00
-    // PDT  0000   Size 0800
-    //  CT  2000   Size 0020
-
-    // Phoenix BIOS Startup:
-    // af   0064   af_  FFFF    CPU
-    // bc   FFFF   bc_  FFFF
-    // de   124F   de_  FFFF
-    // hl   8048   hl_  FFFF
-    // ix   73F9   iy   7057
-    // r    22     i    00
-    // memp 0000   pc   8048
-    //
-    //VDP0  00     VDP  0008
-    //VDP1  80     GROM 0000 (0000.0)
-    //VDP2  06    VDPST 90
-    //VDP3  80      PC  8048
-    //VDP4  00      SP  73B9
-    //VDP5  36      F   64
-    //VDP6  07     Bank 00030003
-    //VDP7  00     DSR  FFFF
-    //
-    // SIT  1800
-    // SDT  3800   SAL  1B00
-    // PDT  0000   Size 0800
-    //  CT  2000   Size 0020
-
 }
 
 // start a hardware cartridge
 void startCartridge() {
-#if 0
-	// Now the BIOS data is RO, (maybe not available)
-    // - check if joystick UP is held down
-    // - if yes
-    // -     load standard Coleco font into BIOS (should be safe)
-    // - else if not
-    // -     load CollectorVision arcade font into BIOS
-    joystfast(KSCAN_MODE_LEFT);   // read left joystick
-    if (KSCAN_JOYY != JOY_UP) {
-        vdpmemcpy(0x1c30, "thin font", 9);
-        memcpy((char*)COLECO_FONT_ADR, THINFONT, SIZE_OF_THINFONT);
-    } else {
-        vdpmemcpy(0x1c30, "fat font", 8);
-        memcpy((char*)COLECO_FONT_ADR, FATFONT, SIZE_OF_FATFONT);
-    }
-#endif
-
     // - set the mappers for real cart (should already be set)
     phBankingScheme = PH_BANK_CART | PH_UPPER_CART;
 
@@ -636,7 +592,7 @@ void runCartHeader(void (*mycenter)(unsigned char, char*)) {
 
     // treat any 0 bytes in the cart fields as space (ie: Video Hustler)
 
-    // first find the owner and copy that out, though skip if it starts with 'PRESENTS'
+    // first find the owner and copy that out
     while ((*p != '/')&&(--cntdown > 0)) ++p;
     if (cntdown == 0) {
         // never mind - malformed string
@@ -783,12 +739,14 @@ int main() {
 	// and pressed reset, otherwise old settings will still be active.
     // If the F18A wasn't active, this will corrupt registers, but that's okay.
     // NOTE: Phoenix F18A gets a reset on reset too, but it does NOT reset the palette
+    // Note that this will also unlock (part of the palette reload), so we don't
+    // need to unlock later.
 	reset_f18a();
 
     // test for a cartridge with the no logo requirement
     // note that startCartridge still does a lot of initialization,
     // in case it needs to undo the F18A setup for the menu later.
-    if ((pRom[0x8000]==0x55)&&(pRom[0x8001]==0xaa)) {
+    if ((pRom(0x8000)==0x55)&&(pRom(0x8001)==0xaa)) {
         startCartridge();    // never returns
     }
 
@@ -825,6 +783,7 @@ int main() {
     // Debug is easier this way.
     VDP_SET_ADDRESS_WRITE(gSprite);
     for (idx=0; idx<16; ++idx) {
+        // F18A doesn't need delays between writes
         VDPWD = 22*8-2; // Y
         VDP_SAFE_DELAY;             // technically, I don't really need the delays cause the F18A is fast enough...
         VDPWD = idx*16; // X
@@ -844,7 +803,8 @@ int main() {
 	// load the character patterns
 	//vdpmemcpy(gPattern, PAT0, 8*256);                 // raw data
     //unrle(gPattern, PAT0, SIZE_OF_PAT0RLE);           // RLE full character set
-    unrle(gPattern+25*8, PAT0, SIZE_OF_PAT0RLE-147);    // hand counted offsets to skip unused
+    //unrle(gPattern+25*8, PAT0, SIZE_OF_PAT0RLE-147);    // hand counted offsets
+    unrle(gPattern, PAT0, SIZE_OF_PAT0RLE);             // final settings
 
 	// turn the screen on
 	VDP_SET_REGISTER(VDP_REG_MODE1, x);
@@ -859,7 +819,7 @@ int main() {
     // Now that the fancy part is done, we can get to work on the real stuff.
 
     // Check for a cartridge plugged in with the logo header
-    if ((pRom[0x8000]==0xaa)&&(pRom[0x8001]==0x55)) {
+    if ((pRom(0x8000)==0xaa)&&(pRom(0x8001)==0x55)) {
         runCartHeader(centerString);    // never returns
     }
 

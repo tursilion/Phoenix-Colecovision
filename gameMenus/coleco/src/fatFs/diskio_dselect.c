@@ -6,15 +6,6 @@
 #include "diskio.h"		/* Declarations of disk functions */
 #include "../phoenix.h" /* declarations of Phoenix hardware */
 
-// TODO: adapt the useful parts from Matt's reference code
-
-// Per the docs, we need to provide:
-// disk_status
-// disk_initialize
-// disk_read
-// (and the unicode stuff for LFNs, which is in ffunicode.c)
-// We only have one disk, so we aren't doing anything special with the pdrv args
-
 // Code adapted from the generic sdmm.c - not updated to Matt's reference just yet
 // Obviously not bit-banging though.
 // License for those parts:

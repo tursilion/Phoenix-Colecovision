@@ -53,12 +53,12 @@ const char hex[16] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','
 // I want to put the directory out of the way of file load, so that
 // if an error occurs, we can go back to the directory without re-reading
 // the SD card. So in case we do solve the above, I'll store the data
-// at page 14. (Since we load pages 1 and 15 during image detection).
+// at page 14. (Since we load page 1 during detection, then load up.)
 #define DIRECTORY_PAGE 14
 // cartridge pages (we need this stuff for the loader, defining it lets us
 // change it easier later if we resolve the issue)
 #define CART_FIRST_PAGE 1       // 0 is SGM, 1 is cart memory
-#define CART_LAST_PAGE 8        // for 256k megacart. We can't make it to 512k with the SGM page there
+#define CART_LAST_PAGE 15       // for 512k megacart (minus 32k)
 
 // how long to sit idle before blanking (on no SD card or cartridge)
 #define BLANK_TIME 5400    // about 3 minutes @ 30hz
@@ -67,8 +67,11 @@ const char hex[16] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','
 extern unsigned char f18a;
 extern const unsigned char FATFONT[];
 
+// This doesn't optimize correctly (it's always a calculated lookup), so just use a macro
+//static volatile unsigned char * const pRom = (volatile unsigned char * const)0;	// access to memory
+#define pRom(x) (*((volatile unsigned char*)(x)))
+
 // hardware control
-static volatile unsigned char * const pRom = (volatile unsigned char * const)0;	// access to memory
 extern void waitVblanks(unsigned char cnt);  // clear and wait for blanks
 extern void startTitle();       // start with no init
 
@@ -137,6 +140,7 @@ void clrscr() {
 // clear the text screen bottom three rows
 void clrscrbottom() {
     vdpmemset(gImage+(40*21), ' ', (40*3));
+    cleartextout();
 }
 
 // output a string at current location, stopping at end of string or end of cnt
@@ -209,7 +213,6 @@ void handleBlanking(unsigned char mode) {
 void displayErrorString(char *pstr, unsigned char x) {
     // - Clear bottom of screen (for text mode)
     clrscrbottom();
-    cleartextout();
     centerString(0, pstr);
     centerString(1, "Press fire...");
 
@@ -277,8 +280,6 @@ void readDir() {
     // Each entry has:
     //      Filename[127]
     //      Byte for directory flag
-    // TODO: we can free some space if we remove altname[] from finfo (and most of the other parameters)
-    //       in ff_getfileinfo this is done, we can just only populate the long name, altname is the short
     if (FR_OK == f_opendir(&dir, path)) {
         debug(path);
 
@@ -479,7 +480,6 @@ void sortDir() {
 
         // if necessary, move the data out of the way
         if (idx < listSize) {
-            // overlapping move - can the Z80 solve that?
             memmove(&sortedList[idx+1], &sortedList[idx], (listSize-idx)*2);
         }
             
@@ -590,24 +590,45 @@ void copyPage(unsigned char a, unsigned char b) {
 }
 
 // reads the rest of a Megacart into memory
-void loadMegacartRom() {
-    unsigned char *p = (unsigned char*)(0x8000+512);
-    unsigned char page = CART_FIRST_PAGE;
+// fsize is the number of 16k blocks the cart contains
+// note it's likely both the initial block reads are wasted
+// on return (failure), we return the page we reached, which
+// lets us decide whether to reload the directory
+unsigned char loadMegacartRom(unsigned char fsize) {
+    unsigned char *p;
+    unsigned char page;
     UINT br;
     FSIZE_t ofs;
 
     clrscrbottom();
     centerString(0, "reading megacart...");
 
-    // seek back to second 512 byte page
-    ofs = 512;
-    if (FR_OK != f_lseek(&fil, ofs)) {
-        f_close(&fil);
-        displayErrorString("Failed to identify file.", 2);
-        return;
+    // seek offset. In the case of a 512k image,
+    // we have to skip the first 32k and hope for the best.
+    ofs = 0;
+    if (fsize == 32) {
+        debug("skipping 32k");
+        ofs = (unsigned int)32*1024;
+    } else {
+        debug("No skip");
     }
 
-    // - read in the rest
+    // calculate the first page - pages are 32k each so divide by 2
+    page = CART_LAST_PAGE - ((fsize-1)>>1);
+    phRAMBankSelect = page;
+
+    // calculate the starting address, it's just the MOD of above
+    // although for any valid image it's going to always be 0x8000+0.
+    p = (unsigned char*)0x8000 + ((fsize&1)?0x4000:0);
+
+    // seek back as requested (usually to 0)
+    if (FR_OK != f_lseek(&fil, ofs)) {
+        f_close(&fil);
+        displayErrorString("Failed to seek file.", 2);
+        return page;
+    }
+
+    // - read in the cart as specified above
     for (;;) {
         FRESULT res;
 
@@ -615,7 +636,7 @@ void loadMegacartRom() {
         if (res != FR_OK) {
             f_close(&fil);
             displayErrorString("Cartridge load failed.", res);
-            return;
+            return page;
         }
         if (br < 512) {
             // end of file
@@ -627,7 +648,7 @@ void loadMegacartRom() {
             // time for the next page!
             ++page;
             if (page > CART_LAST_PAGE) {
-                // if it's exactly 256k, we get here.
+                // if it's exactly 512k, we get here.
                 if (f_eof(&fil)) {
                     // end of file
                     break;
@@ -635,7 +656,7 @@ void loadMegacartRom() {
                     // we ran out of space
                     f_close(&fil);
                     displayErrorString("Megacart ROM too large", 0);
-                    return;
+                    return page;
                 }
             }
             // else, reset the pointer and keep reading
@@ -646,6 +667,7 @@ void loadMegacartRom() {
 
     f_close(&fil);
 
+#if 0
     // - duplicate in memory to reach 256k, for simplicity the core just assumes
     // This is kind of annoying, so we'll just check it's a valid size to be duplicated
     // Valid sizes then are 32k, 64k, 128, 256k, which in Phoenix 32k page counts, is 
@@ -676,6 +698,39 @@ void loadMegacartRom() {
             displayErrorString("Megacart images must be padded", 0);
             return;
     }
+#else
+    // instead of the fixed size approach, we just set a register mask
+    // Valid sizes then are 32k, 64k, 128k, 256k, 512k, so fsize is:
+    //                       2    4    8    16    32 
+    // The question is whether we want to support oddball sizes. We
+    // could TRY to here...
+    switch (fsize) {
+        case 2: 
+            phCartMask = 0x01;  // 2 pages
+            break;
+
+        case 4: 
+            phCartMask = 0x3;   // 4 pages
+            break;
+
+        case 8: 
+            phCartMask = 0x07;  // 8 pages
+            break;
+        
+        case 16:
+            phCartMask = 0x0f;  // 16 pages
+            break;
+
+        case 32:
+            phCartMask = 0x1f;  // 32 pages
+            break;
+
+        default:
+            f_close(&fil);
+            displayErrorString("Megacart images must be padded", fsize);
+            return page;
+    }
+#endif
 
     // - set the mappers appropriately
     phBankingScheme = PH_BANK_MEGACART | PH_UPPER_EXPROM;
@@ -683,6 +738,9 @@ void loadMegacartRom() {
 
     // - jump to "execute title" as above
     startTitle();   // never returns
+
+    // should be unreachable, but SDCC complains
+    return 0;
 }
 
 // draw the highlight on the current selection
@@ -748,6 +806,13 @@ char getUserSelection() {
 
         // VDP vblank wait
         waitVblanks(1);
+
+        // If there's no files, we'll be inefficient and draw this every time around.
+        // But it's not like we have anything better to do until the user removes the card.
+        if (listSize == 0) {
+            centerString(1, "No files found");
+            continue;
+        }
 
         // so we can check if we moved
         oldSelect = listSelect;
@@ -986,8 +1051,7 @@ drawLoop:
                 path[0]='/';
                 path[1]=0;
             } else {
-                // NUL terminate after the /
-                ++pp;
+                // NUL terminate at the /
                 *pp = 0;
             }
         } else {
@@ -1063,6 +1127,8 @@ drawLoop:
 
         // all right, we have a full path, try to open it
         debug(path2);
+        clrscrbottom();
+        centerString(0, "checking...");
 
         res = f_open(&fil, path2, FA_READ);
         if (FR_OK != res) {
@@ -1084,8 +1150,8 @@ drawLoop:
         }
 
         // -    if 55AA or AA55 is detected, we have a valid ROM:
-        if ( ((pRom[0x8000] == 0xaa) && (pRom[0x8001] == 0x55)) ||
-             ((pRom[0x8000] == 0x55) && (pRom[0x8001] == 0xaa)) ) {
+        if ( ((pRom(0x8000) == 0xaa) && (pRom(0x8001) == 0x55)) ||
+             ((pRom(0x8000) == 0x55) && (pRom(0x8001) == 0xaa)) ) {
             loadCartridgeRom();
             // if we return, then the cartridge load failed
             // 32k carts can't overwrite our directory, so just resume!
@@ -1120,18 +1186,18 @@ drawLoop:
             }
 
             // -    if 55AA or AA55 is detected, we have a megacart:
-            if ( ((pRom[0x8200] == 0xaa) && (pRom[0x8201] == 0x55)) ||
-                 ((pRom[0x8200] == 0x55) && (pRom[0x8201] == 0xaa)) ) {
-                loadMegacartRom();
+            if ( ((pRom(0x8200) == 0xaa) && (pRom(0x8201) == 0x55)) ||
+                 ((pRom(0x8200) == 0x55) && (pRom(0x8201) == 0xaa)) ) {
+
                 // if we return, then the cartridge load failed
-                // Megacarts today can't overwrite our directory, so
-                // just resume. But if we expand to 256k then
-                // we need to put some extra code in here...
-#if CART_LAST_PAGE > 8
-#error Megacart needs to reload directory on failure
-#endif
-                phRAMBankSelect = DIRECTORY_PAGE;
-                goto drawLoop;
+                if (loadMegacartRom(fsize) >= DIRECTORY_PAGE) {
+                    // the load potentially corrupted the directory, so reload it
+                    goto dirLoop;
+                } else {
+                    // the directory should be safe!
+                    phRAMBankSelect = DIRECTORY_PAGE;
+                    goto drawLoop;
+                }
             }
         }
 

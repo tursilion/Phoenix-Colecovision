@@ -6,8 +6,6 @@
 #include "diskio.h"		/* Declarations of disk functions */
 #include "../phoenix.h" /* declarations of Phoenix hardware */
 
-// TODO: adapt the useful parts from Matt's reference code
-
 // Per the docs, we need to provide:
 // disk_status
 // disk_initialize

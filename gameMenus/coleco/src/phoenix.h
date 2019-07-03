@@ -29,6 +29,9 @@ volatile __sfr __at 0x56 phSDControl;         // SD card control
 volatile __sfr __at 0x57 phSDData;            // SD card read/write data
 volatile __sfr __at 0x58 phMachineID;         // reads as 8 for Phoenix
 
+// TODO: not confirmed yet
+volatile __sfr __at 0x59 phCartMask;          // cartridge page mask for megacarts 0x01-1F
+
 volatile __sfr __at 0x7f sgmBIOSMap;          // swaps RAM with the Coleco BIOS
 #define SGM_CFG_ENABLE_BIOS 0x02
 
