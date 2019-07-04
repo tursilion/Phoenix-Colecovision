@@ -317,7 +317,7 @@ void readDir() {
             // to be paranoid for now, I'm going to stop at 254
             if (lastFilename >= (unsigned char*)0xff80) {
                 debug("Out of RAM to store filenames");
-                displayErrorString("Maximum directory count reached", (unsigned char)(((unsigned int)lastFilename-0x8000)>>7));
+                displayErrorString("Max directory count reached", (unsigned char)(((unsigned int)lastFilename-0x8000)>>7));
                 break;
             }
         }
