@@ -7,7 +7,7 @@
 //
 // Intentional limitations:
 // - Maximum filename length of 126 characters.
-// - Maximum of 255 files in a folder (including subfolders)
+// - Maximum of 254 files in a folder (including subfolders)
 // - Maximum path length of 512 characters
 // - 7-bit ASCII clean filenames only (ie: no accents or unicode characters)
 
@@ -145,11 +145,12 @@ void clrscrbottom() {
 
 // output a string at current location, stopping at end of string or end of cnt
 void vdpStrOut(const char *p, unsigned char cnt) {
-    while ((*p >= ' ') && (cnt--)) {
+    ++cnt;  // account for pre-decrement so we stop at 0
+    while ((*p >= ' ') && (--cnt)) {
         VDPWD = *(p++);
     }
     if (cnt) {
-        while (cnt--) {
+        while (--cnt) {
             VDPWD = ' ';
         }
     }
@@ -313,9 +314,10 @@ void readDir() {
             }
             lastFilename += 128;
             // we can go up to 0xffff, but if we wrap around we're done
-            // to be paranoid for now, I'm going to stop at 255
+            // to be paranoid for now, I'm going to stop at 254
             if (lastFilename >= (unsigned char*)0xff80) {
                 debug("Out of RAM to store filenames");
+                displayErrorString("Maximum directory count reached", (unsigned char)(((unsigned int)lastFilename-0x8000)>>7));
                 break;
             }
         }
@@ -365,6 +367,12 @@ void drawTitles() {
             VDP_SET_ADDRESS_WRITE(vdp);
             vdp+=40;
             vdpStrOut("", 40);
+            // dealing with unsigned char limit is faster here than
+            // upscaling it to a 16-bit int
+            if (idx == 0xff) {
+                idx--;      // so the loop doesn't wrap around
+                if (vdp == 24*40) break;
+            }
         } else {
             ptr = sortedList[idx];
 
