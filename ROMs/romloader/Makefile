@@ -16,7 +16,8 @@ CC		:= sdcc
 AS		:= sdasz80
 LD		:= sdcc
 H2B		:= makebin
-ROMGEN	:= romgen
+#ROMGEN	:= romgen
+ROMGEN	:= makemem
 
 # 24K Loader from 0000h to 5FFFh
 MEMSIZE	:= 24576
@@ -32,6 +33,10 @@ ODIR	:= obj
 #CFLAGS  = -mz80 --peep-file src/peep.txt --opt-code-speed --max-allocs-per-node 200000 --allow-unsafe-read --fomit-frame-pointer -I$(IDIR) -I..
 CFLAGS  = -mz80 --opt-code-speed --fomit-frame-pointer -I$(IDIR) -I..
 LDFLAGS = -mz80 --code-loc 0x0100 --data-loc 0x6000 --no-std-crt0
+#LDFLAGS = -mz80 --code-loc 0x1000 --data-loc 0x6000 --no-std-crt0
+#LDFLAGS = -mz80 --code-loc 0x2000 --data-loc 0x6000 --no-std-crt0
+#LDFLAGS = -mz80 --code-loc 0x3000 --data-loc 0x6000 --no-std-crt0
+#LDFLAGS = -mz80 --code-loc 0x4000 --data-loc 0x6000 --no-std-crt0
 
 _OBJS   = crt0.rel main.rel
 OBJS    = $(patsubst %,$(ODIR)/%,$(_OBJS))
@@ -45,7 +50,8 @@ all: romloader
 clean:
 	$(RM) $(ODIR)/* *.map *.lk *.noi *.bin *.ihx *.mem *.rom *.vhd *.log
 
-romloader: romloader.mem romloader.vhd
+#romloader: romloader.mem romloader.vhd
+romloader: romloader.mem
 
 # Update impact_load.cmd to match any bitstream file name changes, or figure
 # out how to pass the bit stream file to the command file.
@@ -66,8 +72,10 @@ romloader.vhd: romloader.rom
 	$(ROMGEN) $< romloader a r > $@
 
 # Create a Xilinx format MEM file from the binary ROM
+#romloader.mem: romloader.rom
+#	$(ROMGEN) $< romloader m > $@
 romloader.mem: romloader.rom
-	$(ROMGEN) $< romloader m > $@
+	$(ROMGEN) m $< $@
 
 romloader.rom: romloader.ihx
 

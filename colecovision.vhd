@@ -102,7 +102,9 @@ entity colecovision is
       sd_mosi_o      : out std_logic;
       sd_sclk_o      : out std_logic;
       sd_cs_n_o      : out std_logic;
-      sd_cd_n_i      : in  std_logic      -- Card detect, active low.
+      sd_cd_n_i      : in  std_logic;     -- Card detect, active low.
+      
+      led_o          : out std_logic      -- debug LED
    );
 
 end entity;
@@ -148,9 +150,9 @@ architecture rtl of colecovision is
    -- Audio Mixing
    signal AUDIO_WSG                       : unsigned( 7 downto 0);
    signal AUDIO_EX                        : signed( 7 downto 0);
-   signal AUDIO_EX_A			               : signed( 7 downto 0);
-   signal AUDIO_EX_B			               : signed( 7 downto 0);
-   signal AUDIO_EX_C			               : signed( 7 downto 0);
+   signal AUDIO_EX_A                      : signed( 7 downto 0);
+   signal AUDIO_EX_B                      : signed( 7 downto 0);
+   signal AUDIO_EX_C                      : signed( 7 downto 0);
    signal AUDIO_SUM                       : signed( 8 downto 0);
    signal WSG_CS                          : std_logic;
 
@@ -211,8 +213,24 @@ architecture rtl of colecovision is
    signal ctrl_en_joy_n_s                 : std_logic;
    signal ctrl_int_n_s                    : std_logic;
 
+   -- Upper memory selection and bank schemes
+   signal real_cart_r, real_cart_x        : std_logic := '1';     -- '1' when using a real cartridge
+   signal bank_mode_r, bank_mode_x        : std_logic_vector( 1 downto 0) := "00";
+   signal upmem_mode_r, upmem_mode_x      : std_logic_vector( 1 downto 0) := "00";
+   signal upmem_we_inhibit_s              : std_logic;
+
+   -- MegaCart banking support
+   signal mc_mem_size_r, mc_mem_size_x    : std_logic_vector( 4 downto 0) := "01111";  -- 256K 
+   signal mc_bank_r, mc_bank_x            : std_logic_vector( 4 downto 0) := "11111";
+   signal mc_addr_r, mc_addr_x            : std_logic_vector( 4 downto 0) := "11111";
+   signal mc_en_r, mc_en_x                : std_logic := '0';
+
+
 begin
 
+   -- Debug LED.
+   led_o <= rom_loader_en_r;
+   
    -- Active-low version of the soft reset.
    reset_n_s <= not reset_i;
 
@@ -347,9 +365,9 @@ begin
 
    AUDIO_EX    <= signed(AUDIO_WSG - 128);
 --   AUDIO_SUM      <= (audio_s(7) & audio_s) + (AUDIO_EX(7) & AUDIO_EX);
-   AUDIO_EX_A	<= signed(unsigned(ay_ch_a_s) - 128);
-	AUDIO_EX_B	<= signed(unsigned(ay_ch_b_s) - 128);
-	AUDIO_EX_C	<= signed(unsigned(ay_ch_c_s) - 128);
+   AUDIO_EX_A  <= signed(unsigned(ay_ch_a_s) - 128);
+   AUDIO_EX_B  <= signed(unsigned(ay_ch_b_s) - 128);
+   AUDIO_EX_C  <= signed(unsigned(ay_ch_c_s) - 128);
 
    AUDIO_SUM   <= (   audio_s(7) & audio_s) +
                   (AUDIO_EX_A(7) & AUDIO_EX_A(7) & AUDIO_EX_A(7) & AUDIO_EX_A(7 downto 2)) +
@@ -511,7 +529,7 @@ begin
       end if;
    end if;
    end process;
- 
+
    cv_ram1k_addr_s <= cpu_addr_s(9 downto 0);
 
 
@@ -577,8 +595,11 @@ begin
    -- CPU Data-In Mux
    --
    d_to_cpu_s <=
+      -- Memory
       cpu_data_mux_s when (mreq_n_s = '0' and rfsh_n_s = '1') else
-      io_data_mux_s when cpu_addr_s(7) = '1' else  -- Ports >80 .. >FF
+      -- Original IO ports >80 .. >FF
+      io_data_mux_s when cpu_addr_s(7) = '1' else
+      -- Extended non-standard IO ports >50 .. >7F
       ex_data_mux_s;
 
 
@@ -599,19 +620,17 @@ begin
    --
    -- ROM Addressing During Loading
    --
-   -- During PoR the ROM loader is mapped into memory and the BIOS is
-   -- relocated to a new location.  When the loader is disabled, the
-   -- BIOS is moved back to its normal location.  Also, the 1K of RAM
-   -- is doubled to 2K of actual RAM when the loader is enabled to help
-   -- with providing buffers and such for SD-card operations, etc.
+   -- During PoR a 24K ROM loader and 8K RAM is mapped into the bottom 32K of
+   -- memory, and the BIOS is not accessible.  When the loader is disabled, the
+   -- original BIOS and 1K RAM are visible in their original location.
    --
    --                 Loader: Enabled  Disabled
    --                 ---------------------------
    --  >0000 .. >1FFF (8K)    Loader   BIOS
    --  >2000 .. >3FFF (8K)    Loader   no memory
-   --  >4000 .. >5FFF (8K)    BIOS     no memory
+   --  >4000 .. >5FFF (8K)    Loader   no memory
    --  >6000 .. >63FF (1K)    RAM      RAM
-   --  >6400 .. >67FF (1K)    RAM      mirror of >6000
+   --  >6400 .. >7FFF (7K)    RAM      mirror of >6000
    --
    -- ADAM Memory Banking
    --
@@ -664,12 +683,22 @@ begin
    -- The CV has separate memory and I/O decode override inputs on the
    -- expansion port.  This allows expansion modules like the SGM to replace
    -- the system BIOS with RAM.
+   --
+   --
+   -- MegaCart
+   --
+   -- The MegaCart bank select register is updated any time memory is accessed
+   -- in the range >FFC0 to >FFFF.  The LS-address bits (5..0) are used to
+   -- specify the bank.  The CV does not provide read or write enables to the
+   -- cartridge port, so the enable for updating the bank select register is
+   -- any access to the specified memory range.
 
    memory_decode : process (
       cpu_addr_s, mreq_n_s, rfsh_n_s, wr_n_s,
       d_from_loader_s, d_from_bios_s, d_from_cv_ram1k_r, cart_data_io,
       d_from_ext512_s, sgm_en_r, sgm_8k_en_r,
-      ext_ram_bank_r, rom_loader_en_r )
+      ext_ram_bank_r, rom_loader_en_r, real_cart_r, upmem_mode_r,
+      mc_bank_r, mc_addr_r, mc_en_r )
    begin
 
       cv_ram1k_en_s  <= '0';
@@ -682,27 +711,54 @@ begin
       -- Default to data from a cartridge.
       cpu_data_mux_s <= cart_data_io;
 
-      -- TODO: possibly relocate SGM to the top of the external SRAM if it
-      --       makes supporting the MegaCart banking easier.
-      -- External 512K SRAM.  Select the SGM (bank 0000) or cartridge loaded
-      -- from the SD card.
+
+      -- External 512K SRAM address select priority decode:
+      --
+      --   1. Select the fixed 32K SGM bank-0 when addressing the lower 32K.
+      --   2. If banking, choose address based on the selected bank method.
+      --   3. Otherwise use the 32K bank register.
+
       if cpu_addr_s(15) = '0' then
+         -- Address the SGM 32K at the fixed bank-0 in the 512K.
          ext_ram_addr_s <= "0000" & cpu_addr_s(14 downto 0);
       else
-         ext_ram_addr_s <= ext_ram_bank_r & cpu_addr_s(14 downto 0);
+         if mc_en_r = '1' then
+            -- Banking enabled and MegaCart enabled, check which half of the
+            -- upper 32K of memory is being addressed.
+            if cart_en_80_n_s = '0' or cart_en_A0_n_s = '0' then
+               -- Lower 16K of the upper 32K is *always* the fixed top page.
+               ext_ram_addr_s <= "11111" & cpu_addr_s(13 downto 0);
+            else
+               -- Upper 16K of the upper 32K, use the selected bank.
+               ext_ram_addr_s <= mc_addr_r & cpu_addr_s(13 downto 0);
+            end if;
+         else
+            -- Use the 32K bank register.
+            ext_ram_addr_s <= ext_ram_bank_r & cpu_addr_s(14 downto 0);
+         end if;
       end if;
 
       ext_ram_en_s      <= '0';
       ext_ram_we_n_s    <= '1';
+
+
       -- Required to keep loader ROM from being removed by the synthesizer.
       rom_loader_we_n_s <= '1';
+
+      -- The upper memory-mode register controls whether the 32K pages are
+      -- writable.
+      upmem_we_inhibit_s <= upmem_mode_r(0);
+
+      -- MegaCart bank select register.
+      mc_bank_x         <= mc_bank_r;
 
 
       -- Memory access that is not a refresh cycle.
       if mreq_n_s = '0' and rfsh_n_s = '1' then
 
-         -- TODO: Update to include bank-switchers.
-         ext_ram_en_s <= sgm_en_r; -- or cart_from_sd_en_r;
+         -- Enable the external RAM when the SGM is enabled or
+         -- the physical cartridge is NOT enabled.
+         ext_ram_en_s <= sgm_en_r or (not real_cart_r);
 
          case cpu_addr_s(15 downto 13) is
 
@@ -766,21 +822,85 @@ begin
                -- Enable writing to the SGM, and read data from the SGM.
                ext_ram_we_n_s <= wr_n_s;
                cpu_data_mux_s <= d_from_ext512_s;
-               
+
             else
                -- Normal CV 1K when the loader and SGM are disabled.
                cv_ram1k_en_s  <= '1';
                cpu_data_mux_s <= d_from_cv_ram1k_r;
             end if;
 
-         when "100" =>  cart_en_80_n_s <= '0';           -- 8K  >8000 .. >9FFF
-         when "101" =>  cart_en_A0_n_s <= '0';           -- 8K  >A000 .. >BFFF
-         when "110" =>  cart_en_C0_n_s <= '0';           -- 8K  >C000 .. >DFFF
-         when "111" =>  cart_en_E0_n_s <= '0';           -- 8K  >E000 .. >FFFF
+         when "100" =>                 -- 8K  >8000 .. >9FFF
 
+            cart_en_80_n_s <= '0';
+
+            if real_cart_r = '1' then
+               cpu_data_mux_s <= cart_data_io;
+            else
+               cpu_data_mux_s <= d_from_ext512_s;
+               ext_ram_we_n_s <= wr_n_s or upmem_we_inhibit_s;
+            end if;
+
+         when "101" =>                 -- 8K  >A000 .. >BFFF
+
+            cart_en_A0_n_s <= '0';
+
+            if real_cart_r = '1' then
+               cpu_data_mux_s <= cart_data_io;
+            else
+               cpu_data_mux_s <= d_from_ext512_s;
+               ext_ram_we_n_s <= wr_n_s or upmem_we_inhibit_s;
+            end if;
+
+         when "110" =>                 -- 8K  >C000 .. >DFFF
+
+            cart_en_C0_n_s <= '0';
+
+            if real_cart_r = '1' then
+               cpu_data_mux_s <= cart_data_io;
+            else
+               cpu_data_mux_s <= d_from_ext512_s;
+               ext_ram_we_n_s <= wr_n_s or upmem_we_inhibit_s;
+           end if;
+
+         when "111" =>                 -- 8K  >E000 .. >FFFF
+
+            cart_en_E0_n_s <= '0';
+
+            if real_cart_r = '1' then
+               cpu_data_mux_s <= cart_data_io;
+            else
+               cpu_data_mux_s <= d_from_ext512_s;
+               ext_ram_we_n_s <= wr_n_s or upmem_we_inhibit_s;
+            end if;
+
+            -- MegaCart bank register.  Since the Phoenix only has a 512K
+            -- external memory, the bank register is only 5-bits instead of
+            -- the original 6-bits.  Update on read or write.
+            if cpu_addr_s(12 downto 6) = "1111111" then
+               mc_bank_x <= cpu_addr_s(4 downto 0);
+            end if;
+            
          when others => null;
          end case;
       end if;
+   end process;
+
+   
+   -- MegaCart memory size decode and address bank select formation.  The 512K
+   -- external memory needs to be masked to *appear* to be whatever size EPROM
+   -- image was loaded.  The mask is set by the loader and is used to ignore
+   -- address bits that would not exist on EPROMs less than 512K.  The address
+   -- is also created such that the top of the 512K is utilized since that is
+   -- where the ROM data is loaded.
+   megacart : process ( mc_mem_size_r, mc_bank_r )
+   begin
+      case ( mc_mem_size_r ) is
+      when "00001" => mc_addr_x <= "1111" & mc_bank_r(0);            -- >01 = 32K
+      when "00011" => mc_addr_x <= "111"  & mc_bank_r(1 downto 0);   -- >03 = 64K
+      when "00111" => mc_addr_x <= "11"   & mc_bank_r(2 downto 0);   -- >07 = 128K
+      when "01111" => mc_addr_x <= "1"    & mc_bank_r(3 downto 0);   -- >0F = 256K
+      when others  => mc_addr_x <=          mc_bank_r;               -- >1F = 512K
+      end case;
    end process;
 
 
@@ -835,7 +955,7 @@ begin
    --  >53  xxxxxx_W (W) 0 = SGM disable, 1 = SGM enable
    --       xxxxxxW_ (W) 0 = SGM Sound AY-8910, 1 = SGM Sound SEX-7264
    --
-   --  >54  xxxxWWWW (W) 32K RAM bank select, 0000 and 0001 select 0001
+   --  >54  xxxxWWWW (W) 32K RAM bank select, 0000 is ignored
    --       xxxxRRRR (R) current bank
    --
    --  >55  xxxxxxxx (R) Loader disable, PoR re-enabled ROM loader
@@ -849,7 +969,7 @@ begin
    --         01         32K Expansion ROM, uses bank scheme
    --         10         32K Upper Expansion RAM, uses bank scheme
    --         11         32K Cartridge ROM, ignores bank scheme
-   --    
+   --
    --  >56  xxxxxx_W (W) SD-card CE_n (AKA SS_n), 0=enable
    --       xxxxxxW_ (W) SD-card speed, 1=400KHz, 0=12MHz
    --       RxxxxxRR (R) SD-card card-detect, bit >80 1=card inserted
@@ -859,12 +979,22 @@ begin
    --
    --  >58  00001000 (R) Machine ID, Phoenix = 8
    --
+   --  >59  xxxWWWWW (W) MegaCart memory size
+   --          other     512K
+   --          11111     512K, 32 16K-banks
+   --          01111     256K, 16 16K-banks
+   --          00111     128K,  8 16K-banks
+   --          00011      64K,  4 16K-banks
+   --          00001      32K,  2 16K-banks (same as original cart)
+   --
    --  >7F  xxxxxxWx (W) 0 = 8K SGM RAM, 1 = 8K CV BIOS
    --
    process ( cpu_addr_s, iorq_n_s, m1_n_s, wr_n_s, rd_n_s,
              d_from_cpu_s, d_from_wsg_s, sgm_en_r, sgm_8k_en_r,
              ext_ram_bank_r, rom_loader_en_r,
-             d_from_sd_s, sd_detect_r, sd_slow_clk_r, sd_spi_ss_n_r )
+             d_from_sd_s, sd_detect_r, sd_slow_clk_r, sd_spi_ss_n_r,
+             real_cart_r, bank_mode_r, upmem_mode_r,
+             mc_mem_size_r, mc_en_r )
    begin
       sgm_en_x          <= sgm_en_r;
       sgm_8k_en_x       <= sgm_8k_en_r;
@@ -883,6 +1013,16 @@ begin
 
       ex_data_mux_s     <= (others => '0');
 
+      -- Upper memory and bank mode.
+      real_cart_x       <= real_cart_r;   -- Will be '1' when bank_mode_r == "00"
+      bank_mode_x       <= bank_mode_r;
+      upmem_mode_x      <= upmem_mode_r;
+
+      -- MegaCart support.
+      mc_mem_size_x     <= mc_mem_size_r;
+      mc_en_x           <= mc_en_r;
+
+
       if iorq_n_s = '0' and m1_n_s = '1' then
          case cpu_addr_s(7 downto 4) is
 
@@ -890,23 +1030,27 @@ begin
             case cpu_addr_s(3 downto 0) is
 
             when x"0" =>                  -- port >50 PSG address write
+
                if wr_n_s = '0' then
                   wsg_bdir_s  <= '1';
                   wsg_bc_s    <= '1';
                end if;
 
             when x"1" =>                  -- port >51 PSG data write
+
                if wr_n_s = '0' then
                   wsg_bdir_s  <= '1';
                end if;
 
             when x"2" =>                  -- port >52 PSG data read
+
                if rd_n_s = '0' then
                   wsg_bc_s       <= '1';
                   ex_data_mux_s  <= d_from_wsg_s;
                end if;
 
             when x"3" =>                  -- port >53 SGM enable / disable
+
                if wr_n_s = '0' then
                   sgm_en_x       <= d_from_cpu_s(0);
                end if;
@@ -924,11 +1068,27 @@ begin
                end if;
 
             when x"5" =>                  -- port >55 ROM loader disable
+
                if rd_n_s = '0' then
                   rom_loader_en_x <= '0';
                end if;
 
+               if wr_n_s = '0' then
+                  -- A physical cartridge is selected when no banking is
+                  -- selected.  In this case, all other upper memory banking
+                  -- is ignored.
+                  real_cart_x    <= d_from_cpu_s(1) nor d_from_cpu_s(0);
+                  bank_mode_x    <= d_from_cpu_s(1 downto 0);
+                  upmem_mode_x   <= d_from_cpu_s(5 downto 4);
+                  
+                  -- MegaCart enable, true when MegaCart mode, and upper memory
+                  -- is set to recognize banking.
+                  mc_en_x        <= (not d_from_cpu_s(1)) and d_from_cpu_s(0) and
+                                    (d_from_cpu_s(5) xor d_from_cpu_s(4));
+               end if;
+
             when x"6" =>                  -- port >56 SD-card control
+
                if rd_n_s = '0' then
                   ex_data_mux_s  <= sd_detect_r & "00000" &
                                     sd_slow_clk_r & sd_spi_ss_n_r;
@@ -953,6 +1113,12 @@ begin
                   ex_data_mux_s  <= machine_id_c;
                end if;
 
+            when x"9" =>                  -- port >59 MegaCart memory size
+
+               if wr_n_s = '0' then
+                  mc_mem_size_x  <= d_from_cpu_s(4 downto 0);
+               end if;
+
             when others => null;
             end case;
 
@@ -966,7 +1132,9 @@ begin
          end if;
       end if;
    end process;
-
+   
+   
+   -- System reset and register transfer.
    process (clock_i, reset_i, clk_en_3m58_i)
    begin
    if rising_edge(clock_i) then
@@ -974,10 +1142,17 @@ begin
          sgm_en_r          <= '0';           -- disable SGM on reset
          sgm_8k_en_r       <= '0';           -- BIOS over SGM 8K RAM at >0000
          ext_ram_bank_r    <= "0001";        -- external RAM bank select
-         rom_loader_en_r   <= '1';           -- enabled 16K ROM loader
+         rom_loader_en_r   <= '1';           -- enabled ROM loader
          sd_detect_r       <= '0';           -- no card until sampled
          sd_slow_clk_r     <= '1';           -- fall-back to SD-card SPI slow clock
-         sd_spi_ss_n_r     <= '1';           -- deselect the SD-card device
+         sd_spi_ss_n_r     <= '1';           -- de-select the SD-card device
+         real_cart_r       <= '1';           -- default to a real cartridge
+         bank_mode_r       <= "00";          -- no banking
+         upmem_mode_r      <= "00";          -- upper memory selection does not matter
+         mc_mem_size_r     <= "01111";       -- default to 256K
+         mc_bank_r         <= "11111";       -- default to top bank
+         mc_addr_r         <= "11111";       -- default to top of 512K memory
+         mc_en_r           <= '0';           -- disable MegaCart
 
       elsif clk_en_3m58_i = '1' then
          sgm_en_r          <= sgm_en_x;
@@ -987,6 +1162,13 @@ begin
          sd_detect_r       <= not sd_cd_n_i; -- sample and invert input directly
          sd_slow_clk_r     <= sd_slow_clk_x;
          sd_spi_ss_n_r     <= sd_spi_ss_n_x;
+         real_cart_r       <= real_cart_x;
+         bank_mode_r       <= bank_mode_x;
+         upmem_mode_r      <= upmem_mode_x;
+         mc_mem_size_r     <= mc_mem_size_x;
+         mc_bank_r         <= mc_bank_x;
+         mc_addr_r         <= mc_addr_x;
+         mc_en_r           <= mc_en_x;
 
       end if;
    end if;

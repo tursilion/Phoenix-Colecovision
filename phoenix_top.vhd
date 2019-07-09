@@ -247,6 +247,9 @@ architecture behavior of phoenix_top is
    signal but_dot_s        : std_logic_vector( 0 downto 0);
    signal but_clear_s      : std_logic_vector( 0 downto 0);
    signal but_equal_s      : std_logic_vector( 0 downto 0);
+   
+   -- CV core debug LED.
+   signal cv_led_s         : std_logic;
 
 begin
 
@@ -337,7 +340,7 @@ begin
    --     FPGA out, '0' or 'Z' only! Never output a '1'.
 
    -- Indicate reset with the LED.
-   led_o <= 'Z' when reset_r = '1' else '0';
+   led_o <= 'Z' when reset_r = '1' or cv_led_s = '1' else '0';
 
    -- RGB-LED, set to green
    rgb_led_o <= "101";
@@ -421,7 +424,9 @@ begin
       sd_mosi_o         => sd_mosi_o,
       sd_sclk_o         => sd_sclk_o,
       sd_cs_n_o         => sd_cs_n_o,
-      sd_cd_n_i         => sd_cd_n_i      -- Card detect, active low.
+      sd_cd_n_i         => sd_cd_n_i,     -- Card detect, active low.
+      
+      led_o             => cv_led_s
    );
 
 

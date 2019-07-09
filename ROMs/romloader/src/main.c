@@ -363,7 +363,7 @@ disp_hex(uint8_t d)
 #define CMD16   16 | 0x40   // R1   SET_BLK_SIZE     50  blk  len   01
 #define CMD17   17 | 0x40   // R1   READ_SINGLE_BLK  51  data addr  01
 #define CMD55   55 | 0x40   // R1   APP_CMD_NEXT     77 00 00 00 00 01
-#define CMD58   58 | 0x40   // R3   READ_OCR         78 00 00 00 00 01
+#define CMD58   58 | 0x40   // R3   READ_OCR         7A 00 00 00 00 01
 #define ACMD41  41 | 0x40   // R1   SELF_INIT_SD     69 00 00 00 00 01
 
 // Response R1 format:
