@@ -88,6 +88,24 @@ void debug(const char *p) {
 #endif
 }
 
+// setting up standard screen modes - blanks the screen and returns the unblank command
+// interrupts are also disabled. Unblank will re-enable them, too, write it to VDP_REG_MODE1
+// this is a stripped down version out of libti99Coleco that doesn't set the sprite table or tracking variables
+// A few registers also differ. text mode in menu.c shares this layout.
+unsigned char my_set_graphics(unsigned char sprite_mode) {
+	// this layout is untested but should match editor/assembler's
+	unsigned char unblank = VDP_MODE1_16K | VDP_MODE1_UNBLANK | VDP_MODE1_INT | sprite_mode;
+	VDP_SET_REGISTER(VDP_REG_MODE1, VDP_MODE1_16K);		// no need to OR in the sprite mode for now
+	VDP_SET_REGISTER(VDP_REG_MODE0, 0);
+	VDP_SET_REGISTER(VDP_REG_SIT, 0x00);    // 0x0000
+	VDP_SET_REGISTER(VDP_REG_CT, 64);       // 0x1000
+	VDP_SET_REGISTER(VDP_REG_PDT, 0x01);    // 0x0800
+	VDP_SET_REGISTER(VDP_REG_SAL, 14);      // 0x0700
+	VDP_SET_REGISTER(VDP_REG_SDT, 0x03);    // 0x1800
+	VDP_SET_REGISTER(VDP_REG_COL, ((COLOR_GRAY<<4)|COLOR_BLACK));
+	return unblank;
+}
+
 // unRLE CPU to VDP handler
 // Basic RLE compression applied to PAT0
 // top two msbits are flags:
@@ -213,10 +231,10 @@ void fadeInTextF18A() {
 	VDP_SET_REGISTER(0x2f, 0x00);	// Turn off the DPM mode
 
 	// now set the phoenix color sets (3-12) to white on transparent
-	vdpmemset(gColor+3, 0xf0, 10);
+	vdpmemset(GCOLOR+3, 0xf0, 10);
 	
 	// now copy the characters into place
-	vdpmemcpy(gImage+(18*32), MD0_PHOENIX, 4*32);
+	vdpmemcpy(GIMAGE+(18*32), MD0_PHOENIX, 4*32);
 
 	// now we can fade it in with normal interrupt polling
 	for (i=1; i<16; ++i) {
@@ -238,7 +256,7 @@ void displayLogo() {
     unsigned char const *p;
 	
 	// set the logo color to dark red - logo color sets are 13-31
-	vdpmemset(gColor+13, COLOR_DKRED<<4, 19);
+	vdpmemset(GCOLOR+13, COLOR_DKRED<<4, 19);
 
 	// the logo graphics occupy from roms 1 to 16
     // they are sorted from the bottom up, and use
@@ -251,7 +269,7 @@ void displayLogo() {
         waitVblanks(2);
 		off = (idx-1)*32+(*(p++));
         len = *(p++);
-		vdpmemcpy(gImage+off, p, len);
+		vdpmemcpy(GIMAGE+off, p, len);
         p+=len;
 	}
 }
@@ -261,7 +279,7 @@ void displayLogo() {
 // the appropriate function. String must be less
 // than 256 characters. (Better be less than 32)
 void centerString(unsigned char line, char *p) {
-    unsigned int vdp = gSpritePat + (line*8);
+    unsigned int vdp = GSPRITEPAT + (line*8);
     unsigned char len = 0;
     char *pp = p;
 
@@ -729,7 +747,7 @@ void runCartHeader(void (*mycenter)(unsigned char, char*)) {
 
 // main loop
 int main() {
-	unsigned char x,idx,col;
+	unsigned char x,idx;
 
     // disable interrupt processing
     VDP_INT_DISABLE;
@@ -765,27 +783,15 @@ int main() {
 	// set_graphics leaves the screen disabled so the user can load character sets,
 	// and returns the value to set in VDPR1 to enable it
     // Warning: in the menu.c we assume this value is 0xE2
-	x = set_graphics(VDP_SPR_16x16);
-	col = (COLOR_GRAY<<4)|COLOR_BLACK;
-	VDP_SET_REGISTER(VDP_REG_COL, col);
-     
-	// move the sprite pattern table so it does not overlap the character patterns
-	VDP_SET_REGISTER(VDP_REG_SDT, 0x03);
-	gSpritePat = 0x1800;
-    // Move the sprite attribute table to 0x700
-    VDP_SET_REGISTER(VDP_REG_SAL, 14);
-    gSprite = 0x700;
-    // Move the color table to 0x1000
-    VDP_SET_REGISTER(3, 64);
-    gColor = 0x1000;
+	x = my_set_graphics(VDP_SPR_16x16);
 
     // clear the sprite pattern table
-    vdpmemset(gSpritePat, 0, 256*8);
+    vdpmemset(GSPRITEPAT, 0, 256*8);
 	// set up 16 mag 3 sprites to give us two lines of bitmapped text at the bottom of the screen
     // this part won't work if the F18A isn't present, but I'm okay with that.
     // Why sprites? Oh, why not? Could use the BML but that's not implemented in Classic99
     // Debug is easier this way.
-    VDP_SET_ADDRESS_WRITE(gSprite);
+    VDP_SET_ADDRESS_WRITE(GSPRITE);
     for (idx=0; idx<16; ++idx) {
         // F18A doesn't need delays between writes
         VDPWD = 22*8-2; // Y
@@ -800,15 +806,15 @@ int main() {
     VDPWD = 0xd0;      // terminator
     
     // clear the screen
-	vdpmemset(gImage, 0x18, 768);
+	vdpmemset(GIMAGE, 0x18, 768);
 	// set the color table to white on transparent
-	vdpmemset(gColor, 0xF0, 32);
+	vdpmemset(GCOLOR, 0xF0, 32);
 
 	// load the character patterns
-	//vdpmemcpy(gPattern, PAT0, 8*256);             // raw data
-    //unrle(gPattern, PAT0, SIZE_OF_PAT0RLE);           // RLE full character set
-    //unrle(gPattern+25*8, PAT0, SIZE_OF_PAT0RLE-147);  // hand counted offsets
-    unrle(gPattern, PAT0, SIZE_OF_PAT0RLE);             // final settings
+	//vdpmemcpy(GPATTERN, PAT0, 8*256);             // raw data
+    //unrle(GPATTERN, PAT0, SIZE_OF_PAT0RLE);           // RLE full character set
+    //unrle(GPATTERN+25*8, PAT0, SIZE_OF_PAT0RLE-147);  // hand counted offsets
+    unrle(GPATTERN, PAT0, SIZE_OF_PAT0RLE);             // final settings
 
 	// turn the screen on
 	VDP_SET_REGISTER(VDP_REG_MODE1, x);

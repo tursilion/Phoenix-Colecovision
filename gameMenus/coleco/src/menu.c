@@ -23,6 +23,10 @@
 extern void vdpmemcpyfast(int pAddr, const unsigned char *pSrc, int cnt);
 #define vdpmemcpy vdpmemcpyfast
 
+// foldername to search for - MUST be uppercase, no numbers or punctuation
+const unsigned char FolderName[] = "COLECO";
+const unsigned char FolderNameLen = 7;      // include the terminating NUL
+
 // color scheme for menu - this allows easy customization
 // we can use an F18A palette to make these any colors we want
 // COLORHILITE should pulse a little using palette color cycling
@@ -53,7 +57,9 @@ const char hex[16] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','
 // be selected. 1 through 15 are the cartridge banks. However, this
 // only gives us 480k. Unfortunately, Megacarts are powers of two,
 // meaning we are restricted to 256k megacarts unless we can get
-// that first 32k back.
+// that first 32k back. (But, we try to load 512k anyway, if the first
+// 32k is unused, then we might just work.)
+//
 // I want to put the directory out of the way of file load, so that
 // if an error occurs, we can go back to the directory without re-reading
 // the SD card. So in case we do solve the above, I'll store the data
@@ -122,6 +128,8 @@ unsigned char listSize = 0;         // number of elements in sortedList
 unsigned char listOffset = 0;       // current list offset
 unsigned char listSelect = 0;       // current selection index
 unsigned char repeatTimeout;        // number of frames before autorepeat
+unsigned char firstScan = 0;        // during the first scan, we look for a Coleco folder and enter it
+unsigned char firstDir = 0;         // indicates we need to set up the display for the first time showing a directory
 
 // each index is about 50us
 void dly_50us(unsigned char n)
@@ -145,17 +153,17 @@ void dly_50us(unsigned char n)
 
 // clear the sprite layer
 void cleartextout() {
-    vdpmemset(gSpritePat, 0, 16*4*8);
+    vdpmemset(GSPRITEPAT, 0, 16*4*8);
 }
 
 // clear the text screen
 void clrscr() {
-    vdpmemset(gImage, ' ', 960);
+    vdpmemset(GIMAGE, ' ', 960);
 }
 
 // clear the text screen bottom three rows
 void clrscrbottom() {
-    vdpmemset(gImage+(40*21), ' ', (40*3));
+    vdpmemset(GIMAGE+(40*21), ' ', (40*3));
     cleartextout();
 }
 
@@ -234,7 +242,7 @@ void displayErrorString(char *pstr, unsigned char x) {
     centerString(1, "Press fire...");
 
     // write the code 'x' to top left
-    VDP_SET_ADDRESS_WRITE(gImage + 38);
+    VDP_SET_ADDRESS_WRITE(GIMAGE + 38);
     VDPWD = hex[(x>>4)];
     VDPWD = hex[(x&0xf)];
 
@@ -292,6 +300,7 @@ char mystrcmp(const char *s1, const char *s2) {
 // then one byte for the number of 16k pages in the file, which is
 // zero if it's a directory.
 void readDir() {
+repeatDir:
     lastFilename = (unsigned char*)0x8000;  // no files loaded yet
 
     // Each entry has:
@@ -299,6 +308,10 @@ void readDir() {
     //      Byte for directory flag
     if (FR_OK == f_opendir(&dir, path)) {
         debug(path);
+
+        // this string could be corrupted if we reopen a smaller pathname, but
+        // the only case we should ever redraw this is going from "/" to "/Coleco"
+        centerString(1, path);
 
         if (path[1] != 0) {
             // in a subfolder, so add the ..
@@ -320,8 +333,19 @@ void readDir() {
                 break;      // end of directory
             }
 
+            if ((firstScan) && (finfo.fattrib & AM_DIR)) {
+                // Look for a Coleco folder - this will slow down the first read a bit...
+                // but it was requested to auto-enter it since people will probably have
+                // one card with all their systems on it.
+                if (0 == mystrcmp(finfo.fname, FolderName)) {
+                    f_closedir(&dir);
+                    memcpy(&path[1], FolderName, FolderNameLen);
+                    firstScan = 0;
+                    goto repeatDir;
+                }
+            }
+
             // save it off
-            memset(lastFilename, 0, 127);
             mystrcpy(lastFilename, finfo.fname);    // will truncate to 126 characters
             if (finfo.fattrib & AM_DIR) {
                 *(lastFilename+127) = 0;    // 0 size for directory
@@ -339,6 +363,7 @@ void readDir() {
         }
 
         f_closedir(&dir);
+        firstScan = 0;
     }
 }
 
@@ -365,8 +390,8 @@ void waitRelease(unsigned char j) {
 // display the list of titles
 void drawTitles() {
     unsigned char idx;
-    unsigned int vdp = gImage;
-    unsigned int atvdp = gColor;
+    unsigned int vdp = GIMAGE;
+    unsigned int atvdp = GCOLOR;
 
     for (idx = listOffset; idx < listOffset+24; ++idx) {
         unsigned char *ptr;
@@ -528,8 +553,8 @@ void waitSDCard() {
     //              off before inserting cartridge
                     // row    col
     cleartextout();
-    textout(gSpritePat+(0*8)+(4*16), "Insert SD or turn system");
-    textout(gSpritePat+(1*8)+(1*16), "off before inserting cartridge");
+    textout(GSPRITEPAT+(0*8)+(4*16), "Insert SD or turn system");
+    textout(GSPRITEPAT+(1*8)+(1*16), "off before inserting cartridge");
 
     cntDown = BLANK_TIME;
     debounce = 0;
@@ -633,6 +658,7 @@ unsigned char loadMegacartRom(unsigned char fsize) {
     if (fsize == 32) {
         debug("skipping 32k");
         ofs = (unsigned int)32*1024;
+        fsize-=2;
     } else {
         debug("No skip");
     }
@@ -745,7 +771,7 @@ unsigned char loadMegacartRom(unsigned char fsize) {
             phCartMask = 0x0f;  // 16 pages
             break;
 
-        case 32:
+        case 30:    // should be 32, but we hacked it up
             phCartMask = 0x1f;  // 32 pages
             break;
 
@@ -778,7 +804,7 @@ void drawSelect() {
 
     adr = listSelect - listOffset;     // row on screen
     adr *= 40;      // multiply for offset
-    adr += gColor;  // index into attribute table
+    adr += GCOLOR;  // index into attribute table
 
     attr = vdpreadchar(adr);            // get the current attribute (for text color)
     attr = (attr&0xf0) | COLORHILITE;    // highlight the background
@@ -801,7 +827,7 @@ void undrawSelect() {
         bg = COLORLINE1;
     }
     adr *= 40;      // multiply for offset
-    adr += gColor;  // index into attribute table
+    adr += GCOLOR;  // index into attribute table
 
     attr = vdpreadchar(adr);   // get the current attribute (for text color)
     attr = (attr&0xf0) | bg;    // highlight the background
@@ -963,11 +989,13 @@ nocard:
     path[0]='/';
     path[1]=0;
     if (FR_OK != f_mount(&fatFs, "", 1)) goto nocard;
+    firstScan = 1;
+    firstDir = 1;
 
 dirLoop:
     // - put up 'reading SD card' on status line
     cleartextout();
-	textouthalf(gSpritePat+(1*8)+(8*16), "READING SD CARD");
+	textouthalf(GSPRITEPAT+(0*8)+(12*16), "READING");
 	
     // activate RAM at the cartridge space so we have somewhere to store data
     phBankingScheme = PH_BANK_MEGACART | PH_UPPER_INTRAM;
@@ -983,7 +1011,7 @@ dirLoop:
     // Sort is so fast now that we don't need to display anything
 #if 0
     cleartextout();
-	textouthalf(gSpritePat+(1*8)+(11*16), "Sorting...");
+	textouthalf(GSPRITEPAT+(1*8)+(11*16), "Sorting...");
 #endif
     sortDir();
     cleartextout();
@@ -992,38 +1020,32 @@ dirLoop:
     listOffset = 0;     // top of display
     listSelect = 0;     // user selected index
 
-    // turn off the screen
-    VDP_SET_REGISTER(1, 0x80);
+    if (firstDir) {
+        firstDir = 0;
 
-    // - Load default font
-    vdpmemcpy(0x0800+29*8, FATFONT, 94*8);
+        // turn off the screen
+        VDP_SET_REGISTER(1, 0x80);
 
-    // set up for per-character attributes (the color table is now a per-character color in text mode)
-    VDP_SET_REGISTER(50,0x02);
-#if 0
-    // (these are the same as the main screen)
-    // Move the color table to 0x1000
-    VDP_SET_REGISTER(3, 64);
-    gColor = 0x1000;
-    // Move the sprite table to 0x700
-    VDP_SET_REGISTER(5, 14);
-    gSprite = 0x700;
-    // Move the sprite descriptor table to 0x1800
-    VDP_SET_REGISTER(6, 3);
-    gSpritePat = 0x1800;
-#endif
+        // - Load default font
+        vdpmemcpy(0x0800+29*8, FATFONT, 94*8);
 
-    // background color to match the color scheme
-    VDP_SET_REGISTER(7, COLORBG);
+        // set up for per-character attributes (the color table is now a per-character color in text mode)
+        VDP_SET_REGISTER(50,0x02);
 
-    // - Clear screen (for text mode)
-    clrscr();
+        // background color to match the color scheme
+        VDP_SET_REGISTER(7, COLORBG);
 
-    // load the new palette
-    loadpal_f18a(MENU_PALETTE, 8);
+        // - Clear screen (for text mode)
+        clrscr();
 
-    // set text mode
-    VDP_SET_REGISTER(1,0xf2);
+        // load the new palette
+        loadpal_f18a(MENU_PALETTE, 8);
+
+        // set text mode
+        VDP_SET_REGISTER(1,0xf2);
+    } else {
+        clrscr();
+    }
 
 drawLoop:
     // - Display list of titles

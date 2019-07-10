@@ -46,3 +46,15 @@ volatile __sfr __at 0x7f sgmBIOSMap;          // swaps RAM with the Coleco BIOS
 //#define COLECO_FONT_ADR (0x158b + 0x4000)
 
 void dly_50us(unsigned char n);
+
+// Just some convenient loader defines to improve the code
+// some tables that we never move - a constant will get better code out of SDCC
+// Note you can't JUST change these, you need to fix the code that sets the registers too
+#define GSPRITEPAT 0x1800
+#define GSPRITE 0x0700
+#define GCOLOR 0x1000
+#define GIMAGE 0x0000
+#define GPATTERN 0x0800
+
+
+
