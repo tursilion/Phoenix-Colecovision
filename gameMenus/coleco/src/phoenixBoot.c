@@ -24,6 +24,10 @@ unsigned char f18a;
 // cartridge string (we format it into here)
 char copyright[65];
 
+// fast memcpy, since we don't need delays on the F18A
+extern void vdpmemcpyfast(int pAddr, const unsigned char *pSrc, int cnt);
+#define vdpmemcpy vdpmemcpyfast
+
 // menu function
 extern void menu();
 
@@ -801,9 +805,9 @@ int main() {
 	vdpmemset(gColor, 0xF0, 32);
 
 	// load the character patterns
-	//vdpmemcpy(gPattern, PAT0, 8*256);                 // raw data
+	//vdpmemcpy(gPattern, PAT0, 8*256);             // raw data
     //unrle(gPattern, PAT0, SIZE_OF_PAT0RLE);           // RLE full character set
-    //unrle(gPattern+25*8, PAT0, SIZE_OF_PAT0RLE-147);    // hand counted offsets
+    //unrle(gPattern+25*8, PAT0, SIZE_OF_PAT0RLE-147);  // hand counted offsets
     unrle(gPattern, PAT0, SIZE_OF_PAT0RLE);             // final settings
 
 	// turn the screen on

@@ -19,6 +19,10 @@
 #include "fatFs/ff.h"			/* Obtains integer types */
 #include "fatFs/diskio.h"		/* Declarations of disk functions */
 
+// fast memcpy, since we don't need delays on the F18A
+extern void vdpmemcpyfast(int pAddr, const unsigned char *pSrc, int cnt);
+#define vdpmemcpy vdpmemcpyfast
+
 // color scheme for menu - this allows easy customization
 // we can use an F18A palette to make these any colors we want
 // COLORHILITE should pulse a little using palette color cycling
@@ -122,9 +126,21 @@ unsigned char repeatTimeout;        // number of frames before autorepeat
 // each index is about 50us
 void dly_50us(unsigned char n)
 {
-    // very, very roughly 50us per index
-    volatile int delay=n;
-    while (delay--) { ++delay; --delay; }
+    // roughly 50us per loop
+    // must be an even number of ex's to
+    // not mess up the stack or HL
+    while (n--) {
+        __asm
+            ex (sp),hl      ; 19 t-states
+            ex (sp),hl      ; 19 t-states
+            ex (sp),hl      ; 19 t-states
+            ex (sp),hl      ; 19 t-states
+            ex (sp),hl      ; 19 t-states
+            ex (sp),hl      ; 19 t-states
+            ex (sp),hl      ; 19 t-states
+            ex (sp),hl      ; *8 = 152 t-states =~ 42.4uS, plus loop overhead
+        __endasm;
+    }
 }
 
 // clear the sprite layer
@@ -1176,7 +1192,7 @@ drawLoop:
             ofs = fsize - 1;    // get the size in blocks, minus 1
             ofs <<= 14;         // times 16384 for offset
             if (FR_OK != f_lseek(&fil, ofs)) {
-                debug("Seek failed - disk error?");
+                debug("Seek failed - disk error");
                 f_close(&fil);
                 displayErrorString("Failed to identify file.", res);
                 phRAMBankSelect = DIRECTORY_PAGE;

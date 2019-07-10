@@ -30,6 +30,10 @@
 /* added by Tursi - removes the code to allow either slash ('/' only now) and various */
 /* other 'just to be nice' checks, like duplicated separators */
 
+#define FF_INLINE_PUT_UTF 1
+/* this will only work in ASCII mode, replaces the put_utf calls with inline buffer updates */
+/* added by Tursi */
+
 // Matt had a good idea - if we stored directory entry cluster with the filename, we
 // could just load directly off the cluster, then filename translation would not
 // matter at all... but it's a big mod, so just keeping that in the back pocket for now.
@@ -167,7 +171,7 @@
 /  When LFN is not enabled, this option has no effect. */
 
 
-#define FF_LFN_BUF		255
+#define FF_LFN_BUF		254
 #define FF_SFN_BUF		12
 /* This set of options defines size of file name members in the FILINFO structure
 /  which is used to read out directory items. These values should be suffcient for

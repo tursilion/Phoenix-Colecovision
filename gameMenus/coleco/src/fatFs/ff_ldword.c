@@ -39,7 +39,7 @@
 /* Load/Store multi-byte word in the FAT structure                       */
 /*-----------------------------------------------------------------------*/
 
-WORD ld_word (const BYTE* ptr)	/*	 Load a 2-byte little-endian word */
+WORD ld_word_old (const BYTE* ptr)	/*	 Load a 2-byte little-endian word */
 {
 	WORD rv;
 

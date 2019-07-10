@@ -435,8 +435,12 @@ extern const BYTE ExCvt[];
 #define DIR_READ_FILE(dp) dir_read(dp, 0)
 #define DIR_READ_LABEL(dp) dir_read(dp, 1)
 
+// this is called a lot, but on our z80 machine we're already little endian...
+// TURSI changed.
+//WORD ld_word (const BYTE* ptr);
+#define ld_word(ptr) ((((const BYTE*)ptr)[1]<<8) | ((const BYTE*)ptr)[0])
+
 // Private functions
-WORD ld_word (const BYTE* ptr);
 DWORD ld_dword (const BYTE* ptr);
 int mem_cmp (const void* dst, const void* src, UINT cnt);
 int chk_chr (const char* str, int chr);

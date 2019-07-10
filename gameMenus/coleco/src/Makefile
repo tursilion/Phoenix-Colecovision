@@ -31,7 +31,8 @@ MAIN_OBJS =\
     f18a.$(EXT)  \
     mattfont.$(EXT)  \
     menu.$(EXT)  \
-    memset.$(EXT)
+    memset.$(EXT) \
+    vdp_memcpyfast.$(EXT)
 
 FAT_OBJS =\
     fatFs\diskio_diskinit.$(EXT) \

@@ -46,14 +46,19 @@ void get_fileinfo (
 	FILINFO* fno		/* Pointer to the file information to be filled */
 )
 {
-	UINT si, di;
 #if FF_USE_LFN
+#if FF_INLINE_PUT_UTF == 1
+    // this assumes Tursi's shorter long filenames
+	unsigned char si, di;
+    unsigned char wc, hs;
+#else
+	UINT si, di;
 	WCHAR wc, hs;
+#endif
 	FATFS *fs = dp->obj.fs;
 #else
 	TCHAR c;
 #endif
-
 
 	fno->fname[0] = 0;			/* Invaidate file info */
 	if (dp->sect == 0) return;	/* Exit if read pointer has reached end of directory */
@@ -69,6 +74,12 @@ void get_fileinfo (
 		if (dp->blk_ofs != 0xFFFFFFFF) {	/* Get LFN if available */
 			si = di = hs = 0;
 			while (fs->lfnbuf[si] != 0) {
+#if FF_INLINE_PUT_UTF == 1
+                if (di >= FF_LFN_BUF) { di = 0; break; }
+                wc = fs->lfnbuf[si++];
+                fno->fname[di++] = wc;
+                if (wc == 0) {di = 0; break; }
+#else
 				wc = fs->lfnbuf[si++];		/* Get an LFN character (UTF-16) */
 				if (hs == 0 && IsSurrogate(wc)) {	/* Is it a surrogate? */
 					hs = wc; continue;		/* Get low surrogate */
@@ -76,6 +87,7 @@ void get_fileinfo (
 				wc = put_utf((DWORD)hs << 16 | wc, &fno->fname[di], FF_LFN_BUF - di);	/* Store it in UTF-16 or UTF-8 encoding */
 				if (wc == 0) { di = 0; break; }	/* Invalid char or buffer overflow? */
 				di += wc;
+#endif
 				hs = 0;
 			}
 			if (hs != 0) di = 0;	/* Broken surrogate pair? */
@@ -104,9 +116,11 @@ void get_fileinfo (
 		wc = ff_oem2uni(wc, CODEPAGE);		/* ANSI/OEM -> Unicode */
 		if (wc == 0) { di = 0; break; }		/* Wrong char in the current code page? */
 #if FF_FS_REMOVE_ALTNAME == 1
+        // todo: #if FF_INLINE_PUT_UTF == 1
 		wc = put_utf(wc, &fno->fname[di], FF_SFN_BUF - di);	/* Store it in Unicode */
 #else
-		wc = put_utf(wc, &fno->altname[di], FF_SFN_BUF - di);	/* Store it in Unicode */
+        // todo: #if FF_INLINE_PUT_UTF == 1
+        wc = put_utf(wc, &fno->altname[di], FF_SFN_BUF - di);	/* Store it in Unicode */
 #endif
 		if (wc == 0) { di = 0; break; }		/* Buffer overflow? */
 		di += wc;

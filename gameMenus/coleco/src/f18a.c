@@ -3,6 +3,10 @@
 #include <vdp.h>
 #include "f18a.h"
 
+// fast memcpy, since we don't need delays on the F18A
+extern void vdpmemcpyfast(int pAddr, const unsigned char *pSrc, int cnt);
+#define vdpmemcpy vdpmemcpyfast
+
 // default F18 palette values
 const unsigned int DEFAULT_PALETTE[] = {
 	0x0000,0x0000,0x02C3,0x05D6,0x054F,0x076F,0x0D54,0x04EF,
