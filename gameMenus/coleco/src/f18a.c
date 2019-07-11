@@ -55,13 +55,16 @@ void reset_f18a() {
 	// reset the status register to 0
 	VDP_SET_REGISTER(0x0f, 00);	// V15 = 0 - read SR0 again
 
+    // reset the sprite flicker count to 4
+    VDP_SET_REGISTER(0x33, 4); // stop sprite is #4
+
 	// wait for an interrupt (or, if VDPST2 is active, RUNNING to clear)
 	while (VDPST & 0x80) {
 		VDP_SAFE_DELAY();
 	}
 
     // the above is all needed on older versions of the F18A,
-    // on most recent versions just this will do it all
+    // on most recent versions just this will do it all (except palette)
     VDP_SET_REGISTER(0x32, 0x80);
 }
 

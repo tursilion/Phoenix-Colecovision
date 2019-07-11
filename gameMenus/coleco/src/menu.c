@@ -325,6 +325,7 @@ repeatDir:
         while (FR_OK == f_readdir(&dir, &finfo)) {
             // just in case the return code wasn't enough
             if (disk_status() == STA_NODISK) {
+                f_closedir(&dir);
                 return;
             }
 
@@ -348,7 +349,7 @@ repeatDir:
             // save it off
             mystrcpy(lastFilename, finfo.fname);    // will truncate to 126 characters
             if (finfo.fattrib & AM_DIR) {
-                *(lastFilename+127) = 0;    // 0 size for directory
+                *(lastFilename+127) = 0;            // 0 size for directory
             } else {
                 *(lastFilename+127) = (finfo.fsize + 16383) >> 14;  // number of 16384 pages, rounded up
             }
@@ -450,7 +451,6 @@ void sortDir() {
     // being fancy. Fast Z80 moves SHOULD be inserted by SDCC
     // for the memmove calls.
     // Extra rules: directories before non-directories
-    // The ".." folder is handled special and is not in the list.
     unsigned char *ptr = (unsigned char*)0x8000;
     listSize = 0;
 
@@ -857,13 +857,6 @@ char getUserSelection() {
         // VDP vblank wait
         waitVblanks(1);
 
-        // If there's no files, we'll be inefficient and draw this every time around.
-        // But it's not like we have anything better to do until the user removes the card.
-        if (listSize == 0) {
-            centerString(1, "No files found");
-            continue;
-        }
-
         // so we can check if we moved
         oldSelect = listSelect;
 
@@ -988,7 +981,10 @@ nocard:
     // - Set directory to root (note there are no relative directories!)
     path[0]='/';
     path[1]=0;
-    if (FR_OK != f_mount(&fatFs, "", 1)) goto nocard;
+    if (FR_OK != f_mount(&fatFs, "", 1)) {
+        displayErrorString("Failed to mount SD",0);
+        goto nocard;
+    }
     firstScan = 1;
     firstDir = 1;
 
@@ -1005,6 +1001,11 @@ dirLoop:
     // - Read directory (with long filenames), store filenames in VDP
     readDir();
     if (disk_status() == STA_NODISK) goto nocard;
+    if (lastFilename == (unsigned char*)0x8000) {
+        // then we failed to open the subdirectory, cause at least the ".." should have been created
+        displayErrorString("Failed to open directory", 0);
+        goto nocard;    // start right over at the root
+    }
 
     // - Clear sprites
     // - Sort list
@@ -1013,7 +1014,17 @@ dirLoop:
     cleartextout();
 	textouthalf(GSPRITEPAT+(1*8)+(11*16), "Sorting...");
 #endif
+    // sortDir will set listSize
     sortDir();
+
+    // If there are no files, then probably something went wrong, or the card is really empty.
+    // We'll loop around and retry till the user replaces the card
+    if (listSize == 0) {
+        centerString(1, "No files found");
+        goto nocard;    // start right over at the root
+    }
+
+    // clear any pending text
     cleartextout();
 
     // start at the top

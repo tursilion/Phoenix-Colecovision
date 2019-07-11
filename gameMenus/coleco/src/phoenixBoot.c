@@ -773,12 +773,9 @@ int main() {
     }
 
     // then test if the F18A is actually present - it should be!!
-    // We'll do what we can if it's not working
     f18a = test_f18a();
-    if (f18a) {
-        // ask the F18A to turn off the sprite limit
-        VDP_SET_REGISTER(0x33, 32); // stop sprite is #32
-    }
+    // ask the F18A to turn off the sprite limit
+    VDP_SET_REGISTER(0x33, 32); // stop sprite is #32
 	
 	// set_graphics leaves the screen disabled so the user can load character sets,
 	// and returns the value to set in VDPR1 to enable it
