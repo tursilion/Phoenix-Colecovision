@@ -300,7 +300,6 @@ begin
    );
 
 
-   -- TODO: hold the system reset longer than the F18A reset.
    --
    -- F18A VDP
    --
@@ -421,7 +420,6 @@ begin
    );
 
 
-   -- TODO: Fix DigDug problem.  Not sure if it is a problem with the controller
    --
    -- Controller ports
    --

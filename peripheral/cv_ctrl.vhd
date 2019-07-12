@@ -35,39 +35,55 @@
 
 -- Controllers with interrupt and quadrature inputs.
 --
--- The ground path for the switches is provided via a single logic output
--- which must be capable of sinking enough current for at least five (5)
--- simultaneous closed switches; 16mA to 24mA is probably required.
+-- The ground path for the switches is provided via a single logic output which
+-- must be capable of sinking enough current for at least five (5) simultaneous
+-- closed switches; 16mA to 24mA is probably required.
 --
--- The direction is from the perspective of the circuit, i.e. an
--- "input" is a signal from the controller to the circuit.
+-- The direction is from the perspective of the circuit, i.e. an "input" is a
+-- signal from the controller to the circuit.
 --
 -- ^ means the pin has a weak pull-up on the input.
--- * pin-9 has a resistor in the SAC itself that acts as a pull-up when
---   the stick is selected, and a pull-down when the keypad is selected.
---   The resistor is 10K and is between pin-5 and pin-8, which are the
---   low (ground) paths for the switches.
+-- * pin-9 has a resistor in the SAC itself that acts as a pull-up when the
+--   stick is selected, and a pull-down when the keypad is selected. The
+--   resistor is 10K and is between pin-5 and pin-8, which are the low (ground)
+--   paths for the switches.
 --
 -- Controller DB9 Socket (male pins on console)
--- ==============================
--- Pin   Dir   Stick       Keypad
--- ------------------------------
+-- ================================
+-- Pin   Dir    Stick       Keypad
+--             CV (SAC)    CV (SAC)
+-- --------------------------------
 --  1^   in    Up          P1
 --  2^   in    Down        P2
 --  3^   in    Left        P3
 --  4^   in    Right       P4
 --  5    out   High        Low
 --  6^   in    Fire Left   Fire/Arm Right
---  7^   in    QB          High
+--  7^   in    High (QB)   High
 --  8    out   Low         High
---  9*   in    QA          !QA (inverse of when stick is selected)
+--  9*   in    Low  (QA)   Low (!QA - inverse of when stick is selected)
 --
 -- Controller Input Data Byte
--- -------------------------------
+-- ===============================
 --  7   6   5   4   3   2   1   0   bit
---  QA  FL  QB  IF  L   D   R   U   stick
---  !QA FR  Hi  IF  P3  P2  P4  P1  keypad
---  -   6   7   -   3   2   4   1   DB9 pin
+--  ------------------------------
+--  0   FL  1   1   L   D   R   U   stick   \ Standard
+--  0   FR  1   1   P3  P2  P4  P1  keypad  / Controller
+--  ------------------------------
+--  QA  FL  QB  IF  L   D   R   U   stick   \ Super Action
+--  !QA FR  1   IF  P3  P2  P4  P1  keypad  / Controller
+--  ------------------------------
+--  x   6   7   x   3   2   4   1   DB9 pin controlling the input bit
+--
+-- Input bits 7 and 4 are derived from other circuitry and not directly from
+-- controller inputs.
+--
+-- QA - quadrature A
+-- QB - quadrature B
+-- FL - left fire button
+-- FR - right fire button
+-- IF - interrupt flag
+--
 --
 -- Lookup table for keypad button to input data value in low 4-bits
 -- of controller data.  The input line is low when a button is pushed.
@@ -208,9 +224,11 @@ use ieee.std_logic_unsigned.all;
 
 -- Pin-9 synchronizer and RC-filter emulation.
 --
+-- The counters are designed for a specific input clock frequency.
+--
 entity cv_ctrl_pin9 is
 port (
-   clk_i          : in  std_logic;
+   clk_i          : in  std_logic;  --  21.47727 (21.739) MHz
    clk_en_i       : in  std_logic;
    d_i            : in  std_logic;
    d_o            : out std_logic
@@ -232,9 +250,9 @@ architecture rtl of cv_ctrl_pin9 is
 
 begin
 
-   -- The pin-9 input is first passed through an RC-filter to slow down
-   -- the switch transitions.  The delay is ~400uS before the U24 NAND
-   -- sees a 0->1 transitions at ~1.0V.  The 1->0 transition takes ~140uS
+   -- The pin-9 input is first passed through an RC-filter to slow down the
+   -- controller switch input transitions.  The delay is ~400uS before the U24
+   -- NAND sees a 0->1 transition at ~1.0V.  The 1->0 transition takes ~140uS
    -- at ~1.2V.
    sync_x <= sync_r(2 downto 0) & d_i;
 
@@ -282,6 +300,102 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.std_logic_unsigned.all;
 
+
+-- Input change detection.
+--
+entity cv_ctrl_change_detect is
+port (
+   clk_i          : in  std_logic;  --  21.47727 (21.739) MHz
+   clk_en_i       : in  std_logic;  --  3.58MHz enable
+   reset_n_i      : in  std_logic;
+   d_i            : in  std_logic;
+   d_o            : out std_logic
+);
+end cv_ctrl_change_detect;
+
+architecture rtl of cv_ctrl_change_detect is
+
+   signal d_r, d_x                  : std_logic := '1'; -- default to floating high
+   signal d_last_r                  : std_logic := '0'; -- default to low
+   signal d_cnt_r, d_cnt_x          : unsigned(1 downto 0) := "00";
+   signal d_follow_s                : std_logic;
+
+begin
+
+   -- Any controller that does not use the quadrature inputs, i.e. the standard
+   -- CV controllers, will most likely leave inputs 7 and 9 disconnected.  This
+   -- is a problem for pin-9 since it ties directly to an R/C input filter and
+   -- then to the input of a NAND gate:
+   --
+   --                          ______
+   --                      1 --)12   \
+   -- pin-9 ----/\/\/\----+----)13  11)O--- 0
+   --             R19     |    ------/
+   --                    ---
+   --                    --- C17
+   --                     |
+   --                     V
+   --
+   -- When left disconnected, the input to the NAND gate will be floating, and
+   -- since it is a TTL input, it will float to a logic level of one.  This will
+   -- cause the output of the NAND gate to be low, and subsequently the input
+   -- D7-bit of the controller data byte will always be low (zero).
+   --
+   -- This creates two problems.
+   --
+   -- First, it is very difficult to emulate this floating-input behavior since
+   -- it is not possible to detect when a real controller is connected.  A real
+   -- connection to pin-9 could be high or low at any given time.
+   --
+   -- Second, some poorly written software includes bit-7 in its controller
+   -- status logic, and thus will not work correctly if bit-7 is other than 0,
+   -- which correlates to a high input on pin-13 of the NAND gate.  This also
+   -- means the poorly written software will not work correctly on a real CV
+   -- when a real SAC is connected!
+   --
+   -- The way detection is going to be done here is to watch the input for any
+   -- change, and if it does change, allow following of the input.  Otherwise,
+   -- the input will be treated as a logic high.
+   
+   d_follow_s <= d_cnt_r(1);
+   
+   -- Count changes to the input, clamp at 2 changes.
+   d_cnt_x <= d_cnt_r when d_last_r = d_i or d_follow_s = '1' else d_cnt_r + 1;
+
+   -- Follow the input or keep initial value.
+   d_x <= d_r when d_follow_s = '0' else d_i;
+
+   
+   process ( clk_i, clk_en_i )
+   begin
+   if rising_edge(clk_i) and clk_en_i = '1' then
+      
+      if reset_n_i = '0' then
+         d_r      <= '1';  -- reset to floating high
+         d_last_r <= '0';
+         d_cnt_r  <= "00";
+      else
+         d_r      <= d_x;
+         d_last_r <= d_i;
+         d_cnt_r  <= d_cnt_x;
+      end if;
+   
+   end if;
+   end process;
+
+   -- Output
+   d_o <= d_r;
+
+end rtl;
+
+
+-- Main CV controller circuit.
+--
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.std_logic_unsigned.all;
+
 -- CV Controller
 --
 entity cv_ctrl is
@@ -317,7 +431,8 @@ architecture rtl of cv_ctrl is
    signal p1_4_r,  p2_4_r              : std_logic := '0';
    signal p1_F_r,  p2_F_r              : std_logic := '0';
    signal p1_QB_r, p2_QB_r             : std_logic := '0';
-   signal p1_9_r,  p2_9_r              : std_logic := '0';
+   signal p1_9f_r, p2_9f_r             : std_logic := '0';
+   signal p1_9_r,  p2_9_r              : std_logic := '1'; -- default to floating
 
    -- Quadrature and interrupt
    signal p1_QA_s, p2_QA_s             : std_logic;
@@ -371,7 +486,8 @@ begin
    p1_4 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p4_i(1), p1_4_r);
    p1_6 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p6_i(1), p1_F_r);
    p1_7 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p7_i(1), p1_QB_r);
-   p1_9 : entity work.cv_ctrl_pin9 port map (clk_21m47_i, clk_en_3m58_i, ctrl_p9_i(1), p1_9_r);
+   p1_9 : entity work.cv_ctrl_pin9 port map (clk_21m47_i, clk_en_3m58_i, ctrl_p9_i(1), p1_9f_r);
+   p1_9cd : entity work.cv_ctrl_change_detect port map (clk_21m47_i, clk_en_3m58_i, reset_n_i, p1_9f_r, p1_9_r);
 
    p2_1 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p1_i(2), p2_1_r);
    p2_2 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p2_i(2), p2_2_r);
@@ -379,11 +495,13 @@ begin
    p2_4 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p4_i(2), p2_4_r);
    p2_6 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p6_i(2), p2_F_r);
    p2_7 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p7_i(2), p2_QB_r);
-   p2_9 : entity work.cv_ctrl_pin9 port map (clk_21m47_i, clk_en_3m58_i, ctrl_p9_i(2), p2_9_r);
+   p2_9 : entity work.cv_ctrl_pin9 port map (clk_21m47_i, clk_en_3m58_i, ctrl_p9_i(2), p2_9f_r);
+   p2_9cd : entity work.cv_ctrl_change_detect port map (clk_21m47_i, clk_en_3m58_i, reset_n_i, p2_9f_r, p2_9_r);
 
+   
    -- Create QA.
-   p1_QA_s <= not p1_9_r;
-   p2_QA_s <= not p2_9_r;
+   p1_QA_s <= p1_9_r nand p1_IF_r;
+   p2_QA_s <= p2_9_r nand p2_IF_r;
 
    -- Falling edge detect pin-9.
    p1_edge_s <= p1_QA_s and p1_9last_r;
@@ -405,7 +523,7 @@ begin
    -- Period for 3.58MHz is 279nS.  72 = 1001000
    intcnt_x <= "1001000" when cnt_load_s = '1' else intcnt_r - 1;
 
-   -- Per controller Interrupt Flag counter.
+   -- Per-controller Interrupt Flag counters.
    -- Count is 500uS / 279nS = 1792 = "111 0000 0000"
    -- The flag goes low when an interrupt is triggered.  In stick
    -- mode the duration is 550uS, in keypad mode it is 450uS, so just
@@ -431,14 +549,18 @@ begin
          p1_9last_r     <= '0';
          p2_9last_r     <= '0';
       else
+      
+         -- If the interrupt duration counter is enabled, count down or load.
          if cnt_en_n_s = '0' then
             intcnt_r <= intcnt_x;
          end if;
 
+         -- P1 interrupt flag counter.
          if p1_ifc_zero_s = '0' or p1_ifc_load_s = '1' then
             p1_ifc_cnt_r <= p1_ifc_cnt_x;
          end if;
 
+         -- P2 interrupt flag counter.
          if p2_ifc_zero_s = '0' or p2_ifc_load_s = '1' then
             p2_ifc_cnt_r <= p2_ifc_cnt_x;
          end if;
@@ -454,11 +576,25 @@ begin
    end process;
 
    -- Controller Input Data Byte
-   -- -------------------------------
+   -- ===============================
    --  7   6   5   4   3   2   1   0   bit
-   --  QA  FL  QB  IF  L   D   R   U   stick
-   --  !QA FR  Hi  IF  P3  P2  P4  P1  keypad
-   --  -   6   7   -   3   2   4   1   DB9 pin
+   --  ------------------------------
+   --  0   FL  1   1   L   D   R   U   stick   \ Standard
+   --  0   FR  1   1   P3  P2  P4  P1  keypad  / Controller
+   --  ------------------------------
+   --  QA  FL  QB  IF  L   D   R   U   stick   \ Super Action
+   --  !QA FR  1   IF  P3  P2  P4  P1  keypad  / Controller
+   --  ------------------------------
+   --  x   6   7   x   3   2   4   1   DB9 pin controlling the input bit
+   --
+   -- Input bits 7 and 4 are derived from other circuitry and not directly from
+   -- controller inputs.
+   --
+   -- QA - quadrature A
+   -- QB - quadrature B
+   -- FL - left fire button
+   -- FR - right fire button
+   -- IF - interrupt flag
 
    -- Output
    -- A1=0 read controller 1, A1=1 read controller 2

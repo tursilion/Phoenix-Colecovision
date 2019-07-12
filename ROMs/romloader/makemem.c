@@ -1,5 +1,9 @@
 /**
+ * Unix/MinGW:
  * gcc -Wall -o makemem makemem.c
+ *
+ * Vistual Studio:
+ * cl /W4 makemem.c
  *
  */
 #include <stdio.h>              // printf
