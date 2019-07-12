@@ -52,7 +52,7 @@ entity sn76489_attenuator is
 
   port (
     attenuation_i : in  std_logic_vector(0 to 3);
-    factor_i      : in  signed(0 to 1);
+    factor_i      : in  std_logic;
     product_o     : out signed(0 to 7)
   );
 
@@ -98,14 +98,14 @@ begin
 
     -- this replaces a multiplier and consumes a bit fewer
     -- resources
-    case to_integer(factor_i) is
-      when +1 =>
+--  product_o <= volume_v when factor_i = '1'
+--          else (others => '0');
+
+	 if factor_i = '1' then
         product_o <= volume_v;
-      when -1 =>
-        product_o <= -volume_v;
-      when others =>
+      else 
         product_o <= (others => '0');
-    end case;
+    end if;
 
   end process attenuate;
   --

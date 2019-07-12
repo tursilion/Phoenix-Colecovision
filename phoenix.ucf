@@ -9,7 +9,7 @@ NET "clock_50_i"        LOC="V10" | IOSTANDARD = LVCMOS33;
 
 # Buttons
 #
-NET "btn_reset_n_i"		LOC="B2"  | IOSTANDARD = LVCMOS33; # Ext pullup, 10mS reset
+NET "btn_reset_n_i"		LOC="B2"  | IOSTANDARD = LVCMOS33; # Ext pullup, 10ms reset
 
 
 # External expansion port
@@ -53,7 +53,7 @@ NET "hdmi_n_o<3>"       LOC="V5"  | IOSTANDARD = TMDS_33;
 NET "hdmi_p_o<3>"       LOC="U5"  | IOSTANDARD = TMDS_33;
 
 
-# SRAM
+# SRAM, 512Kx8, 10ns
 #
 NET "sram_addr_o<0>"    LOC="U18" | IOSTANDARD = LVCMOS33;
 NET "sram_addr_o<1>"    LOC="U17" | IOSTANDARD = LVCMOS33;
@@ -74,8 +74,6 @@ NET "sram_addr_o<15>"   LOC="E18" | IOSTANDARD = LVCMOS33;
 NET "sram_addr_o<16>"   LOC="D17" | IOSTANDARD = LVCMOS33;
 NET "sram_addr_o<17>"   LOC="D18" | IOSTANDARD = LVCMOS33;
 NET "sram_addr_o<18>"   LOC="C17" | IOSTANDARD = LVCMOS33;
-NET "sram_addr_o<19>"   LOC="K18" | IOSTANDARD = LVCMOS33;
-NET "sram_addr_o<20>"   LOC="C18" | IOSTANDARD = LVCMOS33;
 
 NET "sram_data_io<0>"   LOC="P18" | IOSTANDARD = LVCMOS33;
 NET "sram_data_io<1>"   LOC="P17" | IOSTANDARD = LVCMOS33;
@@ -93,9 +91,9 @@ NET "sram_we_n_o"       LOC="M18" | IOSTANDARD = LVCMOS33;
 
 # SD/MMC
 #
-NET "sd_cs_n_o"         LOC="C5"  | IOSTANDARD = LVCMOS33 | DRIVE = 8;
-NET "sd_sclk_o"         LOC="B6"  | IOSTANDARD = LVCMOS33 | DRIVE = 8;
-NET "sd_mosi_o"         LOC="A5"  | IOSTANDARD = LVCMOS33 | DRIVE = 8;
+NET "sd_cs_n_o"         LOC="C5"  | IOSTANDARD = LVCMOS33 | PULLUP;
+NET "sd_sclk_o"         LOC="B6"  | IOSTANDARD = LVCMOS33 | PULLUP;
+NET "sd_mosi_o"         LOC="A5"  | IOSTANDARD = LVCMOS33 | PULLUP;
 NET "sd_miso_i"         LOC="A6"  | IOSTANDARD = LVCMOS33; # Ext pullup
 #Missing on board require jumper to D14 LED
 NET "sd_cd_n_i"			LOC="C6"  | IOSTANDARD = LVCMOS33; # Ext pullup
@@ -164,14 +162,14 @@ NET "cart_addr_o<12>"   LOC="L2"  | IOSTANDARD = LVCMOS33;
 NET "cart_addr_o<13>"   LOC="J1"  | IOSTANDARD = LVCMOS33;
 NET "cart_addr_o<14>"   LOC="K3"  | IOSTANDARD = LVCMOS33;
 
-NET "cart_data_i<0>"    LOC="D2"  | IOSTANDARD = LVCMOS33;
-NET "cart_data_i<1>"    LOC="C2"  | IOSTANDARD = LVCMOS33;
-NET "cart_data_i<2>"    LOC="E4"  | IOSTANDARD = LVCMOS33;
-NET "cart_data_i<3>"    LOC="C1"  | IOSTANDARD = LVCMOS33;
-NET "cart_data_i<4>"    LOC="D1"  | IOSTANDARD = LVCMOS33;
-NET "cart_data_i<5>"    LOC="E1"  | IOSTANDARD = LVCMOS33;
-NET "cart_data_i<6>"    LOC="F2"  | IOSTANDARD = LVCMOS33;
-NET "cart_data_i<7>"    LOC="G3"  | IOSTANDARD = LVCMOS33;
+NET "cart_data_io<0>"   LOC="D2"  | IOSTANDARD = LVCMOS33;
+NET "cart_data_io<1>"   LOC="C2"  | IOSTANDARD = LVCMOS33;
+NET "cart_data_io<2>"   LOC="E4"  | IOSTANDARD = LVCMOS33;
+NET "cart_data_io<3>"   LOC="C1"  | IOSTANDARD = LVCMOS33;
+NET "cart_data_io<4>"   LOC="D1"  | IOSTANDARD = LVCMOS33;
+NET "cart_data_io<5>"   LOC="E1"  | IOSTANDARD = LVCMOS33;
+NET "cart_data_io<6>"   LOC="F2"  | IOSTANDARD = LVCMOS33;
+NET "cart_data_io<7>"   LOC="G3"  | IOSTANDARD = LVCMOS33;
 
 //NET "cart_dir_o"        LOC="N1"  | IOSTANDARD = LVCMOS33 | PULLUP; #rev4 PCB
 NET "cart_dir_o"        LOC="N1"  | IOSTANDARD = LVCMOS33; #Rev6 PCB
@@ -203,8 +201,8 @@ TIMESPEC TS_clock_50_i = PERIOD "clock_50_i" 20 ns HIGH 50%;
 NET "clock_master_s" KEEP | TNM_NET = clock_master_s;
 TIMESPEC TS_clock_master_s = PERIOD "clock_master_s" 46.560 ns HIGH 50%;
 
-NET "clock_mem_s" KEEP | TNM_NET = clock_mem_s;
-TIMESPEC TS_clock_mem_s = PERIOD "clock_mem_s" 23.280 ns HIGH 50%;
+#NET "clock_mem_s" KEEP | TNM_NET = clock_mem_s;
+#TIMESPEC TS_clock_mem_s = PERIOD "clock_mem_s" 23.280 ns HIGH 50%;
 
 NET "clk_25m0_s" KEEP | TNM_NET = clk_25m0_s;
 TIMESPEC TS_clk_25m0_s = PERIOD "clk_25m0_s" 40 ns HIGH 50%; //25MHz

@@ -368,7 +368,6 @@ begin
    inst_vga_cont : entity work.f18a_vga_cont_640_60
    port map (
       vga_clk        => clk_25m0_i,
-      rst_n          => reset_n_r,
       hsync          => hsync_s,
       vsync          => vsync_s,
       raster_x       => raster_x_s,
@@ -384,7 +383,6 @@ begin
    port map (
       clk            => clk_100m0_i,
       vga_clk        => clk_25m0_i,
-      rst_n          => reset_n_r,
       raster_x       => raster_x_s,
       raster_y       => raster_y_s,
       y_tick         => y_tick_s,

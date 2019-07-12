@@ -53,7 +53,6 @@ use ieee.numeric_std.all;
 entity f18a_vga_cont_640_60 is
    port(
       vga_clk  : in std_logic;
-      rst_n    : in std_logic;
       hsync    : out std_logic;
       vsync    : out std_logic;
       raster_x : out unsigned(0 to 9);
@@ -118,15 +117,11 @@ begin
    h_count: process (vga_clk)
    begin
       if rising_edge(vga_clk) then
-      if rst_n = '0' then
-         hcounter <= (others => '0');
-      else
          if hcounter = HMAX then
             hcounter <= (others => '0');
          else
             hcounter <= hcounter + 1;
          end if;
-      end if;
       end if;
    end process h_count;
 
@@ -135,9 +130,6 @@ begin
    v_count: process (vga_clk)
    begin
       if rising_edge(vga_clk) then
-      if rst_n = '0' then
-         vcounter <= (others => '0');
-      else
          if hcounter = HMAX then
             if vcounter = VMAX then
                vcounter <= (others => '0');
@@ -145,7 +137,6 @@ begin
                vcounter <= vcounter + 1;
             end if;
          end if;
-      end if;
       end if;
    end process v_count;
 
