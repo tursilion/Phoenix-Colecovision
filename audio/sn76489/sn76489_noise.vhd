@@ -274,7 +274,7 @@ begin
   attenuator_b : entity work.sn76489_attenuator
     port map (
       attenuation_i => a_q,
-      factor_i      => freq_s,
+      factor_i      => freq_ff_q,
       product_o     => noise_o
     );
 

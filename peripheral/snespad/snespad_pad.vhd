@@ -78,21 +78,21 @@ entity snespad_pad is
     but_down_o      : out std_logic;
     but_left_o      : out std_logic;
     but_right_o     : out std_logic;
-	 but_0_o    	  : out std_logic;
-	 but_1_o    	  : out std_logic;
-    but_2_o    	  : out std_logic;
-    but_3_o    	  : out std_logic;
-    but_4_o    	  : out std_logic;
-    but_5_o    	  : out std_logic;
-    but_6_o    	  : out std_logic;
-    but_7_o    	  : out std_logic;
-    but_8_o    	  : out std_logic;
-    but_9_o    	  : out std_logic;
+    but_0_o         : out std_logic;
+    but_1_o         : out std_logic;
+    but_2_o         : out std_logic;
+    but_3_o         : out std_logic;
+    but_4_o         : out std_logic;
+    but_5_o         : out std_logic;
+    but_6_o         : out std_logic;
+    but_7_o         : out std_logic;
+    but_8_o         : out std_logic;
+    but_9_o         : out std_logic;
     but_star_o      : out std_logic;
-    but_num_o    	  : out std_logic;
-    but_dot_o    	  : out std_logic;
+    but_num_o       : out std_logic;
+    but_dot_o       : out std_logic;
     but_clear_o     : out std_logic;
-    but_equal_o	  : out std_logic
+    but_equal_o     : out std_logic
   );
 
 end snespad_pad;
@@ -120,21 +120,22 @@ begin
     severity failure;
   -- pragma translate_on
 
-  seq: process (reset_i, clk_i)
+  seq: process (clk_i)
   begin
+  if rising_edge(clk_i) then
     if reset_i = reset_level_g then
       for i in buttons_t'range loop
         buttons_q(i)       <= button_reset_f(button_level_g);
         shift_buttons_q(i) <= button_reset_f(button_level_g);
       end loop;
 
-    elsif clk_i'event and clk_i = '1' then
+    else
       if save_buttons_i then
         if shift_buttons_q(but_pos_bit2_c) = 1 and shift_buttons_q(but_pos_bit3_c) = 0 then
-		    buttons_q(31 downto 16) <= shift_buttons_q(15 downto 0);
-		  else
-		    buttons_q <= shift_buttons_q;
-		  end if;
+          buttons_q(31 downto 16) <= shift_buttons_q(15 downto 0);
+        else
+          buttons_q <= shift_buttons_q;
+        end if;
       end if;
 
       if clk_en_i and shift_buttons_i then
@@ -143,6 +144,7 @@ begin
       end if;
 
     end if;
+  end if;
   end process;
 
 

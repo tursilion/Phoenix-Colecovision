@@ -58,7 +58,6 @@ entity f18a_counters is
    port (
       clk            : in std_logic;
       vga_clk        : in std_logic;
-      rst_n          : in std_logic;            -- reset active low
       raster_x       : in unsigned(0 to 9);
       raster_y       : in unsigned(0 to 9);
       y_tick         : in std_logic;

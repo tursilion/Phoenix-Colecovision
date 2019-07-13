@@ -71,7 +71,7 @@ architecture rtl of sn76489_tone is
   signal freq_cnt_q : unsigned(0 to 9);
   signal freq_ff_q  : std_logic;
 
-  signal freq_s     : signed(0 to 1);
+  --signal freq_s     : signed(0 to 1);
 
   function all_zero(a : in std_logic_vector) return boolean is
     variable result_v : boolean;
@@ -165,9 +165,9 @@ begin
   -----------------------------------------------------------------------------
   -- Map frequency flip-flop to signed value for attenuator.
   -----------------------------------------------------------------------------
-  freq_s <=   to_signed(+1, 2)
-            when freq_ff_q = '1' else
-              to_signed(-1, 2);
+  --freq_s <=   to_signed(+1, 2)
+  --          when freq_ff_q = '1' else
+  --            to_signed(-1, 2);
 
 
   -----------------------------------------------------------------------------
@@ -176,7 +176,7 @@ begin
   attenuator_b : entity work.sn76489_attenuator
     port map (
       attenuation_i => a_q,
-      factor_i      => freq_s,
+      factor_i      => freq_ff_q,
       product_o     => tone_o
     );
 
