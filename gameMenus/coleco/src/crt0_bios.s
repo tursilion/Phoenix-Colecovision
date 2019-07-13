@@ -143,12 +143,17 @@ _memcpy::
     add hl,sp
     ld sp,hl    ; stack ponts at dest
 
-    pop de
-    pop hl
-    pop bc
+    pop de      ; get dest
+    pop hl      ; get src
+    pop bc      ; get count
+
+    ld a,c      ; check count for zero
+    or a,b
+    jr Z,$mcp1
 
 	ldir
 
+$mcp1:
     ld hl,#-8
     add hl,sp
     ld sp,hl
@@ -166,50 +171,50 @@ _memset::
 
 ;:7: unsigned char *work = buf;
     pop hl          ; hl = pointer
-    pop bc          ; c = ch
-    pop de          ; de = count
+    pop de          ; e = ch
+    pop bc          ; bc = count
 
 ;:9: while (cnt&0x03) {
 $0001:
-	ld	a,e
+	ld	a,c
 	and	a, #0x03
 	jr	Z,$0013
 
 ;:10: *(work++) = ch;
-	ld	(hl),c
+	ld	(hl),e
 	inc	hl
 
 ;:11: --cnt;
-	dec	de
+	dec	bc
 	jr	$0001
 
 ;:14: while (cnt) {
 $0013:
 $0004:
-	ld	a,d
-	or	a,e
+	ld	a,b
+	or	a,c
 	jr	Z,$0006
 
 ;:15: *(work++) = ch;
 ;:16: *(work++) = ch;
 ;:17: *(work++) = ch;
 ;:18: *(work++) = ch;
-	ld	(hl),c
+	ld	(hl),e
 	inc	hl
-	ld	(hl),c
+	ld	(hl),e
 	inc	hl
-	ld	(hl),c
+	ld	(hl),e
 	inc	hl
-	ld	(hl),c
+	ld	(hl),e
 	inc	hl
 
 ;:19: cnt -= 4;
-	ld	a,e
+	ld	a,c
 	add	a,#0xFC
-	ld	e,a
-	ld	a,d
+	ld	c,a
+	ld	a,b
 	adc	a,#0xFF
-	ld	d,a
+	ld	b,a
 	jr	$0004
 
 $0006:
@@ -233,18 +238,13 @@ _memmove::
     add hl,sp
     ld sp,hl    ; stack points at dest
 
-;   count       8
-;   src         6
-;   dest        4
-;   return      2
-;   push    ix  0
-;	push	af  -2
-;	push	af  -4
-;   dec	    sp  -6
-
     pop de       ; dest in de
     pop hl       ; src in hl
     pop bc       ; count in bc
+
+    ld a,c       ; test bc for zero
+    or a,b
+    jp Z,00109$
 
 ;:46: if (((int)src < (int)dst) && ((((int)src) + cnt) > (int)dst))
 	ld	a,l
