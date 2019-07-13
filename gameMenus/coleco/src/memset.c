@@ -1,19 +1,31 @@
 // string functions
+// These are all in crt0.s now
 
-void *memset (void *buf, unsigned char ch, int cnt) 
+#if 0
+void *memset(void *buf, unsigned int ch, unsigned int cnt) 
 {
-    unsigned char *ret = buf;
+    unsigned char *work = buf;
 
-    while (cnt--) {
-        *(ret++) = ch;
+    while (cnt&0x03) {
+        *(work++) = ch;
+        --cnt;
+    }
+
+    while (cnt) {
+        *(work++) = ch;
+        *(work++) = ch;
+        *(work++) = ch;
+        *(work++) = ch;
+        cnt -= 4;
     }
 
     return buf ;
 }
+#endif
 
 #if 0
 // using asm memcpy which is in crt0.s
-void *memcpy (void *dst, void *src, int cnt) 
+void *memcpy (void *dst, void *src, unsigned int cnt) 
 {
     char *d = dst;
     char *s = src;
@@ -26,7 +38,8 @@ void *memcpy (void *dst, void *src, int cnt)
 }
 #endif
 
-void *memmove (void *dst, void *src, int cnt) 
+#if 0
+void *memmove (void *dst, void *src, unsigned int cnt) 
 {
     char *d;
     char *s;
@@ -50,3 +63,4 @@ void *memmove (void *dst, void *src, int cnt)
 
     return dst;
 }
+#endif

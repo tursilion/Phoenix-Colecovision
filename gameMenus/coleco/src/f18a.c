@@ -7,6 +7,14 @@
 extern void vdpmemcpyfast(int pAddr, const unsigned char *pSrc, int cnt);
 #define vdpmemcpy vdpmemcpyfast
 
+// configuration so we can force it after a reset
+// NOTE: This is NOT a flag, it's written directly to register >32
+// We need this cause of our text-attribute-mode menu. So write bit >04
+// to enable the scanlines. Kind of hacky and badly named but I need the ROM space.
+unsigned char useScanlines = 0;     // takes in real time but we need it after a reset
+// stored in phoenixBoot.c - whether to allow 4 sprite flicker or not
+extern unsigned char useFlicker;
+
 // default F18 palette values
 const unsigned int DEFAULT_PALETTE[] = {
 	0x0000,0x0000,0x02C3,0x05D6,0x054F,0x076F,0x0D54,0x04EF,
@@ -55,8 +63,17 @@ void reset_f18a() {
 	// reset the status register to 0
 	VDP_SET_REGISTER(0x0f, 00);	// V15 = 0 - read SR0 again
 
-    // reset the sprite flicker count to 4
-    VDP_SET_REGISTER(0x33, 4); // stop sprite is #4
+    // reset the sprite flicker count to whatever is set
+    if (useFlicker) {
+        VDP_SET_REGISTER(0x1e, 4); // stop sprite is #4
+    } else {
+        VDP_SET_REGISTER(0x1e, 32); // stop sprite is #32
+    }
+
+    // update the scanlines setting (we default to off no matter the existing default right now)
+    // TODO: scanline setting expected to move to the core select menu, so we can remove all this
+    // code that touches useScanlines at that point.
+    VDP_SET_REGISTER(0x32, useScanlines);
 
 	// wait for an interrupt (or, if VDPST2 is active, RUNNING to clear)
 	while (VDPST & 0x80) {

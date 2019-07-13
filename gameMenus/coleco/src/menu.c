@@ -23,6 +23,9 @@
 extern void vdpmemcpyfast(int pAddr, const unsigned char *pSrc, int cnt);
 #define vdpmemcpy vdpmemcpyfast
 
+// kscan wrapper
+extern void readkeypad(unsigned char unit);
+
 // foldername to search for - MUST be uppercase, no numbers or punctuation
 const unsigned char FolderName[] = "COLECO";
 const unsigned char FolderNameLen = 7;      // include the terminating NUL
@@ -90,13 +93,6 @@ extern void textout(unsigned int vdp, const char *p);
 extern void textouthalf(unsigned int vdp, const char *p);
 void centerString(unsigned char line, char *p);
 
-#if 1
-// debugger
-extern void debug(const char *p);
-#else
-#define debug(x)
-#endif
-
 // File structures
 FATFS fatFs;
 FIL fil;
@@ -106,6 +102,12 @@ FILINFO finfo;
 // is only per filename part...
 char path[512];
 char path2[512];    // temporary ram for the load, since we can afford it... (size assumed by copypage() )
+
+// options - mostly a temporary hack until the core menu is in place 
+// - stored in the F18A code
+extern unsigned char useScanlines;     // takes in real time but we need it after a reset
+// - stored in the phoenixBoot code 
+extern unsigned char useFlicker;       // can't enable this until we start a cartridge
 
 // the thin lowercase m doesn't work, so this is a manual replacement
 const unsigned char thinm[8] = {
@@ -191,20 +193,20 @@ void mystrcpy(char *pDest, char *pSrc) {
 
 void waitBothFireClear() {
     for (;;) {
-        kscanfast(1);
+        readkeypad(1);
         if (KSCAN_KEY == 0xff) break;
     }
     for (;;) {
-        kscanfast(2);
+        readkeypad(2);
         if (KSCAN_KEY == 0xff) break;
     }
 }
 
 void waitAnyFirePressed() {
     for (;;) {
-        kscanfast(1);
+        readkeypad(1);
         if (KSCAN_KEY != 0xff) break;
-        kscanfast(2);
+        readkeypad(2);
         if (KSCAN_KEY != 0xff) break;
     }
 }
@@ -223,7 +225,7 @@ void handleBlanking(unsigned char mode) {
         joystfast(2);
         if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
                     
-        kscanfast(0);
+        readkeypad(0);
         if (KSCAN_KEY != 0xff) break;
 
         // even SD insert or remove - no need to sleep here
@@ -242,9 +244,15 @@ void displayErrorString(char *pstr, unsigned char x) {
     centerString(1, "Press fire...");
 
     // write the code 'x' to top left
-    VDP_SET_ADDRESS_WRITE(GIMAGE + 38);
-    VDPWD = hex[(x>>4)];
-    VDPWD = hex[(x&0xf)];
+    if (firstDir) {
+        VDP_SET_ADDRESS_WRITE(GIMAGE + 30);
+        VDPWD = x>>4;
+        VDPWD = x&0x0f;
+    } else {
+        VDP_SET_ADDRESS_WRITE(GIMAGE + 38);
+        VDPWD = hex[(x>>4)];
+        VDPWD = hex[(x&0xf)];
+    }
 
     // make sure both fires are released
     waitBothFireClear();
@@ -307,8 +315,6 @@ repeatDir:
     //      Filename[127]
     //      Byte for directory flag
     if (FR_OK == f_opendir(&dir, path)) {
-        debug(path);
-
         // this string could be corrupted if we reopen a smaller pathname, but
         // the only case we should ever redraw this is going from "/" to "/Coleco"
         centerString(1, path);
@@ -357,7 +363,6 @@ repeatDir:
             // we can go up to 0xffff, but if we wrap around we're done
             // to be paranoid for now, I'm going to stop at 254
             if (lastFilename >= (unsigned char*)0xff80) {
-                debug("Out of RAM to store filenames");
                 displayErrorString("Max directory count reached", (unsigned char)(((unsigned int)lastFilename-0x8000)>>7));
                 break;
             }
@@ -448,8 +453,7 @@ void sortDir() {
     // Hooray for lots of RAM all of a sudden!
     // Since we are building the sort from scratch, we can
     // use a per-element insertion rather than worrying about
-    // being fancy. Fast Z80 moves SHOULD be inserted by SDCC
-    // for the memmove calls.
+    // being fancy.
     // Extra rules: directories before non-directories
     unsigned char *ptr = (unsigned char*)0x8000;
     listSize = 0;
@@ -656,11 +660,8 @@ unsigned char loadMegacartRom(unsigned char fsize) {
     // we have to skip the first 32k and hope for the best.
     ofs = 0;
     if (fsize == 32) {
-        debug("skipping 32k");
         ofs = (unsigned int)32*1024;
         fsize-=2;
-    } else {
-        debug("No skip");
     }
 
     // calculate the first page - pages are 32k each so divide by 2
@@ -725,18 +726,15 @@ unsigned char loadMegacartRom(unsigned char fsize) {
     // The copy isn't quite as awesome as I'd like due to paging...
     switch (page-CART_FIRST_PAGE) {
         case 1: 
-            debug("Megacart size 1"); 
             copyPage(CART_FIRST_PAGE, CART_FIRST_PAGE+1);
             // fall through
 
         case 2: 
-            debug("Megacart size 2"); 
             copyPage(CART_FIRST_PAGE, CART_FIRST_PAGE+2);
             copyPage(CART_FIRST_PAGE+1, CART_FIRST_PAGE+3);
             // fall through
 
         case 4: 
-            debug("Megacart size 4");
             copyPage(CART_FIRST_PAGE, CART_FIRST_PAGE+4);
             copyPage(CART_FIRST_PAGE+1, CART_FIRST_PAGE+5);
             copyPage(CART_FIRST_PAGE+2, CART_FIRST_PAGE+6);
@@ -938,7 +936,7 @@ char getUserSelection() {
             }
 
             // check fire button
-            kscanfast(j);
+            readkeypad(j);
             if (KSCAN_KEY != 0xff) {
                 return 1;   // selected
             }
@@ -1041,7 +1039,8 @@ dirLoop:
         vdpmemcpy(0x0800+29*8, FATFONT, 94*8);
 
         // set up for per-character attributes (the color table is now a per-character color in text mode)
-        VDP_SET_REGISTER(50,0x02);
+        useScanlines |= 0x02;
+        VDP_SET_REGISTER(50,useScanlines);
 
         // background color to match the color scheme
         VDP_SET_REGISTER(7, COLORBG);
@@ -1183,7 +1182,6 @@ drawLoop:
         }
 
         // all right, we have a full path, try to open it
-        debug(path2);
         clrscrbottom();
         centerString(0, "checking...");
 
@@ -1225,7 +1223,6 @@ drawLoop:
             ofs = fsize - 1;    // get the size in blocks, minus 1
             ofs <<= 14;         // times 16384 for offset
             if (FR_OK != f_lseek(&fil, ofs)) {
-                debug("Seek failed - disk error");
                 f_close(&fil);
                 displayErrorString("Failed to identify file.", res);
                 phRAMBankSelect = DIRECTORY_PAGE;

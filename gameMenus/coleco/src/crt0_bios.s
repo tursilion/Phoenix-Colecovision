@@ -130,18 +130,18 @@ clrup:
 	pop af
 	retn
 
-; void *memcpy(void *dest, const void *source, int count)
+;------------------------------------
+; Some basic string functions, here cause
+; it is already an asm file...
+;------------------------------------
+
+; void *memcpy(void *dest, const void *source, unsigned int count)
 ; stack has return, dest, src, count
 ; for LDIR, we need destination in DE, src in HL, and count in BC
 _memcpy::
-; be nice and save regs
-    push hl
-    push bc
-    push de
-
-    ld hl,#8
+    ld hl,#2
     add hl,sp
-    ld sp,hl
+    ld sp,hl    ; stack ponts at dest
 
     pop de
     pop hl
@@ -149,14 +149,171 @@ _memcpy::
 
 	ldir
 
-    ld hl,#-14
+    ld hl,#-8
     add hl,sp
     ld sp,hl
 
-    pop de
-	pop	bc
-	pop	hl
 	ret
+
+;-------------------------------------------------
+
+; void *memset(void *dest, unsigned int val, unsigned int count)
+; stack has return, dest, val, count
+_memset::
+    ld hl,#2
+    add hl,sp
+    ld sp,hl    ; stack points at dest
+
+;:7: unsigned char *work = buf;
+    pop hl          ; hl = pointer
+    pop bc          ; c = ch
+    pop de          ; de = count
+
+;:9: while (cnt&0x03) {
+$0001:
+	ld	a,e
+	and	a, #0x03
+	jr	Z,$0013
+
+;:10: *(work++) = ch;
+	ld	(hl),c
+	inc	hl
+
+;:11: --cnt;
+	dec	de
+	jr	$0001
+
+;:14: while (cnt) {
+$0013:
+$0004:
+	ld	a,d
+	or	a,e
+	jr	Z,$0006
+
+;:15: *(work++) = ch;
+;:16: *(work++) = ch;
+;:17: *(work++) = ch;
+;:18: *(work++) = ch;
+	ld	(hl),c
+	inc	hl
+	ld	(hl),c
+	inc	hl
+	ld	(hl),c
+	inc	hl
+	ld	(hl),c
+	inc	hl
+
+;:19: cnt -= 4;
+	ld	a,e
+	add	a,#0xFC
+	ld	e,a
+	ld	a,d
+	adc	a,#0xFF
+	ld	d,a
+	jr	$0004
+
+$0006:
+;:22: return buf ;
+;	ld	l,4 (ix)
+;	ld	h,5 (ix)
+
+    ld hl,#-8
+    add hl,sp
+    ld sp,hl
+
+	ret
+
+;-------------------------------------------------
+
+; void *memmove(void *dest, void *src, unsigned int count)
+; stack has return, dest, src, count
+; for LDIR/LDDR, we need destination in DE, src in HL, and count in BC
+_memmove::
+    ld hl,#2
+    add hl,sp
+    ld sp,hl    ; stack points at dest
+
+;   count       8
+;   src         6
+;   dest        4
+;   return      2
+;   push    ix  0
+;	push	af  -2
+;	push	af  -4
+;   dec	    sp  -6
+
+    pop de       ; dest in de
+    pop hl       ; src in hl
+    pop bc       ; count in bc
+
+;:46: if (((int)src < (int)dst) && ((((int)src) + cnt) > (int)dst))
+	ld	a,l
+	sub	a,e
+	ld	a,h
+	sbc	a,d
+	jp	PO, 00139$  ; src-dest, jump if overflow (ie: src is greater)
+	xor	a, #0x80
+00139$:
+	jp	P,00108$    ; change/check sign, jump if became positive... was negative (ie: not zero)
+
+	push hl         ; this will overwrite count, bc is our only copy!
+    ld	a,c
+	add	a,l
+	ld	l,a
+	ld	a,b
+	adc	a,h
+	ld	h,a         ; src=src+cnt
+
+	ld	a,e
+	sub	a,l
+	ld	a,d
+	sbc	a,h         ; src-dest, jump if no carry (ie: dest is greater)
+	jr	NC,00108$
+
+; decrementing, memmove case
+;:49: d = ((char *)dst) + cnt - 1;
+; need to add bc and decrement de
+    ld a,c
+    add a,e
+    ld e,a
+    ld a,b
+    adc a,d
+    ld d,a          ; dest = dest + cnt
+	dec	de
+
+;:50: s = ((char *)src) + cnt - 1;
+; src (hl) just needs the -1 now...
+	dec	hl
+
+;:51: while (cnt--) {
+;:52: *d-- = *s--;
+    lddr
+    pop hl          ; just to clean up the stack
+	jr	00109$
+
+; Incrementing - memcpy case
+00108$:
+;:56: d = dst;
+;:57: s = src;
+    pop hl          ; get original source address back
+
+;:58: while (cnt--) {
+;:59: *d++ = *s++;
+    ldir
+
+; exit
+00109$:
+;:63: return dst;
+;	ld	l,4 (ix)
+;	ld	h,5 (ix)
+	
+    ld hl,#-8
+    add hl,sp
+    ld sp,hl
+
+	ret
+
+;-------------------------------------------------
 
 	.area _GSINIT
 gsinit::

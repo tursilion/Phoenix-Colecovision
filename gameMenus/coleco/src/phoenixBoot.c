@@ -23,10 +23,17 @@
 unsigned char f18a;
 // cartridge string (we format it into here)
 char copyright[65];
+// screen line buffer
+unsigned char lineBuffer[40];
 
 // fast memcpy, since we don't need delays on the F18A
 extern void vdpmemcpyfast(int pAddr, const unsigned char *pSrc, int cnt);
 #define vdpmemcpy vdpmemcpyfast
+
+// - stored in the F18A code - actual value of the 0x32 register (so it changes in text mode)
+extern unsigned char useScanlines;     // takes in real time but we need it after a reset
+// 
+unsigned char useFlicker;       // can't enable this until we start a cartridge
 
 // menu function
 extern void menu();
@@ -75,18 +82,6 @@ static volatile __sfr __at 0xc0 port3;  // joystick reset strobe
 // This doesn't optimize correctly (it's always a calculated lookup), so just use a macro
 //static volatile unsigned char * const pRom = (volatile unsigned char * const)0;	// access to memory
 #define pRom(x) *((volatile unsigned char*)(x))
-
-// debugger output for Classic99
-volatile __sfr __at 0x00 debugPort;
-// a full string MUST be written to be output
-void debug(const char *p) {
-#if 1
-    while (*p >= ' ') {
-        debugPort = *(p++);
-    }
-    debugPort=0;
-#endif
-}
 
 // setting up standard screen modes - blanks the screen and returns the unblank command
 // interrupts are also disabled. Unblank will re-enable them, too, write it to VDP_REG_MODE1
@@ -170,6 +165,43 @@ void waitVblanks(unsigned char cnt) {
     	VDP_WAIT_VBLANK_CRU;
     	VDP_CLEAR_VBLANK;
     }
+}
+
+// wrapper for kscan that knows about our hot config keys
+// this allows them to work at pretty much any time automatically
+void readkeypad(unsigned char unit) {
+    static unsigned char lastret = 0xff;
+    unsigned char ret;
+    
+    kscanfast(unit);
+    ret = KSCAN_KEY;
+
+    // check only when changed
+    if (lastret != ret) {
+        lastret = ret;
+        if (unit == '*') {
+            // toggle scanlines - this is pretty obvious so no feedback needed
+            useScanlines ^= SCANLINES_ON;
+            VDP_SET_REGISTER(0x32, useScanlines);
+        } else if (unit == '#') {
+            // toggle sprite flicker
+            // sure, NOW I want a popup window...
+            useFlicker = !useFlicker;
+            // I don't like this, but this is the simplest way to do the notification...
+            vdpmemread(GIMAGE+23*40, lineBuffer, 40);
+            vdpmemset(GIMAGE+23*40, ' ', 40);
+            if (useFlicker) {
+                vdpmemcpy(GIMAGE+23*40+5, "SPRITE FLICKER ENABLED", 7);
+            } else {
+                vdpmemcpy(GIMAGE+23*40+5, "SPRITE FLICKER DISABLED", 7);
+            }
+            waitVblanks(60);
+            vdpmemcpy(GIMAGE+23*40, lineBuffer, 40);
+        }
+    }
+
+    // don't let keypad presses escape this function
+    if (ret != 18) KSCAN_KEY=0xff;
 }
 
 // text out to the sprite layer at the bottom of the screen
@@ -309,6 +341,7 @@ void startTitle() {
     VDP_SET_REGISTER(VDP_REG_MODE1, VDP_MODE1_16K);
 
     // -    reset F18A
+    useScanlines &= SCANLINES_ON;  // turn off every bit except scanline selection
     reset_f18a();
     lock_f18a();
 
@@ -736,7 +769,7 @@ void runCartHeader(void (*mycenter)(unsigned char, char*)) {
     // - wait 5 seconds, allow abort
     cntdown = 300;
     while (cntdown-- > 0) {
-        kscanfast(1);   // read left joystick fire button
+        readkeypad(1);   // read left joystick fire button
         if (KSCAN_KEY == JOY_FIRE) break;
         waitVblanks(1);
     }
@@ -775,7 +808,7 @@ int main() {
     // then test if the F18A is actually present - it should be!!
     f18a = test_f18a();
     // ask the F18A to turn off the sprite limit
-    VDP_SET_REGISTER(0x33, 32); // stop sprite is #32
+    VDP_SET_REGISTER(0x1e, 32); // stop sprite is #32
 	
 	// set_graphics leaves the screen disabled so the user can load character sets,
 	// and returns the value to set in VDPR1 to enable it

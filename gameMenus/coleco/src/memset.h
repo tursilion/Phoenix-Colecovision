@@ -1,3 +1,3 @@
-void *memset (void *buf, unsigned char ch, int count);
-void *memcpy (void *dst, void *src, int acount);
-void *memmove (void *dst, void *src, int acount);
+void *memset (void *buf, unsigned int ch, unsigned int count);
+void *memcpy (void *dst, void *src, unsigned int count);
+void *memmove (void *dst, void *src, unsigned int count);
