@@ -103,17 +103,6 @@ FILINFO finfo;
 char path[512];
 char path2[512];    // temporary ram for the load, since we can afford it... (size assumed by copypage() )
 
-// options - mostly a temporary hack until the core menu is in place 
-// - stored in the F18A code
-extern unsigned char useScanlines;     // takes in real time but we need it after a reset
-// - stored in the phoenixBoot code 
-extern unsigned char useFlicker;       // can't enable this until we start a cartridge
-
-// the thin lowercase m doesn't work, so this is a manual replacement
-const unsigned char thinm[8] = {
-    0,0, 0xf8, 0xa8, 0xa8, 0xa8, 0xa8, 0
-};
-
 // structures for file access
 // Each entry has:
 //      Filename[127]
@@ -1039,8 +1028,7 @@ dirLoop:
         vdpmemcpy(0x0800+29*8, FATFONT, 94*8);
 
         // set up for per-character attributes (the color table is now a per-character color in text mode)
-        useScanlines |= 0x02;
-        VDP_SET_REGISTER(50,useScanlines);
+        VDP_SET_REGISTER(50,0x02);
 
         // background color to match the color scheme
         VDP_SET_REGISTER(7, COLORBG);

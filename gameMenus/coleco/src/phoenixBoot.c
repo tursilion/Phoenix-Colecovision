@@ -30,11 +30,6 @@ unsigned char lineBuffer[40];
 extern void vdpmemcpyfast(int pAddr, const unsigned char *pSrc, int cnt);
 #define vdpmemcpy vdpmemcpyfast
 
-// - stored in the F18A code - actual value of the 0x32 register (so it changes in text mode)
-extern unsigned char useScanlines;     // takes in real time but we need it after a reset
-// 
-unsigned char useFlicker;       // can't enable this until we start a cartridge
-
 // menu function
 extern void menu();
 
@@ -167,41 +162,16 @@ void waitVblanks(unsigned char cnt) {
     }
 }
 
-// wrapper for kscan that knows about our hot config keys
+// wrapper for kscan that knows about our hot config keys (uh, except we have none right now)
 // this allows them to work at pretty much any time automatically
+// don't let keypad presses escape this function, want fire buttons only
 void readkeypad(unsigned char unit) {
-    static unsigned char lastret = 0xff;
     unsigned char ret;
     
     kscanfast(unit);
     ret = KSCAN_KEY;
 
-    // check only when changed
-    if (lastret != ret) {
-        lastret = ret;
-        if (unit == '*') {
-            // toggle scanlines - this is pretty obvious so no feedback needed
-            useScanlines ^= SCANLINES_ON;
-            VDP_SET_REGISTER(0x32, useScanlines);
-        } else if (unit == '#') {
-            // toggle sprite flicker
-            // sure, NOW I want a popup window...
-            useFlicker = !useFlicker;
-            // I don't like this, but this is the simplest way to do the notification...
-            vdpmemread(GIMAGE+23*40, lineBuffer, 40);
-            vdpmemset(GIMAGE+23*40, ' ', 40);
-            if (useFlicker) {
-                vdpmemcpy(GIMAGE+23*40+5, "SPRITE FLICKER ENABLED", 7);
-            } else {
-                vdpmemcpy(GIMAGE+23*40+5, "SPRITE FLICKER DISABLED", 7);
-            }
-            waitVblanks(60);
-            vdpmemcpy(GIMAGE+23*40, lineBuffer, 40);
-        }
-    }
-
-    // don't let keypad presses escape this function
-    if (ret != 18) KSCAN_KEY=0xff;
+    if (ret != JOY_FIRE) KSCAN_KEY=0xff;
 }
 
 // text out to the sprite layer at the bottom of the screen
@@ -341,7 +311,6 @@ void startTitle() {
     VDP_SET_REGISTER(VDP_REG_MODE1, VDP_MODE1_16K);
 
     // -    reset F18A
-    useScanlines &= SCANLINES_ON;  // turn off every bit except scanline selection
     reset_f18a();
     lock_f18a();
 
@@ -841,10 +810,11 @@ int main() {
 	vdpmemset(GCOLOR, 0xF0, 32);
 
 	// load the character patterns
-	//vdpmemcpy(GPATTERN, PAT0, 8*256);             // raw data
-    //unrle(GPATTERN, PAT0, SIZE_OF_PAT0RLE);           // RLE full character set
-    //unrle(GPATTERN+25*8, PAT0, SIZE_OF_PAT0RLE-147);  // hand counted offsets
-    unrle(GPATTERN, PAT0, SIZE_OF_PAT0RLE);             // final settings
+	//vdpmemcpy(GPATTERN, PAT0, 8*256);                 // raw data
+    unrle(GPATTERN+16*8, PAT0, SIZE_OF_PAT0RLE-103);    // final settings
+    // copy in the hex characters for debug
+    vdpmemcpy(GPATTERN, &FATFONT[('0'-29)*8], 10*8);       // want char '0', first is #29, 8 bytes each, copy 10
+    vdpmemcpy(GPATTERN+(8*10), &FATFONT[('A'-29)*8], 6*8); // same, but 6 chars starting at 'A'
 
 	// turn the screen on
 	VDP_SET_REGISTER(VDP_REG_MODE1, x);
@@ -852,7 +822,7 @@ int main() {
 	// wait for the first two vblanks
     waitVblanks(2);
 
-	// F18A available
+	// F18A available 
 	fadeInTextF18A();
     displayLogo();
 

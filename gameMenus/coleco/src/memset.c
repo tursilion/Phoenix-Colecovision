@@ -1,5 +1,6 @@
 // string functions
 // These are all in crt0.s now
+// TODO: check for 0 counts...
 
 #if 0
 void *memset(void *buf, unsigned int ch, unsigned int cnt) 

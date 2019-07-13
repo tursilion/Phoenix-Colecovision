@@ -7,14 +7,6 @@
 extern void vdpmemcpyfast(int pAddr, const unsigned char *pSrc, int cnt);
 #define vdpmemcpy vdpmemcpyfast
 
-// configuration so we can force it after a reset
-// NOTE: This is NOT a flag, it's written directly to register >32
-// We need this cause of our text-attribute-mode menu. So write bit >04
-// to enable the scanlines. Kind of hacky and badly named but I need the ROM space.
-unsigned char useScanlines = 0;     // takes in real time but we need it after a reset
-// stored in phoenixBoot.c - whether to allow 4 sprite flicker or not
-extern unsigned char useFlicker;
-
 // default F18 palette values
 const unsigned int DEFAULT_PALETTE[] = {
 	0x0000,0x0000,0x02C3,0x05D6,0x054F,0x076F,0x0D54,0x04EF,
@@ -40,8 +32,6 @@ void lock_f18a() {
 	// reset the F18A to defaults (except palette, requires 1.6)
 	VDP_SET_REGISTER(0x32, 0x80); 	// VR2/50, value 10000000
 									// reset and lock F18A, or corrupt R2
-	VDP_SET_REGISTER(0x39, 0x00);	// VR1/57, value 00000000
-									// write once (corrupts VDPR1)
 }
 
 // This will corrupt the registers if it's not
@@ -63,35 +53,21 @@ void reset_f18a() {
 	// reset the status register to 0
 	VDP_SET_REGISTER(0x0f, 00);	// V15 = 0 - read SR0 again
 
-    // reset the sprite flicker count to whatever is set
-    if (useFlicker) {
-        VDP_SET_REGISTER(0x1e, 4); // stop sprite is #4
-    } else {
-        VDP_SET_REGISTER(0x1e, 32); // stop sprite is #32
-    }
-
-    // update the scanlines setting (we default to off no matter the existing default right now)
-    // TODO: scanline setting expected to move to the core select menu, so we can remove all this
-    // code that touches useScanlines at that point.
-    VDP_SET_REGISTER(0x32, useScanlines);
-
-	// wait for an interrupt (or, if VDPST2 is active, RUNNING to clear)
+    // wait for an interrupt (or, if VDPST2 is active, RUNNING to clear)
 	while (VDPST & 0x80) {
 		VDP_SAFE_DELAY();
 	}
 
-    // the above is all needed on older versions of the F18A,
-    // on most recent versions just this will do it all (except palette)
-    VDP_SET_REGISTER(0x32, 0x80);
+    // the above is all needed on older versions of the F18A
+    lock_f18a();
 }
 
 // load a small test program and see if the GPU is available
 // corrupts 12 bytes at 0x1c00
 // This does the unlock for you!
 unsigned char test_f18a() {
-	VDP_SET_REGISTER(0x32, 0x80);	// VR2/50, value 10000000
-									// reset and lock F18A, or corrupt R2
-    unlock_f18a();
+    lock_f18a();        // reset and lock, if present, to get a clean state
+    unlock_f18a();      // attempt to unlock
 
 	// If we are not on the F18A, then R1 is screwed up now, that's okay
 	vdpmemcpy(0x1c00, GPUTEST, 12);	// copy program (and zero 0x1c10)
