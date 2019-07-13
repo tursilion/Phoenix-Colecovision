@@ -306,7 +306,9 @@ repeatDir:
     if (FR_OK == f_opendir(&dir, path)) {
         // this string could be corrupted if we reopen a smaller pathname, but
         // the only case we should ever redraw this is going from "/" to "/Coleco"
-        centerString(1, path);
+        // To avoid corruption, we use the temporary path2 (it's safe at this point)
+        mystrcpy(path2, path);
+        centerString(1, path2);
 
         if (path[1] != 0) {
             // in a subfolder, so add the ..
