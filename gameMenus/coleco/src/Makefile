@@ -27,6 +27,8 @@ MAIN_OBJS =\
     menu.$(EXT)  \
     vdp_memcpyfast.$(EXT)
 
+# By building FatFS as a library with distinct files, any functions
+# we dont use are automatically stripped from the output
 FAT_OBJS =\
     fatFs\diskio_diskinit.$(EXT) \
     fatFs\diskio_diskioctl.$(EXT) \

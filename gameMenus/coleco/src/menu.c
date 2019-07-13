@@ -1,3 +1,4 @@
+//*****************************
 // Phoenix Menu
 // Relies on FatFS
 // Called from PhoenixBoot
@@ -19,6 +20,8 @@
 #include "fatFs/ff.h"			/* Obtains integer types */
 #include "fatFs/diskio.h"		/* Declarations of disk functions */
 
+// --- externs ---
+
 // fast memcpy, since we don't need delays on the F18A
 extern void vdpmemcpyfast(int pAddr, const unsigned char *pSrc, int cnt);
 #define vdpmemcpy vdpmemcpyfast
@@ -26,35 +29,36 @@ extern void vdpmemcpyfast(int pAddr, const unsigned char *pSrc, int cnt);
 // kscan wrapper
 extern void readkeypad(unsigned char unit);
 
-// foldername to search for - MUST be uppercase, no numbers or punctuation
-const unsigned char FolderName[] = "COLECO";
-const unsigned char FolderNameLen = 7;      // include the terminating NUL
+// hardware control
+extern void waitVblanks(unsigned char cnt);  // clear and wait for blanks
+extern void startTitle();       // start with no init
 
-// color scheme for menu - this allows easy customization
-// we can use an F18A palette to make these any colors we want
-// COLORHILITE should pulse a little using palette color cycling
-// menu F18 palette values - 12 bit format 0000RRRR GGGGBBBB
-const unsigned int MENU_PALETTE[] = {
-	0x0000,0x0000,  // unchanged transparent and black just for comfort (white is also unchanged
-    0x0000,         // line 1
-    0x0010,         // line 2
-    0x0eee,         // text
-    0x044e,         // directory
-    0x0000,         // background
-    0x0900          // hilite
-    // we don't need to define the rest
-};
+// sprite layer updates (yes, text mode sprites!)
+extern void textout(unsigned int vdp, const char *p);
+extern void textouthalf(unsigned int vdp, const char *p);
+extern void centerString(unsigned char line, char *p);
 
-// Color scheme - these will be redefined by palette above
+// Reference to the font for copying out of
+extern const unsigned char FATFONT[];
+
+
+// --- hardware ---
+
+// This doesn't optimize correctly (it's always a calculated lookup), so just use a macro
+//static volatile unsigned char * const pRom = (volatile unsigned char * const)0;	// access to memory
+#define pRom(x) (*((volatile unsigned char*)(x)))
+
+
+// --- definitions ---
+
+// Color scheme - these will be redefined by palette below.
+// To change colors, change the palette values rather than these numbers.
 #define COLORLINE1      2
 #define COLORLINE2      3
 #define COLORTEXT       4
 #define COLORDIRECTORY  5
 #define COLORBG         6
 #define COLORHILITE     7
-
-// hex conversion
-const char hex[16] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
 
 // working RAM bank for directory - 0 is the SGM bank and can not
 // be selected. 1 through 15 are the cartridge banks. However, this
@@ -76,32 +80,15 @@ const char hex[16] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','
 // how long to sit idle before blanking (on no SD card or cartridge)
 #define BLANK_TIME 5400    // about 3 minutes @ 30hz
 
-// we assume that the f18a exists...
-extern unsigned char f18a;
-extern const unsigned char FATFONT[];
 
-// This doesn't optimize correctly (it's always a calculated lookup), so just use a macro
-//static volatile unsigned char * const pRom = (volatile unsigned char * const)0;	// access to memory
-#define pRom(x) (*((volatile unsigned char*)(x)))
 
-// hardware control
-extern void waitVblanks(unsigned char cnt);  // clear and wait for blanks
-extern void startTitle();       // start with no init
+// --- work buffers ---
 
-// sprite layer updates (yes, text mode sprites!)
-extern void textout(unsigned int vdp, const char *p);
-extern void textouthalf(unsigned int vdp, const char *p);
-void centerString(unsigned char line, char *p);
-
-// File structures
-FATFS fatFs;
-FIL fil;
-DIR dir;
-FILINFO finfo;
-// I'm not sure if we need to reflect this in fatfs or if the working buffer
-// is only per filename part...
+// Current path, and a temporary for manipulating it
 char path[512];
 char path2[512];    // temporary ram for the load, since we can afford it... (size assumed by copypage() )
+
+// --- variables ---
 
 // structures for file access
 // Each entry has:
@@ -113,7 +100,8 @@ char path2[512];    // temporary ram for the load, since we can afford it... (si
 // them out 128 bytes each. (We could store a lookup
 // table in VDP). But for now we'll just enforce the
 // upper limit as a count.
-unsigned char *lastFilename=0;      // using RAM version
+
+unsigned char *lastFilename=0;      // points after last RAM filename entry address
 unsigned char *sortedList[256];     // sorted pointers to filenames
 unsigned char listSize = 0;         // number of elements in sortedList
 unsigned char listOffset = 0;       // current list offset
@@ -121,6 +109,38 @@ unsigned char listSelect = 0;       // current selection index
 unsigned char repeatTimeout;        // number of frames before autorepeat
 unsigned char firstScan = 0;        // during the first scan, we look for a Coleco folder and enter it
 unsigned char firstDir = 0;         // indicates we need to set up the display for the first time showing a directory
+
+// File structures
+FATFS fatFs;
+FIL fil;
+DIR dir;
+FILINFO finfo;
+
+// --- static data ---
+
+// foldername to search for - MUST be uppercase, no numbers or punctuation
+const unsigned char FolderName[] = "COLECO";
+const unsigned char FolderNameLen = 7;      // include the terminating NUL
+
+// color scheme for menu - this allows easy customization
+// we can use an F18A palette to make these any colors we want
+// COLORHILITE should pulse a little using palette color cycling
+// menu F18 palette values - 12 bit format 0000RRRR GGGGBBBB
+const unsigned int MENU_PALETTE[] = {
+	0x0000,0x0000,  // unchanged transparent and black just for comfort (white is also unchanged
+    0x0000,         // line 1
+    0x0010,         // line 2
+    0x0eee,         // text
+    0x044e,         // directory
+    0x0000,         // background
+    0x0900          // hilite
+    // we don't need to define the rest
+};
+
+// hex conversion
+const char hex[16] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
+
+// --- and functions... ---
 
 // each index is about 50us
 void dly_50us(unsigned char n)
@@ -180,6 +200,7 @@ void mystrcpy(char *pDest, char *pSrc) {
     *(pDest) = 0;
 }
 
+// Wait for both player 1 and player 2 fire buttons to be released
 void waitBothFireClear() {
     for (;;) {
         readkeypad(1);
@@ -191,6 +212,7 @@ void waitBothFireClear() {
     }
 }
 
+// wait for player 1 or player 2 fire button to be pressed
 void waitAnyFirePressed() {
     for (;;) {
         readkeypad(1);
@@ -200,6 +222,7 @@ void waitAnyFirePressed() {
     }
 }
 
+// Blank the screen and wait for an input, then restore the screen
 void handleBlanking(unsigned char mode) {
     unsigned char disk = disk_status();
 
@@ -256,7 +279,8 @@ void displayErrorString(char *pstr, unsigned char x) {
     waitBothFireClear();
 }
 
-// simple strcmp (char return instead of int cause z80)
+// case-insensitive strcmp (char return instead of int cause z80)
+// also treats underscore as equal to space
 char mystrcmp(const char *s1, const char *s2) {
     unsigned char c1,c2;
     for (;;) { 
@@ -302,11 +326,10 @@ repeatDir:
 
     // Each entry has:
     //      Filename[127]
-    //      Byte for directory flag
+    //      Byte for size (/16k) or directory
     if (FR_OK == f_opendir(&dir, path)) {
-        // this string could be corrupted if we reopen a smaller pathname, but
-        // the only case we should ever redraw this is going from "/" to "/Coleco"
-        // To avoid corruption, we use the temporary path2 (it's safe at this point)
+        // To avoid corruption caused by centerString, 
+        // we use path2 as a temporary (it's safe at this point)
         mystrcpy(path2, path);
         centerString(1, path2);
 
@@ -335,6 +358,8 @@ repeatDir:
                 // Look for a Coleco folder - this will slow down the first read a bit...
                 // but it was requested to auto-enter it since people will probably have
                 // one card with all their systems on it.
+                // this could cause issues if we reopen a smaller pathname, but
+                // the only case we should ever follow this is going from "/" to "/Coleco"
                 if (0 == mystrcmp(finfo.fname, FolderName)) {
                     f_closedir(&dir);
                     memcpy(&path[1], FolderName, FolderNameLen);
@@ -440,6 +465,7 @@ void drawTitles() {
     }
 }
 
+// uses an insertion sort to create a list of pointers to the discovered files, in alphabetical order
 void sortDir() {
     // Hooray for lots of RAM all of a sudden!
     // Since we are building the sort from scratch, we can
@@ -452,7 +478,7 @@ void sortDir() {
     while (ptr < lastFilename) {
         unsigned char idx;
         // whereever this loop exits, that's where we store it
-#if 1
+
         // This is orders of magnitude faster on a mostly-sorted folder
         // Two loops here - if we are a file, we work backwards,
         // and a directory, we work forwards. This is just to optimize
@@ -498,29 +524,6 @@ void sortDir() {
                 break;
             }
         }
-#else
-        // simple search
-        for (idx = 0; idx < listSize; ++idx) {
-            unsigned char *ptr2;
-            unsigned char t1,t2;
-
-            // check against the already sorted code
-            ptr2 = sortedList[idx];
-
-            t1 = *(ptr+127);
-            t2 = *(ptr2+127);
-
-            // if we are a file comparing to a directory, continue
-            if ((t1 != 0) && (t2 == 0)) continue;
-
-            // if we are a directory comparing to a file, stop here
-            if ((t1 == 0) && (t2 != 0)) break;
-
-            // otherwise, if we have a lower filename, stop here
-            // equal shouldn't happen, but if it does it will sort after
-            if (mystrcmp(ptr, ptr2) < 0) break;
-        }
-#endif
 
         // if necessary, move the data out of the way
         if (idx < listSize) {
@@ -709,35 +712,6 @@ unsigned char loadMegacartRom(unsigned char fsize) {
 
     f_close(&fil);
 
-#if 0
-    // - duplicate in memory to reach 256k, for simplicity the core just assumes
-    // This is kind of annoying, so we'll just check it's a valid size to be duplicated
-    // Valid sizes then are 32k, 64k, 128, 256k, which in Phoenix 32k page counts, is 
-    // 1, 2, 4, or 8. Furthermore, we can't get here if it's 8 cause we had to early out above.
-    // The copy isn't quite as awesome as I'd like due to paging...
-    switch (page-CART_FIRST_PAGE) {
-        case 1: 
-            copyPage(CART_FIRST_PAGE, CART_FIRST_PAGE+1);
-            // fall through
-
-        case 2: 
-            copyPage(CART_FIRST_PAGE, CART_FIRST_PAGE+2);
-            copyPage(CART_FIRST_PAGE+1, CART_FIRST_PAGE+3);
-            // fall through
-
-        case 4: 
-            copyPage(CART_FIRST_PAGE, CART_FIRST_PAGE+4);
-            copyPage(CART_FIRST_PAGE+1, CART_FIRST_PAGE+5);
-            copyPage(CART_FIRST_PAGE+2, CART_FIRST_PAGE+6);
-            copyPage(CART_FIRST_PAGE+3, CART_FIRST_PAGE+7);
-            break;
-
-        default:
-            f_close(&fil);
-            displayErrorString("Megacart images must be padded", 0);
-            return;
-    }
-#else
     // instead of the fixed size approach, we just set a register mask
     // Valid sizes then are 32k, 64k, 128k, 256k, 512k, so fsize is:
     //                       2    4    8    16    32 
@@ -769,7 +743,6 @@ unsigned char loadMegacartRom(unsigned char fsize) {
             displayErrorString("Megacart images must be padded", fsize);
             return page;
     }
-#endif
 
     // - set the mappers appropriately
     phBankingScheme = PH_BANK_MEGACART | PH_UPPER_EXPROM;
@@ -999,10 +972,6 @@ dirLoop:
     // - Clear sprites
     // - Sort list
     // Sort is so fast now that we don't need to display anything
-#if 0
-    cleartextout();
-	textouthalf(GSPRITEPAT+(1*8)+(11*16), "Sorting...");
-#endif
     // sortDir will set listSize
     sortDir();
 

@@ -96,11 +96,5 @@ $0003:
 	pop hl
 __endasm;
 }
-
-
-
-
-
-
 #endif
 

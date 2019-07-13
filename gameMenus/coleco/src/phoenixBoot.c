@@ -1,3 +1,4 @@
+//******************************
 // New Phoenix boot BIOS
 // Created by Tursi/M.Brent
 // Boot logo and SD menu
@@ -13,29 +14,41 @@
 #define HEADERS__
 #include "newmap2.c"
 #include "mattfont.c"
-#if 0
-// currently I am not able to hot-patch the Coleco BIOS at startup
-#include "thinfont.c"
-#endif
 #undef HEADERS__
 
-// we assume that the f18a exists...
-unsigned char f18a;
+// --- externs ---
+
+// fast memcpy, since we don't need delays on the F18A
+extern void vdpmemcpyfast(int pAddr, const unsigned char *pSrc, int cnt);
+#define vdpmemcpy vdpmemcpyfast
+// menu function
+extern void menu();
+
+// --- hardware ---
+static volatile __sfr __at 0xc0 port3;  // joystick reset strobe
+
+// macro for accessing ROM inline - this optimizes as you'd expect
+#define pRom(x) *((volatile unsigned char*)(x))
+
+// --- definitions ---
+
+// cartridge name format: "DONKEY KONG/NINTENDO/1982"
+// There is no explicit limit on the lengths of the first two strings
+#define CART_NAME_INFO 0x8024
+
+// --- work buffers ---
+
 // cartridge string (we format it into here)
 char copyright[65];
 // screen line buffer
 unsigned char lineBuffer[40];
 
-// fast memcpy, since we don't need delays on the F18A
-extern void vdpmemcpyfast(int pAddr, const unsigned char *pSrc, int cnt);
-#define vdpmemcpy vdpmemcpyfast
+// --- variables ---
 
-// menu function
-extern void menu();
+// we assume that the f18a exists...
+unsigned char f18a;
 
-// name format: "DONKEY KONG/NINTENDO/1982"
-// There is no explicit limit on the lengths of the first two strings
-#define CART_NAME_INFO 0x8024
+// --- static data ---
 
 // Coleco color table at 0x2003
 static const unsigned char colorTable[] = {
@@ -55,8 +68,8 @@ static const unsigned char colorTable[] = {
 //pRom(0x63f2+4*2)   = 0x00;
 //pRom(0x63f2+4*2+1) = 0x20;
 static const unsigned char regTable[] = {
-    0x00, 0x1b, 0x00, 0x38, 0x00, 0x18,
-    0x00, 0x00, 0x00, 0x20
+    0x00, 0x1b, 0x00, 0x38, 0x00, 
+    0x18, 0x00, 0x00, 0x00, 0x20
 };
 
 // trampoline to start the cart with the Coleco BIOS loaded
@@ -71,12 +84,7 @@ static const unsigned char trampoline[] = {
     0xe9                // -        JP [HL]             E9
 };
 
-// hardware control
-static volatile __sfr __at 0xc0 port3;  // joystick reset strobe
-
-// This doesn't optimize correctly (it's always a calculated lookup), so just use a macro
-//static volatile unsigned char * const pRom = (volatile unsigned char * const)0;	// access to memory
-#define pRom(x) *((volatile unsigned char*)(x))
+// --- and functions... ---
 
 // setting up standard screen modes - blanks the screen and returns the unblank command
 // interrupts are also disabled. Unblank will re-enable them, too, write it to VDP_REG_MODE1
@@ -222,6 +230,7 @@ void textouthalf(unsigned int vdp, const char *p) {
 	}
 }
 
+// fade in the PHOENIX text using F18A palette
 void fadeInTextF18A() {
 	unsigned char p = 0;
 	unsigned char i;
@@ -305,6 +314,10 @@ void centerString(unsigned char line, char *p) {
 }
 
 // start whatever is configured at 0x8000
+// This function is responsible for preparing Coleco RAM and
+// VDP RAM to resemble what a real Coleco BIOS would have done,
+// then to switch that BIOS in and start the title (without running
+// THROUGH the BIOS).
 void startTitle() {
     // - execute title
     // -    disable screen and interrupts
@@ -548,7 +561,6 @@ void startTitle() {
         // -                LD A,3                      // table code (0=sprite name, 1=sprite gen, 2=pattern name, 3=pattern gen, 4=color)
         // -                CALL PUT_VRAM (0x1fbe->1C27)
         // -                    (This has lots of special cases, but I can just hard code the results)
-        //vdpmemcpy(0x0000+0x1d*8, (void*)COLECO_FONT_ADR, 96*8);
         vdpmemcpy(0x0000+0x1d*8, (void*)FATFONT, 96*8);
 
         // -                LD HL,SPACE (0x15a3)        // also copies space into character #0
@@ -557,7 +569,6 @@ void startTitle() {
         // -                LD A,3                      // pattern table
         // -                CALL PUT_VRAM
         // -                RET
-        //vdpmemcpy(0x0000, (void*)(COLECO_FONT_ADR+3*8), 8);      // space is after copyright, T, and M
         vdpmemcpy(0x0000, (void*)(FATFONT+3*8), 8);      // space is after copyright, T, and M
 
         // and, although it's not in the startup code itself,
@@ -747,7 +758,7 @@ void runCartHeader(void (*mycenter)(unsigned char, char*)) {
     startCartridge();
 }
 
-// main loop
+// This is where we start!
 int main() {
 	unsigned char x,idx;
 

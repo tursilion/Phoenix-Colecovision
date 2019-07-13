@@ -1,5 +1,4 @@
 // F18A interface functions
-
 #include <vdp.h>
 #include "f18a.h"
 
