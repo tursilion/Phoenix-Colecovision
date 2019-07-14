@@ -524,3 +524,80 @@ FRESULT validate (	/* Returns FR_OK or FR_INVALID_OBJECT */
 	FFOBJID* obj,			/* Pointer to the FFOBJID, the 1st member in the FIL/DIR object, to check validity */
 	FATFS** rfs				/* Pointer to pointer to the owner filesystem object to return */
 );
+
+///////////////////////////////////////////
+// Write functions, previously omitted
+///////////////////////////////////////////
+
+#if FF_FS_READONLY == 0
+FRESULT sync_window (	/* Returns FR_OK or FR_DISK_ERR */
+	FATFS* fs			/* Filesystem object */
+);
+FRESULT sync_fs (	/* Returns FR_OK or FR_DISK_ERR */
+	FATFS* fs		/* Filesystem object */
+);
+FRESULT put_fat (	/* FR_OK(0):succeeded, !=0:error */
+	FATFS* fs,		/* Corresponding filesystem object */
+	DWORD clst,		/* FAT index number (cluster number) to be changed */
+	DWORD val		/* New value to be set to the entry */
+);
+FRESULT remove_chain (	/* FR_OK(0):succeeded, !=0:error */
+	FFOBJID* obj,		/* Corresponding object */
+	DWORD clst,			/* Cluster to remove a chain from */
+	DWORD pclst			/* Previous cluster of clst (0 if entire chain) */
+);
+DWORD create_chain (	/* 0:No free cluster, 1:Internal error, 0xFFFFFFFF:Disk error, >=2:New cluster# */
+	FFOBJID* obj,		/* Corresponding object */
+	DWORD clst			/* Cluster# to stretch, 0:Create a new chain */
+);
+FRESULT dir_clear (	/* Returns FR_OK or FR_DISK_ERR */
+	FATFS *fs,		/* Filesystem object */
+	DWORD clst		/* Directory table to clear */
+);
+FRESULT dir_alloc (	/* FR_OK(0):succeeded, !=0:error */
+	DIR* dp,				/* Pointer to the directory object */
+	UINT nent				/* Number of contiguous entries to allocate */
+);
+void st_clust (
+	FATFS* fs,	/* Pointer to the fs object */
+	BYTE* dir,	/* Pointer to the key entry */
+	DWORD cl	/* Value to be set */
+);
+#if FF_USE_LFN
+void put_lfn (
+	const WCHAR* lfn,	/* Pointer to the LFN */
+	BYTE* dir,			/* Pointer to the LFN entry to be created */
+	BYTE ord,			/* LFN order (1-20) */
+	BYTE sum			/* Checksum of the corresponding SFN */
+);
+#endif
+void gen_numname (
+	BYTE* dst,			/* Pointer to the buffer to store numbered SFN */
+	const BYTE* src,	/* Pointer to SFN */
+	const WCHAR* lfn,	/* Pointer to LFN */
+	UINT seq			/* Sequence number */
+);
+DWORD xsum32 (	/* Returns 32-bit checksum */
+	BYTE  dat,			/* Byte to be calculated (byte-by-byte processing) */
+	DWORD sum			/* Previous sum value */
+);
+FRESULT load_obj_xdir (
+	DIR* dp,			/* Blank directory object to be used to access containing direcotry */
+	const FFOBJID* obj	/* Object with its containing directory information */
+);
+FRESULT store_xdir (
+	DIR* dp				/* Pointer to the direcotry object */
+);
+FRESULT dir_register (	/* FR_OK:succeeded, FR_DENIED:no free entry or too many SFN collision, FR_DISK_ERR:disk error */
+	DIR* dp						/* Target directory with object name to be created */
+);
+void st_word (BYTE* ptr, WORD val);	/* Store a 2-byte word in little-endian */
+void st_dword (BYTE* ptr, DWORD val);	/* Store a 4-byte word in little-endian */
+FRESULT dir_remove (	/* FR_OK:Succeeded, FR_DISK_ERR:A disk error */
+	DIR* dp					/* Directory object pointing the entry to be removed */
+);
+
+
+
+
+#endif  // FF_FS_READONLY == 0

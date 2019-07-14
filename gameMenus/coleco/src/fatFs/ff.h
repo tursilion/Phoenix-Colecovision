@@ -240,7 +240,7 @@ typedef struct {
 typedef struct {
 	FSIZE_t	fsize;			/* File size */
 
-#if FF_FS_IGNORE_TIMESTAMP == 1
+#if FF_FS_IGNORE_TIMESTAMP != 1
 	WORD	fdate;			/* Modified date */
 	WORD	ftime;			/* Modified time */
 #endif

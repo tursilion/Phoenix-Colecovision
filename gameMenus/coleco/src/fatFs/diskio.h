@@ -26,11 +26,17 @@ DSTATUS disk_initialize (BYTE pdrv);
 DSTATUS disk_status (BYTE pdrv);
 DRESULT disk_read (BYTE pdrv, BYTE* buff, DWORD sector, UINT count);
 DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff);
+#if !FF_FS_READONLY
+DRESULT disk_write (BYTE pdrv, BYTE* buff, DWORD sector, UINT count);
+#endif
 #else
 DSTATUS disk_initialize ();
 DSTATUS disk_status ();
 DRESULT disk_read (BYTE* buff, DWORD sector, UINT count);
 DRESULT disk_ioctl (BYTE cmd, void* buff);
+#if !FF_FS_READONLY
+DRESULT disk_write (BYTE* buff, DWORD sector, UINT count);
+#endif
 #endif
 
 // Internal

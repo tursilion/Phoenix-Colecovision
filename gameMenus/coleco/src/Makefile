@@ -34,6 +34,7 @@ FAT_OBJS =\
     fatFs\diskio_diskioctl.$(EXT) \
     fatFs\diskio_diskread.$(EXT) \
     fatFs\diskio_diskstatus.$(EXT) \
+    fatFs\diskio_diskwrite.$(EXT) \
     fatFs\diskio_dselect.$(EXT) \
     fatFs\diskio_rcvrdatablock.$(EXT) \
     fatFs\diskio_rcvrmmc.$(EXT) \
@@ -47,22 +48,35 @@ FAT_OBJS =\
     fatFs\ff_closedir.$(EXT) \
     fatFs\ff_clst2sect.$(EXT) \
     fatFs\ff_cmplfn.$(EXT) \
+    fatFs\ff_createchain.$(EXT) \
     fatFs\ff_createname.$(EXT) \
+    fatFs\ff_diralloc.$(EXT) \
+    fatFs\ff_dirclear.$(EXT) \
     fatFs\ff_dirfind.$(EXT) \
     fatFs\ff_dirnext.$(EXT) \
     fatFs\ff_dirread.$(EXT) \
+    fatFs\ff_dirregister.$(EXT) \
     fatFs\ff_dirsdi.$(EXT) \
     fatFs\ff_fchdir.$(EXT) \
     fatFs\ff_fchdrive.$(EXT) \
     fatFs\ff_fclose.$(EXT) \
     fatFs\ff_findvolume.$(EXT) \
+    fatFs\ff_fgetfree.$(EXT) \
+    fatFs\ff_fmkdir.$(EXT) \
     fatFs\ff_fmount.$(EXT) \
     fatFs\ff_followpath.$(EXT) \
     fatFs\ff_fopen.$(EXT) \
     fatFs\ff_fread.$(EXT) \
+    fatFs\ff_frename.$(EXT) \
+    fatFs\ff_fsync.$(EXT) \
+    fatFs\ff_ftruncate.$(EXT) \
+    fatFs\ff_funlink.$(EXT) \
+    fatFs\ff_fwrite.$(EXT) \
+    fatFs\ff_gennumname.$(EXT) \
     fatFs\ff_getfat.$(EXT) \
     fatFs\ff_getfileinfo.$(EXT) \
     fatFs\ff_getldnumber.$(EXT) \
+    fatFs\ff_loadobjxdir.$(EXT) \
     fatFs\ff_ldclust.$(EXT) \
     fatFs\ff_lddword.$(EXT) \
     fatFs\ff_ldword.$(EXT) \
@@ -71,12 +85,22 @@ FAT_OBJS =\
     fatFs\ff_movewindow.$(EXT) \
     fatFs\ff_opendir.$(EXT) \
     fatFs\ff_picklfn.$(EXT) \
+    fatFs\ff_putfat.$(EXT) \
+    fatFs\ff_putlfn.$(EXT) \
     fatFs\ff_pututf.$(EXT) \
     fatFs\ff_readdir.$(EXT) \
+    fatFs\ff_removechain.$(EXT) \
+    fatFs\ff_stclust.$(EXT) \
+    fatFs\ff_storexdir.$(EXT) \
+    fatFs\ff_stdword.$(EXT) \
+    fatFs\ff_stword.$(EXT) \
+    fatFs\ff_syncfs.$(EXT) \
+    fatFs\ff_syncwindow.$(EXT) \
     fatFs\ff_sumsfn.$(EXT) \
     fatFs\ff_tchar2uni.$(EXT) \
     fatFs\ff_validate.$(EXT) \
     fatFs\ff_vars.$(EXT) \
+    fatFs\ff_xsum32.$(EXT) \
     fatFs\ffunicode_cp.$(EXT) \
     fatFs\ffunicode_ffoem2uni.$(EXT) \
     fatFs\ffunicode_ffuni2oem.$(EXT) \
