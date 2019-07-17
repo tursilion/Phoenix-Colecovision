@@ -80,7 +80,7 @@ architecture rtl of sn76489_noise is
 
   signal lfsr_q            : std_logic_vector(0 to 15);
 
-  signal freq_s      : signed(0 to 1);
+  --signal freq_s      : signed(0 to 1);
 
 begin
 
@@ -263,9 +263,9 @@ begin
   -----------------------------------------------------------------------------
   -- Map output of LFSR to signed value for attenuator.
   -----------------------------------------------------------------------------
-  freq_s <=   to_signed(+1, 2)
-            when lfsr_q(0) = '1' else
-              to_signed( 0, 2);
+  --freq_s <=   to_signed(+1, 2)
+  --          when lfsr_q(0) = '1' else
+  --            to_signed( 0, 2);
 
 
   -----------------------------------------------------------------------------
@@ -274,7 +274,7 @@ begin
   attenuator_b : entity work.sn76489_attenuator
     port map (
       attenuation_i => a_q,
-      factor_i      => freq_ff_q,
+      factor_i      => lfsr_q(0),
       product_o     => noise_o
     );
 
