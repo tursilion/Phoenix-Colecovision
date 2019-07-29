@@ -80,6 +80,9 @@ static const unsigned char trampoline[] = {
     0x2a, 0x0a, 0x80,   // -        LD HL,[0x800A]      2A800A
 
 //  0xC3,0x00,0x00,      // JP 0x0000 (reboot bios)
+// 
+//    0x3e,0xef,          // ld a,0xef
+//    0xed,0x47,          // ld i,a   (set i to non-zero)
 
     0xe9                // -        JP [HL]             E9
 };
@@ -324,8 +327,7 @@ void startTitle() {
     VDP_SET_REGISTER(VDP_REG_MODE1, VDP_MODE1_16K);
 
     // -    reset F18A
-    reset_f18a();
-    lock_f18a();
+    reset_f18a();   // also locks
 
     // the RAM located at 0x6000 is the original ColecoVision 1k
     // but unlike the Coleco BIOS, we /must/ access at 0x6000, not
