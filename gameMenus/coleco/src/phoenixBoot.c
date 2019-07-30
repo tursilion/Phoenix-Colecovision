@@ -322,6 +322,8 @@ void centerString(unsigned char line, char *p) {
 // then to switch that BIOS in and start the title (without running
 // THROUGH the BIOS).
 void startTitle() {
+    int idx;
+
     // - execute title
     // -    disable screen and interrupts
     VDP_SET_REGISTER(VDP_REG_MODE1, VDP_MODE1_16K);
@@ -332,6 +334,13 @@ void startTitle() {
     // the RAM located at 0x6000 is the original ColecoVision 1k
     // but unlike the Coleco BIOS, we /must/ access at 0x6000, not
     // one of the later mirrors.
+
+    // this clears the RAM to foil basic detection algorithms
+    // A real Coleco is far more random, but this should do for now
+    for (idx=0x6000; idx<0x6400; idx+=2) {
+        pRom(idx)=0;
+        pRom(idx+1) = 0xff;
+    }
 
     // -    prepare system as per original BIOS:
     // -        In test mode, it doesn't do ANYTHING, it just jumps to the cart immediately (must honor to avoid pointers)
