@@ -27,7 +27,8 @@ extern void vdpmemcpyfast(int pAddr, const unsigned char *pSrc, int cnt);
 #define vdpmemcpy vdpmemcpyfast
 
 // kscan wrapper
-extern void readkeypad(unsigned char unit);
+extern void readkeypad();
+extern void readjoyst();
 
 // hardware control
 extern void waitVblanks(unsigned char cnt);  // clear and wait for blanks
@@ -87,6 +88,12 @@ extern const unsigned char FATFONT[];
 // Current path, and a temporary for manipulating it
 char path[512];
 char path2[512];    // temporary ram for the load, since we can afford it... (size assumed by copypage() )
+
+// options - mostly a temporary hack until the core menu is in place
+// - stored in the F18A code
+extern unsigned char useScanlines;     // takes in real time but we need it after a reset
+// - stored in the phoenixBoot code
+extern unsigned char useFlicker;       // can't enable this until we start a cartridge
 
 // --- variables ---
 
@@ -201,24 +208,20 @@ void mystrcpy(char *pDest, char *pSrc) {
 }
 
 // Wait for both player 1 and player 2 fire buttons to be released
+// (actually any keys)
 void waitBothFireClear() {
     for (;;) {
-        readkeypad(1);
-        if (KSCAN_KEY == 0xff) break;
-    }
-    for (;;) {
-        readkeypad(2);
+        readkeypad();
         if (KSCAN_KEY == 0xff) break;
     }
 }
 
 // wait for player 1 or player 2 fire button to be pressed
+// (fire ONLY)
 void waitAnyFirePressed() {
     for (;;) {
-        readkeypad(1);
-        if (KSCAN_KEY != 0xff) break;
-        readkeypad(2);
-        if (KSCAN_KEY != 0xff) break;
+        readkeypad();
+        if (KSCAN_KEY == JOY_FIRE) break;
     }
 }
 
@@ -231,13 +234,10 @@ void handleBlanking(unsigned char mode) {
 
     // wait for any input to clear it
     for (;;) {
-        joystfast(1);
-        if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
-
-        joystfast(2);
+        readjoyst();
         if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
                     
-        readkeypad(0);
+        readkeypad();
         if (KSCAN_KEY != 0xff) break;
 
         // even SD insert or remove - no need to sleep here
@@ -391,9 +391,9 @@ repeatDir:
 
 // wait for joystick key to be released
 // there's a timeout to provide a crude auto-repeat
-void waitRelease(unsigned char j) {
+void waitRelease() {
     for (;;) {
-        joystfast(j);
+        readjoyst();
         if ((KSCAN_JOYY == 0) && (KSCAN_JOYX == 0)) {
             repeatTimeout = 45;     // hold this long before next repeat starts
             break;
@@ -802,7 +802,6 @@ void undrawSelect() {
 //   1 = user made a selection
 //  -1/-2  = user paged the directory (redraw needed, indicates which stick)
 char getUserSelection() {
-    unsigned char j;
     int cntDown = BLANK_TIME;
 
     // draw the selection bar
@@ -823,88 +822,86 @@ char getUserSelection() {
         oldSelect = listSelect;
 
         // scan the joysticks (both work)
-        for (j=1; j<3; j++) {
-            joystfast(j);
+        readjoyst();
 
-            if (KSCAN_JOYY == JOY_UP) {
-                if (listSelect > 0) {
-                    undrawSelect();     // clear the highlight
-                    --listSelect;       // count down
-                    if (listSelect < listOffset) {
-                        listOffset--;
-                        return -j;      // request redraw
-                    }
-                    drawSelect();
+        if (KSCAN_JOYY == JOY_UP) {
+            if (listSelect > 0) {
+                undrawSelect();     // clear the highlight
+                --listSelect;       // count down
+                if (listSelect < listOffset) {
+                    listOffset--;
+                    return -1;      // request redraw
                 }
-                waitRelease(j);
-                cntDown = BLANK_TIME;
-                continue;
+                drawSelect();
             }
+            waitRelease();
+            cntDown = BLANK_TIME;
+            continue;
+        }
 
-            if (KSCAN_JOYY == JOY_DOWN) {
-                if (listSelect < listSize-1) {
-                    undrawSelect();
-                    ++listSelect;
-                    if (listSelect > listOffset+23) {
-                        listOffset++;
-                        return -j;      // request redraw
-                    }
-                    drawSelect();
+        if (KSCAN_JOYY == JOY_DOWN) {
+            if (listSelect < listSize-1) {
+                undrawSelect();
+                ++listSelect;
+                if (listSelect > listOffset+23) {
+                    listOffset++;
+                    return -1;      // request redraw
                 }
-                waitRelease(j);
-                cntDown = BLANK_TIME;
-                continue;
+                drawSelect();
             }
+            waitRelease();
+            cntDown = BLANK_TIME;
+            continue;
+        }
 
-            if (KSCAN_JOYX == JOY_RIGHT) {
-                if (listOffset+23 < listSize-1) {
-                    // page ahead, restrict to 8-bits
-                    unsigned char add = listSize-1-listOffset;
-                    if (add < 24) {
-                        listOffset += add;
-                        listSelect = listOffset;
-                    } else {
-                        listOffset += 24;
-                        listSelect += 24;
-                    }
-                    return -j;          // request redraw
+        if (KSCAN_JOYX == JOY_RIGHT) {
+            if (listOffset+23 < listSize-1) {
+                // page ahead, restrict to 8-bits
+                unsigned char add = listSize-1-listOffset;
+                if (add < 24) {
+                    listOffset += add;
+                    listSelect = listOffset;
                 } else {
-                    undrawSelect();
-                    listSelect = listSize-1;
-                    drawSelect();
+                    listOffset += 24;
+                    listSelect += 24;
                 }
-                waitRelease(j);
-                cntDown = BLANK_TIME;
-                continue;
+                return -1;          // request redraw
+            } else {
+                undrawSelect();
+                listSelect = listSize-1;
+                drawSelect();
             }
+            waitRelease();
+            cntDown = BLANK_TIME;
+            continue;
+        }
 
-            if (KSCAN_JOYX == JOY_LEFT) {
-                if (listOffset > 0) {
-                    // page back, restrict to 8 bits
-                    if (listOffset < 24) {
-                        listOffset = 0;
-                        listSelect = 0;
-                    } else {
-                        listOffset -=24;
-                        listSelect -=24;
-                    }
-                    return -j;          // request redraw
-                } else {
-                    undrawSelect();
+        if (KSCAN_JOYX == JOY_LEFT) {
+            if (listOffset > 0) {
+                // page back, restrict to 8 bits
+                if (listOffset < 24) {
+                    listOffset = 0;
                     listSelect = 0;
-                    drawSelect();
+                } else {
+                    listOffset -=24;
+                    listSelect -=24;
                 }
-                waitRelease(j);
-                cntDown = BLANK_TIME;
-                continue;
+                return -1;          // request redraw
+            } else {
+                undrawSelect();
+                listSelect = 0;
+                drawSelect();
             }
+            waitRelease();
+            cntDown = BLANK_TIME;
+            continue;
+        }
 
-            // check fire button
-            readkeypad(j);
-            if (KSCAN_KEY != 0xff) {
-                return 1;   // selected
-            }
-        }   // next joystick
+        // check fire button
+        readkeypad();
+        if (KSCAN_KEY == JOY_FIRE) {
+            return 1;   // selected
+        }
 
         if (oldSelect == listSelect) {
             // no joystick move, so reset the auto-repeat
@@ -999,7 +996,9 @@ dirLoop:
         vdpmemcpy(0x0800+29*8, FATFONT, 94*8);
 
         // set up for per-character attributes (the color table is now a per-character color in text mode)
-        VDP_SET_REGISTER(50,0x02);
+//        VDP_SET_REGISTER(50,0x02);
+        useScanlines |= 0x02;
+        VDP_SET_REGISTER(50,useScanlines);
 
         // background color to match the color scheme
         VDP_SET_REGISTER(7, COLORBG);
@@ -1032,7 +1031,7 @@ drawLoop:
         drawTitles();
 
         // and then wait for the autorepeat
-        waitRelease(-ret);
+        waitRelease();
     }
 
     // in the event that the SD card was removed, jump back up

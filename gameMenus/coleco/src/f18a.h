@@ -11,3 +11,9 @@ unsigned char test_f18a();
 // load a palette into the F18A
 // data format is 12-bit 0RGB (4 bits each gun)
 void loadpal_f18a(unsigned int *ptr, unsigned char cnt);
+
+// prepare the F18A to launch a Coleco title with sprite and scanline settings
+void prepare_f18a();
+
+// define for the useScanlines variable
+#define SCANLINES_ON 0x04

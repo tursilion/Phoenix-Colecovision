@@ -18,28 +18,28 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000000  s__HEADER0                      
      00000001  l__BSS                          
      00000001  l__GSFINAL                      
-     0000000C  l__INITIALIZED                  
-     0000000C  l__INITIALIZER                  
-     00000010  l__GSINIT                       
+     0000000D  l__INITIALIZED                  
+     0000000D  l__INITIALIZER                  
+     00000018  l__GSINIT                       
      00000088  l__HEADER0                      
      00000090  s__CODE                         
      000001FE  l__HOME                         
-     00000CEA  l__DATA                         
-     00005B46  l__CODE                         
-     00005BD6  s__HOME                         
-     00005DD4  s__INITIALIZER                  
-     00005DE0  s__GSINIT                       
-     00005DF0  s__GSFINAL                      
+     00000CEC  l__DATA                         
+     00005BFD  l__CODE                         
+     00005C8D  s__HOME                         
+     00005E8B  s__INITIALIZER                  
+     00005E98  s__GSINIT                       
+     00005EB0  s__GSFINAL                      
      00007000  s__DATA                         
-     00007CEA  s__BSS                          
-     00007CEB  s__HEAP                         
-     00007CEB  s__INITIALIZED                  
+     00007CEC  s__BSS                          
+     00007CED  s__HEAP                         
+     00007CED  s__INITIALIZED                  
 ASxxxx Linker V03.00 + NoICE + sdld,  page 2.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_CODE                               00000090    00005B46 =       23366. bytes (REL,CON)
+_CODE                               00000090    00005BFD =       23549. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -49,128 +49,131 @@ _CODE                               00000090    00005B46 =       23366. bytes (R
      0000012C  _my_set_graphics                   phoenixBoot
      00000198  _unrle                             phoenixBoot
      00000238  _waitVblanks                       phoenixBoot
-     0000025F  _readkeypad                        phoenixBoot
-     00000276  _textout                           phoenixBoot
-     000002B8  _textouthalf                       phoenixBoot
-     000003B2  _fadeInTextF18A                    phoenixBoot
-     00000416  _displayLogo                       phoenixBoot
-     00000498  _centerString                      phoenixBoot
-     00000521  _startTitle                        phoenixBoot
-     00000658  _startCartridge                    phoenixBoot
-     0000065F  _runCartHeader                     phoenixBoot
-     0000094C  _main                              phoenixBoot
-     00000A61  _PAT0                              newmap2
-     00000F12  _MD0_LOGO                          newmap2
-     0000101F  _MD0_PHOENIX                       newmap2
-     0000109F  _unlock_f18a                       f18a
-     000010B0  _DEFAULT_PALETTE                   f18a
-     000010D0  _GPUTEST                           f18a
-     000010DC  _lock_f18a                         f18a
-     000010E5  _reset_f18a                        f18a
-     0000111D  _test_f18a                         f18a
-     0000116C  _loadpal_f18a                      f18a
-     000011AB  _FATFONT                           mattfont
-     0000149B  _dly_50us                          menu
-     000014B3  _FolderName                        menu
-     000014BA  _FolderNameLen                     menu
-     000014BB  _MENU_PALETTE                      menu
-     000014CB  _hex                               menu
-     000014DB  _cleartextout                      menu
-     000014EC  _clrscr                            menu
-     000014FF  _clrscrbottom                      menu
-     00001514  _vdpStrOut                         menu
-     00001543  _mystrcpy                          menu
-     00001572  _waitBothFireClear                 menu
-     0000158F  _waitAnyFirePressed                menu
-     000015AB  _handleBlanking                    menu
-     00001613  _displayErrorString                menu
-     0000168F  _mystrcmp                          menu
-     000016D6  _readDir                           menu
-     00001859  _waitRelease                       menu
-     00001890  _drawTitles                        menu
-     00001A18  _sortDir                           menu
-     00001B1D  _waitSDCard                        menu
-     00001BD3  _loadCartridgeRom                  menu
-     00001CC8  _copyPage                          menu
-     00001D0C  _loadMegacartRom                   menu
+     0000025F  _readjoyst                         phoenixBoot
+     0000027A  _readkeypad                        phoenixBoot
+     0000035B  _textout                           phoenixBoot
+     0000039D  _textouthalf                       phoenixBoot
+     00000497  _fadeInTextF18A                    phoenixBoot
+     000004FB  _displayLogo                       phoenixBoot
+     0000057D  _centerString                      phoenixBoot
+     00000606  _startTitle                        phoenixBoot
+     00000745  _startCartridge                    phoenixBoot
+     0000074C  _runCartHeader                     phoenixBoot
+     00000A2B  _main                              phoenixBoot
+     00000B3D  _PAT0                              newmap2
+     00000FEE  _MD0_LOGO                          newmap2
+     000010FB  _MD0_PHOENIX                       newmap2
+     0000117B  _unlock_f18a                       f18a
+     0000118C  _DEFAULT_PALETTE                   f18a
+     000011AC  _GPUTEST                           f18a
+     000011B8  _reset_f18a                        f18a
+     000011C1  _lock_f18a                         f18a
+     000011CA  _prepare_f18a                      f18a
+     0000122A  _test_f18a                         f18a
+     00001279  _loadpal_f18a                      f18a
+     000012B8  _FATFONT                           mattfont
+     000015A8  _dly_50us                          menu
+     000015C0  _FolderName                        menu
+     000015C7  _FolderNameLen                     menu
+     000015C8  _MENU_PALETTE                      menu
+     000015D8  _hex                               menu
+     000015E8  _cleartextout                      menu
+     000015F9  _clrscr                            menu
+     0000160C  _clrscrbottom                      menu
+     00001621  _vdpStrOut                         menu
+     00001650  _mystrcpy                          menu
+     0000167F  _waitBothFireClear                 menu
+     00001689  _waitAnyFirePressed                menu
+     00001694  _handleBlanking                    menu
+     000016DF  _displayErrorString                menu
+     0000175B  _mystrcmp                          menu
+     000017A2  _readDir                           menu
+     00001925  _waitRelease                       menu
+     00001954  _drawTitles                        menu
+     00001ADC  _sortDir                           menu
+     00001BE1  _waitSDCard                        menu
+     00001C97  _loadCartridgeRom                  menu
 ASxxxx Linker V03.00 + NoICE + sdld,  page 3.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_CODE                               00000090    00005B46 =       23366. bytes (REL,CON)
+_CODE                               00000090    00005BFD =       23549. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00001F44  _drawSelect                        menu
-     00001FA6  _undrawSelect                      menu
-     00001FEB  _getUserSelection                  menu
-     00002204  _menu                              menu
-     000026D1  _dummyfunc                         vdp_memcpyfast
-     000026D1  _vdpmemcpyfast                     vdp_memcpyfast
-     00002703  _f_read                            ff_fread
-     00002B5D  _disk_read                         diskio_diskread
-     00002C19  _joystfast                         joystfast
-     00002C71  _my_nmi                            vdp_ints
-     00002C8D  _setUserIntHook                    vdp_ints
-     00002C9E  _clearUserIntHook                  vdp_ints
-     00002CA5  _vdpinit                           vdp_ints
-     00002CDF  _disk_status                       diskio_diskstatus
-     00002CEF  _f_opendir                         ff_opendir
-     00002DDA  _f_open                            ff_fopen
-     00002F40  _f_mount                           ff_fmount
-     00002F84  _send_cmd                          diskio_sendcmd
-     000030CB  _kscanfast                         kscanfast
-     00003122  _keys                              kscanfast
-     00003132  _select                            diskio_select
-     0000315A  _rcvr_datablock                    diskio_rcvrdatablock
-     000031C0  _vdpreadchar                       vdp_readchar
-     000031DD  _disk_initialize                   diskio_diskinit
-     00003373  _deselect                          diskio_dselect
-     00003389  ___sdcc_call_hl                    
-     0000338A  _validate                          ff_validate
-     000033FF  _ld_dword                          ff_lddword
-     000034C0  _LfnOfs                            ff_vars
-     000034CD  _ExCvt                             ff_vars
-     0000354D  _vdpmemset                         vdp_memset
-     0000356F  _clst2sect                         ff_clst2sect
-     00003629  _find_volume                       ff_findvolume
-     00003D76  ___sdcc_enter_ix                   
-     00003D80  _rcvr_mmc                          diskio_rcvrmmc
-     00003D80  _rcvr_mmc_dummy                    diskio_rcvrmmc
-     00003DA9  _f_lseek                           ff_lseek
-     0000427A  _ld_clust                          ff_ldclust
-     0000430B  _get_fat                           ff_getfat
-     000044B7  _f_closedir                        ff_closedir
-     000044DE  _f_close                           ff_fclose
-     00004505  _xmit_mmc                          diskio_xmitmmc
-     0000451A  _dir_sdi                           ff_dirsdi
-     00004839  _follow_path                       ff_followpath
-     00004965  _f_readdir                         ff_readdir
-     000049D9  _wait_ready                        diskio_waitready
-     00004A15  _get_fileinfo                      ff_getfileinfo
-     00004C23  _move_window                       ff_movewindow
-     00004CB1  _create_name                       ff_createname
-     000050C7  _check_fs                          ff_checkfs
-     00005190  __mulint                           
+     00001D8C  _copyPage                          menu
+     00001DD0  _loadMegacartRom                   menu
+     00002008  _drawSelect                        menu
+     0000206A  _undrawSelect                      menu
+     000020AF  _getUserSelection                  menu
+     00002285  _menu                              menu
+     00002750  _dummyfunc                         vdp_memcpyfast
+     00002750  _vdpmemcpyfast                     vdp_memcpyfast
+     00002782  _f_read                            ff_fread
+     00002BDC  _vdpmemread                        vdp_memread
+     00002C14  _disk_read                         diskio_diskread
+     00002CD0  _joystfast                         joystfast
+     00002D28  _my_nmi                            vdp_ints
+     00002D44  _setUserIntHook                    vdp_ints
+     00002D55  _clearUserIntHook                  vdp_ints
+     00002D5C  _vdpinit                           vdp_ints
+     00002D96  _disk_status                       diskio_diskstatus
+     00002DA6  _f_opendir                         ff_opendir
+     00002E91  _f_open                            ff_fopen
+     00002FF7  _f_mount                           ff_fmount
+     0000303B  _send_cmd                          diskio_sendcmd
+     00003182  _kscanfast                         kscanfast
+     000031D9  _keys                              kscanfast
+     000031E9  _select                            diskio_select
+     00003211  _rcvr_datablock                    diskio_rcvrdatablock
+     00003277  _vdpreadchar                       vdp_readchar
+     00003294  _disk_initialize                   diskio_diskinit
+     0000342A  _deselect                          diskio_dselect
+     00003440  ___sdcc_call_hl                    
+     00003441  _validate                          ff_validate
+     000034B6  _ld_dword                          ff_lddword
+     00003577  _LfnOfs                            ff_vars
+     00003584  _ExCvt                             ff_vars
+     00003604  _vdpmemset                         vdp_memset
+     00003626  _clst2sect                         ff_clst2sect
+     000036E0  _find_volume                       ff_findvolume
+     00003E2D  ___sdcc_enter_ix                   
+     00003E37  _rcvr_mmc                          diskio_rcvrmmc
+     00003E37  _rcvr_mmc_dummy                    diskio_rcvrmmc
+     00003E60  _f_lseek                           ff_lseek
+     00004331  _ld_clust                          ff_ldclust
+     000043C2  _get_fat                           ff_getfat
+     0000456E  _f_closedir                        ff_closedir
+     00004595  _f_close                           ff_fclose
+     000045BC  _xmit_mmc                          diskio_xmitmmc
+     000045D1  _dir_sdi                           ff_dirsdi
+     000048F0  _follow_path                       ff_followpath
+     00004A1C  _f_readdir                         ff_readdir
+     00004A90  _wait_ready                        diskio_waitready
+     00004ACC  _get_fileinfo                      ff_getfileinfo
+     00004CDA  _move_window                       ff_movewindow
 ASxxxx Linker V03.00 + NoICE + sdld,  page 4.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_CODE                               00000090    00005B46 =       23366. bytes (REL,CON)
+_CODE                               00000090    00005BFD =       23549. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00005198  __mul16                            
-     000051AC  _dir_read                          ff_dirread
-     0000539D  _sum_sfn                           ff_sumsfn
-     000053C9  _dir_find                          ff_dirfind
-     00005619  _pick_lfn                          ff_picklfn
-     00005732  _chk_chr                           ff_chkchr
-     00005758  _dir_next                          ff_dirnext
-     00005A46  _mem_cmp                           ff_memcmp
-     00005A95  _cmp_lfn                           ff_cmplfn
+     00004D68  _create_name                       ff_createname
+     0000517E  _check_fs                          ff_checkfs
+     00005247  __mulint                           
+     0000524F  __mul16                            
+     00005263  _dir_read                          ff_dirread
+     00005454  _sum_sfn                           ff_sumsfn
+     00005480  _dir_find                          ff_dirfind
+     000056D0  _pick_lfn                          ff_picklfn
+     000057E9  _chk_chr                           ff_chkchr
+     0000580F  _dir_next                          ff_dirnext
+     00005AFD  _mem_cmp                           ff_memcmp
+     00005B4C  _cmp_lfn                           ff_cmplfn
 
 ASxxxx Linker V03.00 + NoICE + sdld,  page 5.
 Hexadecimal  [32-Bits]
@@ -186,19 +189,19 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_HOME                               00005BD6    000001FE =         510. bytes (REL,CON)
+_HOME                               00005C8D    000001FE =         510. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00005BD6  __mullong                          _mullong
-     00005D54  __divulong                         _divulong
+     00005C8D  __mullong                          _mullong
+     00005E0B  __divulong                         _divulong
 
 ASxxxx Linker V03.00 + NoICE + sdld,  page 7.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_INITIALIZER                        00005DD4    0000000C =          12. bytes (REL,CON)
+_INITIALIZER                        00005E8B    0000000D =          13. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -207,18 +210,18 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_GSINIT                             00005DE0    00000010 =          16. bytes (REL,CON)
+_GSINIT                             00005E98    00000018 =          24. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00005DE0  gsinit                             crt0
+     00005E98  gsinit                             crt0
 
 ASxxxx Linker V03.00 + NoICE + sdld,  page 9.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_GSFINAL                            00005DF0    00000001 =           1. bytes (REL,CON)
+_GSFINAL                            00005EB0    00000001 =           1. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -227,60 +230,64 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_DATA                               00007000    00000CEA =        3306. bytes (REL,CON)
+_DATA                               00007000    00000CEC =        3308. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00007000  _copyright                         phoenixBoot
-     00007041  _lineBuffer                        phoenixBoot
-     00007069  _f18a                              phoenixBoot
-     0000706A  _path                              menu
-     0000726A  _path2                             menu
-     0000746A  _sortedList                        menu
-     0000766A  _repeatTimeout                     menu
-     0000766B  _fatFs                             menu
-     00007893  _fil                               menu
-     00007AAF  _dir                               menu
-     00007ADB  _finfo                             menu
-     00007BDF  _KSCAN_KEY                         joystfast
-     00007BE0  _KSCAN_JOYY                        joystfast
-     00007BE1  _KSCAN_JOYX                        joystfast
-     00007BE2  _KSCAN_STATUS                      joystfast
-     00007BE3  _csHigh                            diskio_diskinit
-     00007BE4  _csLow                             diskio_diskinit
-     00007BE5  _CardType                          diskio_diskinit
-     00007BE6  _FatFs                             ff_vars
-     00007BE8  _Fsid                              ff_vars
-     00007BEA  _LfnBuf                            ff_vars
+     00007000  _useFlicker                        phoenixBoot
+     00007001  _copyright                         phoenixBoot
+     00007042  _lineBuffer                        phoenixBoot
+     0000706A  _f18a                              phoenixBoot
+     0000706C  _path                              menu
+     0000726C  _path2                             menu
+     0000746C  _sortedList                        menu
+     0000766C  _repeatTimeout                     menu
+     0000766D  _fatFs                             menu
+     00007895  _fil                               menu
+     00007AB1  _dir                               menu
+     00007ADD  _finfo                             menu
+     00007BE1  _KSCAN_KEY                         joystfast
+     00007BE2  _KSCAN_JOYY                        joystfast
+     00007BE3  _KSCAN_JOYX                        joystfast
+     00007BE4  _KSCAN_STATUS                      joystfast
+     00007BE5  _csHigh                            diskio_diskinit
+     00007BE6  _csLow                             diskio_diskinit
+     00007BE7  _CardType                          diskio_diskinit
+     00007BE8  _FatFs                             ff_vars
+     00007BEA  _Fsid                              ff_vars
+     00007BEC  _LfnBuf                            ff_vars
+
 ASxxxx Linker V03.00 + NoICE + sdld,  page 11.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_BSS                                00007CEA    00000001 =           1. bytes (REL,CON)
+_BSS                                00007CEC    00000001 =           1. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00007CEA  _vdpLimi                           crt0
+     00007CEC  _vdpLimi                           crt0
 
 ASxxxx Linker V03.00 + NoICE + sdld,  page 12.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_INITIALIZED                        00007CEB    0000000C =          12. bytes (REL,CON)
+_INITIALIZED                        00007CED    0000000D =          13. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00007CEB  _lastFilename                      menu
-     00007CED  _listSize                          menu
-     00007CEE  _listOffset                        menu
-     00007CEF  _listSelect                        menu
-     00007CF0  _firstScan                         menu
-     00007CF1  _firstDir                          menu
-     00007CF2  _VDP_STATUS_MIRROR                 vdp_ints
-     00007CF5  _VDP_INT_COUNTER                   vdp_ints
-     00007CF6  _Stat                              diskio_diskinit
+     00007CED  _useScanlines                      f18a
+     00007CEE  _lastFilename                      menu
+     00007CF0  _listSize                          menu
+     00007CF1  _listOffset                        menu
+     00007CF2  _listSelect                        menu
+     00007CF3  _firstScan                         menu
+     00007CF4  _firstDir                          menu
+     00007CF5  _VDP_STATUS_MIRROR                 vdp_ints
+     00007CF8  _VDP_INT_COUNTER                   vdp_ints
+     00007CF9  _Stat                              diskio_diskinit
+
 ASxxxx Linker V03.00 + NoICE + sdld,  page 13.
 
 Files Linked                              [ module(s) ]
@@ -297,6 +304,7 @@ vdp_memcpyfast.rel                        [ vdp_memcpyfast ]
 Libraries Linked                          [ object file ]
 
 fatfs.a                                   [ ff_fread ]
+../libti99coleco/libti99.a                [ vdp_memread ]
 fatfs.a                                   [ diskio_diskread ]
 ../libti99coleco/libti99.a                [ joystfast ]
 ../libti99coleco/libti99.a                [ vdp_ints ]

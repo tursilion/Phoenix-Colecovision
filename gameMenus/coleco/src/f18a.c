@@ -6,6 +6,14 @@
 extern void vdpmemcpyfast(int pAddr, const unsigned char *pSrc, int cnt);
 #define vdpmemcpy vdpmemcpyfast
 
+// configuration so we can force it after a reset
+// NOTE: This is NOT a flag, it's written directly to register >32
+// We need this cause of our text-attribute-mode menu. So write bit >04
+// to enable the scanlines. Kind of hacky and badly named but I need the ROM space.
+unsigned char useScanlines = 0;     // takes in real time but we need it after a reset
+// stored in phoenixBoot.c - whether to allow 4 sprite flicker or not
+extern unsigned char useFlicker;
+
 // default F18 palette values
 const unsigned int DEFAULT_PALETTE[] = {
 	0x0000,0x0000,0x02C3,0x05D6,0x054F,0x076F,0x0D54,0x04EF,
@@ -26,17 +34,26 @@ void unlock_f18a() {
 	VDP_SET_REGISTER(0x39, 0x1c);	// write again (unlocks enhanced mode)
 }
 
-// lock F18A if unlocked (1.6 or later)
-void lock_f18a() {
+// reset F18A if unlocked (1.6 or later)
+void reset_f18a() {
 	// reset the F18A to defaults (except palette, requires 1.6)
 	VDP_SET_REGISTER(0x32, 0x80); 	// VR2/50, value 10000000
 									// reset and lock F18A, or corrupt R2
 }
 
+// just lock the F18A (preserves all settings)
+void lock_f18a() {
+    VDP_SET_REGISTER(0x39, 0x00);	// VR1/57, value 00000000 (corrupts VDPR1 if already locked)
+}
+
 // This will corrupt the registers if it's not
 // an F18A, so after calling this, reset the VDP with lock_f18a
 // Note that this, by necessity, unlocks the F18A if it was locked.
-void reset_f18a() {
+// This is a Phoenix specific function...
+void prepare_f18a() {
+    // go for a reset of anything we may have tweaked
+    reset_f18a();
+
     // If for nothing else, the palette reset requires us to be unlocked
     unlock_f18a();
 
@@ -52,12 +69,24 @@ void reset_f18a() {
 	// reset the status register to 0
 	VDP_SET_REGISTER(0x0f, 00);	// V15 = 0 - read SR0 again
 
+    // reset the sprite flicker count to whatever is set
+    if (useFlicker) {
+        VDP_SET_REGISTER(0x1e, 4); // stop sprite is #4
+    } else {
+        VDP_SET_REGISTER(0x1e, 32); // stop sprite is #32
+    }
+
+    // update the scanlines setting (we default to off no matter the existing default right now)
+    // TODO: scanline setting expected to move to the core select menu, so we can remove all this
+    // code that touches useScanlines at that point.
+    VDP_SET_REGISTER(0x32, useScanlines);
+
     // wait for an interrupt (or, if VDPST2 is active, RUNNING to clear)
 	while (VDPST & 0x80) {
 		VDP_SAFE_DELAY();
 	}
 
-    // the above is all needed on older versions of the F18A
+    // now just re-lock the F18A in order to preserve our deliberate settings
     lock_f18a();
 }
 
@@ -65,7 +94,7 @@ void reset_f18a() {
 // corrupts 12 bytes at 0x1c00
 // This does the unlock for you!
 unsigned char test_f18a() {
-    lock_f18a();        // reset and lock, if present, to get a clean state
+    reset_f18a();        // reset and lock, if present, to get a clean state
     unlock_f18a();      // attempt to unlock
 
 	// If we are not on the F18A, then R1 is screwed up now, that's okay
