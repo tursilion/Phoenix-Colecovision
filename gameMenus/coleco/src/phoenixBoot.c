@@ -16,6 +16,10 @@
 #include "mattfont.c"
 #undef HEADERS__
 
+// - stored in the F18A code - actual value of the 0x32 register (so it changes in text mode)
+extern unsigned char useScanlines;     // takes in real time but we need it after a reset
+unsigned char useFlicker;       // can't enable this until we start a cartridge
+
 // --- externs ---
 
 // fast memcpy, since we don't need delays on the F18A
@@ -173,16 +177,51 @@ void waitVblanks(unsigned char cnt) {
     }
 }
 
-// wrapper for kscan that knows about our hot config keys (uh, except we have none right now)
+// wrapper for joyst that checks both joysticks
+void readjoyst() {
+    joystfast(1);
+    if ((KSCAN_JOYY==0)&&(KSCAN_JOYX==0)) {
+        // try joystick 2
+        joystfast(2);
+    }
+}
+
+// wrapper for kscan that knows about our hot config keys and reads both sticks
 // this allows them to work at pretty much any time automatically
-// don't let keypad presses escape this function, want fire buttons only
-void readkeypad(unsigned char unit) {
+void readkeypad() {
+    static unsigned char lastret = 0xff;
     unsigned char ret;
     
-    kscanfast(unit);
+    kscanfast(1);
     ret = KSCAN_KEY;
+    if (ret == 0xff) {
+        // try joystick 2
+        kscanfast(2);
+        ret = KSCAN_KEY;
+    }
 
-    if (ret != JOY_FIRE) KSCAN_KEY=0xff;
+    // check only when changed
+    if (lastret != ret) {
+        lastret = ret;
+        if (ret == '*') {
+            // toggle scanlines - this is pretty obvious so no feedback needed
+            useScanlines ^= SCANLINES_ON;
+            VDP_SET_REGISTER(0x32, useScanlines);
+        } else if (ret == '#') {
+            // toggle sprite flicker
+            useFlicker = !useFlicker;
+            // I don't like this, but this is the simplest way to do the notification...
+            vdpmemread(GIMAGE+23*40, lineBuffer, 40);
+            vdpmemset(GIMAGE+23*40, ' ', 40);
+            if (useFlicker) {
+                vdpmemcpy(GIMAGE+23*40+18, "SPRITE FLICKER ENABLED", 22);
+            } else {
+                vdpmemcpy(GIMAGE+23*40+17, "SPRITE FLICKER DISABLED", 23);
+            }
+            waitVblanks(60);
+            vdpmemcpy(GIMAGE+23*40, lineBuffer, 40);
+        }
+    }
 }
 
 // text out to the sprite layer at the bottom of the screen
@@ -329,7 +368,8 @@ void startTitle() {
     VDP_SET_REGISTER(VDP_REG_MODE1, VDP_MODE1_16K);
 
     // -    reset F18A
-    reset_f18a();   // also locks
+    useScanlines &= SCANLINES_ON;  // turn off every bit except scanline selection
+    prepare_f18a();   // also locks
 
     // the RAM located at 0x6000 is the original ColecoVision 1k
     // but unlike the Coleco BIOS, we /must/ access at 0x6000, not
@@ -760,7 +800,7 @@ void runCartHeader(void (*mycenter)(unsigned char, char*)) {
     // - wait 5 seconds, allow abort
     cntdown = 300;
     while (cntdown-- > 0) {
-        readkeypad(1);   // read left joystick fire button
+        readkeypad();   // read joystick fire buttons
         if (KSCAN_KEY == JOY_FIRE) break;
         waitVblanks(1);
     }
@@ -785,9 +825,8 @@ int main() {
 	// and pressed reset, otherwise old settings will still be active.
     // If the F18A wasn't active, this will corrupt registers, but that's okay.
     // NOTE: Phoenix F18A gets a reset on reset too, but it does NOT reset the palette
-    // Note that this will also unlock (part of the palette reload), so we don't
-    // need to unlock later.
-	reset_f18a();
+    // This will reset, and then test if the F18A is actually present - it should be!!
+    f18a = test_f18a();
 
     // test for a cartridge with the no logo requirement
     // note that startCartridge still does a lot of initialization,
@@ -796,8 +835,6 @@ int main() {
         startCartridge();    // never returns
     }
 
-    // then test if the F18A is actually present - it should be!!
-    f18a = test_f18a();
     // ask the F18A to turn off the sprite limit
     VDP_SET_REGISTER(0x1e, 32); // stop sprite is #32
 	
