@@ -288,14 +288,14 @@ _memmove::
 ;:51: while (cnt--) {
 ;:52: *d-- = *s--;
     lddr
-    pop hl          ; just to clean up the stack
+    pop hl          ; just to fix up the stack
 	jr	00109$
 
 ; Incrementing - memcpy case
+; all registers needed are still intact
 00108$:
 ;:56: d = dst;
 ;:57: s = src;
-    pop hl          ; get original source address back
 
 ;:58: while (cnt--) {
 ;:59: *d++ = *s++;
