@@ -268,7 +268,7 @@ _memmove::
 	sub	a,l
 	ld	a,d
 	sbc	a,h         ; src-dest, jump if no carry (ie: dest is greater)
-	jr	NC,00108$
+	jr	NC,00110$
 
 ; decrementing, memmove case
 ;:49: d = ((char *)dst) + cnt - 1;
@@ -290,6 +290,10 @@ _memmove::
     lddr
     pop hl          ; just to fix up the stack
 	jr	00109$
+	
+; need to recover original hl before we do the following
+00110$:
+	pop hl
 
 ; Incrementing - memcpy case
 ; all registers needed are still intact
