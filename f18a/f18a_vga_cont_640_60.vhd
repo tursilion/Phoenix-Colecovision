@@ -79,8 +79,8 @@ architecture rtl of f18a_vga_cont_640_60 is
    -- When divided by the 40ns pixel clock, that is a total of 793.65 pixels.
    -- 794 * 40ns = 31.76us * 525 = 16.674ms
    -- 1 / 16.674ms = 59.973Hz
---   constant HMAX  : integer := 799;    -- 0 to 799 == 800 pixels
-   constant HMAX  : integer := 793;    -- 0 to 799 == 800 pixels
+   constant HMAX  : integer := 795;    -- 0 to 799 == 800 pixels
+-- constant HMAX  : integer := 793;    -- 0 to 799 == 800 pixels
    constant VMAX  : integer := 524;    -- 0 to 524 == 525 lines
 
    -- 640x480 display size.
@@ -89,10 +89,10 @@ architecture rtl of f18a_vga_cont_640_60 is
 
    -- Front porch is 16px, followed by a 96px hsync, then a 48px back porch.
    -- 640 + 16 + 96 + 48 = 800
---   constant HFP   : integer := 656;    -- Horz end of front porch (16px)
---   constant HSP   : integer := 752;    -- Horz end of sync pulse (96px)
-   constant HFP   : integer := 650;    -- Horz end of front porch (16px)
-   constant HSP   : integer := 746;    -- Horz end of sync pulse (96px)
+   constant HFP   : integer := 656;    -- Horz end of front porch (16px)
+   constant HSP   : integer := 752;    -- Horz end of sync pulse (96px)
+-- constant HFP   : integer := 650;    -- Horz end of front porch (16px)
+-- constant HSP   : integer := 746;    -- Horz end of sync pulse (96px)
 
    -- 'px' here means vertical 'lines'
    -- Front proch is 11px, followed by a 2px vsync, then a 30px back porch.

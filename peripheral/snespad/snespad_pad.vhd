@@ -131,12 +131,16 @@ begin
 
     else
       if save_buttons_i then
-        if shift_buttons_q(but_pos_bit2_c) = 1 and shift_buttons_q(but_pos_bit3_c) = 0 then
-          buttons_q(31 downto 16) <= shift_buttons_q(15 downto 0);
-        else
-          buttons_q <= shift_buttons_q;
-        end if;
-      end if;
+			if  shift_buttons_q(but_pos_bit3_c) = 1
+			and shift_buttons_q(but_pos_bit2_c) = 0
+			and shift_buttons_q(but_pos_bit1_c) = 1
+			and shift_buttons_q(but_pos_bit0_c) = 1
+		then
+			buttons_q <= shift_buttons_q;
+		else
+			buttons_q <= shift_buttons_q(31 downto 16) & "1111111111111111";
+		end if;
+	end if;
 
       if clk_en_i and shift_buttons_i then
         shift_buttons_q(buttons_t'high downto 1) <= shift_buttons_q(buttons_t'high-1 downto 0);

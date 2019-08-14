@@ -132,9 +132,10 @@ architecture rtl of colecovision is
    signal d_from_vdp_s                    : std_logic_vector( 7 downto 0);
    signal vdp_r_n_s                       : std_logic;
    signal vdp_w_n_s                       : std_logic;
+   signal vdp_settings_s						: std_logic_vector( 1 downto 0);
 
    -- SN76489 Sound
-   signal audio_s                         : signed(7 downto 0);
+   signal audio_s                         : std_logic_vector(7 downto 0);
    signal sn489_ready_s                   : std_logic;
    signal sn489_we_n_s                    : std_logic;
 
@@ -142,6 +143,7 @@ architecture rtl of colecovision is
    signal d_from_wsg_s                    : std_logic_vector(7 downto 0);
    signal wsg_bdir_s                      : std_logic;
    signal wsg_bc_s                        : std_logic;
+   signal wsg_native_q     				  : std_logic := '0';
 
    signal ay_ch_a_s                       : std_logic_vector( 7 downto 0);
    signal ay_ch_b_s                       : std_logic_vector( 7 downto 0);
@@ -149,11 +151,11 @@ architecture rtl of colecovision is
 
    -- Audio Mixing
    signal AUDIO_WSG                       : unsigned( 7 downto 0);
-   signal AUDIO_EX                        : signed( 7 downto 0);
-   signal AUDIO_EX_A                      : signed( 7 downto 0);
+   signal AUDIO_EX                        : unsigned( 8 downto 0);
+   signal AUDIO_EX_A                      : unsigned( 7 downto 0);
    signal AUDIO_EX_B                      : signed( 7 downto 0);
    signal AUDIO_EX_C                      : signed( 7 downto 0);
-   signal AUDIO_SUM                       : signed( 8 downto 0);
+   signal AUDIO_SUM                       : unsigned( 8 downto 0);
    signal WSG_CS                          : std_logic;
 
    -- Internal 1K RAM
@@ -249,24 +251,24 @@ begin
    -- the wait-state.
    --
    -- Leaving this out for now.
---   m1_wait: process (clock_i, reset_n_s, m1_n_s)
---   begin
---      if reset_n_s = '0' or m1_n_s = '1' then
---         m1_wait_q   <= '0';
---      elsif rising_edge(clock_i) then
---         if clk_en_3m58_i = '1' then
---            m1_wait_q <= not m1_wait_q;
---         end if;
---      end if;
---   end process m1_wait;
+   m1_wait: process (clock_i, reset_n_s, m1_n_s)
+   begin
+      if reset_n_s = '0' or m1_n_s = '1' then
+         m1_wait_q   <= '0';
+      elsif rising_edge(clock_i) then
+         if clk_en_3m58_i = '1' then
+            m1_wait_q <= not m1_wait_q;
+         end if;
+      end if;
+   end process m1_wait;
 
    -- TODO: Matthew H, March 19, 2019
    -- Why is the wait being created via the clock enable instead of the
    -- real WAIT_n input to the CPU?  Is the T80 core WAIT_n broken?
    --
    -- Modified CPU clock enable based on slow devices or the wait state.
---   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and not m1_wait_q;
-   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and sd_wait_n_s;
+   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and not m1_wait_q and sd_wait_n_s;
+--   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and sd_wait_n_s;
 
    -- CPU maskable interrupt input, currently only the controllers.
    int_n_s <= ctrl_int_n_s;
@@ -330,8 +332,8 @@ begin
       blu_o          => blu_o,         -- out std_logic_vector(0 to 3);
 
       -- Feature Selection
-      sprite_max_i   => '0',           -- in std_logic;   -- Default sprite max, '0' = 32, '1' = 4
-      scanlines_i    => '0',           -- in std_logic;   -- Simulated scan lines, '0' = no, '1' = yes
+      sprite_max_i   => vdp_settings_s(1),             -- in std_logic;   -- Default sprite max, '0' = 32, '1' = 4
+      scanlines_i    => vdp_settings_s(0), -- in std_logic;   -- Simulated scan lines, '0' = no, '1' = yes
 
       -- SPI to GPU
       spi_clk_o      => open,          -- out std_logic
@@ -362,62 +364,65 @@ begin
    --audio_o         <= std_logic_vector(audio_s);
    --audio_signed_o  <= audio_s;
 
-   AUDIO_EX    <= signed(AUDIO_WSG - 128);
---   AUDIO_SUM      <= (audio_s(7) & audio_s) + (AUDIO_EX(7) & AUDIO_EX);
-   AUDIO_EX_A  <= signed(unsigned(ay_ch_a_s) - 128);
-   AUDIO_EX_B  <= signed(unsigned(ay_ch_b_s) - 128);
-   AUDIO_EX_C  <= signed(unsigned(ay_ch_c_s) - 128);
+--   AUDIO_EX    <= signed(AUDIO_WSG-128);
+   AUDIO_EX    <= "0"&AUDIO_WSG;
+	AUDIO_EX_A <= resize(unsigned(audio_s), 8);
+   AUDIO_SUM      <= AUDIO_EX + AUDIO_EX_A;
+--   AUDIO_SUM      <= ("00" & audio_s ) ;
+--   AUDIO_EX_A  <= signed(unsigned(ay_ch_a_s) - 128);
+--   AUDIO_EX_B  <= signed(unsigned(ay_ch_b_s) - 128);
+--   AUDIO_EX_C  <= signed(unsigned(ay_ch_c_s) - 128);
 
-   AUDIO_SUM   <= (   audio_s(7) & audio_s) +
-                  (AUDIO_EX_A(7) & AUDIO_EX_A(7) & AUDIO_EX_A(7) & AUDIO_EX_A(7 downto 2)) +
-                  (AUDIO_EX_B(7) & AUDIO_EX_B(7) & AUDIO_EX_B(7) & AUDIO_EX_B(7 downto 2)) +
-                  (AUDIO_EX_C(7) & AUDIO_EX_C(7) & AUDIO_EX_C(7) & AUDIO_EX_C(7 downto 2));
+--   AUDIO_SUM   <= (   audio_s(7) & audio_s) +
+--                  (AUDIO_EX_A(7) & AUDIO_EX_A(7) & AUDIO_EX_A(7) & AUDIO_EX_A(7 downto 2)) +
+--                  (AUDIO_EX_B(7) & AUDIO_EX_B(7) & AUDIO_EX_B(7) & AUDIO_EX_B(7 downto 2)) +
+--                  (AUDIO_EX_C(7) & AUDIO_EX_C(7) & AUDIO_EX_C(7) & AUDIO_EX_C(7 downto 2));
 
    audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
-   audio_signed_o <= AUDIO_SUM(8 downto 1);
+   audio_signed_o <= signed(AUDIO_SUM(8 downto 1));
 
    --
    -- COURTNEY (SEX 7264) WAVETABLE SOUND GENERATOR (WSG)
    --
---   WSG : ENTITY work.SEX7264
---   PORT MAP
---   (
---       CLK         => clock_i      ,
---       CLKENA      => clk_en_3m58_i, -- WARNING
---      nRESET       => reset_n_s    ,
---       BDIR        => wsg_bdir_s   ,
---       BC1         => wsg_bc_s     ,
---       DAI         => d_from_cpu_s ,
---       DAO         => d_from_wsg_s ,
---       NATIVE      => wsg_native_q ,
---       DIGITAL_MIX => AUDIO_WSG
---   );
+   WSG : ENTITY work.SEX7264
+   PORT MAP
+   (
+       CLK         => clock_i      ,
+       CLKENA      => clk_en_3m58_i, -- WARNING
+      nRESET       => reset_n_s    ,
+       BDIR        => wsg_bdir_s   ,
+       BC1         => wsg_bc_s     ,
+       DAI         => d_from_cpu_s ,
+       DAO         => d_from_wsg_s ,
+       NATIVE      => wsg_native_q ,
+       DIGITAL_MIX => AUDIO_WSG
+   );
 
    -- YM-2149, SGM Audio AY-8910 compatible
-   ym2149_inst: entity work.YM2149
-   port map (
-      CLK         => clock_i,
-      CE          => clk_en_3m58_i,
-      RESET       => reset_i,
-      BDIR        => wsg_bdir_s,
-      BC          => wsg_bc_s,
-      DI          => d_from_cpu_s,
-      DO          => d_from_wsg_s,
-      CHANNEL_A   => ay_ch_a_s,
-      CHANNEL_B   => ay_ch_b_s,
-      CHANNEL_C   => ay_ch_c_s,
+--   ym2149_inst: entity work.YM2149
+--   port map (
+--      CLK         => clock_i,
+--      CE          => clk_en_1m79_i,
+--      RESET       => reset_i,
+--      BDIR        => wsg_bdir_s,
+--      BC          => wsg_bc_s,
+--      DI          => d_from_cpu_s,
+--      DO          => d_from_wsg_s,
+--      CHANNEL_A   => ay_ch_a_s,
+--      CHANNEL_B   => ay_ch_b_s,
+--      CHANNEL_C   => ay_ch_c_s,
 
-      SEL         => '0',
-      MODE        => '0',
+--      SEL         => '0',
+--      MODE        => '0',
 
-      ACTIVE      => open,
+--      ACTIVE      => open,
 
-      IOA_in      => x"00",
-      IOA_out     => open,
+--      IOA_in      => x"00",
+--      IOA_out     => open,
 
-      IOB_in      => x"00",
-      IOB_out     => open
-   );
+--      IOB_in      => x"00",
+--     IOB_out     => open
+--   );
 
 
    --
