@@ -151,11 +151,11 @@ architecture rtl of colecovision is
 
    -- Audio Mixing
    signal AUDIO_WSG                       : unsigned( 7 downto 0);
-   signal AUDIO_EX                        : unsigned( 8 downto 0);
-   signal AUDIO_EX_A                      : unsigned( 7 downto 0);
-   signal AUDIO_EX_B                      : signed( 7 downto 0);
+   signal AUDIO_EX                        : unsigned( 10 downto 0);
+   signal AUDIO_EX_A                      : unsigned( 10 downto 0);
+   signal AUDIO_EX_B                      : unsigned( 10 downto 0);
    signal AUDIO_EX_C                      : signed( 7 downto 0);
-   signal AUDIO_SUM                       : unsigned( 8 downto 0);
+   signal AUDIO_SUM                       : unsigned( 10 downto 0);
    signal WSG_CS                          : std_logic;
 
    -- Internal 1K RAM
@@ -361,68 +361,53 @@ begin
       aout_o      => audio_s
    );
 
-   --audio_o         <= std_logic_vector(audio_s);
-   --audio_signed_o  <= audio_s;
-
---   AUDIO_EX    <= signed(AUDIO_WSG-128);
-   AUDIO_EX    <= "0"&AUDIO_WSG;
-	AUDIO_EX_A <= resize(unsigned(audio_s), 8);
-   AUDIO_SUM      <= AUDIO_EX + AUDIO_EX_A;
---   AUDIO_SUM      <= ("00" & audio_s ) ;
---   AUDIO_EX_A  <= signed(unsigned(ay_ch_a_s) - 128);
---   AUDIO_EX_B  <= signed(unsigned(ay_ch_b_s) - 128);
---   AUDIO_EX_C  <= signed(unsigned(ay_ch_c_s) - 128);
-
---   AUDIO_SUM   <= (   audio_s(7) & audio_s) +
---                  (AUDIO_EX_A(7) & AUDIO_EX_A(7) & AUDIO_EX_A(7) & AUDIO_EX_A(7 downto 2)) +
---                  (AUDIO_EX_B(7) & AUDIO_EX_B(7) & AUDIO_EX_B(7) & AUDIO_EX_B(7 downto 2)) +
---                  (AUDIO_EX_C(7) & AUDIO_EX_C(7) & AUDIO_EX_C(7) & AUDIO_EX_C(7 downto 2));
-
-   audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
-   audio_signed_o <= signed(AUDIO_SUM(8 downto 1));
+   AUDIO_EX_A <= unsigned(std_logic_vector'("0"&audio_s&"00"));
+   AUDIO_SUM <= AUDIO_EX_A + unsigned(ay_ch_a_s) + unsigned(ay_ch_b_s) + unsigned(ay_ch_c_s);
+	audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
+   audio_signed_o <= signed(AUDIO_SUM(10 downto 3)-128);
 
    --
    -- COURTNEY (SEX 7264) WAVETABLE SOUND GENERATOR (WSG)
    --
-   WSG : ENTITY work.SEX7264
-   PORT MAP
-   (
-       CLK         => clock_i      ,
-       CLKENA      => clk_en_3m58_i, -- WARNING
-      nRESET       => reset_n_s    ,
-       BDIR        => wsg_bdir_s   ,
-       BC1         => wsg_bc_s     ,
-       DAI         => d_from_cpu_s ,
-       DAO         => d_from_wsg_s ,
-       NATIVE      => wsg_native_q ,
-       DIGITAL_MIX => AUDIO_WSG
-   );
+ --  WSG : ENTITY work.SEX7264
+ --  PORT MAP
+ --  (
+ --      CLK         => clock_i      ,
+ --      CLKENA      => clk_en_3m58_i, -- WARNING
+ --     nRESET       => reset_n_s    ,
+ --      BDIR        => wsg_bdir_s   ,
+ --      BC1         => wsg_bc_s     ,
+ --      DAI         => d_from_cpu_s ,
+ --      DAO         => d_from_wsg_s ,
+ --      NATIVE      => wsg_native_q ,
+ --      DIGITAL_MIX => AUDIO_WSG
+ --  );
 
    -- YM-2149, SGM Audio AY-8910 compatible
---   ym2149_inst: entity work.YM2149
---   port map (
---      CLK         => clock_i,
---      CE          => clk_en_1m79_i,
---      RESET       => reset_i,
---      BDIR        => wsg_bdir_s,
---      BC          => wsg_bc_s,
---      DI          => d_from_cpu_s,
---      DO          => d_from_wsg_s,
---      CHANNEL_A   => ay_ch_a_s,
---      CHANNEL_B   => ay_ch_b_s,
---      CHANNEL_C   => ay_ch_c_s,
+   ym2149_inst: entity work.YM2149
+   port map (
+      CLK         => clock_i,
+      CE          => clk_en_1m79_i,
+      RESET       => reset_i,
+      BDIR        => wsg_bdir_s,
+      BC          => wsg_bc_s,
+      DI          => d_from_cpu_s,
+      DO          => d_from_wsg_s,
+      CHANNEL_A   => ay_ch_a_s,
+      CHANNEL_B   => ay_ch_b_s,
+      CHANNEL_C   => ay_ch_c_s,
 
---      SEL         => '0',
---      MODE        => '0',
+      SEL         => '0',
+      MODE        => '0',
 
---      ACTIVE      => open,
+      ACTIVE      => open,
 
---      IOA_in      => x"00",
---      IOA_out     => open,
+      IOA_in      => x"00",
+      IOA_out     => open,
 
---      IOB_in      => x"00",
---     IOB_out     => open
---   );
+      IOB_in      => x"00",
+     IOB_out     => open
+   );
 
 
    --

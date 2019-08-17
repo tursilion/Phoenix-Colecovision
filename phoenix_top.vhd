@@ -709,7 +709,8 @@ begin
    --
 
    audio_s <= std_logic_vector(unsigned(audio_signed_s + 128));
-   sound_hdmi_s <= '0' & audio_s & audio_s(7 downto 1);
+   --audio_s <= std_logic_vector(unsigned(audio_signed_s));
+   sound_hdmi_s <= "00" & audio_s & "000000";
 
    hdmi: entity work.hdmi
    generic map (
