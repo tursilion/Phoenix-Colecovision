@@ -9,7 +9,7 @@
 //-- design of HDMI output for Neo Geo MVS
 
 module hdmidataencoder 
-#(parameter FREQ=27000000, FS=48000, CTS=27000, N=6144) 
+#(parameter FREQ=25000000, FS=48000, CTS=25000, N=6144) 
 (
 	input 			i_pixclk,
 	input 			i_hSync,

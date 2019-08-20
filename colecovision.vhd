@@ -80,7 +80,7 @@ entity colecovision is
 
       -- Audio output
       audio_o        : out std_logic_vector(7 downto 0);
-      audio_signed_o : out signed(7 downto 0);
+      audio_signed_o : out unsigned(7 downto 0);
 
       -- VGA output
       blank_o        : out std_logic;
@@ -135,7 +135,8 @@ architecture rtl of colecovision is
    signal vdp_settings_s						: std_logic_vector( 1 downto 0);
 
    -- SN76489 Sound
-   signal audio_s                         : std_logic_vector(7 downto 0);
+   signal audio_s                         : std_logic_vector(7 downto 0);--mister SN core
+	--signal audio_s                         : signed(7 downto 0);--signed
    signal sn489_ready_s                   : std_logic;
    signal sn489_we_n_s                    : std_logic;
 
@@ -251,24 +252,24 @@ begin
    -- the wait-state.
    --
    -- Leaving this out for now.
-   m1_wait: process (clock_i, reset_n_s, m1_n_s)
-   begin
-      if reset_n_s = '0' or m1_n_s = '1' then
-         m1_wait_q   <= '0';
-      elsif rising_edge(clock_i) then
-         if clk_en_3m58_i = '1' then
-            m1_wait_q <= not m1_wait_q;
-         end if;
-      end if;
-   end process m1_wait;
+   --m1_wait: process (clock_i, reset_n_s, m1_n_s)
+   --begin
+   --   if reset_n_s = '0' or m1_n_s = '1' then
+   --      m1_wait_q   <= '0';
+   --   elsif rising_edge(clock_i) then
+   --      if clk_en_3m58_i = '1' then
+   --         m1_wait_q <= not m1_wait_q;
+   --      end if;
+   --   end if;
+   --end process m1_wait;
 
    -- TODO: Matthew H, March 19, 2019
    -- Why is the wait being created via the clock enable instead of the
    -- real WAIT_n input to the CPU?  Is the T80 core WAIT_n broken?
    --
    -- Modified CPU clock enable based on slow devices or the wait state.
-   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and not m1_wait_q and sd_wait_n_s;
---   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and sd_wait_n_s;
+   --clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and not m1_wait_q and sd_wait_n_s;
+   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and sd_wait_n_s;
 
    -- CPU maskable interrupt input, currently only the controllers.
    int_n_s <= ctrl_int_n_s;
@@ -360,12 +361,13 @@ begin
       d_i         => d_from_cpu_s,
       aout_o      => audio_s
    );
-
-   AUDIO_EX_A <= unsigned(std_logic_vector'("0"&audio_s&"00"));
+   
+   AUDIO_EX_A <= unsigned(std_logic_vector'(audio_s&"000"));
    AUDIO_SUM <= AUDIO_EX_A + unsigned(ay_ch_a_s) + unsigned(ay_ch_b_s) + unsigned(ay_ch_c_s);
 	audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
-   audio_signed_o <= signed(AUDIO_SUM(10 downto 3)-128);
-
+   --audio_signed_o <= signed(AUDIO_SUM(10 downto 3)-128);
+	audio_signed_o <= unsigned(AUDIO_SUM(10 downto 3)) when sgm_en_r = '1' else unsigned(audio_s);
+	
    --
    -- COURTNEY (SEX 7264) WAVETABLE SOUND GENERATOR (WSG)
    --
@@ -406,7 +408,7 @@ begin
       IOA_out     => open,
 
       IOB_in      => x"00",
-     IOB_out     => open
+      IOB_out     => open
    );
 
 
