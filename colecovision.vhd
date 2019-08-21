@@ -80,7 +80,7 @@ entity colecovision is
 
       -- Audio output
       audio_o        : out std_logic_vector(7 downto 0);
-      audio_signed_o : out unsigned(7 downto 0);
+      audio_signed_o : out signed(7 downto 0);
 
       -- VGA output
       blank_o        : out std_logic;
@@ -137,7 +137,7 @@ architecture rtl of colecovision is
    -- SN76489 Sound
    signal audio_s                         : std_logic_vector(7 downto 0);--mister SN core
 	--signal audio_s                         : signed(7 downto 0);--signed
-   signal sn489_ready_s                   : std_logic;
+	signal sn489_ready_s                   : std_logic;
    signal sn489_we_n_s                    : std_logic;
 
    -- AY-8910 SGM Sound
@@ -372,7 +372,7 @@ begin
 	AUDIO_EX_A <= unsigned(std_logic_vector'(audio_s&"000"));
    AUDIO_SUM <= AUDIO_EX_A + AUDIO_WSG + AUDIO_WSG;
 	audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
-   audio_signed_o <= unsigned(AUDIO_SUM(9 downto 2)) when sgm_en_r = '1' else unsigned(audio_s);
+   audio_signed_o <= signed(unsigned(AUDIO_SUM(9 downto 2))-128) when sgm_en_r = '1' else signed(unsigned(audio_s)-128);
 	
 	
 	

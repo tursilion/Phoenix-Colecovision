@@ -185,7 +185,7 @@ architecture behavior of phoenix_top is
    signal vram_we_s        : std_logic;
 
    -- Audio
-   signal audio_signed_s   : unsigned(7 downto 0);
+   signal audio_signed_s   : signed(7 downto 0);
    signal audio_s          : std_logic_vector( 7 downto 0);
    signal audio_dac_s      : std_logic;
 
@@ -708,8 +708,8 @@ begin
    -- HDMI
    --
 
-   audio_s <= std_logic_vector(audio_signed_s);
-   sound_hdmi_s <= "000" & audio_s & "00000";
+    audio_s <= std_logic_vector(unsigned(signed(audio_signed_s)+128));
+    sound_hdmi_s <= "00" & audio_s & "000000";
 
    hdmi: entity work.hdmi
    generic map (
