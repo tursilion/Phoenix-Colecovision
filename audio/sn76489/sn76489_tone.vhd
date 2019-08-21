@@ -136,12 +136,12 @@ begin
 
     elsif clock_i'event and clock_i = '1' then
       if clk_en_i then
-        if (freq_cnt_q > 0) and (freq_cnt_q <2) then
+        if freq_cnt_q = 0 then
           -- update counter from frequency register
           freq_cnt_q <= f_q;
 
           -- and toggle the frequency flip-flop if enabled
-          if not all_zero(f_q) then
+          if (f_q > 5) then
             freq_ff_q <= not freq_ff_q;
           else
             -- if frequency setting is 0, then keep flip-flop at +1
