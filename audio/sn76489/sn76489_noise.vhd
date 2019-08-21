@@ -77,7 +77,7 @@ architecture rtl of sn76489_noise is
          shift_source_q    : std_logic;
   signal shift_rise_edge_s : boolean;
 
-  signal lfsr_q            : std_logic_vector(0 to 15);
+  signal lfsr_q            : std_logic_vector(0 to 14);
 
 begin
 
@@ -202,9 +202,9 @@ begin
   lfsr: process (clock_i, res_n_i)
 
     function lfsr_tapped_f(lfsr : in std_logic_vector) return std_logic is
-      constant tapped_bits_c : std_logic_vector(0 to 15)
+      constant tapped_bits_c : std_logic_vector(0 to 14)
         -- tapped bits are 0, 2, 15
-        := "1010000000000001";
+        := "110000000000000";
       variable parity_v : std_logic;
     begin
       parity_v := '0';

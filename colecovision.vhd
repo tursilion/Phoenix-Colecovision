@@ -80,7 +80,7 @@ entity colecovision is
 
       -- Audio output
       audio_o        : out std_logic_vector(7 downto 0);
-      audio_signed_o : out signed(7 downto 0);
+      audio_signed_o : out unsigned(7 downto 0);
 
       -- VGA output
       blank_o        : out std_logic;
@@ -135,7 +135,8 @@ architecture rtl of colecovision is
    signal vdp_settings_s						: std_logic_vector( 1 downto 0);
 
    -- SN76489 Sound
-   signal audio_s                         : std_logic_vector(7 downto 0);
+   signal audio_s                         : std_logic_vector(7 downto 0);--mister SN core
+	--signal audio_s                         : signed(7 downto 0);--signed
    signal sn489_ready_s                   : std_logic;
    signal sn489_we_n_s                    : std_logic;
 
@@ -360,54 +361,63 @@ begin
       d_i         => d_from_cpu_s,
       aout_o      => audio_s
    );
-
-   AUDIO_EX_A <= unsigned(std_logic_vector'("0"&audio_s&"00"));
-   AUDIO_SUM <= AUDIO_EX_A + unsigned(ay_ch_a_s) + unsigned(ay_ch_b_s) + unsigned(ay_ch_c_s);
+   
+	--Vanilla AY mixing
+   --AUDIO_EX_A <= unsigned(std_logic_vector'(audio_s&"000"));
+   --AUDIO_SUM <= AUDIO_EX_A + unsigned(ay_ch_a_s) + unsigned(ay_ch_b_s) + unsigned(ay_ch_c_s);
+	--audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
+   --audio_signed_o <= unsigned(AUDIO_SUM(10 downto 3)) when sgm_en_r = '1' else unsigned(audio_s);
+	
+	--Courtney mixing
+	AUDIO_EX_A <= unsigned(std_logic_vector'(audio_s&"000"));
+   AUDIO_SUM <= AUDIO_EX_A + AUDIO_WSG + AUDIO_WSG;
 	audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
-   audio_signed_o <= signed(AUDIO_SUM(10 downto 3)-128);
-
+   audio_signed_o <= unsigned(AUDIO_SUM(9 downto 2)) when sgm_en_r = '1' else unsigned(audio_s);
+	
+	
+	
    --
    -- COURTNEY (SEX 7264) WAVETABLE SOUND GENERATOR (WSG)
    --
- --  WSG : ENTITY work.SEX7264
- --  PORT MAP
- --  (
- --      CLK         => clock_i      ,
- --      CLKENA      => clk_en_3m58_i, -- WARNING
- --     nRESET       => reset_n_s    ,
- --      BDIR        => wsg_bdir_s   ,
- --      BC1         => wsg_bc_s     ,
- --      DAI         => d_from_cpu_s ,
- --      DAO         => d_from_wsg_s ,
- --      NATIVE      => wsg_native_q ,
- --      DIGITAL_MIX => AUDIO_WSG
- --  );
+   WSG : ENTITY work.SEX7264 
+   PORT MAP
+   (
+       CLK         => clock_i      ,
+       CLKENA      => clk_en_3m58_i, -- WARNING
+      nRESET       => reset_n_s    ,
+       BDIR        => wsg_bdir_s   ,
+       BC1         => wsg_bc_s     ,
+       DAI         => d_from_cpu_s ,
+       DAO         => d_from_wsg_s ,
+       NATIVE      => wsg_native_q ,
+       DIGITAL_MIX => AUDIO_WSG
+   );
 
    -- YM-2149, SGM Audio AY-8910 compatible
-   ym2149_inst: entity work.YM2149
-   port map (
-      CLK         => clock_i,
-      CE          => clk_en_1m79_i,
-      RESET       => reset_i,
-      BDIR        => wsg_bdir_s,
-      BC          => wsg_bc_s,
-      DI          => d_from_cpu_s,
-      DO          => d_from_wsg_s,
-      CHANNEL_A   => ay_ch_a_s,
-      CHANNEL_B   => ay_ch_b_s,
-      CHANNEL_C   => ay_ch_c_s,
+   --ym2149_inst: entity work.YM2149
+   --port map (
+   --   CLK         => clock_i,
+   --   CE          => clk_en_1m79_i,
+   --   RESET       => reset_i,
+   --   BDIR        => wsg_bdir_s,
+   --   BC          => wsg_bc_s,
+   --  DI          => d_from_cpu_s,
+   --   DO          => d_from_wsg_s,
+   --   CHANNEL_A   => ay_ch_a_s,
+   --   CHANNEL_B   => ay_ch_b_s,
+   --   CHANNEL_C   => ay_ch_c_s,
 
-      SEL         => '0',
-      MODE        => '0',
+   --   SEL         => '0',
+   --   MODE        => '0',
 
-      ACTIVE      => open,
+   --   ACTIVE      => open,
 
-      IOA_in      => x"00",
-      IOA_out     => open,
+   --   IOA_in      => x"00",
+   --   IOA_out     => open,
 
-      IOB_in      => x"00",
-     IOB_out     => open
-   );
+   --   IOB_in      => x"00",
+   --  IOB_out     => open
+   --);
 
 
    --
