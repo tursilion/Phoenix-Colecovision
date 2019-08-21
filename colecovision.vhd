@@ -252,24 +252,24 @@ begin
    -- the wait-state.
    --
    -- Leaving this out for now.
-   --m1_wait: process (clock_i, reset_n_s, m1_n_s)
-   --begin
-   --   if reset_n_s = '0' or m1_n_s = '1' then
-   --      m1_wait_q   <= '0';
-   --   elsif rising_edge(clock_i) then
-   --      if clk_en_3m58_i = '1' then
-   --         m1_wait_q <= not m1_wait_q;
-   --      end if;
-   --   end if;
-   --end process m1_wait;
+   m1_wait: process (clock_i, reset_n_s, m1_n_s)
+   begin
+      if reset_n_s = '0' or m1_n_s = '1' then
+         m1_wait_q   <= '0';
+      elsif rising_edge(clock_i) then
+         if clk_en_3m58_i = '1' then
+            m1_wait_q <= not m1_wait_q;
+         end if;
+      end if;
+   end process m1_wait;
 
    -- TODO: Matthew H, March 19, 2019
    -- Why is the wait being created via the clock enable instead of the
    -- real WAIT_n input to the CPU?  Is the T80 core WAIT_n broken?
    --
    -- Modified CPU clock enable based on slow devices or the wait state.
-   --clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and not m1_wait_q and sd_wait_n_s;
-   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and sd_wait_n_s;
+   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and not m1_wait_q and sd_wait_n_s;
+--   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and sd_wait_n_s;
 
    -- CPU maskable interrupt input, currently only the controllers.
    int_n_s <= ctrl_int_n_s;
@@ -362,54 +362,62 @@ begin
       aout_o      => audio_s
    );
    
-   AUDIO_EX_A <= unsigned(std_logic_vector'(audio_s&"000"));
-   AUDIO_SUM <= AUDIO_EX_A + unsigned(ay_ch_a_s) + unsigned(ay_ch_b_s) + unsigned(ay_ch_c_s);
+	--Vanilla AY mixing
+   --AUDIO_EX_A <= unsigned(std_logic_vector'(audio_s&"000"));
+   --AUDIO_SUM <= AUDIO_EX_A + unsigned(ay_ch_a_s) + unsigned(ay_ch_b_s) + unsigned(ay_ch_c_s);
+	--audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
+   --audio_signed_o <= unsigned(AUDIO_SUM(10 downto 3)) when sgm_en_r = '1' else unsigned(audio_s);
+	
+	--Courtney mixing
+	AUDIO_EX_A <= unsigned(std_logic_vector'(audio_s&"000"));
+   AUDIO_SUM <= AUDIO_EX_A + AUDIO_WSG + AUDIO_WSG;
 	audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
-   --audio_signed_o <= signed(AUDIO_SUM(10 downto 3)-128);
-	audio_signed_o <= unsigned(AUDIO_SUM(10 downto 3)) when sgm_en_r = '1' else unsigned(audio_s);
+   audio_signed_o <= unsigned(AUDIO_SUM(9 downto 2)) when sgm_en_r = '1' else unsigned(audio_s);
+	
+	
 	
    --
    -- COURTNEY (SEX 7264) WAVETABLE SOUND GENERATOR (WSG)
    --
- --  WSG : ENTITY work.SEX7264
- --  PORT MAP
- --  (
- --      CLK         => clock_i      ,
- --      CLKENA      => clk_en_3m58_i, -- WARNING
- --     nRESET       => reset_n_s    ,
- --      BDIR        => wsg_bdir_s   ,
- --      BC1         => wsg_bc_s     ,
- --      DAI         => d_from_cpu_s ,
- --      DAO         => d_from_wsg_s ,
- --      NATIVE      => wsg_native_q ,
- --      DIGITAL_MIX => AUDIO_WSG
- --  );
+   WSG : ENTITY work.SEX7264 
+   PORT MAP
+   (
+       CLK         => clock_i      ,
+       CLKENA      => clk_en_3m58_i, -- WARNING
+      nRESET       => reset_n_s    ,
+       BDIR        => wsg_bdir_s   ,
+       BC1         => wsg_bc_s     ,
+       DAI         => d_from_cpu_s ,
+       DAO         => d_from_wsg_s ,
+       NATIVE      => wsg_native_q ,
+       DIGITAL_MIX => AUDIO_WSG
+   );
 
    -- YM-2149, SGM Audio AY-8910 compatible
-   ym2149_inst: entity work.YM2149
-   port map (
-      CLK         => clock_i,
-      CE          => clk_en_1m79_i,
-      RESET       => reset_i,
-      BDIR        => wsg_bdir_s,
-      BC          => wsg_bc_s,
-      DI          => d_from_cpu_s,
-      DO          => d_from_wsg_s,
-      CHANNEL_A   => ay_ch_a_s,
-      CHANNEL_B   => ay_ch_b_s,
-      CHANNEL_C   => ay_ch_c_s,
+   --ym2149_inst: entity work.YM2149
+   --port map (
+   --   CLK         => clock_i,
+   --   CE          => clk_en_1m79_i,
+   --   RESET       => reset_i,
+   --   BDIR        => wsg_bdir_s,
+   --   BC          => wsg_bc_s,
+   --  DI          => d_from_cpu_s,
+   --   DO          => d_from_wsg_s,
+   --   CHANNEL_A   => ay_ch_a_s,
+   --   CHANNEL_B   => ay_ch_b_s,
+   --   CHANNEL_C   => ay_ch_c_s,
 
-      SEL         => '0',
-      MODE        => '0',
+   --   SEL         => '0',
+   --   MODE        => '0',
 
-      ACTIVE      => open,
+   --   ACTIVE      => open,
 
-      IOA_in      => x"00",
-      IOA_out     => open,
+   --   IOA_in      => x"00",
+   --   IOA_out     => open,
 
-      IOB_in      => x"00",
-      IOB_out     => open
-   );
+   --   IOB_in      => x"00",
+   --  IOB_out     => open
+   --);
 
 
    --
