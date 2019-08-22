@@ -138,7 +138,7 @@ begin
 
     elsif clock_i'event and clock_i = '1' then
       if clk_en_i then
-        if freq_cnt_q = 0 then
+        if freq_cnt_q = 1 then
           -- update counter from frequency register
           freq_cnt_q <= f_q;
 

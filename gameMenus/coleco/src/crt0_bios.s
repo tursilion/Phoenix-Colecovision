@@ -268,7 +268,7 @@ _memmove::
 	sub	a,l
 	ld	a,d
 	sbc	a,h         ; src-dest, jump if no carry (ie: dest is greater)
-	jr	NC,00108$
+	jr	NC,00110$
 
 ; decrementing, memmove case
 ;:49: d = ((char *)dst) + cnt - 1;
@@ -288,14 +288,18 @@ _memmove::
 ;:51: while (cnt--) {
 ;:52: *d-- = *s--;
     lddr
-    pop hl          ; just to clean up the stack
+    pop hl          ; just to fix up the stack
 	jr	00109$
+	
+; need to recover original hl before we do the following
+00110$:
+	pop hl
 
 ; Incrementing - memcpy case
+; all registers needed are still intact
 00108$:
 ;:56: d = dst;
 ;:57: s = src;
-    pop hl          ; get original source address back
 
 ;:58: while (cnt--) {
 ;:59: *d++ = *s++;

@@ -724,7 +724,7 @@ void runCartHeader(void (*mycenter)(unsigned char, char*)) {
 
     // check how many characters we have left - we need to save
     // six for the " c1982" part
-    cntdown = 64-(o-copyright)-6;
+    cntdown = 63-(o-copyright)-6;
 
     // now just copy until the slash
     while ((*p != '/')&&(--cntdown > 0)) {
@@ -786,12 +786,14 @@ void runCartHeader(void (*mycenter)(unsigned char, char*)) {
         while ((p > copyright) && (*p != ' ')) {
             --p;
         }
-        // if, somehow, we didn't find a space, we're just going to deal with it.
+        // if, somehow, we didn't find a space, just assume it's corrupt and don't show anything
         // it shouldn't have happened!
-        *p = '\0';
-        mycenter(0, copyright);
-        ++p;
-        mycenter(1, p);
+        if (*p == ' ') {
+            *p = '\0';
+            mycenter(0, copyright);
+            ++p;
+            mycenter(1, p);
+        }
     } else {
         // it all fits, use the lower line cause it looks better with the gap
         mycenter(1, copyright);
