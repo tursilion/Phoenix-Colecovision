@@ -708,15 +708,14 @@ begin
    -- HDMI
    --
 
-   audio_s <= std_logic_vector(unsigned(audio_signed_s + 128));
-   --audio_s <= std_logic_vector(unsigned(audio_signed_s));
-   sound_hdmi_s <= "00" & audio_s & "000000";
+    audio_s <= std_logic_vector(unsigned(signed(audio_signed_s)+128));
+    sound_hdmi_s <= "00" & audio_s & "000000";
 
    hdmi: entity work.hdmi
    generic map (
-      FREQ  => 25200000,   -- pixel clock frequency
+      FREQ  => 25000000,   -- pixel clock frequency
       FS    => 48000,      -- audio sample rate - should be 32000, 41000 or 48000 = 48KHz
-      CTS   => 25200,      -- CTS = Freq(pixclk) * N / (128 * Fs)
+      CTS   => 25000,      -- CTS = Freq(pixclk) * N / (128 * Fs)
       N     => 6144        -- N = 128 * Fs /1000,  128 * Fs /1500 <= N <= 128 * Fs /300 (Check HDMI spec 7.2 for details)
    )
    port map (

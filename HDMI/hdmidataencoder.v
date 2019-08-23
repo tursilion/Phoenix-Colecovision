@@ -9,7 +9,7 @@
 //-- design of HDMI output for Neo Geo MVS
 
 module hdmidataencoder 
-#(parameter FREQ=27000000, FS=48000, CTS=27000, N=6144) 
+#(parameter FREQ=25000000, FS=48000, CTS=25000, N=6144) 
 (
 	input 			i_pixclk,
 	input 			i_hSync,
@@ -192,14 +192,14 @@ endtask
 
 task AproximateAudio;
 begin
-	audioLAvgSum <= audioLAvgSum + i_audioL;
-	audioRAvgSum <= audioRAvgSum + i_audioR;
-	audioLAvg <= audioLAvgSum/audioAvgCnt;
-	audioRAvg <= audioRAvgSum/audioAvgCnt;
-	audioAvgCnt <= audioAvgCnt + 1;
-	//audioLAvg <= i_audioL;
-	//audioRAvg <= i_audioR;
-	//audioAvgCnt <= 1;
+	//audioLAvgSum <= audioLAvgSum + i_audioL;
+	//audioRAvgSum <= audioRAvgSum + i_audioR;
+	//audioLAvg <= audioLAvgSum/audioAvgCnt;
+	//audioRAvg <= audioRAvgSum/audioAvgCnt;
+	//audioAvgCnt <= audioAvgCnt + 1;
+	audioLAvg <= i_audioL;
+	audioRAvg <= i_audioR;
+	audioAvgCnt <= 1;
    
 end
 endtask
