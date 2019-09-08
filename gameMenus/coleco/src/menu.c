@@ -349,9 +349,16 @@ repeatDir:
                 return;
             }
 
-            // parse the file information
-            if (finfo.fname[0] == '\0') {
-                break;      // end of directory
+            {
+                unsigned char x = finfo.fname[0];
+
+                if (finfo.fname[0] == '.') {
+                    continue;   // ignore files starting with period
+                }
+
+                if (finfo.fname[0] == '\0') {
+                    break;      // end of directory
+                }
             }
 
             if ((firstScan) && (finfo.fattrib & AM_DIR)) {
@@ -367,7 +374,7 @@ repeatDir:
                     goto repeatDir;
                 }
             }
-
+            
             // save it off
             mystrcpy(lastFilename, finfo.fname);    // will truncate to 126 characters
             if (finfo.fattrib & AM_DIR) {
