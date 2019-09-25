@@ -134,7 +134,7 @@ const unsigned char FolderNameLen = 7;      // include the terminating NUL
 // COLORHILITE should pulse a little using palette color cycling
 // menu F18 palette values - 12 bit format 0000RRRR GGGGBBBB
 const unsigned int MENU_PALETTE[] = {
-	0x0000,0x0000,  // unchanged transparent and black just for comfort (white is also unchanged
+	0x0000,0x0000,  // unchanged transparent and black just for comfort (white is also unchanged)
     0x0000,         // line 1
     0x0010,         // line 2
     0x0eee,         // text
@@ -143,6 +143,38 @@ const unsigned int MENU_PALETTE[] = {
     0x0900          // hilite
     // we don't need to define the rest
 };
+
+// black and white high contrast palette
+const unsigned int MENU_CONTRAST[] = {
+	0x0000,0x0000,  // unchanged transparent and black just for comfort (white is also unchanged)
+    0x0000,         // line 1
+    0x0000,         // line 2
+    0x0eee,         // text
+    0x0aaa,         // directory
+    0x0000,         // background
+    0x0222          // hilite
+    // we don't need to define the rest
+};
+
+// black and white inverted palette
+const unsigned int MENU_INVERT[] = {
+	0x0eee,0x0eee,  // match to new background
+    0x0eee,         // line 1
+    0x0eee,         // line 2
+    0x0000,         // text
+    0x0444,         // directory
+    0x0eee,         // background
+    0x0ccc          // hilite
+    // we don't need to define the rest
+};
+
+const unsigned int *MENU_COLOR_SETS[] = {
+	MENU_PALETTE,
+	MENU_CONTRAST,
+	MENU_INVERT
+};
+
+unsigned char currentPalette;
 
 // hex conversion
 const char hex[16] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
@@ -929,6 +961,17 @@ char getUserSelection() {
     }
 }
 
+// load the selected palette
+void load_palette() {
+	loadpal_f18a(MENU_COLOR_SETS[currentPalette], 8);
+}
+
+void inc_palette() {
+	++currentPalette;
+	if (currentPalette >= sizeof(MENU_COLOR_SETS)/sizeof(MENU_COLOR_SETS[0])) currentPalette = 0;
+	load_palette();
+}
+
 
 // run the menu itself
 // this function is long and uses gotos. Don't look if you're academic in nature :)
@@ -1014,7 +1057,8 @@ dirLoop:
         clrscr();
 
         // load the new palette
-        loadpal_f18a(MENU_PALETTE, 8);
+        currentPalette = 0;
+        load_palette();
 
         // set text mode
         VDP_SET_REGISTER(1,0xf2);

@@ -58,6 +58,7 @@ void get_fileinfo (
 	FATFS *fs = dp->obj.fs;
 #else
 	TCHAR c;
+	UINT si, di;
 #endif
 
 	fno->fname[0] = 0;			/* Invaidate file info */
