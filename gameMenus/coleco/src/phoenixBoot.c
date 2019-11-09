@@ -18,7 +18,8 @@
 
 // - stored in the F18A code - actual value of the 0x32 register (so it changes in text mode)
 extern unsigned char useScanlines;     // takes in real time but we need it after a reset
-unsigned char useFlicker;       // can't enable this until we start a cartridge
+unsigned char useFlicker;       		// can't enable this until we start a cartridge
+extern void inc_palette();
 
 // --- externs ---
 
@@ -220,7 +221,10 @@ void readkeypad() {
             }
             waitVblanks(60);
             vdpmemcpy(GIMAGE+23*40, lineBuffer, 40);
-        }
+        } else if (ret == '0') {
+			// toggle palette
+			inc_palette();
+		}
     }
 }
 
