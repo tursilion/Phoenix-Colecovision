@@ -19,6 +19,7 @@
 // - stored in the F18A code - actual value of the 0x32 register (so it changes in text mode)
 extern unsigned char useScanlines;     // takes in real time but we need it after a reset
 unsigned char useFlicker;       // can't enable this until we start a cartridge
+unsigned char text_width;        // needed for the menu popup
 
 // --- externs ---
 
@@ -44,8 +45,8 @@ static volatile __sfr __at 0xc0 port3;  // joystick reset strobe
 
 // cartridge string (we format it into here)
 char copyright[65];
-// screen line buffer
-unsigned char lineBuffer[40];
+// screen line buffer - hooray for lots of RAM!
+unsigned char lineBuffer[16*40];
 
 // --- variables ---
 
@@ -92,6 +93,7 @@ static const unsigned char trampoline[] = {
 };
 
 // --- and functions... ---
+void readkeypad();
 
 // setting up standard screen modes - blanks the screen and returns the unblank command
 // interrupts are also disabled. Unblank will re-enable them, too, write it to VDP_REG_MODE1
@@ -108,6 +110,7 @@ unsigned char my_set_graphics(unsigned char sprite_mode) {
 	VDP_SET_REGISTER(VDP_REG_SAL, 14);      // 0x0700
 	VDP_SET_REGISTER(VDP_REG_SDT, 0x03);    // 0x1800
 	VDP_SET_REGISTER(VDP_REG_COL, ((COLOR_GRAY<<4)|COLOR_BLACK));
+    text_width = 32;
 	return unblank;
 }
 
@@ -186,10 +189,76 @@ void readjoyst() {
     }
 }
 
+// simple config menu for scanlines and flicker that we can activate
+// even before a cartridge boots - called ONLY from readkeypad()
+void cfgMenu() {
+    unsigned char lastkey = 0xff;
+    unsigned int block = 8*40;
+    unsigned int pos = GIMAGE+8*40;
+
+    // if we're in gfx mode, then the logo is up, which means we don't
+    // have a character set. Rather than rewrite everything for the bitmap
+    // overlay right now, we'll just fake it and load the chars we need.
+    // With a little luck, they'll be under the window... ;)
+    // FATFONT starts at char 29, and I want starting at char 48...
+    if (text_width == 32) {
+        vdpmemcpy(GPATTERN+' '*8, &FATFONT[(' '-29)*8], ('X'-' '+1)*8);
+        // the firebird is okay as long as we stick to uppercase letters,
+        // but the phoenix logo needs to be cleared. By luck, color is also okay.
+        block = 16*32;
+        pos = GIMAGE + 8*32;
+    }
+
+    // We might be in gfx or text mode, so we'll just left-align, sort of
+    vdpmemread(pos, lineBuffer, block);
+    vdpmemset(pos, ' ', block);
+    pos += text_width+3;
+    vdpmemcpy(pos, "PRESS:", 6);
+    pos += text_width+2;
+    vdpmemcpy(pos, "1 TOGGLE SCANLINES", 18);
+    pos += text_width;
+    vdpmemcpy(pos, "2 TOGGLE FLICKER (OFF)", 22);
+    pos += text_width + text_width;
+    vdpmemcpy(pos, "0 EXIT MENU", 11);
+
+    for (;;) {
+        readkeypad();
+        if (KSCAN_KEY != lastkey) {
+            lastkey = KSCAN_KEY;
+
+            if (lastkey == '0') {
+                break;
+            } else if (lastkey == '1') {
+                // toggle scanlines - this is pretty obvious so no feedback needed
+                useScanlines ^= SCANLINES_ON;
+                VDP_SET_REGISTER(0x32, useScanlines);
+            } else if (lastkey == '2') {
+                // toggle flicker and update display
+                useFlicker = !useFlicker;
+                if (useFlicker) {
+                    vdpmemcpy(GIMAGE+11*text_width+23, "ON ", 3);
+                } else {
+                    vdpmemcpy(GIMAGE+11*text_width+23, "OFF", 3);
+                }
+            }
+        }
+    }
+
+    // restore the display
+    vdpmemcpy(GIMAGE+8*text_width, lineBuffer, block);
+
+    // in graphics mode, restore the font - we have to do it all since
+    // we can't (trivally) unrle only part of it.
+    if (text_width == 32) {
+        unrle(GPATTERN+16*8, PAT0, SIZE_OF_PAT0RLE-103);    // final settings
+    }
+}
+
 // wrapper for kscan that knows about our hot config keys and reads both sticks
 // this allows them to work at pretty much any time automatically
 void readkeypad() {
     static unsigned char lastret = 0xff;
+    static unsigned char inCfg = 0;
     unsigned char ret;
     
     kscanfast(1);
@@ -201,25 +270,12 @@ void readkeypad() {
     }
 
     // check only when changed
-    if (lastret != ret) {
+    if ((!inCfg) && (lastret != ret)) {
         lastret = ret;
-        if (ret == '*') {
-            // toggle scanlines - this is pretty obvious so no feedback needed
-            useScanlines ^= SCANLINES_ON;
-            VDP_SET_REGISTER(0x32, useScanlines);
-        } else if (ret == '#') {
-            // toggle sprite flicker
-            useFlicker = !useFlicker;
-            // I don't like this, but this is the simplest way to do the notification...
-            vdpmemread(GIMAGE+23*40, lineBuffer, 40);
-            vdpmemset(GIMAGE+23*40, ' ', 40);
-            if (useFlicker) {
-                vdpmemcpy(GIMAGE+23*40+18, "SPRITE FLICKER ENABLED", 22);
-            } else {
-                vdpmemcpy(GIMAGE+23*40+17, "SPRITE FLICKER DISABLED", 23);
-            }
-            waitVblanks(60);
-            vdpmemcpy(GIMAGE+23*40, lineBuffer, 40);
+        if ((ret == '*')||(ret == '#')) {
+            inCfg = 1;
+            cfgMenu();
+            inCfg = 0;
         }
     }
 }
@@ -375,7 +431,7 @@ void startTitle() {
     // but unlike the Coleco BIOS, we /must/ access at 0x6000, not
     // one of the later mirrors.
 
-    // this clears the RAM to foil basic detection algorithms
+    // Clear ram with an alternating pattern to simulate dram init
     // A real Coleco is far more random, but this should do for now
     for (idx=0x6000; idx<0x6400; idx+=2) {
         pRom(idx)=0;
@@ -830,13 +886,6 @@ int main() {
     // This will reset, and then test if the F18A is actually present - it should be!!
     f18a = test_f18a();
 
-    // test for a cartridge with the no logo requirement
-    // note that startCartridge still does a lot of initialization,
-    // in case it needs to undo the F18A setup for the menu later.
-    if ((pRom(0x8000)==0x55)&&(pRom(0x8001)==0xaa)) {
-        startCartridge();    // never returns
-    }
-
     // ask the F18A to turn off the sprite limit
     VDP_SET_REGISTER(0x1e, 32); // stop sprite is #32
 	
@@ -882,6 +931,16 @@ int main() {
 
 	// wait for the first two vblanks
     waitVblanks(2);
+
+    // test for a cartridge with the no logo requirement
+    // note that startCartridge still does a lot of initialization,
+    // in case it needs to undo the F18A setup for the menu later.
+    if ((pRom(0x8000)==0x55)&&(pRom(0x8001)==0xaa)) {
+        // give the user one chance to load the menu, if the cart autoboots
+        readkeypad();
+        // never returns
+        startCartridge();
+    }
 
 	// F18A available 
 	fadeInTextF18A();
