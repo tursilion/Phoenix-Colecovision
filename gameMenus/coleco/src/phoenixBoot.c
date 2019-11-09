@@ -20,6 +20,7 @@
 extern unsigned char useScanlines;     // takes in real time but we need it after a reset
 unsigned char useFlicker;       // can't enable this until we start a cartridge
 unsigned char text_width;        // needed for the menu popup
+extern void inc_palette();
 
 // --- externs ---
 
@@ -276,7 +277,10 @@ void readkeypad() {
             inCfg = 1;
             cfgMenu();
             inCfg = 0;
-        }
+        } else if (ret == '0') {
+			// toggle palette
+			inc_palette();
+		}
     }
 }
 
