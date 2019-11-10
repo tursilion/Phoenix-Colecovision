@@ -254,24 +254,24 @@ begin
    -- the wait-state.
    --
    -- Leaving this out for now.
-   --m1_wait: process (clock_i, reset_n_s, m1_n_s)
-   --begin
-   --   if reset_n_s = '0' or m1_n_s = '1' then
-   --      m1_wait_q   <= '0';
-   --   elsif rising_edge(clock_i) then
-   --      if clk_en_3m58_i = '1' then
-   --         m1_wait_q <= not m1_wait_q;
-   --      end if;
-   --   end if;
-   --end process m1_wait;
+   m1_wait: process (clock_i, reset_n_s, m1_n_s)
+   begin
+      if reset_n_s = '0' or m1_n_s = '1' then
+         m1_wait_q   <= '0';
+      elsif rising_edge(clock_i) then
+         if clk_en_3m58_i = '1' then
+            m1_wait_q <= not m1_wait_q;
+         end if;
+      end if;
+   end process m1_wait;
 
    -- TODO: Matthew H, March 19, 2019
    -- Why is the wait being created via the clock enable instead of the
    -- real WAIT_n input to the CPU?  Is the T80 core WAIT_n broken?
    --
    -- Modified CPU clock enable based on slow devices or the wait state.
-   --clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and not m1_wait_q and sd_wait_n_s;
-   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and sd_wait_n_s;
+   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and not m1_wait_q and sd_wait_n_s;
+   --clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and sd_wait_n_s;
 
    -- CPU maskable interrupt input, currently only the controllers.
    int_n_s <= ctrl_int_n_s;
@@ -378,8 +378,9 @@ begin
 	
 	mix_s <= unsigned(std_logic_vector'(audio_s(6 downto 0) & "0000")) + unsigned(std_logic_vector'("000"& ay_ch_a_s)) + unsigned(std_logic_vector'("000"& ay_ch_b_s))+ unsigned(std_logic_vector'("000"& ay_ch_c_s));
 	
-	audio_o        <= std_logic_vector(mix_s(10 downto 3));
-   audio_signed_o <= (others =>'0');
+	--audio_o        <= std_logic_vector(mix_s(10 downto 3));
+   audio_signed_o <= signed(unsigned(std_logic_vector(mix_s(10 downto 3)))-128);
+	--audio_signed_o <= (others =>'0');
 	
 	
    --
