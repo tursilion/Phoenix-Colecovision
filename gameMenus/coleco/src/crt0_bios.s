@@ -74,7 +74,7 @@ start:
 	ldir					; do it
 
     ; we will have to fix the memory bank before we prepare the system RAM
-	ld  sp, #0x8000			; We have 8k to run stack in here - be aware of tables from 0x73B9-7x3FF!
+	ld  sp, #0x8000			; 6000-6FFF is reserved for Coleco, 7000-7FFF is used by menu
 	call gsinit				; Initialize global variables
 	
 	call _vdpinit			; Initialize VDP and sound

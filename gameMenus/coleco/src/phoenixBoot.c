@@ -46,8 +46,10 @@ static volatile __sfr __at 0xc0 port3;  // joystick reset strobe
 
 // cartridge string (we format it into here)
 char copyright[65];
-// screen line buffer - hooray for lots of RAM!
-unsigned char lineBuffer[16*40];
+// screen line buffer - shoving this larger array out of the way
+// down in the Coleco RAM space - remember not to access it after
+// beginning the cartridge start sequence!
+unsigned char *lineBuffer = (unsigned char*)0x6000;
 
 // --- static data ---
 
@@ -81,9 +83,6 @@ static const unsigned char trampoline[] = {
     0x2a, 0x0a, 0x80,   // -        LD HL,[0x800A]      2A800A
 
 //  0xC3,0x00,0x00,      // JP 0x0000 (reboot bios)
-// 
-//    0x3e,0xef,          // ld a,0xef
-//    0xed,0x47,          // ld i,a   (set i to non-zero)
 
     0xe9                // -        JP [HL]             E9
 };
@@ -214,14 +213,14 @@ void cfgMenu() {
     pos += text_width;
     vdpmemcpy(pos, "2 TOGGLE FLICKER (OFF)", 22);
     pos += text_width + text_width;
-    vdpmemcpy(pos, "0 EXIT MENU", 11);
+    vdpmemcpy(pos, "9 EXIT MENU", 11);
 
     for (;;) {
         readkeypad();
         if (KSCAN_KEY != lastkey) {
             lastkey = KSCAN_KEY;
 
-            if (lastkey == '0') {
+            if (lastkey == '9') {
                 break;
             } else if (lastkey == '1') {
                 // toggle scanlines - this is pretty obvious so no feedback needed
@@ -335,7 +334,7 @@ void fadeInTextF18A() {
 	VDP_SET_REGISTER(0x2f, 0x8f);	// Reg 47, value: 1000 1111, DPM = 1, AUTO INC = 0, palreg 15.
 	VDPWD = 0;
 	VDPWD = 0;						// color is now black
-	VDP_SET_REGISTER(0x2f, 0x00);	// Turn off the DPM mode
+	//VDP_SET_REGISTER(0x2f, 0x00);	// Turn off the DPM mode
 
 	// now set the phoenix color sets (3-12) to white on transparent
 	vdpmemset(GCOLOR+3, 0xf0, 10);
@@ -901,13 +900,9 @@ int main() {
     for (idx=0; idx<16; ++idx) {
         // F18A doesn't need delays between writes
         VDPWD = 22*8-2; // Y
-        VDP_SAFE_DELAY;             // technically, I don't really need the delays cause the F18A is fast enough...
         VDPWD = idx*16; // X
-        VDP_SAFE_DELAY;             // just good practice I guess
         VDPWD = idx*4;  // char
-        VDP_SAFE_DELAY;
         VDPWD = 15;     // color
-        VDP_SAFE_DELAY;
     }
     VDPWD = 0xd0;      // terminator
     
@@ -919,9 +914,6 @@ int main() {
 	// load the character patterns
 	//vdpmemcpy(GPATTERN, PAT0, 8*256);                 // raw data
     unrle(GPATTERN+16*8, PAT0, SIZE_OF_PAT0RLE-103);    // final settings
-    // copy in the hex characters for debug
-    vdpmemcpy(GPATTERN, &FATFONT[('0'-29)*8], 10*8);       // want char '0', first is #29, 8 bytes each, copy 10
-    vdpmemcpy(GPATTERN+(8*10), &FATFONT[('A'-29)*8], 6*8); // same, but 6 chars starting at 'A'
 
 	// turn the screen on
 	VDP_SET_REGISTER(VDP_REG_MODE1, x);
