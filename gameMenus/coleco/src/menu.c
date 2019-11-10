@@ -172,8 +172,8 @@ const unsigned int MENU_INVERT[] = {
 
 const unsigned int *MENU_COLOR_SETS[] = {
 	MENU_PALETTE,
-	MENU_CONTRAST,
-	MENU_INVERT
+	MENU_INVERT,
+	MENU_CONTRAST
 };
 
 unsigned char currentPalette;

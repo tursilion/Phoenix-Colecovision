@@ -49,11 +49,6 @@ char copyright[65];
 // screen line buffer - hooray for lots of RAM!
 unsigned char lineBuffer[16*40];
 
-// --- variables ---
-
-// we assume that the f18a exists...
-unsigned char f18a;
-
 // --- static data ---
 
 // Coleco color table at 0x2003
@@ -81,8 +76,8 @@ static const unsigned char regTable[] = {
 // trampoline to start the cart with the Coleco BIOS loaded
 // This area (0x6000) seems untouched by the Coleco BIOS
 static const unsigned char trampoline[] = {
-    0xdb, 0x55,         // -        IN 0x55,A           DB55    swaps the BIOS - note RAM goes from 2k to 1k!
-    0x31,0xb9,0x73,     // -        LD SP,0x73B9        31B973
+    0xdb, 0x55,         // -        IN 0x55,A           DB55    swaps the BIOS - note RAM goes from 8k to 1k!
+    0x31, 0xb9, 0x73,   // -        LD SP,0x73B9        31B973
     0x2a, 0x0a, 0x80,   // -        LD HL,[0x800A]      2A800A
 
 //  0xC3,0x00,0x00,      // JP 0x0000 (reboot bios)
@@ -102,7 +97,6 @@ void readkeypad();
 // A few registers also differ. text mode in menu.c shares this layout.
 unsigned char my_set_graphics(unsigned char sprite_mode) {
 	// this layout is untested but should match editor/assembler's
-	unsigned char unblank = VDP_MODE1_16K | VDP_MODE1_UNBLANK | VDP_MODE1_INT | sprite_mode;
 	VDP_SET_REGISTER(VDP_REG_MODE1, VDP_MODE1_16K);		// no need to OR in the sprite mode for now
 	VDP_SET_REGISTER(VDP_REG_MODE0, 0);
 	VDP_SET_REGISTER(VDP_REG_SIT, 0x00);    // 0x0000
@@ -112,7 +106,7 @@ unsigned char my_set_graphics(unsigned char sprite_mode) {
 	VDP_SET_REGISTER(VDP_REG_SDT, 0x03);    // 0x1800
 	VDP_SET_REGISTER(VDP_REG_COL, ((COLOR_GRAY<<4)|COLOR_BLACK));
     text_width = 32;
-	return unblank;
+	return VDP_MODE1_16K | VDP_MODE1_UNBLANK | VDP_MODE1_INT | sprite_mode;
 }
 
 // unRLE CPU to VDP handler
@@ -885,10 +879,9 @@ int main() {
 
 	// we must do this first - in case the user was running F18A software
 	// and pressed reset, otherwise old settings will still be active.
-    // If the F18A wasn't active, this will corrupt registers, but that's okay.
     // NOTE: Phoenix F18A gets a reset on reset too, but it does NOT reset the palette
-    // This will reset, and then test if the F18A is actually present - it should be!!
-    f18a = test_f18a();
+    reset_f18a();
+    unlock_f18a();
 
     // ask the F18A to turn off the sprite limit
     VDP_SET_REGISTER(0x1e, 32); // stop sprite is #32
