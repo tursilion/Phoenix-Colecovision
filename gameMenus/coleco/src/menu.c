@@ -615,6 +615,9 @@ void waitSDCard() {
         } else {
             ++debounce;
         }
+
+        // allow a chance for the menu
+        readkeypad();
     }
 }
 
