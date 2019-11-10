@@ -343,7 +343,7 @@ begin
    led_o <= 'Z' when reset_r = '1' or cv_led_s = '1' else '0';
 
    -- RGB-LED, set to green
-   rgb_led_o <= "101";
+   rgb_led_o <= "001";
 
 
    --
@@ -401,8 +401,8 @@ begin
       cart_en_e0_n_o    => cart_en_E0_n_o,
 
       -- Audio output
-      audio_o           => open,
-      audio_signed_o    => audio_signed_s,
+      audio_o           => audio_s,
+      audio_signed_o    => open,
 
       -- VGA output
       blank_o           => vga_blank_s,
@@ -708,8 +708,8 @@ begin
    -- HDMI
    --
 
-    audio_s <= std_logic_vector(unsigned(signed(audio_signed_s)+128));
-    sound_hdmi_s <= "00" & audio_s & "000000";
+   --audio_s <= std_logic_vector(unsigned(signed(audio_signed_s)+128));
+   sound_hdmi_s <= '0' & audio_s & "0000000";
 
    hdmi: entity work.hdmi
    generic map (
