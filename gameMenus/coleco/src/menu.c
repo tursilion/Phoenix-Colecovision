@@ -42,6 +42,8 @@ extern void centerString(unsigned char line, char *p);
 // Reference to the font for copying out of
 extern const unsigned char FATFONT[];
 
+// needed for the popup menu
+extern unsigned char text_width;
 
 // --- hardware ---
 
@@ -170,8 +172,8 @@ const unsigned int MENU_INVERT[] = {
 
 const unsigned int *MENU_COLOR_SETS[] = {
 	MENU_PALETTE,
-	MENU_CONTRAST,
-	MENU_INVERT
+	MENU_INVERT,
+	MENU_CONTRAST
 };
 
 unsigned char currentPalette;
@@ -613,6 +615,9 @@ void waitSDCard() {
         } else {
             ++debounce;
         }
+
+        // allow a chance for the menu
+        readkeypad();
     }
 }
 
@@ -1062,6 +1067,7 @@ dirLoop:
 
         // set text mode
         VDP_SET_REGISTER(1,0xf2);
+        text_width = 40;
     } else {
         clrscr();
     }

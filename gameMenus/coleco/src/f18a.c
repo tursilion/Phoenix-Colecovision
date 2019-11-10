@@ -20,15 +20,7 @@ const unsigned int DEFAULT_PALETTE[] = {
 	0x0F54,0x0F76,0x0DC3,0x0ED6,0x02B2,0x0C5C,0x0CCC,0x0FFF
 };
 
-// default GPU program for testing
-const unsigned char GPUTEST[] = {
-	0x02,0x00,0x12,0x34,	//	LI R0,0x1234
-	0xC8,0x00,0x1C,0x10,	//	MOV R0,@0x1C10
-	0x03,0x40,				//	IDLE
-	0x00,0x00				//	DATA 0x0000
-};
-
-// you should use test_f18a rather than call this directly
+// unlocks the f18a
 void unlock_f18a() {
 	VDP_SET_REGISTER(0x39, 0x1c);	// VR1/57, value 00011100, write once (corrupts VDPR1)
 	VDP_SET_REGISTER(0x39, 0x1c);	// write again (unlocks enhanced mode)
@@ -90,39 +82,9 @@ void prepare_f18a() {
     lock_f18a();
 }
 
-// load a small test program and see if the GPU is available
-// corrupts 12 bytes at 0x1c00
-// This does the unlock for you!
-unsigned char test_f18a() {
-    reset_f18a();        // reset and lock, if present, to get a clean state
-    unlock_f18a();      // attempt to unlock
-
-	// If we are not on the F18A, then R1 is screwed up now, that's okay
-	vdpmemcpy(0x1c00, GPUTEST, 12);	// copy program (and zero 0x1c10)
-	
-	// Start the GPU program, pause, then check the result
-	VDP_SET_REGISTER(0x36, 0x1c);	// MSB of GPU program
-	VDP_SET_REGISTER(0x37, 0x00);	// LSB of GPU program (starts execution)
-
-	VDP_SAFE_DELAY();				// any delay here is sufficient, the GPU is way faster than us
-
-	VDP_SET_ADDRESS(0x1c10);		// check the data address, which we initialized to 0
-	if (VDPRD != 0x12) {
-		// incorrect byte
-		return 0;
-	}
-	if (VDPRD != 0x34) {
-		// strange to fail here...
-		return 0;
-	}
-	
-	// if we get here, it's all good
-	return 1;
-}
-
 // load an F18A palette from ptr (16-bit words, little endian)
 // data format is 12-bit 0RGB color.
-void loadpal_f18a(unsigned int *ptr, unsigned char cnt) {
+void loadpal_f18a(const unsigned int *ptr, unsigned char cnt) {
 	VDP_SET_REGISTER(0x2f, 0xc0);	// Reg 47, value: 1100 0000, DPM = 1, AUTO INC = 1, palreg 0.       
 
 	while (cnt-- > 0) {
