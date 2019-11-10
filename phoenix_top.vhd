@@ -401,8 +401,8 @@ begin
       cart_en_e0_n_o    => cart_en_E0_n_o,
 
       -- Audio output
-      audio_o           => audio_s,
-      audio_signed_o    => open,
+      audio_o           => open,
+      audio_signed_o    => audio_signed_s,
 
       -- VGA output
       blank_o           => vga_blank_s,
@@ -556,7 +556,7 @@ begin
             key_v := cv_key_number_c;
          end if;
 
-         -- SNES joypad (TODO: implement NTT)
+         -- SNES joypad 
          if but_tl_s(0) = '0' then           -- TL button pressed, numbers 1 at 6
             if    but_y_s(0) = '0' then
                -- KEY 1
@@ -708,8 +708,8 @@ begin
    -- HDMI
    --
 
-   --audio_s <= std_logic_vector(unsigned(signed(audio_signed_s)+128));
-   sound_hdmi_s <= '0' & audio_s & "0000000";
+   audio_s <= std_logic_vector(unsigned(signed(audio_signed_s)+128));
+   sound_hdmi_s <= "0" & audio_s & "0000000";
 
    hdmi: entity work.hdmi
    generic map (
