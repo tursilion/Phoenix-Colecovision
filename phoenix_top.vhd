@@ -343,7 +343,7 @@ begin
    led_o <= 'Z' when reset_r = '1' or cv_led_s = '1' else '0';
 
    -- RGB-LED, set to green
-   rgb_led_o <= "101";
+   rgb_led_o <= "001";
 
 
    --
@@ -556,7 +556,7 @@ begin
             key_v := cv_key_number_c;
          end if;
 
-         -- SNES joypad (TODO: implement NTT)
+         -- SNES joypad 
          if but_tl_s(0) = '0' then           -- TL button pressed, numbers 1 at 6
             if    but_y_s(0) = '0' then
                -- KEY 1
@@ -708,8 +708,8 @@ begin
    -- HDMI
    --
 
-    audio_s <= std_logic_vector(unsigned(signed(audio_signed_s)+128));
-    sound_hdmi_s <= "00" & audio_s & "000000";
+   audio_s <= std_logic_vector(unsigned(signed(audio_signed_s)+128));
+   sound_hdmi_s <= "0" & audio_s & "0000000";
 
    hdmi: entity work.hdmi
    generic map (
