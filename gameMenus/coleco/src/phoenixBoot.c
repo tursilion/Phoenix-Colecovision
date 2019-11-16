@@ -9,7 +9,7 @@
 #include "vdp.h"
 #include "phoenix.h"
 #include "f18a.h"
-#include "kscan.h"
+#include "joykey.h"
 
 #define HEADERS__
 #include "newmap2.c"
@@ -18,8 +18,8 @@
 
 // - stored in the F18A code - actual value of the 0x32 register (so it changes in text mode)
 extern unsigned char useScanlines;     // takes in real time but we need it after a reset
-unsigned char useFlicker;       // can't enable this until we start a cartridge
-unsigned char text_width;        // needed for the menu popup
+unsigned char useFlicker=0;            // can't enable this until we start a cartridge
+unsigned char text_width=32;           // needed for the menu popup
 extern void inc_palette();
 
 // --- externs ---
@@ -38,7 +38,7 @@ static volatile __sfr __at 0xc0 port3;  // joystick reset strobe
 
 // --- definitions ---
 
-// cartridge name format: "DONKEY KONG/NINTENDO/1982"
+// cartridge name format: "GAME NAME/COMPANY/1982"
 // There is no explicit limit on the lengths of the first two strings
 #define CART_NAME_INFO 0x8024
 
@@ -49,7 +49,7 @@ char copyright[65];
 // screen line buffer - shoving this larger array out of the way
 // down in the Coleco RAM space - remember not to access it after
 // beginning the cartridge start sequence!
-unsigned char *lineBuffer = (unsigned char*)0x6000;
+unsigned char lineBuffer[40*16];
 
 // --- static data ---
 
@@ -174,21 +174,13 @@ void waitVblanks(unsigned char cnt) {
     }
 }
 
-// wrapper for joyst that checks both joysticks
-void readjoyst() {
-    joystfast(1);
-    if ((KSCAN_JOYY==0)&&(KSCAN_JOYX==0)) {
-        // try joystick 2
-        joystfast(2);
-    }
-}
-
 // simple config menu for scanlines and flicker that we can activate
 // even before a cartridge boots - called ONLY from readkeypad()
 void cfgMenu() {
     unsigned char lastkey = 0xff;
     unsigned int block = 8*40;
     unsigned int pos = GIMAGE+8*40;
+    unsigned char de1 = 0, de2 = 0;
 
     // if we're in gfx mode, then the logo is up, which means we don't
     // have a character set. Rather than rewrite everything for the bitmap
@@ -211,29 +203,39 @@ void cfgMenu() {
     pos += text_width+2;
     vdpmemcpy(pos, "1 TOGGLE SCANLINES", 18);
     pos += text_width;
-    vdpmemcpy(pos, "2 TOGGLE FLICKER (OFF)", 22);
+    vdpmemcpy(pos, "2 TOGGLE FLICKER (   )", 22);
     pos += text_width + text_width;
     vdpmemcpy(pos, "9 EXIT MENU", 11);
 
     for (;;) {
+		waitVblanks(1);
+		if (useFlicker) {
+			vdpmemcpy(GIMAGE+11*text_width+23, "ON ", 3);
+		} else {
+			vdpmemcpy(GIMAGE+11*text_width+23, "OFF", 3);
+		}
+		if (de1) --de1;
+		if (de2) --de2;
+
         readkeypad();
-        if (KSCAN_KEY != lastkey) {
-            lastkey = KSCAN_KEY;
+        if (MY_KEY != lastkey) {
+            lastkey = MY_KEY;
 
             if (lastkey == '9') {
                 break;
             } else if (lastkey == '1') {
-                // toggle scanlines - this is pretty obvious so no feedback needed
-                useScanlines ^= SCANLINES_ON;
-                VDP_SET_REGISTER(0x32, useScanlines);
+				if (de1 == 0) {
+					// toggle scanlines - this is pretty obvious so no feedback needed
+					useScanlines ^= SCANLINES_ON;
+					VDP_SET_REGISTER(0x32, useScanlines);
+					de1 = 15;
+				}
             } else if (lastkey == '2') {
-                // toggle flicker and update display
-                useFlicker = !useFlicker;
-                if (useFlicker) {
-                    vdpmemcpy(GIMAGE+11*text_width+23, "ON ", 3);
-                } else {
-                    vdpmemcpy(GIMAGE+11*text_width+23, "OFF", 3);
-                }
+				if (de2 == 0) {
+					// toggle flicker and update display
+					useFlicker = !useFlicker;
+					de2 = 15;
+				}
             }
         }
     }
@@ -253,24 +255,21 @@ void cfgMenu() {
 void readkeypad() {
     static unsigned char lastret = 0xff;
     static unsigned char inCfg = 0;
-    unsigned char ret;
     
-    kscanfast(1);
-    ret = KSCAN_KEY;
-    if (ret == 0xff) {
+    readinputs(1);
+    if ((MY_KEY == 0xff)&&(MY_JOYX==0)&&(MY_JOYY==0)) {
         // try joystick 2
-        kscanfast(2);
-        ret = KSCAN_KEY;
+        readinputs(2);
     }
 
     // check only when changed
-    if ((!inCfg) && (lastret != ret)) {
-        lastret = ret;
-        if ((ret == '*')||(ret == '#')) {
+    if ((!inCfg) && (lastret != MY_KEY)) {
+        lastret = MY_KEY;
+        if ((MY_KEY == '*')||(MY_KEY == '#')) {
             inCfg = 1;
             cfgMenu();
             inCfg = 0;
-        } else if (ret == '0') {
+        } else if (MY_KEY == '0') {
 			// toggle palette
 			inc_palette();
 		}
@@ -704,6 +703,7 @@ void startCartridge() {
 }
 
 // display the cartridge copyright information, then start it
+// This is an expensive function, but I like the results too much to remove it!
 void runCartHeader(void (*mycenter)(unsigned char, char*)) {
     // - read and display the cartridge name & copyright on the status line
     // String at 0x8024 is GAME_NAME/OWNER/COPYRIGHT
@@ -856,7 +856,7 @@ void runCartHeader(void (*mycenter)(unsigned char, char*)) {
     cntdown = 300;
     while (cntdown-- > 0) {
         readkeypad();   // read joystick fire buttons
-        if (KSCAN_KEY == JOY_FIRE) break;
+        if (MY_KEY == JOY_FIRE) break;
         waitVblanks(1);
     }
 
@@ -890,8 +890,9 @@ int main() {
     // Warning: in the menu.c we assume this value is 0xE2
 	x = my_set_graphics(VDP_SPR_16x16);
 
-    // clear the sprite pattern table
-    vdpmemset(GSPRITEPAT, 0, 256*8);
+    // clear the sprite pattern table (already done above)
+//    vdpmemset(GSPRITEPAT, 0, 256*8);
+
 	// set up 16 mag 3 sprites to give us two lines of bitmapped text at the bottom of the screen
     // this part won't work if the F18A isn't present, but I'm okay with that.
     // Why sprites? Oh, why not? Could use the BML but that's not implemented in Classic99
@@ -948,4 +949,3 @@ int main() {
 
 	return 0;
 }
-	

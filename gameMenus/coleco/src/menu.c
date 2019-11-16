@@ -1,4 +1,5 @@
 //*****************************
+//*****************************
 // Phoenix Menu
 // Relies on FatFS
 // Called from PhoenixBoot
@@ -16,7 +17,7 @@
 #include "vdp.h"
 #include "phoenix.h"
 #include "f18a.h"
-#include "kscan.h"
+#include "joykey.h"
 #include "fatFs/ff.h"			/* Obtains integer types */
 #include "fatFs/diskio.h"		/* Declarations of disk functions */
 
@@ -28,7 +29,6 @@ extern void vdpmemcpyfast(int pAddr, const unsigned char *pSrc, int cnt);
 
 // kscan wrapper
 extern void readkeypad();
-extern void readjoyst();
 
 // hardware control
 extern void waitVblanks(unsigned char cnt);  // clear and wait for blanks
@@ -94,8 +94,6 @@ char path2[512];    // temporary ram for the load, since we can afford it... (si
 // options - mostly a temporary hack until the core menu is in place
 // - stored in the F18A code
 extern unsigned char useScanlines;     // takes in real time but we need it after a reset
-// - stored in the phoenixBoot code
-extern unsigned char useFlicker;       // can't enable this until we start a cartridge
 
 // --- variables ---
 
@@ -246,7 +244,7 @@ void mystrcpy(char *pDest, char *pSrc) {
 void waitBothFireClear() {
     for (;;) {
         readkeypad();
-        if (KSCAN_KEY == 0xff) break;
+        if (MY_KEY == 0xff) break;
     }
 }
 
@@ -255,7 +253,7 @@ void waitBothFireClear() {
 void waitAnyFirePressed() {
     for (;;) {
         readkeypad();
-        if (KSCAN_KEY == JOY_FIRE) break;
+        if (MY_KEY == JOY_FIRE) break;
     }
 }
 
@@ -268,11 +266,9 @@ void handleBlanking(unsigned char mode) {
 
     // wait for any input to clear it
     for (;;) {
-        readjoyst();
-        if ((KSCAN_JOYY)||(KSCAN_JOYX)) break;
-                    
         readkeypad();
-        if (KSCAN_KEY != 0xff) break;
+        if (MY_KEY != 0xff) break;
+        if ((MY_JOYY)||(MY_JOYX)) break;
 
         // even SD insert or remove - no need to sleep here
         if (disk_status() != disk) break;
@@ -434,8 +430,8 @@ repeatDir:
 // there's a timeout to provide a crude auto-repeat
 void waitRelease() {
     for (;;) {
-        readjoyst();
-        if ((KSCAN_JOYY == 0) && (KSCAN_JOYX == 0)) {
+        readkeypad();
+        if ((MY_JOYY == 0) && (MY_JOYX == 0)) {
             repeatTimeout = 45;     // hold this long before next repeat starts
             break;
         } else {
@@ -866,9 +862,9 @@ char getUserSelection() {
         oldSelect = listSelect;
 
         // scan the joysticks (both work)
-        readjoyst();
+        readkeypad();
 
-        if (KSCAN_JOYY == JOY_UP) {
+        if (MY_JOYY == JOY_UP) {
             if (listSelect > 0) {
                 undrawSelect();     // clear the highlight
                 --listSelect;       // count down
@@ -883,7 +879,7 @@ char getUserSelection() {
             continue;
         }
 
-        if (KSCAN_JOYY == JOY_DOWN) {
+        if (MY_JOYY == JOY_DOWN) {
             if (listSelect < listSize-1) {
                 undrawSelect();
                 ++listSelect;
@@ -898,7 +894,7 @@ char getUserSelection() {
             continue;
         }
 
-        if (KSCAN_JOYX == JOY_RIGHT) {
+        if (MY_JOYX == JOY_RIGHT) {
             if (listOffset+23 < listSize-1) {
                 // page ahead, restrict to 8-bits
                 unsigned char add = listSize-1-listOffset;
@@ -920,7 +916,7 @@ char getUserSelection() {
             continue;
         }
 
-        if (KSCAN_JOYX == JOY_LEFT) {
+        if (MY_JOYX == JOY_LEFT) {
             if (listOffset > 0) {
                 // page back, restrict to 8 bits
                 if (listOffset < 24) {
@@ -942,8 +938,7 @@ char getUserSelection() {
         }
 
         // check fire button
-        readkeypad();
-        if (KSCAN_KEY == JOY_FIRE) {
+        if (MY_KEY == JOY_FIRE) {
             return 1;   // selected
         }
 

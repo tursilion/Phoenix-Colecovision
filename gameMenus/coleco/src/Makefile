@@ -25,7 +25,8 @@ MAIN_OBJS =\
     f18a.$(EXT)  \
     mattfont.$(EXT)  \
     menu.$(EXT)  \
-    vdp_memcpyfast.$(EXT)
+    vdp_memcpyfast.$(EXT) \
+    joykey.$(EXT)
 
 # By building FatFS as a library with distinct files, any functions
 # we dont use are automatically stripped from the output
@@ -113,7 +114,7 @@ all: bios fatfs
 
 bios: $(MAIN_OBJS) fatfs f18a.h memset.h phoenix.h
 	$(RM) phoenixBoot.ihx
-	$(CC) -mz80 --no-std-crt0 --code-loc 0x0090 --data-loc 0x7000 -l../libti99coleco/libti99.a -lfatfs.a $(MAIN_OBJS) -o phoenixBoot.ihx
+	$(CC) -mz80 --no-std-crt0 --code-loc 0x0090 --data-loc 0x6400 -l../libti99coleco/libti99.a -lfatfs.a $(MAIN_OBJS) -o phoenixBoot.ihx
 
 fatfs: $(FAT_OBJS) fatFs/ff.h fatFs/ffconf.h fatFs/diskio.h
 	$(AR) -r fatfs.a $(FAT_OBJS)
