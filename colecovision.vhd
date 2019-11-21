@@ -104,7 +104,8 @@ entity colecovision is
       sd_cs_n_o      : out std_logic;
       sd_cd_n_i      : in  std_logic;     -- Card detect, active low.
       
-      led_o          : out std_logic      -- debug LED
+      led_o          : out std_logic;      -- debug LED
+	  wait_n_i		 : in  std_logic
    );
 
 end entity;
@@ -287,7 +288,7 @@ begin
       RESET_n  => reset_n_s,           -- in std_logic;
       CLK_n    => clock_i,             -- in std_logic;  21.47727 (21.739) MHz
       CLKEN    => clk_en_cpu_s,        -- in std_logic;
-      WAIT_n   => '1',                 -- in std_logic;
+      WAIT_n   => wait_n_i,            -- in std_logic;
       INT_n    => int_n_s,             -- in std_logic;
       NMI_n    => nmi_n_s,             -- in std_logic;
       BUSRQ_n  => '1',                 -- in std_logic;
@@ -376,11 +377,11 @@ begin
 	--audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
    --audio_signed_o <= signed(unsigned(AUDIO_SUM(9 downto 2))-128) when sgm_en_r = '1' else signed(unsigned(audio_s)-128);
 	
-	mix_s <= unsigned(std_logic_vector'(audio_s(6 downto 0) & "0000")) + unsigned(std_logic_vector'("000"& ay_ch_a_s)) + unsigned(std_logic_vector'("000"& ay_ch_b_s))+ unsigned(std_logic_vector'("000"& ay_ch_c_s));
+	mix_s <= unsigned(std_logic_vector'(audio_s(7 downto 0) & "000")) + unsigned(std_logic_vector'("0000"& ay_ch_a_s(7 downto 1))) + unsigned(std_logic_vector'("0000"& ay_ch_b_s(7 downto 1)))+ unsigned(std_logic_vector'("0000"& ay_ch_c_s(7 downto 1)));
+	audio_signed_o <= signed(unsigned(std_logic_vector(mix_s(10 downto 3)))-128);
 	
 	--audio_o        <= std_logic_vector(mix_s(10 downto 3));
-   audio_signed_o <= signed(unsigned(std_logic_vector(mix_s(10 downto 3)))-128);
-	--audio_signed_o <= (others =>'0');
+   --audio_signed_o <= (others =>'0');
 	
 	
    --

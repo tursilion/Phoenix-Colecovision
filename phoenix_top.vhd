@@ -250,6 +250,8 @@ architecture behavior of phoenix_top is
    
    -- CV core debug LED.
    signal cv_led_s         : std_logic;
+	
+	signal wait_n_s			: std_logic :='1';
 
 begin
 
@@ -426,7 +428,8 @@ begin
       sd_cs_n_o         => sd_cs_n_o,
       sd_cd_n_i         => sd_cd_n_i,     -- Card detect, active low.
       
-      led_o             => cv_led_s
+      led_o             => cv_led_s,
+	  wait_n_i			=> wait_n_s
    );
 
 
@@ -503,7 +506,7 @@ begin
       but_a_s, but_b_s, but_up_s, but_down_s, but_left_s, but_right_s,
       but_x_s, but_y_s, but_sel_s, but_start_s, but_tl_s, but_tr_s, but_0_s,
       but_1_s, but_2_s, but_3_s, but_4_s, but_5_s, but_6_s, but_7_s, but_8_s,
-      but_9_s, but_star_s, but_num_s, but_dot_s, but_clear_s, but_equal_s
+      but_9_s, but_star_s, but_num_s, but_dot_s, but_clear_s, but_equal_s, wait_n_s
    )
       variable key_v   : natural range cv_keys_t'range;
       variable fire1_v : std_logic;
@@ -557,8 +560,15 @@ begin
          end if;
 
          -- SNES joypad 
-         if but_tl_s(0) = '0' then           -- TL button pressed, numbers 1 at 6
-            if    but_y_s(0) = '0' then
+         if but_tl_s(0) = '0' then           -- TL button pressed, numbers 1 to 6
+            if but_tr_s(0) = '0' then			-- TL and TR button pressed
+				if    but_y_s(0) = '0' then
+					wait_n_s <= '0';
+				elsif but_x_s(0) = '0' then
+					wait_n_s <='1';
+				end if;
+			end if;
+			if    but_y_s(0) = '0' then
                -- KEY 1
                key_v := cv_key_1_c;
             elsif but_x_s(0) = '0' then
