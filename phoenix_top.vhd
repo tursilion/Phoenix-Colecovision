@@ -251,7 +251,7 @@ architecture behavior of phoenix_top is
    -- CV core debug LED.
    signal cv_led_s         : std_logic;
 	
-	signal wait_n_s			: std_logic :='1';
+	signal wait_n_s			: std_logic;
 
 begin
 
@@ -563,9 +563,9 @@ begin
          if but_tl_s(0) = '0' then           -- TL button pressed, numbers 1 to 6
             if but_tr_s(0) = '0' then			-- TL and TR button pressed
 				if    but_y_s(0) = '0' then
-					wait_n_s <= '0';
+					wait_n_s <= '1';
 				elsif but_x_s(0) = '0' then
-					wait_n_s <='1';
+					wait_n_s <='0';
 				end if;
 			end if;
 			if    but_y_s(0) = '0' then

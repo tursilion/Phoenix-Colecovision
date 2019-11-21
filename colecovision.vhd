@@ -128,6 +128,9 @@ architecture rtl of colecovision is
    signal cpu_addr_s                      : std_logic_vector(15 downto 0);
    signal d_to_cpu_s                      : std_logic_vector( 7 downto 0);
    signal d_from_cpu_s                    : std_logic_vector( 7 downto 0);
+   signal wait_n_r						  : std_logic;
+	
+	
 
    -- F18A VDP
    signal d_from_vdp_s                    : std_logic_vector( 7 downto 0);
@@ -288,7 +291,7 @@ begin
       RESET_n  => reset_n_s,           -- in std_logic;
       CLK_n    => clock_i,             -- in std_logic;  21.47727 (21.739) MHz
       CLKEN    => clk_en_cpu_s,        -- in std_logic;
-      WAIT_n   => wait_n_i,            -- in std_logic;
+      WAIT_n   => wait_n_r,            -- in std_logic;
       INT_n    => int_n_s,             -- in std_logic;
       NMI_n    => nmi_n_s,             -- in std_logic;
       BUSRQ_n  => '1',                 -- in std_logic;
@@ -1168,7 +1171,8 @@ begin
          mc_bank_r         <= "11111";       -- default to top bank
          mc_addr_r         <= "11111";       -- default to top of 512K memory
          mc_en_r           <= '0';           -- disable MegaCart
-
+		 wait_n_r		   <= '1';
+			
       elsif clk_en_3m58_i = '1' then
          sgm_en_r          <= sgm_en_x;
          sgm_8k_en_r       <= sgm_8k_en_x;
@@ -1184,6 +1188,7 @@ begin
          mc_bank_r         <= mc_bank_x;
          mc_addr_r         <= mc_addr_x;
          mc_en_r           <= mc_en_x;
+		 wait_n_r		   <= not wait_n_i;
 
       end if;
    end if;
