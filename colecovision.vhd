@@ -373,6 +373,7 @@ begin
    --AUDIO_SUM <= AUDIO_EX_A + unsigned(ay_ch_a_s) + unsigned(ay_ch_b_s) + unsigned(ay_ch_c_s);
 	--audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
    --audio_signed_o <= signed(unsigned(AUDIO_SUM(9 downto 2))-128) when sgm_en_r = '1' else signed(unsigned(audio_s)-128);
+	--mix_s <= unsigned(std_logic_vector'(audio_s(7 downto 0) & "000")) + unsigned(std_logic_vector'("0000"& ay_ch_a_s(7 downto 1))) + unsigned(std_logic_vector'("0000"& ay_ch_b_s(7 downto 1)))+ unsigned(std_logic_vector'("0000"& ay_ch_c_s(7 downto 1)));
 	
 	--Courtney mixing
 	--AUDIO_EX_A <= unsigned(std_logic_vector'(audio_s&"000"));
@@ -380,8 +381,9 @@ begin
 	--audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
    --audio_signed_o <= signed(unsigned(AUDIO_SUM(9 downto 2))-128) when sgm_en_r = '1' else signed(unsigned(audio_s)-128);
 	
-	mix_s <= unsigned(std_logic_vector'(audio_s(7 downto 0) & "000")) + unsigned(std_logic_vector'("0000"& ay_ch_a_s(7 downto 1))) + unsigned(std_logic_vector'("0000"& ay_ch_b_s(7 downto 1)))+ unsigned(std_logic_vector'("0000"& ay_ch_c_s(7 downto 1)));
-	audio_signed_o <= signed(unsigned(std_logic_vector(mix_s(10 downto 3)))-128);
+	mix_s <= unsigned(std_logic_vector'(audio_s(7 downto 0) & "000")) + AUDIO_WSG + AUDIO_WSG;
+	audio_signed_o <= (signed(unsigned(std_logic_vector(mix_s(10 downto 3)))-128));
+	--audio_signed_o <= (signed(unsigned(std_logic_vector(mix_s(10 downto 3)))-128))when (wait_n_r = '1') else signed(std_logic_vector'("00000000"));
 	
 	--audio_o        <= std_logic_vector(mix_s(10 downto 3));
    --audio_signed_o <= (others =>'0');
@@ -390,45 +392,45 @@ begin
    --
    -- COURTNEY (SEX 7264) WAVETABLE SOUND GENERATOR (WSG)
    --
-   --WSG : ENTITY work.SEX7264 
-   --PORT MAP
-   --(
-   --    CLK         => clock_i      ,
-   --    CLKENA      => clk_en_3m58_i, -- WARNING
-   --   nRESET       => reset_n_s    ,
-   --    BDIR        => wsg_bdir_s   ,
-   --    BC1         => wsg_bc_s     ,
-   --    DAI         => d_from_cpu_s ,
-   --    DAO         => d_from_wsg_s ,
-   --    NATIVE      => wsg_native_q ,
-   --    DIGITAL_MIX => AUDIO_WSG
-   --);
+   WSG : ENTITY work.SEX7264 
+   PORT MAP
+   (
+       CLK         => clock_i      ,
+       CLKENA      => clk_en_3m58_i, -- WARNING
+      nRESET       => reset_n_s    ,
+       BDIR        => wsg_bdir_s   ,
+       BC1         => wsg_bc_s     ,
+       DAI         => d_from_cpu_s ,
+       DAO         => d_from_wsg_s ,
+       NATIVE      => wsg_native_q ,
+       DIGITAL_MIX => AUDIO_WSG
+   );
 
    -- YM-2149, SGM Audio AY-8910 compatible
-   ym2149_inst: entity work.YM2149
-   port map (
-      CLK         => clock_i,
-      CE          => clk_en_1m79_i,
-      RESET       => reset_i,
-      BDIR        => wsg_bdir_s,
-      BC          => wsg_bc_s,
-      DI          => d_from_cpu_s,
-      DO          => d_from_wsg_s,
-      CHANNEL_A   => ay_ch_a_s,
-      CHANNEL_B   => ay_ch_b_s,
-      CHANNEL_C   => ay_ch_c_s,
+   --ym2149_inst: entity work.YM2149
+   --port map (
+   --   CLK         => clock_i,
+   --   CE          => clk_en_1m79_i,
+   --   RESET       => reset_i,
+   --   BDIR        => wsg_bdir_s,
+   --   BC          => wsg_bc_s,
+   --   DI          => d_from_cpu_s,
+   --   DO          => d_from_wsg_s,
+   --   CHANNEL_A   => ay_ch_a_s,
+   --   CHANNEL_B   => ay_ch_b_s,
+   --   CHANNEL_C   => ay_ch_c_s,
 
-      SEL         => '0',
-      MODE        => '0',
+   --   SEL         => '0',
+   --   MODE        => '0',
 
-      ACTIVE      => open,
+   --   ACTIVE      => open,
 
-      IOA_in      => x"00",
-      IOA_out     => open,
+   --   IOA_in      => x"00",
+   --   IOA_out     => open,
 
-      IOB_in      => x"00",
-      IOB_out     => open
-   );
+   --   IOB_in      => x"00",
+   --   IOB_out     => open
+   --);
 
 
    --
@@ -1132,7 +1134,7 @@ begin
             end case;
 			when x"3" =>
 				case cpu_addr_s(3 downto 0) is
-					when x"0" =>                  -- port >30 AK keyboard interface check port
+					when x"1" =>                  -- port >30 AK keyboard interface check port
 						--set port 30 to 30 so it will be different then port reads on 31,32,33 which will cause the system
 						-- to not detect an Andy Keys keyboard
 						if rd_n_s = '0' then
@@ -1171,7 +1173,7 @@ begin
          mc_bank_r         <= "11111";       -- default to top bank
          mc_addr_r         <= "11111";       -- default to top of 512K memory
          mc_en_r           <= '0';           -- disable MegaCart
-		 wait_n_r		   <= '1';
+		 --wait_n_r		      <= '1';
 			
       elsif clk_en_3m58_i = '1' then
          sgm_en_r          <= sgm_en_x;
