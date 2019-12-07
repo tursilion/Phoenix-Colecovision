@@ -7,7 +7,11 @@
 -- All rights reserved
 --
 -------------------------------------------------------------------------------
-
+--
+-- Retaining the above copyright for attribution.
+--
+-- License to use granted to CollectorVision Phoenix Project
+--
 library ieee;
 use ieee.std_logic_1164.all;
 

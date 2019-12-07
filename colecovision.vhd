@@ -139,8 +139,7 @@ architecture rtl of colecovision is
    signal vdp_settings_s						: std_logic_vector( 1 downto 0);
 
    -- SN76489 Sound
-   signal audio_s                         : std_logic_vector(7 downto 0);--mister SN core
-	--signal audio_s                         : signed(7 downto 0);--signed
+   signal audio_s                         : std_logic_vector(7 downto 0);
 	signal sn489_ready_s                   : std_logic;
    signal sn489_we_n_s                    : std_logic;
 

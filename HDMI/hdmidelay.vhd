@@ -5,6 +5,12 @@
 -- please contact me for explicit permission at me _at_ alsp.net.
 -- This applies for source and binary form and derived works.
 
+--
+-- Retaining the above copyright for attribution.
+--
+-- License to use granted to CollectorVision Phoenix Project
+--
+
 library ieee;
 use ieee.std_logic_1164.all;
 

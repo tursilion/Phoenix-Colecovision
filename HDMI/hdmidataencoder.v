@@ -8,6 +8,11 @@
 //-- Audio and infoframe packet generation mechanizms based on Charlie Cole 2015 
 //-- design of HDMI output for Neo Geo MVS
 
+//--
+//-- Retaining the above copyright for attribution.
+//--
+//-- License to use granted to CollectorVision Phoenix Project
+//--
 module hdmidataencoder 
 #(parameter FREQ=25000000, FS=48000, CTS=25000, N=6144) 
 (
