@@ -704,7 +704,7 @@ void startCartridge() {
 
 // display the cartridge copyright information, then start it
 // This is an expensive function, but I like the results too much to remove it!
-void runCartHeader(void (*mycenter)(unsigned char, char*)) {
+void runCartHeader() {
     // - read and display the cartridge name & copyright on the status line
     // String at 0x8024 is GAME_NAME/OWNER/COPYRIGHT
     // OWNER is displayed first and often includes "presents"
@@ -722,9 +722,16 @@ void runCartHeader(void (*mycenter)(unsigned char, char*)) {
 
     unsigned char *p = (unsigned char*)CART_NAME_INFO;
     unsigned char *o = copyright;
-    const unsigned char *sk = "PRESENTS ";
+    const unsigned char *sk = "PRESENTS";
     unsigned char *pYr;
-    int cntdown = 32;
+    int cntdown;
+
+    // We keep finding exception cases that break this display, so to provide a workaround
+    // for other carts, just check for held fire button here. If found, we'll skip the formatting
+    readkeypad();   // read joystick fire buttons
+    if (MY_KEY == JOY_FIRE) {     
+        startCartridge();      // never returns
+    };
 
     // clear the buffer
     memset(copyright, 0, sizeof(copyright));
@@ -732,6 +739,7 @@ void runCartHeader(void (*mycenter)(unsigned char, char*)) {
     // treat any 0 bytes in the cart fields as space (ie: Video Hustler)
 
     // first find the owner and copy that out
+    cntdown = 32;
     while ((*p != '/')&&(--cntdown > 0)) ++p;
     if (cntdown == 0) {
         // never mind - malformed string
@@ -743,27 +751,25 @@ void runCartHeader(void (*mycenter)(unsigned char, char*)) {
     while ((*p == ' ')&&(--cntdown > 0)) {
         ++p;
     }
-    
-    // copy out, skipping 'PRESENTS ' if there
+
+    // Skip the word 'PRESENTS' if present
+    while ((*sk)&&(*sk == *p)) { ++p; ++sk; }
+
+    // skip spaces again
+    cntdown = 32;
+    while ((*p == ' ')&&(--cntdown > 0)) {
+        ++p;
+    }
+
+    // copy out - max output so far is 32
     cntdown = 32;
     while ((*p != '/')&&(--cntdown > 0)) {
-        if (0 != sk) {
-            if (*p == *sk) {
-                ++cntdown;
-                ++sk;
-                ++p;
-                continue;
-            } else {
-                // no more skipping after the first char
-                sk = 0;
-            }
-        }
         *(o++) = *(p++);
     }
     // save the pointer off for later
     pYr = p;
 
-    // we know we could not have copied too many characters
+    // we know we could not have copied too many characters (33)
     *(o++)=' ';
 
     // okay, now we have "OWNER ", back up and get GAME_NAME
@@ -776,10 +782,10 @@ void runCartHeader(void (*mycenter)(unsigned char, char*)) {
     }
 
     // check how many characters we have left - we need to save
-    // six for the " c1982" part
+    // six for the " c1982" part (min count here is 24)
     cntdown = 63-(o-copyright)-6;
 
-    // now just copy until the slash
+    // now just copy until the slash (max now is 57)
     while ((*p != '/')&&(--cntdown > 0)) {
         *(o++) = *(p++);
     }
@@ -800,17 +806,18 @@ void runCartHeader(void (*mycenter)(unsigned char, char*)) {
         *(o++) = *(pYr++);
         *(o++) = *(pYr++);
         *(o++) = *(pYr++);
-        *(o) = '\0';
+        *(o) = '\0';        // total max of 63 printable, 64 bytes
     }
 
     // now from copyright to o-1, replace any 0 bytes with space
+    // Predecrement here is important to avoid replacing the terminator
     while (--o >= copyright) {
         if (*o == 0) *o=' ';
     }
 
     // make positive it's NUL terminated, just in case
     copyright[64]='\0';
-
+    
     // now we have the string, remove leading spaces
     while (copyright[0] == ' ') {
         memmove(copyright, copyright+1, sizeof(copyright)-1);
@@ -843,13 +850,13 @@ void runCartHeader(void (*mycenter)(unsigned char, char*)) {
         // it shouldn't have happened!
         if (*p == ' ') {
             *p = '\0';
-            mycenter(0, copyright);
+            centerString(0, copyright);
             ++p;
-            mycenter(1, p);
+            centerString(1, p);
         }
     } else {
         // it all fits, use the lower line cause it looks better with the gap
-        mycenter(1, copyright);
+        centerString(1, copyright);
     }
 
     // - wait 5 seconds, allow abort
@@ -940,7 +947,7 @@ int main() {
 
     // Check for a cartridge plugged in with the logo header
     if ((pRom(0x8000)==0xaa)&&(pRom(0x8001)==0x55)) {
-        runCartHeader(centerString);    // never returns
+        runCartHeader();    // never returns
     }
 
     // If no cartridge
