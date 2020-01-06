@@ -31,6 +31,10 @@ void reset_f18a() {
 	// reset the F18A to defaults (except palette, requires 1.6)
 	VDP_SET_REGISTER(0x32, 0x80); 	// VR2/50, value 10000000
 									// reset and lock F18A, or corrupt R2
+
+    // make sure the display is off and dark
+    VDP_SET_REGISTER(7, 0);         // do this first to minimize the time for a flash
+    VDP_SET_REGISTER(VDP_REG_MODE1, VDP_MODE1_16K);
 }
 
 // just lock the F18A (preserves all settings)
