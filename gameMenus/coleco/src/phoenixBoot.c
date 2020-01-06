@@ -654,7 +654,7 @@ void startTitle() {
         // -                LD C,0
         // -                CALL WRITE_REGISTER (0x1fd9)    // black screen
         // -                RET
-        VDP_SET_REGISTER(7, 0);
+        VDP_SET_REGISTER(7, 1);     // TODO: forcing black instead of transparent as a workaround
 
         // -        Load character set
         // -            CALL LOAD_ASCII (0x1927)
