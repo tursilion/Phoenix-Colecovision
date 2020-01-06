@@ -33,8 +33,8 @@ void reset_f18a() {
 									// reset and lock F18A, or corrupt R2
 
     // make sure the display is off and dark
+    VDP_SET_REGISTER(7, 0);         // do this first to minimize the time for a flash
     VDP_SET_REGISTER(VDP_REG_MODE1, VDP_MODE1_16K);
-    VDP_SET_REGISTER(7, 0);
 }
 
 // just lock the F18A (preserves all settings)
