@@ -417,7 +417,7 @@ void startTitle() {
 
     // - execute title
     // -    disable screen and interrupts
-    VDP_SET_REGISTER(VDP_REG_MODE1, VDP_MODE1_16K);
+    // VDP_SET_REGISTER(VDP_REG_MODE1, VDP_MODE1_16K); - done by prepare_f18a()
 
     // -    reset F18A
     useScanlines &= SCANLINES_ON;  // turn off every bit except scanline selection
@@ -654,7 +654,7 @@ void startTitle() {
         // -                LD C,0
         // -                CALL WRITE_REGISTER (0x1fd9)    // black screen
         // -                RET
-        VDP_SET_REGISTER(7, 1);     // TODO: forcing black instead of transparent as a workaround
+        //VDP_SET_REGISTER(7, 0); // done by prepare_f18a
 
         // -        Load character set
         // -            CALL LOAD_ASCII (0x1927)
