@@ -250,6 +250,8 @@ architecture behavior of phoenix_top is
    
    -- CV core debug LED.
    signal cv_led_s         : std_logic;
+	
+	signal wait_n_s			: std_logic;
 
 begin
 
@@ -342,7 +344,7 @@ begin
    -- Indicate reset with the LED.
    led_o <= 'Z' when reset_r = '1' or cv_led_s = '1' else '0';
 
-   -- RGB-LED, set to green
+   -- RGB-LED, set to yellow
    rgb_led_o <= "001";
 
 
@@ -426,7 +428,8 @@ begin
       sd_cs_n_o         => sd_cs_n_o,
       sd_cd_n_i         => sd_cd_n_i,     -- Card detect, active low.
       
-      led_o             => cv_led_s
+      led_o             => cv_led_s,
+	  wait_n_i			=> wait_n_s
    );
 
 
@@ -503,7 +506,7 @@ begin
       but_a_s, but_b_s, but_up_s, but_down_s, but_left_s, but_right_s,
       but_x_s, but_y_s, but_sel_s, but_start_s, but_tl_s, but_tr_s, but_0_s,
       but_1_s, but_2_s, but_3_s, but_4_s, but_5_s, but_6_s, but_7_s, but_8_s,
-      but_9_s, but_star_s, but_num_s, but_dot_s, but_clear_s, but_equal_s
+      but_9_s, but_star_s, but_num_s, but_dot_s, but_clear_s, but_equal_s, wait_n_s
    )
       variable key_v   : natural range cv_keys_t'range;
       variable fire1_v : std_logic;
@@ -557,7 +560,7 @@ begin
          end if;
 
          -- SNES joypad 
-         if but_tl_s(0) = '0' then           -- TL button pressed, numbers 1 at 6
+         if but_tl_s(0) = '0' then           -- TL button pressed, numbers 1 to 6
             if    but_y_s(0) = '0' then
                -- KEY 1
                key_v := cv_key_1_c;
@@ -698,7 +701,9 @@ begin
    -- Quadrature inputs for both controllers.
    ctrl_p7_s <= joy2_p7_i & joy1_p7_i;
    ctrl_p9_s <= joy2_p9_i & joy1_p9_i;
-
+   --ctrl_p7_s <= "11"; --disable encoder lines
+   --ctrl_p9_s <= "11"; --disable encoder lines
+   
    -- Output stick vs keypad selection.
    joy_p5_o <= ctrl_p5_s;
    joy_p8_o <= ctrl_p8_s;

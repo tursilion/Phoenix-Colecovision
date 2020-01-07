@@ -36,6 +36,14 @@
 --
 -------------------------------------------------------------------------------
 
+--
+-- Retaining the above copyright for attribution.
+--
+-- Release as a 3-clause BSD license with permission exlusive to CollectorVision Phoenix Project
+-- otherwise reverts to above GPL3 license. See License.PHX file for more info
+--
+
+
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
