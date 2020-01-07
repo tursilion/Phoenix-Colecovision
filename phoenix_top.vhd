@@ -344,7 +344,7 @@ begin
    -- Indicate reset with the LED.
    led_o <= 'Z' when reset_r = '1' or cv_led_s = '1' else '0';
 
-   -- RGB-LED, set to green
+   -- RGB-LED, set to yellow
    rgb_led_o <= "001";
 
 
@@ -561,14 +561,7 @@ begin
 
          -- SNES joypad 
          if but_tl_s(0) = '0' then           -- TL button pressed, numbers 1 to 6
-            if but_tr_s(0) = '0' then			-- TL and TR button pressed
-				if    but_y_s(0) = '0' then
-					wait_n_s <= '1';
-				elsif but_x_s(0) = '0' then
-					wait_n_s <='0';
-				end if;
-			end if;
-			if    but_y_s(0) = '0' then
+            if    but_y_s(0) = '0' then
                -- KEY 1
                key_v := cv_key_1_c;
             elsif but_x_s(0) = '0' then
@@ -708,7 +701,9 @@ begin
    -- Quadrature inputs for both controllers.
    ctrl_p7_s <= joy2_p7_i & joy1_p7_i;
    ctrl_p9_s <= joy2_p9_i & joy1_p9_i;
-
+   --ctrl_p7_s <= "11"; --disable encoder lines
+   --ctrl_p9_s <= "11"; --disable encoder lines
+   
    -- Output stick vs keypad selection.
    joy_p5_o <= ctrl_p5_s;
    joy_p8_o <= ctrl_p8_s;

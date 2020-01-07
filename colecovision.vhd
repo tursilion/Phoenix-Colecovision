@@ -1172,7 +1172,7 @@ begin
          mc_bank_r         <= "11111";       -- default to top bank
          mc_addr_r         <= "11111";       -- default to top of 512K memory
          mc_en_r           <= '0';           -- disable MegaCart
-		 --wait_n_r		      <= '1';
+		 wait_n_r		   <= '1';
 			
       elsif clk_en_3m58_i = '1' then
          sgm_en_r          <= sgm_en_x;
