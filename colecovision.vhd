@@ -104,7 +104,8 @@ entity colecovision is
       sd_cs_n_o      : out std_logic;
       sd_cd_n_i      : in  std_logic;     -- Card detect, active low.
       
-      led_o          : out std_logic      -- debug LED
+      led_o          : out std_logic;      -- debug LED
+	  wait_n_i		 : in  std_logic
    );
 
 end entity;
@@ -127,6 +128,9 @@ architecture rtl of colecovision is
    signal cpu_addr_s                      : std_logic_vector(15 downto 0);
    signal d_to_cpu_s                      : std_logic_vector( 7 downto 0);
    signal d_from_cpu_s                    : std_logic_vector( 7 downto 0);
+   signal wait_n_r						  : std_logic;
+	
+	
 
    -- F18A VDP
    signal d_from_vdp_s                    : std_logic_vector( 7 downto 0);
@@ -135,8 +139,7 @@ architecture rtl of colecovision is
    signal vdp_settings_s						: std_logic_vector( 1 downto 0);
 
    -- SN76489 Sound
-   signal audio_s                         : std_logic_vector(7 downto 0);--mister SN core
-	--signal audio_s                         : signed(7 downto 0);--signed
+   signal audio_s                         : std_logic_vector(7 downto 0);
 	signal sn489_ready_s                   : std_logic;
    signal sn489_we_n_s                    : std_logic;
 
@@ -287,7 +290,7 @@ begin
       RESET_n  => reset_n_s,           -- in std_logic;
       CLK_n    => clock_i,             -- in std_logic;  21.47727 (21.739) MHz
       CLKEN    => clk_en_cpu_s,        -- in std_logic;
-      WAIT_n   => '1',                 -- in std_logic;
+      WAIT_n   => wait_n_r,            -- in std_logic;
       INT_n    => int_n_s,             -- in std_logic;
       NMI_n    => nmi_n_s,             -- in std_logic;
       BUSRQ_n  => '1',                 -- in std_logic;
@@ -369,6 +372,7 @@ begin
    --AUDIO_SUM <= AUDIO_EX_A + unsigned(ay_ch_a_s) + unsigned(ay_ch_b_s) + unsigned(ay_ch_c_s);
 	--audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
    --audio_signed_o <= signed(unsigned(AUDIO_SUM(9 downto 2))-128) when sgm_en_r = '1' else signed(unsigned(audio_s)-128);
+	--mix_s <= unsigned(std_logic_vector'(audio_s(7 downto 0) & "000")) + unsigned(std_logic_vector'("0000"& ay_ch_a_s(7 downto 1))) + unsigned(std_logic_vector'("0000"& ay_ch_b_s(7 downto 1)))+ unsigned(std_logic_vector'("0000"& ay_ch_c_s(7 downto 1)));
 	
 	--Courtney mixing
 	--AUDIO_EX_A <= unsigned(std_logic_vector'(audio_s&"000"));
@@ -376,55 +380,56 @@ begin
 	--audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
    --audio_signed_o <= signed(unsigned(AUDIO_SUM(9 downto 2))-128) when sgm_en_r = '1' else signed(unsigned(audio_s)-128);
 	
-	mix_s <= unsigned(std_logic_vector'(audio_s(6 downto 0) & "0000")) + unsigned(std_logic_vector'("000"& ay_ch_a_s)) + unsigned(std_logic_vector'("000"& ay_ch_b_s))+ unsigned(std_logic_vector'("000"& ay_ch_c_s));
+	mix_s <= unsigned(std_logic_vector'(audio_s(7 downto 0) & "000")) + AUDIO_WSG + AUDIO_WSG;
+	audio_signed_o <= (signed(unsigned(std_logic_vector(mix_s(10 downto 3)))-128));
+	--audio_signed_o <= (signed(unsigned(std_logic_vector(mix_s(10 downto 3)))-128))when (wait_n_r = '1') else signed(std_logic_vector'("00000000"));
 	
 	--audio_o        <= std_logic_vector(mix_s(10 downto 3));
-   audio_signed_o <= signed(unsigned(std_logic_vector(mix_s(10 downto 3)))-128);
-	--audio_signed_o <= (others =>'0');
+   --audio_signed_o <= (others =>'0');
 	
 	
    --
    -- COURTNEY (SEX 7264) WAVETABLE SOUND GENERATOR (WSG)
    --
-   --WSG : ENTITY work.SEX7264 
-   --PORT MAP
-   --(
-   --    CLK         => clock_i      ,
-   --    CLKENA      => clk_en_3m58_i, -- WARNING
-   --   nRESET       => reset_n_s    ,
-   --    BDIR        => wsg_bdir_s   ,
-   --    BC1         => wsg_bc_s     ,
-   --    DAI         => d_from_cpu_s ,
-   --    DAO         => d_from_wsg_s ,
-   --    NATIVE      => wsg_native_q ,
-   --    DIGITAL_MIX => AUDIO_WSG
-   --);
+   WSG : ENTITY work.SEX7264 
+   PORT MAP
+   (
+       CLK         => clock_i      ,
+       CLKENA      => clk_en_3m58_i, -- WARNING
+      nRESET       => reset_n_s    ,
+       BDIR        => wsg_bdir_s   ,
+       BC1         => wsg_bc_s     ,
+       DAI         => d_from_cpu_s ,
+       DAO         => d_from_wsg_s ,
+       NATIVE      => wsg_native_q ,
+       DIGITAL_MIX => AUDIO_WSG
+   );
 
    -- YM-2149, SGM Audio AY-8910 compatible
-   ym2149_inst: entity work.YM2149
-   port map (
-      CLK         => clock_i,
-      CE          => clk_en_1m79_i,
-      RESET       => reset_i,
-      BDIR        => wsg_bdir_s,
-      BC          => wsg_bc_s,
-      DI          => d_from_cpu_s,
-      DO          => d_from_wsg_s,
-      CHANNEL_A   => ay_ch_a_s,
-      CHANNEL_B   => ay_ch_b_s,
-      CHANNEL_C   => ay_ch_c_s,
+   --ym2149_inst: entity work.YM2149
+   --port map (
+   --   CLK         => clock_i,
+   --   CE          => clk_en_1m79_i,
+   --   RESET       => reset_i,
+   --   BDIR        => wsg_bdir_s,
+   --   BC          => wsg_bc_s,
+   --   DI          => d_from_cpu_s,
+   --   DO          => d_from_wsg_s,
+   --   CHANNEL_A   => ay_ch_a_s,
+   --   CHANNEL_B   => ay_ch_b_s,
+   --   CHANNEL_C   => ay_ch_c_s,
 
-      SEL         => '0',
-      MODE        => '0',
+   --   SEL         => '0',
+   --   MODE        => '0',
 
-      ACTIVE      => open,
+   --   ACTIVE      => open,
 
-      IOA_in      => x"00",
-      IOA_out     => open,
+   --   IOA_in      => x"00",
+   --   IOA_out     => open,
 
-      IOB_in      => x"00",
-      IOB_out     => open
-   );
+   --   IOB_in      => x"00",
+   --   IOB_out     => open
+   --);
 
 
    --
@@ -1128,7 +1133,7 @@ begin
             end case;
 			when x"3" =>
 				case cpu_addr_s(3 downto 0) is
-					when x"0" =>                  -- port >30 AK keyboard interface check port
+					when x"1" =>                  -- port >30 AK keyboard interface check port
 						--set port 30 to 30 so it will be different then port reads on 31,32,33 which will cause the system
 						-- to not detect an Andy Keys keyboard
 						if rd_n_s = '0' then
@@ -1167,7 +1172,8 @@ begin
          mc_bank_r         <= "11111";       -- default to top bank
          mc_addr_r         <= "11111";       -- default to top of 512K memory
          mc_en_r           <= '0';           -- disable MegaCart
-
+		 wait_n_r		   <= '1';
+			
       elsif clk_en_3m58_i = '1' then
          sgm_en_r          <= sgm_en_x;
          sgm_8k_en_r       <= sgm_8k_en_x;
@@ -1183,6 +1189,7 @@ begin
          mc_bank_r         <= mc_bank_x;
          mc_addr_r         <= mc_addr_x;
          mc_en_r           <= mc_en_x;
+		 wait_n_r		   <= not wait_n_i;
 
       end if;
    end if;

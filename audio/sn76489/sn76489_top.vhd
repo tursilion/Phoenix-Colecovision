@@ -55,6 +55,13 @@
 --
 -------------------------------------------------------------------------------
 
+--
+-- Retaining the above copyright for attribution.
+--
+-- Release as a 3-clause BSD license with permission exlusive to CollectorVision Phoenix Project
+-- otherwise reverts to above GPL3 license. See License.PHX file for more info
+--
+
 library ieee;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;

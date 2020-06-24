@@ -20,51 +20,51 @@ ADDRESS_MAP phoenix PPC405 0
 
     ADDRESS_SPACE loader RAMB16 [0x00000000:0x00005FFF]
         BUS_BLOCK
-            coleco/loader/Mram_ram_1 RAMB16 [7:0] [0:2047] PLACED = X1Y16;
+            coleco/loader/Mram_ram_1 RAMB16 [7:0] [0:2047] PLACED = X0Y14;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            coleco/loader/Mram_ram_2 RAMB16 [7:0] [2048:4095] PLACED = X1Y12;
+            coleco/loader/Mram_ram_2 RAMB16 [7:0] [2048:4095] PLACED = X0Y18;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            coleco/loader/Mram_ram_3 RAMB16 [7:0] [4096:6143] PLACED = X1Y10;
+            coleco/loader/Mram_ram_3 RAMB16 [7:0] [4096:6143] PLACED = X0Y20;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            coleco/loader/Mram_ram_4 RAMB16 [7:0] [6144:8191] PLACED = X1Y14;
+            coleco/loader/Mram_ram_4 RAMB16 [7:0] [6144:8191] PLACED = X0Y16;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            coleco/loader/Mram_ram_5 RAMB16 [7:0] [8192:10239] PLACED = X1Y4;
+            coleco/loader/Mram_ram_5 RAMB16 [7:0] [8192:10239] PLACED = X0Y10;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            coleco/loader/Mram_ram_6 RAMB16 [7:0] [10240:12287] PLACED = X1Y2;
+            coleco/loader/Mram_ram_6 RAMB16 [7:0] [10240:12287] PLACED = X0Y8;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            coleco/loader/Mram_ram_7 RAMB16 [7:0] [12288:14335] PLACED = X1Y6;
+            coleco/loader/Mram_ram_7 RAMB16 [7:0] [12288:14335] PLACED = X0Y6;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            coleco/loader/Mram_ram_8 RAMB16 [7:0] [14336:16383] PLACED = X1Y0;
+            coleco/loader/Mram_ram_8 RAMB16 [7:0] [14336:16383] PLACED = X0Y4;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            coleco/loader/Mram_ram_9 RAMB16 [7:0] [16384:18431] PLACED = X0Y8;
+            coleco/loader/Mram_ram_9 RAMB16 [7:0] [16384:18431] PLACED = X0Y24;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            coleco/loader/Mram_ram_A RAMB16 [7:0] [18432:20479] PLACED = X0Y10;
+            coleco/loader/Mram_ram_A RAMB16 [7:0] [18432:20479] PLACED = X0Y26;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            coleco/loader/Mram_ram_B RAMB16 [7:0] [20480:22527] PLACED = X0Y6;
+            coleco/loader/Mram_ram_B RAMB16 [7:0] [20480:22527] PLACED = X0Y28;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            coleco/loader/Mram_ram_C RAMB16 [7:0] [22528:24575] PLACED = X0Y12;
+            coleco/loader/Mram_ram_C RAMB16 [7:0] [22528:24575] PLACED = X0Y22;
         END_BUS_BLOCK;
     END_ADDRESS_SPACE;
 

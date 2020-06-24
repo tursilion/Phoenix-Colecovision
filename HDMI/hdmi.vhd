@@ -11,6 +11,11 @@
 -- N=0x1000 CTS=0x6978 (27MHz pixel clock -> 32KHz audio clock)
 -- N=0x1800 CTS=0x6978 (27MHz pixel clock -> 48KHz audio clock)
 ---------------------------------------------------------------------------
+--
+-- Retaining the above copyright for attribution.
+--
+-- License for to use granted to CollectorVision Phoenix Project
+--
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
