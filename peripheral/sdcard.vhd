@@ -48,7 +48,7 @@
 --
 --       Clock       Period    8-bit transfer
 --       ------------------------------------
--- Slow  340.562KHz  2.936us   23.526us  
+-- Slow  340.562KHz  2.936us   23.526us
 -- Fast  10.898MHz   91.76ns   779.960ns
 -- Z80   3.58MHz     279.3ns   1.11us  (4 cycle) IO instruction
 --
@@ -110,9 +110,9 @@
 --              \________________________________/         RD_n     \
 --  |         |         |         |         |   ___   |              } Read cycle
 -- --------------------------------------------X___X-----  Data In  /
---  |         |         |  ___    |         |         |  
+--  |         |         |  ___    |         |         |
 -- XXXXXXXXXXXXXXXXXXXXXXX/   \XXXXXXXXXXXXXXXXXXXXXXXXXX  CPU imposed wait
---  |         |     ____|_________|__       |         |  
+--  |         |     ____|_________|__       |         |
 -- XXXXXXXXXXXXXXXX/                 \XXXXXXXXXXXXXXXXXXX  SPI wait state
 -- _|_________|_        |         |         |     ____|__
 --              \________________________________/         WR_n     \
@@ -175,7 +175,7 @@ architecture rtl of sdcard is
    signal state_r, state_x : state_t;
 
    signal rt_en_s                : std_logic := '1';
-   
+
    signal dmux_s                 : std_logic_vector( 7 downto 0) := x"00";
    signal shift_r, shift_x       : std_logic_vector( 7 downto 0) := x"00";
    signal count_r, count_x       : unsigned( 2 downto 0) := "111";
