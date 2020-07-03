@@ -1,3 +1,0 @@
-# SDCC library files must have a windows line ending
-.a text eol=crlf
-

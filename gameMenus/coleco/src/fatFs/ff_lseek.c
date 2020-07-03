@@ -45,6 +45,7 @@ FRESULT f_lseek (
 	FSIZE_t ofs		/* File pointer from top of file */
 )
 {
+    // worse if made global...
 	FRESULT res;
 	FATFS *fs;
 	DWORD clst, bcs, nsect;
