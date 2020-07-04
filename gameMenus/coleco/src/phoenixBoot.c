@@ -878,7 +878,7 @@ void runCartHeader() {
 // This is where we start!
 void main() {
 	unsigned char x,idx;
-
+    
     // disable interrupt processing
     VDP_INT_DISABLE;
 
@@ -957,3 +957,4 @@ void main() {
     // call the menu - never returns
     menu();
 }
+

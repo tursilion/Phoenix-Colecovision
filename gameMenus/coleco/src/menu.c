@@ -410,7 +410,12 @@ repeatDir:
             if (finfo.fattrib & AM_DIR) {
                 *(lastFilename+127) = 0;            // 0 size for directory
             } else {
-                *(lastFilename+127) = (finfo.fsize + 16383) >> 14;  // number of 16384 pages, rounded up
+                // calculate the number of 16384 pages, rounded up
+                // SDCC4.0 can't handle this 32-bit add-then-shift properly...
+//              *(lastFilename+127) = (finfo.fsize + 16383) >> 14;
+				unsigned char x = finfo.fsize >> 14;
+				if (finfo.fsize&0x3fff) ++x;
+                *(lastFilename+127) = x;
             }
             lastFilename += 128;
             // we can go up to 0xffff, but if we wrap around we're done
@@ -1165,7 +1170,7 @@ drawLoop:
         FRESULT res;
         UINT br;
         char *s1, *s2;
-        char fsize = *(p+127);  // save off the size (16k chunks)
+        unsigned char fsize = *(p+127);  // save off the size (16k chunks)
 
         // create the filename
         s1 = path2;

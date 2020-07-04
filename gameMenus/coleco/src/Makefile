@@ -112,8 +112,8 @@ link: bios fatfs
 # these tools are not included as they are not useful to the average person, but
 # are available on github
 tursi: bios fatfs
-	"../tursi_tools/makemegacart.exe" -bios phoenixBoot.ihx phoenixBoot.rom
-	"../tursi_tools/parseMap.exe" phoenixBoot.map
+	"../makemegacart.exe" -bios phoenixBoot.ihx phoenixBoot.rom
+	"../parseMap.exe" phoenixBoot.map
 
 bios: $(MAIN_OBJS) fatfs f18a.h memset.h phoenix.h
 	$(RM) phoenixBoot.ihx

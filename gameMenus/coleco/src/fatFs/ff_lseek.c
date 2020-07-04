@@ -129,7 +129,7 @@ FRESULT f_lseek (
 		if (fs->fs_type != FS_EXFAT && ofs >= 0x100000000) ofs = 0xFFFFFFFF;	/* Clip at 4 GiB - 1 if at FATxx */
 #endif
 		if (ofs > fp->obj.objsize && (FF_FS_READONLY || !(fp->flag & FA_WRITE))) {	/* In read-only mode, clip offset with the file size */
-			ofs = fp->obj.objsize;
+            ofs = fp->obj.objsize;
 		}
 		ifptr = fp->fptr;
 		fp->fptr = nsect = 0;
@@ -170,14 +170,14 @@ FRESULT f_lseek (
 					{
 						clst = get_fat(&fp->obj, clst);	/* Follow cluster chain if not in write mode */
 					}
-					if (clst == 0xFFFFFFFF) ABORT(fs, FR_DISK_ERR);
-					if (clst <= 1 || clst >= fs->n_fatent) ABORT(fs, FR_INT_ERR);
+                    if (clst == 0xFFFFFFFF) { ABORT(fs, FR_DISK_ERR); }
+                    if (clst <= 1 || clst >= fs->n_fatent) { ABORT(fs, FR_INT_ERR); }
 					fp->clust = clst;
 				}
 				fp->fptr += ofs;
 				if (ofs % SS(fs)) {
 					nsect = clst2sect(fs, clst);	/* Current sector */
-					if (nsect == 0) ABORT(fs, FR_INT_ERR);
+                    if (nsect == 0) { ABORT(fs, FR_INT_ERR); }
 					nsect += (DWORD)(ofs / SS(fs));
 				}
 			}
@@ -201,14 +201,14 @@ FRESULT f_lseek (
 #if FF_FS_ONEDRIVE != 1
 			if (disk_read(fs->pdrv, fp->buf, nsect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);	/* Fill sector cache */
 #else
-			if (disk_read(fp->buf, nsect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);	/* Fill sector cache */
+            if (disk_read(fp->buf, nsect, 1) != RES_OK) { ABORT(fs, FR_DISK_ERR); }	/* Fill sector cache */
 #endif
 #endif
 			fp->sect = nsect;
 		}
 	}
 
-	LEAVE_FF(fs, res);
+    LEAVE_FF(fs, res);
 }
 
 #endif
