@@ -27,6 +27,7 @@ webtalk_impact.xml
 webtalk_pn.xml
 xlnx_auto_0_xdb/
 /DOCs/Coleco_s700a/src/tb_vdp18
+gameMenus/coleco/tursi_tools
 /ROMs/bootrom.zip
 /ROMs/Firmware/*.BIN
 /ROMs/Firmware/*.ROM
