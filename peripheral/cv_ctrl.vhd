@@ -356,20 +356,20 @@ begin
    -- The way detection is going to be done here is to watch the input for any
    -- change, and if it does change, allow following of the input.  Otherwise,
    -- the input will be treated as a logic high.
-   
+
    d_follow_s <= d_cnt_r(1);
-   
+
    -- Count changes to the input, clamp at 2 changes.
    d_cnt_x <= d_cnt_r when d_last_r = d_i or d_follow_s = '1' else d_cnt_r + 1;
 
    -- Follow the input or keep initial value.
    d_x <= d_r when d_follow_s = '0' else d_i;
 
-   
+
    process ( clk_i, clk_en_i )
    begin
    if rising_edge(clk_i) and clk_en_i = '1' then
-      
+
       if reset_n_i = '0' then
          d_r      <= '1';  -- reset to floating high
          d_last_r <= '0';
@@ -379,7 +379,7 @@ begin
          d_last_r <= d_i;
          d_cnt_r  <= d_cnt_x;
       end if;
-   
+
    end if;
    end process;
 
@@ -400,8 +400,8 @@ use ieee.std_logic_unsigned.all;
 --
 entity cv_ctrl is
 port (
-   clk_21m47_i       : in  std_logic;  --  21.47727 (21.739) MHz
-   clk_en_3m58_i     : in  std_logic;
+   clk_i             : in  std_logic;
+   clk_3m58_en_i     : in  std_logic;
    reset_n_i         : in  std_logic;
    ctrl_en_key_n_i   : in  std_logic;
    ctrl_en_joy_n_i   : in  std_logic;
@@ -468,9 +468,9 @@ begin
       '1' when ctrl_en_key_n_i = '1' and ctrl_en_joy_n_i = '0' else
       keyjoy_sel_r;
 
-   process ( clk_21m47_i, clk_en_3m58_i )
+   process ( clk_i, clk_3m58_en_i )
    begin
-      if rising_edge(clk_21m47_i) and clk_en_3m58_i = '1' then
+      if rising_edge(clk_i) and clk_3m58_en_i = '1' then
          if reset_n_i = '0' then
             keyjoy_sel_r <= '0';
          else
@@ -480,25 +480,25 @@ begin
    end process;
 
    -- Synchronize the inputs and provide a little debounce (about 1uS).
-   p1_1 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p1_i(1), p1_1_r);
-   p1_2 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p2_i(1), p1_2_r);
-   p1_3 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p3_i(1), p1_3_r);
-   p1_4 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p4_i(1), p1_4_r);
-   p1_6 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p6_i(1), p1_F_r);
-   p1_7 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p7_i(1), p1_QB_r);
-   p1_9 : entity work.cv_ctrl_pin9 port map (clk_21m47_i, clk_en_3m58_i, ctrl_p9_i(1), p1_9f_r);
-   p1_9cd : entity work.cv_ctrl_change_detect port map (clk_21m47_i, clk_en_3m58_i, reset_n_i, p1_9f_r, p1_9_r);
+   p1_1 : entity work.cv_ctrl_sync port map (clk_i, clk_3m58_en_i, ctrl_p1_i(1), p1_1_r);
+   p1_2 : entity work.cv_ctrl_sync port map (clk_i, clk_3m58_en_i, ctrl_p2_i(1), p1_2_r);
+   p1_3 : entity work.cv_ctrl_sync port map (clk_i, clk_3m58_en_i, ctrl_p3_i(1), p1_3_r);
+   p1_4 : entity work.cv_ctrl_sync port map (clk_i, clk_3m58_en_i, ctrl_p4_i(1), p1_4_r);
+   p1_6 : entity work.cv_ctrl_sync port map (clk_i, clk_3m58_en_i, ctrl_p6_i(1), p1_F_r);
+   p1_7 : entity work.cv_ctrl_sync port map (clk_i, clk_3m58_en_i, ctrl_p7_i(1), p1_QB_r);
+   p1_9 : entity work.cv_ctrl_pin9 port map (clk_i, clk_3m58_en_i, ctrl_p9_i(1), p1_9f_r);
+   p1_9cd : entity work.cv_ctrl_change_detect port map (clk_i, clk_3m58_en_i, reset_n_i, p1_9f_r, p1_9_r);
 
-   p2_1 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p1_i(2), p2_1_r);
-   p2_2 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p2_i(2), p2_2_r);
-   p2_3 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p3_i(2), p2_3_r);
-   p2_4 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p4_i(2), p2_4_r);
-   p2_6 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p6_i(2), p2_F_r);
-   p2_7 : entity work.cv_ctrl_sync port map (clk_21m47_i, clk_en_3m58_i, ctrl_p7_i(2), p2_QB_r);
-   p2_9 : entity work.cv_ctrl_pin9 port map (clk_21m47_i, clk_en_3m58_i, ctrl_p9_i(2), p2_9f_r);
-   p2_9cd : entity work.cv_ctrl_change_detect port map (clk_21m47_i, clk_en_3m58_i, reset_n_i, p2_9f_r, p2_9_r);
+   p2_1 : entity work.cv_ctrl_sync port map (clk_i, clk_3m58_en_i, ctrl_p1_i(2), p2_1_r);
+   p2_2 : entity work.cv_ctrl_sync port map (clk_i, clk_3m58_en_i, ctrl_p2_i(2), p2_2_r);
+   p2_3 : entity work.cv_ctrl_sync port map (clk_i, clk_3m58_en_i, ctrl_p3_i(2), p2_3_r);
+   p2_4 : entity work.cv_ctrl_sync port map (clk_i, clk_3m58_en_i, ctrl_p4_i(2), p2_4_r);
+   p2_6 : entity work.cv_ctrl_sync port map (clk_i, clk_3m58_en_i, ctrl_p6_i(2), p2_F_r);
+   p2_7 : entity work.cv_ctrl_sync port map (clk_i, clk_3m58_en_i, ctrl_p7_i(2), p2_QB_r);
+   p2_9 : entity work.cv_ctrl_pin9 port map (clk_i, clk_3m58_en_i, ctrl_p9_i(2), p2_9f_r);
+   p2_9cd : entity work.cv_ctrl_change_detect port map (clk_i, clk_3m58_en_i, reset_n_i, p2_9f_r, p2_9_r);
 
-   
+
    -- Create QA.
    p1_QA_s <= p1_9_r nand p1_IF_r;
    p2_QA_s <= p2_9_r nand p2_IF_r;
@@ -536,9 +536,9 @@ begin
    p2_ifc_load_s <= p2_edge_s and p2_ifc_zero_s;
    p2_ifc_cnt_x <= "11100000000" when p2_ifc_load_s = '1' else p2_ifc_cnt_r - 1;
 
-   process ( clk_21m47_i, clk_en_3m58_i )
+   process ( clk_i, clk_3m58_en_i )
    begin
-   if rising_edge(clk_21m47_i) and clk_en_3m58_i = '1' then
+   if rising_edge(clk_i) and clk_3m58_en_i = '1' then
       if reset_n_i = '0' then
          intcnt_r       <= (others => '0');
          int_n_r        <= '1';
@@ -549,7 +549,7 @@ begin
          p1_9last_r     <= '0';
          p2_9last_r     <= '0';
       else
-      
+
          -- If the interrupt duration counter is enabled, count down or load.
          if cnt_en_n_s = '0' then
             intcnt_r <= intcnt_x;

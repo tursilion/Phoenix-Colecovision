@@ -635,7 +635,15 @@ begin
 					case Special_LD(1 downto 0) is
 					when "00" =>
 						ACC <= I;
+						F(Flag_S) <= I(7);
+						if I = "00000000" then
+                  	F(Flag_Z) <= '1';
+						else
+                  	F(Flag_Z) <= '0';
+						end if;
+						F(Flag_H) <= '0';
 						F(Flag_P) <= IntE_FF2;
+						F(Flag_N) <= '0';
 					when "01" =>
 						ACC <= std_logic_vector(R);
 						F(Flag_P) <= IntE_FF2;

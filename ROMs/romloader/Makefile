@@ -6,9 +6,12 @@
 # These commands are assumed to be in the path:
 #
 #   sdcc, sdasz80, makebin  : part of SDCC
+#   data2mem, impact        : part of the Xilinx ISE suite
+#
+# These utilities are included:
+#
 #   romgen                  : a MikeJ tool
 #   makemem					: replacement for romgen
-#   data2mem, impact        : part of the Xilinx ISE suite
 #
 
 CP		:= cp
@@ -17,8 +20,8 @@ CC		:= sdcc
 AS		:= sdasz80
 LD		:= sdcc
 H2B		:= makebin
-#ROMGEN	:= romgen
-ROMGEN	:= makemem
+#ROMGEN	:= ../../Utils/romgen
+ROMGEN	:= ../../Utils/makemem
 
 # 24K Loader from 0000h to 5FFFh
 MEMSIZE	:= 24576

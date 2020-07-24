@@ -1,3 +1,18 @@
+--
+-- Phoenix ColecoVision Core
+-- Released under the 3-Clause BSD License:
+--
+-- Copyright 2019 - 2020
+-- Matthew Hagerty, Brian Burney
+--
+-- This core started as a mix of the ColecoFPGA core and a CV core designed and
+-- written by Matthew.  By the time of the first release, this CV core has been
+-- completely rewritten several times over, and nothing of either original core
+-- remains. However, both systems provided information and a starting point for
+-- this implementation, and credit is always due.
+--
+-- Attribution for the ColecoFPGA project:
+--
 -------------------------------------------------------------------------------
 --
 -- ColecoFPGA project
@@ -44,70 +59,64 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity colecovision is
-   generic (
-      mach_id_g      : integer := 0
-   );
-   port (
-      clock_i        : in  std_logic;        --  21.47727 (21.739 PLL) MHz
-      clock_mem_i    : in  std_logic;        --  42.95454 (43.478 PLL) MHz
-      clk_100m0_i    : in  std_logic;
-      clk_25m0_i     : in  std_logic;
-      clk_en_3m58_i  : in  std_logic;
-      clk_en_1m79_i  : in  std_logic;
-      reset_i        : in  std_logic;        -- Soft Reset, active high
-      por_n_i        : in  std_logic;        -- Power-on Reset, active low
+generic
+   ( mach_id_g             : integer := 0
+);
+port
+   ( clk_25m0_i            : in  std_logic
+   ; clk_100m0_i           : in  std_logic
+   ; clk_3m58_en_i         : in  std_logic
+   ; reset_i               : in  std_logic -- Soft Reset, active high
+   ; por_n_i               : in  std_logic -- Power-on Reset, active low
 
-      -- Physical controller interface
-      ctrl_p1_i      : in  std_logic_vector( 2 downto 1);
-      ctrl_p2_i      : in  std_logic_vector( 2 downto 1);
-      ctrl_p3_i      : in  std_logic_vector( 2 downto 1);
-      ctrl_p4_i      : in  std_logic_vector( 2 downto 1);
-      ctrl_p5_o      : out std_logic;
-      ctrl_p6_i      : in  std_logic_vector( 2 downto 1);
-      ctrl_p7_i      : in  std_logic_vector( 2 downto 1);
-      ctrl_p8_o      : out std_logic;
-      ctrl_p9_i      : in  std_logic_vector( 2 downto 1);
+   -- Physical controller interface
+   ; ctrl_p1_i             : in  std_logic_vector( 2 downto 1)
+   ; ctrl_p2_i             : in  std_logic_vector( 2 downto 1)
+   ; ctrl_p3_i             : in  std_logic_vector( 2 downto 1)
+   ; ctrl_p4_i             : in  std_logic_vector( 2 downto 1)
+   ; ctrl_p5_o             : out std_logic
+   ; ctrl_p6_i             : in  std_logic_vector( 2 downto 1)
+   ; ctrl_p7_i             : in  std_logic_vector( 2 downto 1)
+   ; ctrl_p8_o             : out std_logic
+   ; ctrl_p9_i             : in  std_logic_vector( 2 downto 1)
 
-      -- Physical cartridge interface
-      cart_addr_o    : out std_logic_vector(14 downto 0);   -- 32K
-      cart_dir_o     : out std_logic;
-      cart_data_io   : inout std_logic_vector( 7 downto 0);
-      cart_oe_n_o    : out std_logic;
-      cart_en_80_n_o : out std_logic;
-      cart_en_a0_n_o : out std_logic;
-      cart_en_c0_n_o : out std_logic;
-      cart_en_e0_n_o : out std_logic;
+   -- Physical cartridge interface
+   ; cart_addr_o           : out std_logic_vector(14 downto 0) -- 32K
+   ; cart_dir_o            : out std_logic
+   ; cart_data_io          : inout std_logic_vector( 7 downto 0)
+   ; cart_oe_n_o           : out std_logic
+   ; cart_en_80_n_o        : out std_logic
+   ; cart_en_a0_n_o        : out std_logic
+   ; cart_en_c0_n_o        : out std_logic
+   ; cart_en_e0_n_o        : out std_logic
 
-      -- Audio output
-      audio_o        : out std_logic_vector(7 downto 0);
-      audio_signed_o : out signed(7 downto 0);
+   -- Audio output
+   ; pcm16_o               : out std_logic_vector(15 downto 0)
 
-      -- VGA output
-      blank_o        : out std_logic;
-      hsync_n_o      : out std_logic;
-      vsync_n_o      : out std_logic;
-      red_o          : out std_logic_vector( 3 downto 0);
-      grn_o          : out std_logic_vector( 3 downto 0);
-      blu_o          : out std_logic_vector( 3 downto 0);
+   -- VGA output
+   ; blank_o               : out std_logic
+   ; hsync_n_o             : out std_logic
+   ; vsync_n_o             : out std_logic
+   ; red_o                 : out std_logic_vector( 3 downto 0)
+   ; grn_o                 : out std_logic_vector( 3 downto 0)
+   ; blu_o                 : out std_logic_vector( 3 downto 0)
 
-      -- External SRAM, 512Kx8, 10ns
-      sram_addr_o    : out    std_logic_vector(18 downto 0);
-      sram_data_io   : inout  std_logic_vector(7 downto 0);
-      sram_ce_n_o    : out    std_logic;
-      sram_oe_n_o    : out    std_logic;
-      sram_we_n_o    : out    std_logic;
+   -- External SRAM, 512Kx8, 10ns
+   ; sram_addr_o           : out    std_logic_vector(18 downto 0)
+   ; sram_data_io          : inout  std_logic_vector(7 downto 0)
+   ; sram_ce_n_o           : out    std_logic
+   ; sram_oe_n_o           : out    std_logic
+   ; sram_we_n_o           : out    std_logic
 
-      -- SD-card SPI interface
-      sd_miso_i      : in  std_logic;
-      sd_mosi_o      : out std_logic;
-      sd_sclk_o      : out std_logic;
-      sd_cs_n_o      : out std_logic;
-      sd_cd_n_i      : in  std_logic;     -- Card detect, active low.
-      
-      led_o          : out std_logic;      -- debug LED
-	  wait_n_i		 : in  std_logic
-   );
+   -- SD-card SPI interface
+   ; sd_miso_i             : in  std_logic
+   ; sd_mosi_o             : out std_logic
+   ; sd_sclk_o             : out std_logic
+   ; sd_cs_n_o             : out std_logic
+   ; sd_cd_n_i             : in  std_logic -- Card detect, active low.
 
+   ; led_o                 : out std_logic -- debug LED
+);
 end entity;
 
 architecture rtl of colecovision is
@@ -120,7 +129,8 @@ architecture rtl of colecovision is
    signal int_n_s                         : std_logic;
    signal iorq_n_s                        : std_logic;
    signal m1_n_s                          : std_logic;
-   signal m1_wait_q                       : std_logic;
+   signal m1_n_r                          : std_logic := '1';
+   signal m1_wait_n_r                     : std_logic := '1';
    signal rd_n_s                          : std_logic;
    signal wr_n_s                          : std_logic;
    signal mreq_n_s                        : std_logic;
@@ -128,41 +138,27 @@ architecture rtl of colecovision is
    signal cpu_addr_s                      : std_logic_vector(15 downto 0);
    signal d_to_cpu_s                      : std_logic_vector( 7 downto 0);
    signal d_from_cpu_s                    : std_logic_vector( 7 downto 0);
-   signal wait_n_r						  : std_logic;
-	
-	
 
    -- F18A VDP
    signal d_from_vdp_s                    : std_logic_vector( 7 downto 0);
    signal vdp_r_n_s                       : std_logic;
    signal vdp_w_n_s                       : std_logic;
-   signal vdp_settings_s						: std_logic_vector( 1 downto 0);
+   signal vdp_settings_r						: std_logic_vector( 1 downto 0) := "00";
 
-   -- SN76489 Sound
-   signal audio_s                         : std_logic_vector(7 downto 0);
+   -- SN76489 PSG
 	signal sn489_ready_s                   : std_logic;
    signal sn489_we_n_s                    : std_logic;
+   signal sn76489_pcm14s_s                : unsigned(13 downto 0);
 
-   -- AY-8910 SGM Sound
+   -- YM-2149 / AY-3-8910 PSG
    signal d_from_wsg_s                    : std_logic_vector(7 downto 0);
    signal wsg_bdir_s                      : std_logic;
    signal wsg_bc_s                        : std_logic;
-   signal wsg_native_q     				  : std_logic := '0';
-
-   signal ay_ch_a_s                       : std_logic_vector( 7 downto 0);
-   signal ay_ch_b_s                       : std_logic_vector( 7 downto 0);
-   signal ay_ch_c_s                       : std_logic_vector( 7 downto 0);
+   signal ym2149_pcm14s_s                 : unsigned(13 downto 0);
 
    -- Audio Mixing
-   signal AUDIO_WSG                       : unsigned( 7 downto 0);
-   signal mix_s                       	  : unsigned( 10 downto 0);
-   signal AUDIO_EX                        : unsigned( 10 downto 0);
-   signal AUDIO_EX_A                      : unsigned( 10 downto 0);
-   signal AUDIO_EX_B                      : unsigned( 10 downto 0);
-   signal AUDIO_EX_C                      : unsigned( 10 downto 0);
-   signal AUDIO_EX_D                      : unsigned( 10 downto 0);
-   signal AUDIO_SUM                       : unsigned( 10 downto 0);
-   signal WSG_CS                          : std_logic;
+   signal pcm16_r                         : unsigned (15 downto 0) := (others => '0');
+   signal pcm16_x                         : unsigned (15 downto 0);
 
    -- Internal 1K RAM
    type ram1k_t is array (0 to 1023) of std_logic_vector( 7 downto 0);
@@ -173,12 +169,15 @@ architecture rtl of colecovision is
    signal d_from_cv_ram1k_r               : std_logic_vector( 7 downto 0);
 
    -- SGM RAM
-   signal sgm_en_r, sgm_en_x              : std_logic;
-   signal sgm_8k_en_r, sgm_8k_en_x        : std_logic;
+   signal sgm_en_r                        : std_logic := '0';
+   signal sgm_en_x                        : std_logic;
+   signal sgm_8k_en_r                     : std_logic := '0';
+   signal sgm_8k_en_x                     : std_logic;
 
    -- External SRAM
    signal ext_ram_addr_s                  : std_logic_vector(18 downto 0);
-   signal ext_ram_bank_r, ext_ram_bank_x  : std_logic_vector( 3 downto 0) := "0001";
+   signal ext_ram_bank_r                  : std_logic_vector( 3 downto 0) := "0001";
+   signal ext_ram_bank_x                  : std_logic_vector( 3 downto 0);
    signal ext_ram_en_s                    : std_logic := '0';
    signal ext_ram_we_n_s                  : std_logic;
    signal d_from_ext512_s                 : std_logic_vector( 7 downto 0);
@@ -194,17 +193,20 @@ architecture rtl of colecovision is
    signal bios_we_s                       : std_logic;
 
    -- ROM Loader
-   signal rom_loader_en_r, rom_loader_en_x: std_logic := '1';  -- at power-up the loader is active.
+   signal rom_loader_en_r                 : std_logic := '1'; -- at power-up the loader is active.
+   signal rom_loader_en_x                 : std_logic;
    signal d_from_loader_s                 : std_logic_vector( 7 downto 0);
    signal rom_loader_we_n_s               : std_logic := '1';
 
    -- SD-card support
    signal d_from_sd_s                     : std_logic_vector( 7 downto 0);
-   signal sd_cs_n_s                       : std_logic;         -- SD-card selected
-   signal sd_wait_n_s                     : std_logic;         -- CPU should wait for SD-card
-   signal sd_detect_r                     : std_logic := '0';  -- default no card.
-   signal sd_slow_clk_r, sd_slow_clk_x    : std_logic := '1';  -- start SPI with slow clock
-   signal sd_spi_ss_n_r, sd_spi_ss_n_x    : std_logic := '1';  -- SD-card SPI device select
+   signal sd_cs_n_s                       : std_logic;        -- SD-card selected
+   signal sd_wait_n_s                     : std_logic;        -- CPU should wait for SD-card
+   signal sd_detect_r                     : std_logic := '0'; -- default no card.
+   signal sd_slow_clk_r                   : std_logic := '1'; -- start SPI with slow clock
+   signal sd_slow_clk_x                   : std_logic;
+   signal sd_spi_ss_n_r                   : std_logic := '1'; -- SD-card SPI device select
+   signal sd_spi_ss_n_x                   : std_logic;
 
    -- Machine ID
    constant machine_id_c                  : std_logic_vector( 7 downto 0) := std_logic_vector(to_unsigned(mach_id_g, 8));
@@ -222,89 +224,96 @@ architecture rtl of colecovision is
    signal ctrl_int_n_s                    : std_logic;
 
    -- Upper memory selection and bank schemes
-   signal real_cart_r, real_cart_x        : std_logic := '1';     -- '1' when using a real cartridge
-   signal bank_mode_r, bank_mode_x        : std_logic_vector( 1 downto 0) := "00";
-   signal upmem_mode_r, upmem_mode_x      : std_logic_vector( 1 downto 0) := "00";
+   signal real_cart_r                     : std_logic := '1'; -- '1' when using a real cartridge
+   signal real_cart_x                     : std_logic;
+   signal bank_mode_r                     : std_logic_vector( 1 downto 0) := "00";
+   signal bank_mode_x                     : std_logic_vector( 1 downto 0);
+   signal upmem_mode_r                    : std_logic_vector( 1 downto 0) := "00";
+   signal upmem_mode_x                    : std_logic_vector( 1 downto 0);
    signal upmem_we_inhibit_s              : std_logic;
 
    -- MegaCart banking support
-   signal mc_mem_size_r, mc_mem_size_x    : std_logic_vector( 4 downto 0) := "01111";  -- 256K 
-   signal mc_bank_r, mc_bank_x            : std_logic_vector( 4 downto 0) := "11111";
-   signal mc_addr_r, mc_addr_x            : std_logic_vector( 4 downto 0) := "11111";
-   signal mc_en_r, mc_en_x                : std_logic := '0';
-
+   signal mc_mem_size_r                   : std_logic_vector( 4 downto 0) := "01111"; -- 256K
+   signal mc_mem_size_x                   : std_logic_vector( 4 downto 0);
+   signal mc_bank_r                       : std_logic_vector( 4 downto 0) := "11111";
+   signal mc_bank_x                       : std_logic_vector( 4 downto 0);
+   signal mc_addr_r                       : std_logic_vector( 4 downto 0) := "11111";
+   signal mc_addr_x                       : std_logic_vector( 4 downto 0);
+   signal mc_en_r                         : std_logic := '0';
+   signal mc_en_x                         : std_logic;
 
 begin
 
    -- Debug LED.
    led_o <= rom_loader_en_r;
-   
+
    -- Active-low version of the soft reset.
    reset_n_s <= not reset_i;
 
    --
    -- Instruction Fetch Wait State Generator.
    --
-   -- TODO: Matthew H, Mar 16, 2019
-   -- The real ColecoVision has what seems to be a circuit that creates a
-   -- wait-state for instruction fetches.  The measured signals on this
-   -- circuit are very odd, and the HDL below is not accurate (and never
-   -- would have created the single wait-state during the instruction
-   -- fetch-cycle to begin with).
+   -- Z80-based systems, like the ColecoVision and MSX computers, have a
+   -- circuit that inserts a wait-state during the instruction fetch cycle.
+   -- It is unclear why this is necessary, but that mystery will have to be
+   -- solved later.
    --
-   -- It is also unclear why the ColecoVision would have a wait-state on
-   -- instruction fetch only, with all other memory accesses not having
-   -- the wait-state.
-   --
-   -- Leaving this out for now.
-   m1_wait: process (clock_i, reset_n_s, m1_n_s)
+   m1_wait: process (clk_25m0_i, reset_n_s, m1_n_s)
    begin
+   if rising_edge(clk_25m0_i) then
+
+      m1_n_r <= m1_n_s;
+
+      -- Disable during reset or non-instruction fetch cycles.
       if reset_n_s = '0' or m1_n_s = '1' then
-         m1_wait_q   <= '0';
-      elsif rising_edge(clock_i) then
-         if clk_en_3m58_i = '1' then
-            m1_wait_q <= not m1_wait_q;
-         end if;
+         m1_wait_n_r <= '1';
+
+      -- Edge-detect the instruction-fetch signal and assert the wait.
+      elsif m1_n_r = '1' and m1_n_s = '0' then
+         m1_wait_n_r <= '0';
+
+      -- Remove the wait on the next machine cycle.
+      elsif clk_3m58_en_i = '1' then
+         m1_wait_n_r <= '1';
       end if;
+   end if;
    end process m1_wait;
+
+
+   --
+   -- Z80 CPU, synchronous top level with clock enable
+   --
 
    -- TODO: Matthew H, March 19, 2019
    -- Why is the wait being created via the clock enable instead of the
    -- real WAIT_n input to the CPU?  Is the T80 core WAIT_n broken?
    --
    -- Modified CPU clock enable based on slow devices or the wait state.
-   clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and not m1_wait_q and sd_wait_n_s;
-   --clk_en_cpu_s <= clk_en_3m58_i and sn489_ready_s and sd_wait_n_s;
+   clk_en_cpu_s <= clk_3m58_en_i and sn489_ready_s and m1_wait_n_r and sd_wait_n_s;
 
    -- CPU maskable interrupt input, currently only the controllers.
    int_n_s <= ctrl_int_n_s;
 
-   --
-   -- Z80 CPU, synchronous top level with clock enable
-   --
-
-   -- TODO: switch back to async Z80 because it registers its outputs.
-
    inst_t80 : entity work.t80se
-   port map (
-      RESET_n  => reset_n_s,           -- in std_logic;
-      CLK_n    => clock_i,             -- in std_logic;  21.47727 (21.739) MHz
-      CLKEN    => clk_en_cpu_s,        -- in std_logic;
-      WAIT_n   => wait_n_r,            -- in std_logic;
-      INT_n    => int_n_s,             -- in std_logic;
-      NMI_n    => nmi_n_s,             -- in std_logic;
-      BUSRQ_n  => '1',                 -- in std_logic;
-      M1_n     => m1_n_s,              -- out std_logic;
-      MREQ_n   => mreq_n_s,            -- out std_logic;
-      IORQ_n   => iorq_n_s,            -- out std_logic;
-      RD_n     => rd_n_s,              -- out std_logic;
-      WR_n     => wr_n_s,              -- out std_logic;
-      RFSH_n   => rfsh_n_s,            -- out std_logic;
-      HALT_n   => open,                -- out std_logic;
-      BUSAK_n  => open,                -- out std_logic;
-      A        => cpu_addr_s,          -- out std_logic_vector(15 downto 0);
-      DI       => d_to_cpu_s,          -- in std_logic_vector(7 downto 0);
-      DO       => d_from_cpu_s         -- out std_logic_vector(7 downto 0)
+   port map
+   ( RESET_n   => reset_n_s    -- in std_logic;
+   , CLK_n     => clk_25m0_i   -- in std_logic;
+   , CLKEN     => clk_en_cpu_s -- in std_logic;
+   , WAIT_n    => '1'          -- in std_logic;
+   , INT_n     => int_n_s      -- in std_logic;
+   , NMI_n     => nmi_n_s      -- in std_logic;
+   , BUSRQ_n   => '1'          -- in std_logic;
+   , M1_n      => m1_n_s       -- out std_logic;
+   , MREQ_n    => mreq_n_s     -- out std_logic;
+   , IORQ_n    => iorq_n_s     -- out std_logic;
+   , RD_n      => rd_n_s       -- out std_logic;
+   , WR_n      => wr_n_s       -- out std_logic;
+   , RFSH_n    => rfsh_n_s     -- out std_logic;
+   , HALT_n    => open         -- out std_logic;
+   , BUSAK_n   => open         -- out std_logic;
+   , A         => cpu_addr_s   -- out std_logic_vector(15 downto 0);
+   , DI        => d_to_cpu_s   -- in std_logic_vector(7 downto 0);
+   , DO        => d_from_cpu_s -- out std_logic_vector(7 downto 0)
    );
 
 
@@ -316,144 +325,117 @@ begin
    -- problems for legacy or non-F18A games.
    --
    inst_f18a : entity work.f18a_core
-   port map (
-      clk_100m0_i    => clk_100m0_i,   -- in  std_logic;
-      clk_25m0_i     => clk_25m0_i,    -- in  std_logic;
-
-      -- 9918A to Host interface
-      reset_n_i      => reset_n_s,     -- in  std_logic; F18A get soft reset
-      mode_i         => cpu_addr_s(0), -- in  std_logic;
-      csw_n_i        => vdp_w_n_s,     -- in  std_logic;
-      csr_n_i        => vdp_r_n_s,     -- in  std_logic;
-      int_n_o        => nmi_n_s,       -- out std_logic;
-      cd_i           => d_from_cpu_s,  -- in  std_logic_vector(0 to 7);
-      cd_o           => d_from_vdp_s,  -- out std_logic_vector(0 to 7);
-
-      -- Video Output
-      blank_o        => blank_o,       -- out std_logic;
-      hsync_o        => hsync_n_o,     -- out std_logic;
-      vsync_o        => vsync_n_o,     -- out std_logic;
-      red_o          => red_o,         -- out std_logic_vector(0 to 3);
-      grn_o          => grn_o,         -- out std_logic_vector(0 to 3);
-      blu_o          => blu_o,         -- out std_logic_vector(0 to 3);
-
-      -- Feature Selection
-      sprite_max_i   => vdp_settings_s(1),             -- in std_logic;   -- Default sprite max, '0' = 32, '1' = 4
-      scanlines_i    => vdp_settings_s(0), -- in std_logic;   -- Simulated scan lines, '0' = no, '1' = yes
-
-      -- SPI to GPU
-      spi_clk_o      => open,          -- out std_logic
-      spi_cs_o       => open,          -- out std_logic;
-      spi_mosi_o     => open,          -- out std_logic;
-      spi_miso_i     => '0'            -- in  std_logic;
+   port map
+   ( clk_100m0_i    => clk_100m0_i  -- must be 100MHz
+   , clk_25m0_i     => clk_25m0_i   -- must be an actual 25MHz clock, NOT an enable
+   -- 9918A to Host interface
+   , reset_n_i      => reset_n_s    -- active low, the F18A gets soft reset
+   , mode_i         => cpu_addr_s(0)
+   , csw_n_i        => vdp_w_n_s
+   , csr_n_i        => vdp_r_n_s
+   , int_n_o        => nmi_n_s
+   , cd_i           => d_from_cpu_s
+   , cd_o           => d_from_vdp_s
+   -- Video Output
+   , blank_o        => blank_o      -- active high during active video
+   , hsync_o        => hsync_n_o
+   , vsync_o        => vsync_n_o
+   , red_o          => red_o        -- 4-bit red
+   , grn_o          => grn_o        -- 4-bit green
+   , blu_o          => blu_o        -- 4-bit blue
+   -- Feature Selection
+   , sprite_max_i   => vdp_settings_r(1) -- default sprite max, '0'=32, '1'=4
+   , scanlines_i    => vdp_settings_r(0) -- simulated scan lines, '0'=no, '1'=yes
+   -- SPI for GPU access, not enabled in the Phoenix
+   , spi_clk_o      => open
+   , spi_cs_o       => open
+   , spi_mosi_o     => open
+   , spi_miso_i     => '0'
    );
 
 
    --
    -- SN76489 Programmable Sound Generator
    --
-   psg_b : entity work.sn76489_top
-   generic map (
-      clock_div_16_g => 1
+   sn76489_audio_inst : entity work.sn76489_audio
+   generic map
+   ( MIN_PERIOD_CNT_G => 17 -- Accommodate games that use audible-carrier A.M.
    )
-   port map (
-      clock_i     => clock_i,
-      clock_en_i  => clk_en_3m58_i,
-      res_n_i     => reset_n_s,
-      ce_n_i      => sn489_we_n_s,
-      we_n_i      => sn489_we_n_s,
-      ready_o     => sn489_ready_s,
-      d_i         => d_from_cpu_s,
-      aout_o      => audio_s
-   );
-   
-	--Vanilla AY mixing
-   --AUDIO_EX_A <= unsigned(std_logic_vector'(audio_s&"000"));
-   --AUDIO_SUM <= AUDIO_EX_A + unsigned(ay_ch_a_s) + unsigned(ay_ch_b_s) + unsigned(ay_ch_c_s);
-	--audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
-   --audio_signed_o <= signed(unsigned(AUDIO_SUM(9 downto 2))-128) when sgm_en_r = '1' else signed(unsigned(audio_s)-128);
-	--mix_s <= unsigned(std_logic_vector'(audio_s(7 downto 0) & "000")) + unsigned(std_logic_vector'("0000"& ay_ch_a_s(7 downto 1))) + unsigned(std_logic_vector'("0000"& ay_ch_b_s(7 downto 1)))+ unsigned(std_logic_vector'("0000"& ay_ch_c_s(7 downto 1)));
-	
-	--Courtney mixing
-	--AUDIO_EX_A <= unsigned(std_logic_vector'(audio_s&"000"));
-   --AUDIO_SUM <= AUDIO_EX_A + AUDIO_WSG + AUDIO_WSG;
-	--audio_o        <= (others => '0'); --std_logic_vector(AUDIO_SUM); -- OPEN
-   --audio_signed_o <= signed(unsigned(AUDIO_SUM(9 downto 2))-128) when sgm_en_r = '1' else signed(unsigned(audio_s)-128);
-	
-	mix_s <= unsigned(std_logic_vector'(audio_s(7 downto 0) & "000")) + AUDIO_WSG + AUDIO_WSG;
-	audio_signed_o <= (signed(unsigned(std_logic_vector(mix_s(10 downto 3)))-128));
-	--audio_signed_o <= (signed(unsigned(std_logic_vector(mix_s(10 downto 3)))-128))when (wait_n_r = '1') else signed(std_logic_vector'("00000000"));
-	
-	--audio_o        <= std_logic_vector(mix_s(10 downto 3));
-   --audio_signed_o <= (others =>'0');
-	
-	
-   --
-   -- COURTNEY (SEX 7264) WAVETABLE SOUND GENERATOR (WSG)
-   --
-   WSG : ENTITY work.SEX7264 
-   PORT MAP
-   (
-       CLK         => clock_i      ,
-       CLKENA      => clk_en_3m58_i, -- WARNING
-      nRESET       => reset_n_s    ,
-       BDIR        => wsg_bdir_s   ,
-       BC1         => wsg_bc_s     ,
-       DAI         => d_from_cpu_s ,
-       DAO         => d_from_wsg_s ,
-       NATIVE      => wsg_native_q ,
-       DIGITAL_MIX => AUDIO_WSG
+   port map
+   ( clk_i        => clk_25m0_i    -- System clock
+   , en_clk_psg_i => clk_3m58_en_i -- PSG clock enable
+   , ce_n_i       => sn489_we_n_s  -- chip enable, active low
+   , wr_n_i       => sn489_we_n_s  -- write enable, active low
+   , ready_o      => sn489_ready_s -- low during I/O operations
+   , data_i       => d_from_cpu_s
+   , ch_a_o       => open
+   , ch_b_o       => open
+   , ch_c_o       => open
+   , noise_o      => open
+   , mix_audio_o  => open
+   , pcm14s_o     => sn76489_pcm14s_s
    );
 
-   -- YM-2149, SGM Audio AY-8910 compatible
-   --ym2149_inst: entity work.YM2149
-   --port map (
-   --   CLK         => clock_i,
-   --   CE          => clk_en_1m79_i,
-   --   RESET       => reset_i,
-   --   BDIR        => wsg_bdir_s,
-   --   BC          => wsg_bc_s,
-   --   DI          => d_from_cpu_s,
-   --   DO          => d_from_wsg_s,
-   --   CHANNEL_A   => ay_ch_a_s,
-   --   CHANNEL_B   => ay_ch_b_s,
-   --   CHANNEL_C   => ay_ch_c_s,
 
-   --   SEL         => '0',
-   --   MODE        => '0',
+   --
+   -- YM-2149 (AY-3-8910) Programmable Sound Generator
+   --
+   ym2149_audio_inst: entity work.ym2149_audio
+   port map
+   ( clk_i        => clk_25m0_i     -- System clock
+   , en_clk_psg_i => clk_3m58_en_i  -- PSG clock enable
+   , sel_n_i      => '0'            -- divide the input clock by 2
+   , reset_n_i    => reset_n_s      -- active low
+   , bc_i         => wsg_bc_s       -- bus control
+   , bdir_i       => wsg_bdir_s     -- bus direction
+   , data_i       => d_from_cpu_s
+   , data_r_o     => d_from_wsg_s   -- registered output data
+   , ch_a_o       => open
+   , ch_b_o       => open
+   , ch_c_o       => open
+   , mix_audio_o  => open
+   , pcm14s_o     => ym2149_pcm14s_s
+   );
 
-   --   ACTIVE      => open,
 
-   --   IOA_in      => x"00",
-   --   IOA_out     => open,
+   -- Mix the 14-bit signed PCM audio signals into a signed 16-bit PCM sample.
+   pcm16_x <= (
+      (sn76489_pcm14s_s(13) & sn76489_pcm14s_s) +
+      ( ym2149_pcm14s_s(13) &  ym2149_pcm14s_s) ) & "0";
 
-   --   IOB_in      => x"00",
-   --   IOB_out     => open
-   --);
+   pcm16_o <= std_logic_vector(pcm16_r);
+
+   -- Register the final audio sample.
+   process (clk_25m0_i) begin
+   if rising_edge(clk_25m0_i) then
+   if clk_3m58_en_i = '1' then
+      pcm16_r <= pcm16_x;
+   end if;
+   end if; end process;
 
 
    --
    -- Controller ports
    --
    ctrl_b : entity work.cv_ctrl
-   port map (
-      clk_21m47_i       => clock_i,
-      clk_en_3m58_i     => clk_en_3m58_i,
-      reset_n_i         => reset_n_s,
-      ctrl_en_key_n_i   => ctrl_en_key_n_s,
-      ctrl_en_joy_n_i   => ctrl_en_joy_n_s,
-      ctrl_p1_i         => ctrl_p1_i,
-      ctrl_p2_i         => ctrl_p2_i,
-      ctrl_p3_i         => ctrl_p3_i,
-      ctrl_p4_i         => ctrl_p4_i,
-      ctrl_p5_o         => ctrl_p5_o,
-      ctrl_p6_i         => ctrl_p6_i,
-      ctrl_p7_i         => ctrl_p7_i,
-      ctrl_p8_o         => ctrl_p8_o,
-      ctrl_p9_i         => ctrl_p9_i,
-      ctrl_sel_i        => cpu_addr_s(1), -- A1=0 read controller 1, A1=1 read controller 2
-      ctrl_d_o          => d_from_ctrl_s,
-      ctrl_int_n_o      => ctrl_int_n_s
+   port map
+   ( clk_i           => clk_25m0_i
+   , clk_3m58_en_i   => clk_3m58_en_i
+   , reset_n_i       => reset_n_s
+   , ctrl_en_key_n_i => ctrl_en_key_n_s
+   , ctrl_en_joy_n_i => ctrl_en_joy_n_s
+   , ctrl_p1_i       => ctrl_p1_i
+   , ctrl_p2_i       => ctrl_p2_i
+   , ctrl_p3_i       => ctrl_p3_i
+   , ctrl_p4_i       => ctrl_p4_i
+   , ctrl_p5_o       => ctrl_p5_o
+   , ctrl_p6_i       => ctrl_p6_i
+   , ctrl_p7_i       => ctrl_p7_i
+   , ctrl_p8_o       => ctrl_p8_o
+   , ctrl_p9_i       => ctrl_p9_i
+   , ctrl_sel_i      => cpu_addr_s(1) -- A1=0 read controller 1, A1=1 read controller 2
+   , ctrl_d_o        => d_from_ctrl_s
+   , ctrl_int_n_o    => ctrl_int_n_s
    );
 
 
@@ -461,21 +443,21 @@ begin
    -- SD-card SPI interface
    --
    sdcard: entity work.sdcard
-   port map (
-      clk_21m74_i    => clock_i,
-      reset_i        => reset_i,
-      slow_clk_i     => sd_slow_clk_r, -- '1' = use slow SPI clock
-      spi_ss_n_i     => sd_spi_ss_n_r,
-      cs_n_i         => sd_cs_n_s,
-      wait_n_o       => sd_wait_n_s,
-      wr_n_i         => wr_n_s,        -- indicate a write operation
-      data_i         => d_from_cpu_s,
-      data_o         => d_from_sd_s,
-      -- SD card interface
-      spi_cs_n_o     => sd_cs_n_o,
-      spi_sclk_o     => sd_sclk_o,
-      spi_mosi_o     => sd_mosi_o,
-      spi_miso_i     => sd_miso_i
+   port map
+   ( clk_i        => clk_25m0_i
+   , reset_n_i    => reset_n_s
+   , slow_clk_i   => sd_slow_clk_r -- '1' = use slow SPI clock
+   , spi_ss_n_i   => sd_spi_ss_n_r
+   , cs_n_i       => sd_cs_n_s
+   , wait_n_o     => sd_wait_n_s
+   , wr_n_i       => wr_n_s
+   , data_i       => d_from_cpu_s
+   , data_o       => d_from_sd_s
+   -- SD card interface
+   , spi_cs_n_o   => sd_cs_n_o
+   , spi_sclk_o   => sd_sclk_o
+   , spi_mosi_o   => sd_mosi_o
+   , spi_miso_i   => sd_miso_i
    );
 
 
@@ -500,12 +482,12 @@ begin
    -- 24K ROM Loader
    --
    loader: entity work.romloader
-   port map (
-      clock_i     => clock_i,
-      we_n_i      => rom_loader_we_n_s,
-      addr_i      => cpu_addr_s(14 downto 0),
-      data_i      => d_from_cpu_s,
-      data_o      => d_from_loader_s
+   port map
+   ( clock_i      => clk_25m0_i
+   , we_n_i       => rom_loader_we_n_s
+   , addr_i       => cpu_addr_s(14 downto 0)
+   , data_i       => d_from_cpu_s
+   , data_o       => d_from_loader_s
    );
 
 
@@ -513,12 +495,12 @@ begin
    -- 8K ROM BIOS
    --
    bios: entity work.rombios
-   port map (
-      clock_i     => clock_i,
-      we_i        => bios_we_s,
-      addr_i      => cpu_addr_s(12 downto 0),
-      data_i      => d_from_cpu_s,
-      data_o      => d_from_bios_s
+   port map
+   ( clock_i      => clk_25m0_i
+   , we_i         => bios_we_s
+   , addr_i       => cpu_addr_s(12 downto 0)
+   , data_i       => d_from_cpu_s
+   , data_o       => d_from_bios_s
    );
 
    -- TODO Maybe allow BIOS to be written to?
@@ -528,9 +510,9 @@ begin
    --
    -- CV Internal 1K RAM
    --
-   cv_ram_1k : process (clock_i, cv_ram1k_en_s, cv_ram1k_addr_s, wr_n_s)
+   cv_ram_1k : process (clk_25m0_i, cv_ram1k_en_s, cv_ram1k_addr_s, wr_n_s)
    begin
-   if rising_edge(clock_i) then
+   if rising_edge(clk_25m0_i) then
       if cv_ram1k_en_s = '1' then
          if wr_n_s = '0' then
             cv_ram1k_r(to_integer(unsigned(cv_ram1k_addr_s))) <= d_from_cpu_s;
@@ -547,21 +529,20 @@ begin
    -- External SRAM, 512Kx8, 10ns
    --
    ext512 : entity work.ext512x8sram
-   port map (
-      clk_i          => clock_i,
-      -- Z80 CPU
-      cpu_addr_i     => ext_ram_addr_s,
-      cpu_en_i       => ext_ram_en_s,        -- Active high
-      cpu_we_n_i     => ext_ram_we_n_s,      -- Active low
-      cpu_data_i     => d_from_cpu_s,
-      cpu_data_o     => d_from_ext512_s,
-
-      -- External SRAM Interface
-      sram_addr_o    => sram_addr_o,
-      sram_data_io   => sram_data_io,
-      sram_ce_n_o    => sram_ce_n_o,
-      sram_oe_n_o    => sram_oe_n_o,
-      sram_we_n_o    => sram_we_n_o
+   port map
+   ( clk_i        => clk_25m0_i
+   -- Z80 CPU
+   , cpu_addr_i   => ext_ram_addr_s
+   , cpu_en_i     => ext_ram_en_s   -- active high
+   , cpu_we_n_i   => ext_ram_we_n_s -- active low
+   , cpu_data_i   => d_from_cpu_s
+   , cpu_data_o   => d_from_ext512_s
+   -- External SRAM Interface
+   , sram_addr_o  => sram_addr_o
+   , sram_data_io => sram_data_io
+   , sram_ce_n_o  => sram_ce_n_o
+   , sram_oe_n_o  => sram_oe_n_o
+   , sram_we_n_o  => sram_we_n_o
    );
 
 
@@ -703,13 +684,14 @@ begin
    -- cartridge port, so the enable for updating the bank select register is
    -- any access to the specified memory range.
 
-   memory_decode : process (
-      cpu_addr_s, mreq_n_s, rfsh_n_s, wr_n_s,
-      d_from_loader_s, d_from_bios_s, d_from_cv_ram1k_r, cart_data_io,
-      d_from_ext512_s, sgm_en_r, sgm_8k_en_r,
-      ext_ram_bank_r, rom_loader_en_r, real_cart_r, upmem_mode_r,
-      mc_bank_r, mc_addr_r, mc_en_r )
-   begin
+   memory_decode : process
+   ( cpu_addr_s, mreq_n_s, rfsh_n_s, wr_n_s
+   , d_from_loader_s, d_from_bios_s, d_from_cv_ram1k_r, cart_data_io
+   , d_from_ext512_s, sgm_en_r, sgm_8k_en_r
+   , ext_ram_bank_r, rom_loader_en_r, real_cart_r, upmem_mode_r
+   , mc_bank_r, mc_addr_r, mc_en_r
+   , cart_en_80_n_s, cart_en_A0_n_s, upmem_we_inhibit_s
+   ) begin
 
       cv_ram1k_en_s  <= '0';
 
@@ -889,13 +871,13 @@ begin
             if cpu_addr_s(12 downto 6) = "1111111" then
                mc_bank_x <= cpu_addr_s(4 downto 0);
             end if;
-            
+
          when others => null;
          end case;
       end if;
    end process;
 
-   
+
    -- MegaCart memory size decode and address bank select formation.  The 512K
    -- external memory needs to be masked to *appear* to be whatever size EPROM
    -- image was loaded.  The mask is set by the loader and is used to ignore
@@ -999,13 +981,14 @@ begin
    --
    --  >7F  xxxxxxWx (W) 0 = 8K SGM RAM, 1 = 8K CV BIOS
    --
-   process ( cpu_addr_s, iorq_n_s, m1_n_s, wr_n_s, rd_n_s,
-             d_from_cpu_s, d_from_wsg_s, sgm_en_r, sgm_8k_en_r,
-             ext_ram_bank_r, rom_loader_en_r,
-             d_from_sd_s, sd_detect_r, sd_slow_clk_r, sd_spi_ss_n_r,
-             real_cart_r, bank_mode_r, upmem_mode_r,
-             mc_mem_size_r, mc_en_r )
-   begin
+   process
+   ( cpu_addr_s, iorq_n_s, m1_n_s, wr_n_s, rd_n_s
+   , d_from_cpu_s, d_from_wsg_s, sgm_en_r, sgm_8k_en_r
+   , ext_ram_bank_r, rom_loader_en_r
+   , d_from_sd_s, sd_detect_r, sd_slow_clk_r, sd_spi_ss_n_r
+   , real_cart_r, bank_mode_r, upmem_mode_r
+   , mc_mem_size_r, mc_en_r
+   ) begin
       sgm_en_x          <= sgm_en_r;
       sgm_8k_en_x       <= sgm_8k_en_r;
 
@@ -1090,7 +1073,7 @@ begin
                   real_cart_x    <= d_from_cpu_s(1) nor d_from_cpu_s(0);
                   bank_mode_x    <= d_from_cpu_s(1 downto 0);
                   upmem_mode_x   <= d_from_cpu_s(5 downto 4);
-                  
+
                   -- MegaCart enable, true when MegaCart mode, and upper memory
                   -- is set to recognize banking.
                   mc_en_x        <= (not d_from_cpu_s(1)) and d_from_cpu_s(0) and
@@ -1151,12 +1134,12 @@ begin
          end if;
       end if;
    end process;
-   
-   
+
+
    -- System reset and register transfer.
-   process (clock_i, reset_i, clk_en_3m58_i)
+   process (clk_25m0_i, reset_i, clk_3m58_en_i)
    begin
-   if rising_edge(clock_i) then
+   if rising_edge(clk_25m0_i) then
       if reset_i = '1' then
          sgm_en_r          <= '0';           -- disable SGM on reset
          sgm_8k_en_r       <= '0';           -- BIOS over SGM 8K RAM at >0000
@@ -1172,9 +1155,8 @@ begin
          mc_bank_r         <= "11111";       -- default to top bank
          mc_addr_r         <= "11111";       -- default to top of 512K memory
          mc_en_r           <= '0';           -- disable MegaCart
-		 wait_n_r		   <= '1';
-			
-      elsif clk_en_3m58_i = '1' then
+
+      elsif clk_3m58_en_i = '1' then
          sgm_en_r          <= sgm_en_x;
          sgm_8k_en_r       <= sgm_8k_en_x;
          ext_ram_bank_r    <= ext_ram_bank_x;
@@ -1189,7 +1171,6 @@ begin
          mc_bank_r         <= mc_bank_x;
          mc_addr_r         <= mc_addr_x;
          mc_en_r           <= mc_en_x;
-		 wait_n_r		   <= not wait_n_i;
 
       end if;
    end if;

@@ -33,24 +33,30 @@
 -- POSSIBILITY OF SUCH DAMAGE.
 
 --
--- The SD-card standard specifies a V1.01 minimum speed of:
+-- MMC cards have a maximum clock of 25MHz, and a maximum clock of 400KHz is
+-- required during the initialization phase, until the card type and speed are
+-- known and a higher speed negotiated.  The Phoenix uses single-bit SPI mode:
 --
--- read  12MB/sec or 96MHz bit clock
--- write  2MB/sec or 16MHz bit clock
+--   MMC SPI  20MHz  2.5MB/s
+--   SD  SPI  25MHz  2.125MB/s
 --
--- An input clock of 21MHz from the Phoenix system will be used to derive the
--- fast and slow versions of the clock.  Even the fast clock is well below the
--- 16MHz minimum for SD-cards, yet fast enough to read or write a byte at the
--- typical speed of the Z80; and able to read or write an entire 512K memory
--- in about 1 second.  This should be fast enough for retro-computer systems.
+-- The Phoenix system clock is around 25MHz, which is divided by two in the
+-- SPI FSM to derive the SPI clock.  This easily stays under the 20MHz max
+-- clock to support MMC.  When in slow-clock mode, the input clock is divided
+-- by 64 to create a clock below the required 400KHz.
 --
--- Clock speeds and Z80 IO instruction comparison:
+-- Still, these clocks are fast enough to read or write a byte at the typical
+-- speed of the Z80; and able to read or write an entire 512K memory in about 1
+-- second.
 --
---       Clock       Period    8-bit transfer
+-- Assuming a system clock of 25MHz, the resulting clock speeds and Z80 I/O
+-- instruction comparison:
+--
+--         Clock     Period    8-bit transfer
 --       ------------------------------------
--- Slow  340.562KHz  2.936us   23.526us
--- Fast  10.898MHz   91.76ns   779.960ns
--- Z80   3.58MHz     279.3ns   1.11us  (4 cycle) IO instruction
+-- Slow  390.62KHz    2.56us   23.52us
+-- Fast   12.5MHz    80.00ns  640.00ns
+-- Z80     3.58MHz  279.36ns    1.11us (4-cycle) I/O instruction
 --
 -- Using the fast clock, an 8-bit transfer should be fast enough to only cause
 -- one additional wait-state during a normal IO instruction, which takes four
@@ -119,8 +125,8 @@
 --  |      ___|_________|_________|_________|_________|              } Write cycle
 -- -------X____________________________________________X-  Data Out /
 --  |         |         |         |         |         |
--- VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV  21MHz clock
--- \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/  10MHz fast SPI clock
+-- VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV  system clock, 25MHz max
+-- \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/  fast SPI clock, system clock/2
 -- _|_________|_    | | | | | | | |         |_________|__
 --              \__________________________/               cs_n_i (IOR_n + IO decode)
 -- _|_________|___  | | | | | | | |  _______|_________|__
@@ -146,27 +152,27 @@ use ieee.numeric_std.all;
 use ieee.std_logic_unsigned.all;
 
 entity sdcard is
-   port (
-      clk_21m74_i    : in  std_logic;  --  21.47727 (21.739 PLL) MHz
-      reset_i        : in  std_logic;
+port
+   ( clk_i              : in     std_logic -- 25MHz max
+   ; reset_n_i          : in     std_logic -- active low
 
-      -- SD-card control
-      slow_clk_i     : in  std_logic;  -- '1' = use slow SPI clock
-      spi_ss_n_i     : in  std_logic;  -- '0' to select the SD-card device
+   -- SD-card control
+   ; slow_clk_i         : in     std_logic -- '1' = use slow SPI clock
+   ; spi_ss_n_i         : in     std_logic -- '0' to select the SD-card device
 
-      -- CPU
-      cs_n_i         : in  std_logic;  -- '0' start an 8-bit transfer, hold low until wait_n_o = '1'
-      wait_n_o       : out std_logic;  -- '0' during transfer, CPU should wait
-      wr_n_i         : in  std_logic;  -- '0' for write, allows >FF to be written during a read
-      data_i         : in  std_logic_vector( 7 downto 0);
-      data_o         : out std_logic_vector( 7 downto 0);
+   -- CPU
+   ; cs_n_i             : in     std_logic -- '0' start an 8-bit transfer, hold low until wait_n_o = '1'
+   ; wait_n_o           : out    std_logic -- '0' during transfer, CPU should wait
+   ; wr_n_i             : in     std_logic -- '0' for write, allows >FF to be written during a read
+   ; data_i             : in     std_logic_vector( 7 downto 0)
+   ; data_o             : out    std_logic_vector( 7 downto 0)
 
-      -- SD-card SPI
-      spi_cs_n_o     : out std_logic;
-      spi_sclk_o     : out std_logic;
-      spi_mosi_o     : out std_logic;
-      spi_miso_i     : in  std_logic
-   );
+   -- SD-card SPI
+   ; spi_cs_n_o         : out    std_logic
+   ; spi_sclk_o         : out    std_logic
+   ; spi_mosi_o         : out    std_logic
+   ; spi_miso_i         : in     std_logic
+);
 end entity;
 
 architecture rtl of sdcard is
@@ -187,6 +193,7 @@ architecture rtl of sdcard is
    signal clk_r, clk_x           : std_logic := '0';
    signal clk_en_s               : std_logic := '1';
 
+   -- Slow clock divides the input clock by 32.
    signal slow_clk_r, slow_clk_x : unsigned( 4 downto 0) := "00000";
    signal slow_en_s              : std_logic := '0';
 
@@ -286,15 +293,16 @@ begin
             clk_en_s <= '0';
          end if;
 
+         -- Divide the input clock to produce the slow clock.
          slow_clk_x <= slow_clk_r - 1;
       end if;
    end process;
 
 
-   process (clk_21m74_i)
+   process (clk_i)
    begin
-      if rising_edge(clk_21m74_i) then
-         if reset_i = '1' then
+      if rising_edge(clk_i) then
+         if reset_n_i = '0' then
 
             state_r     <= st_idle;
             slow_clk_r  <= (others => '0');

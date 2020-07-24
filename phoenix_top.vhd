@@ -1,3 +1,21 @@
+--
+-- Phoenix ColecoVision Top
+-- Released under the 3-Clause BSD License:
+--
+-- Copyright 2019 - 2020
+-- Matthew Hagerty, Brian Burney
+--
+-- This core started as a mix of the ColecoFPGA core and a CV core designed and
+-- written by Matthew.  By the time of the first release, this CV core has been
+-- completely rewritten several times over, and nothing of either original core
+-- remains. However, both systems provided information and a starting point for
+-- this implementation, and credit is always due.
+--
+-- The SNES and PS2 Keyboard components remain mostly intact from the previous
+-- core.
+--
+-- Attribution for the ColecoFPGA project:
+--
 -------------------------------------------------------------------------------
 --
 -- ColecoFPGA project
@@ -38,14 +56,46 @@
 --
 -------------------------------------------------------------------------------
 
-
 --
--- Retaining the above copyright for attribution.
+-- Change log:
 --
--- April 2019: Heavily modified and adapted for the Phoenix system.
---             Matthew Hagerty
+-- July 2020, Matthew Hagerty
 --
-
+--   * Fixed flag bug in Z80 core.
+--   * Added new YM-2149 core.
+--   * Added new SN-76489 core.
+--   * Fixed audio mixing to correct signed 16-bit PCM.
+--   * Fixed info-frame data in TMDS core.
+--   * Added Phoenix build system for merging bit-streams with the CV menu code.
+--   * Added missing bin2phx utility and created makefile for it.
+--   * Added missing bit2bin utility and created makefile for it.
+--   * Added missing makemem utility and created makefile for it.
+--   * Included data2mem.exe as part of the included utilities.
+--   * Included the needed SDCC compiler as part of the repo.
+--   * Fixed the clock generation, fixing all failed timing constraints.
+--   * Changed system clock to 25MHz.
+--   * Corrected the 3.579MHz clock-enable generation.
+--   * Fixed wait-state circuit.
+--   * Updated UCF file to support the new LVDS level-shifter.
+--   * Cleaned up most code files for consistency and removed unused signals.
+--   * Updated all comments to ensure accuracy with existing code.
+--   * Tursi updated the CV menu to compile with SDCC 4.0.
+--
+--   Games known to have been fixed by these changes:
+--
+--     Sound and speech problems fixed:
+--     * EggerLand
+--     * QBIQS
+--     * Squish'Em Sam
+--     * Side Trak
+--     * Children of the Night
+--     * Wizard of Wor
+--
+--     Games not previously working, that now work:
+--     * Sky Jaguar
+--     * Magical Tree
+--     * Road Fighter
+--
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -53,101 +103,107 @@ use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
 
 entity phoenix_top is
-   port (
-      -- Clocks
-      clock_50_i        : in     std_logic;
+port
+   ( clock_50m0_i_net   : in     std_logic
 
-      -- Buttons
-      btn_reset_n_i     : in     std_logic;  -- Active low, pull-up with RC time of ~10ms
+   -- Buttons
+   ; btn_reset_n_i      : in     std_logic -- Active low, pull-up with RC time of ~10ms
 
-      -- External IO port
---      exp_io1_net       : inout  std_logic_vector(12 downto 2) := (others => 'Z');
---      exp_io2_net       : inout  std_logic_vector(24 downto 15):= (others => 'Z');
+   -- External IO port
+--   ; exp_io1_net        : inout  std_logic_vector(12 downto 2) := (others => 'Z')
+--   ; exp_io2_net        : inout  std_logic_vector(24 downto 15):= (others => 'Z')
 
-      -- SRAM
-      sram_addr_o       : out    std_logic_vector(18 downto 0) := (others => '0');
-      sram_data_io      : inout  std_logic_vector(7 downto 0)  := (others => 'Z');
-      sram_ce_n_o       : out    std_logic := '1';
-      sram_oe_n_o       : out    std_logic := '1';
-      sram_we_n_o       : out    std_logic := '1';
+   -- SRAM
+   ; sram_addr_o        : out    std_logic_vector(18 downto 0) := (others => '0')
+   ; sram_data_io       : inout  std_logic_vector(7 downto 0)  := (others => 'Z')
+   ; sram_ce_n_o        : out    std_logic := '1'
+   ; sram_oe_n_o        : out    std_logic := '1'
+   ; sram_we_n_o        : out    std_logic := '1'
 
-      -- PS2
-      ps2_clk_io        : inout  std_logic := 'Z';
-      ps2_data_io       : inout  std_logic := 'Z';
+   -- PS2
+   ; ps2_clk_io         : inout  std_logic := 'Z'
+   ; ps2_data_io        : inout  std_logic := 'Z'
 
-      -- SD Card
-      sd_cs_n_o         : out    std_logic := '1';
-      sd_sclk_o         : out    std_logic := '0';
-      sd_mosi_o         : out    std_logic := 'Z';
-      sd_miso_i         : in     std_logic;
-      sd_cd_n_i         : in     std_logic;           -- Card detect, active low, ext pullup
+   -- SD Card
+   ; sd_cs_n_o          : out    std_logic := '1'
+   ; sd_sclk_o          : out    std_logic := '0'
+   ; sd_mosi_o          : out    std_logic := 'Z'
+   ; sd_miso_i          : in     std_logic
+   ; sd_cd_n_i          : in     std_logic -- Card detect, active low, ext pull-up
 
-      -- Flash
-      flash_cs_n_o      : out    std_logic := '1';
-      flash_sclk_o      : out    std_logic := '0';
-      flash_mosi_o      : out    std_logic := '0';
-      flash_miso_i      : in     std_logic;
-      flash_wp_o        : out    std_logic := '0';
-      flash_hold_o      : out    std_logic := '1';
+   -- Flash
+-- Unused. MH June 2020.
+--   ; flash_cs_n_o       : out    std_logic := '1'
+--   ; flash_sclk_o       : out    std_logic := '0'
+--   ; flash_mosi_o       : out    std_logic := '0'
+--   ; flash_miso_i       : in     std_logic
+--   ; flash_wp_o         : out    std_logic := '0'
+--   ; flash_hold_o       : out    std_logic := '1'
 
-      -- Joystick
-      joy_p5_o          : out    std_logic;
-      joy_p8_o          : out    std_logic;
-      joy1_p1_i         : in     std_logic;
-      joy1_p2_i         : in     std_logic;
-      joy1_p3_i         : in     std_logic;
-      joy1_p4_i         : in     std_logic;
-      joy1_p6_i         : in     std_logic;
-      joy1_p7_i         : in     std_logic;
-      joy1_p9_i         : in     std_logic;
-      joy2_p1_i         : in     std_logic;
-      joy2_p2_i         : in     std_logic;
-      joy2_p3_i         : in     std_logic;
-      joy2_p4_i         : in     std_logic;
-      joy2_p6_i         : in     std_logic;
-      joy2_p7_i         : in     std_logic;
-      joy2_p9_i         : in     std_logic;
+   -- Joystick
+   ; joy_p5_o           : out    std_logic
+   ; joy_p8_o           : out    std_logic
+   ; joy1_p1_i          : in     std_logic
+   ; joy1_p2_i          : in     std_logic
+   ; joy1_p3_i          : in     std_logic
+   ; joy1_p4_i          : in     std_logic
+   ; joy1_p6_i          : in     std_logic
+   ; joy1_p7_i          : in     std_logic
+   ; joy1_p9_i          : in     std_logic
+   ; joy2_p1_i          : in     std_logic
+   ; joy2_p2_i          : in     std_logic
+   ; joy2_p3_i          : in     std_logic
+   ; joy2_p4_i          : in     std_logic
+   ; joy2_p6_i          : in     std_logic
+   ; joy2_p7_i          : in     std_logic
+   ; joy2_p9_i          : in     std_logic
 
-      -- SNES controller
-      snesjoy_clock_o   : out    std_logic := '1';
-      snesjoy_latch_o   : out    std_logic := '1';
-      snesjoy_data_i    : in     std_logic;
+   -- SNES controller
+   ; snesjoy_clock_o    : out    std_logic := '1'
+   ; snesjoy_latch_o    : out    std_logic := '1'
+   ; snesjoy_data_i     : in     std_logic
 
-      -- HDMI
-      hdmi_p_o          : out    std_logic_vector(3 downto 0);
-      hdmi_n_o          : out    std_logic_vector(3 downto 0);
+   -- TMDS
+   ; tmds_p_o           : out    std_logic_vector(3 downto 0)
+   ; tmds_n_o           : out    std_logic_vector(3 downto 0)
 
-      -- Cartridge
-      cart_addr_o       : out    std_logic_vector(14 downto 0) := (others => '0');
-      cart_data_io      : inout  std_logic_vector( 7 downto 0);
-      cart_dir_o        : out    std_logic := '0'; --Rev6 PCB
-      cart_oe_n_o       : out    std_logic := '1';
-      cart_en_80_n_o    : out    std_logic := '1';
-      cart_en_A0_n_o    : out    std_logic := '1';
-      cart_en_C0_n_o    : out    std_logic := '1';
-      cart_en_E0_n_o    : out    std_logic := '1';
+   -- Cartridge
+   ; cart_addr_o        : out    std_logic_vector(14 downto 0) := (others => '0')
+   ; cart_data_io       : inout  std_logic_vector( 7 downto 0)
+   ; cart_dir_o         : out    std_logic := '0' --Rev6 PCB
+   ; cart_oe_n_o        : out    std_logic := '1'
+   ; cart_en_80_n_o     : out    std_logic := '1'
+   ; cart_en_A0_n_o     : out    std_logic := '1'
+   ; cart_en_C0_n_o     : out    std_logic := '1'
+   ; cart_en_E0_n_o     : out    std_logic := '1'
 
-      -- LED and RGB-LED
-      led_o             : out    std_logic := '0';
-      rgb_led_o         : out    std_logic_vector(2 downto 0) := (others => '1')
-   );
+   -- LED and RGB-LED
+   ; led_o              : out    std_logic := '0'
+   ; rgb_led_o          : out    std_logic_vector(2 downto 0) := (others => '1')
+);
 end entity;
+
 
 use work.cv_keys_pack.all;
 
 architecture behavior of phoenix_top is
 
    -- Clocks and enables
-   signal clock_master_s   : std_logic;
-   signal clock_mem_s      : std_logic;
-   signal clock_vdp_en_s   : std_logic;
-   signal clock_5m_en_s    : std_logic;
-   signal clock_3m_en_s    : std_logic;
-   signal clock_wsg_en_s   : std_logic;
-   signal clock_hdmi_s     : std_logic;
-   signal clock_hdmi_n_s   : std_logic;
+   signal clk_15m909_s     : std_logic;
+   signal clk_15m909_nb_s  : std_logic;
+   signal clk_40m909_s     : std_logic;
+   signal clk_21m48_s      : std_logic;
+   signal clk_3m58_en_s    : std_logic;
+   signal clk_1m79_en_s    : std_logic;
+   signal clock_tmds_s     : std_logic;
+   signal clock_tmds_n_s   : std_logic;
    signal clk_25m0_s       : std_logic;
    signal clk_100m0_s      : std_logic;
+
+   signal clk_3m58_en_r    : std_logic := '0';
+   signal cnt3m58_r        : unsigned(2 downto 0) := "000";
+   signal cnt3m58_x        : unsigned(2 downto 0);
+
 
    -- Resets
    signal rst_cnt_r        : unsigned(7 downto 0) := (others => '1');
@@ -185,9 +241,7 @@ architecture behavior of phoenix_top is
    signal vram_we_s        : std_logic;
 
    -- Audio
-   signal audio_signed_s   : signed(7 downto 0);
-   signal audio_s          : std_logic_vector( 7 downto 0);
-   signal audio_dac_s      : std_logic;
+   signal pcm16_s          : std_logic_vector(15 downto 0);
 
    -- Video
    signal vga_hsync_n_s    : std_logic;
@@ -196,12 +250,16 @@ architecture behavior of phoenix_top is
    signal vga_r_s          : std_logic_vector( 3 downto 0);
    signal vga_g_s          : std_logic_vector( 3 downto 0);
    signal vga_b_s          : std_logic_vector( 3 downto 0);
-   signal sound_hdmi_s     : std_logic_vector(15 downto 0);
+   signal sound_tmds_s     : std_logic_vector(15 downto 0);
    signal tdms_r_s         : std_logic_vector( 9 downto 0);
    signal tdms_g_s         : std_logic_vector( 9 downto 0);
    signal tdms_b_s         : std_logic_vector( 9 downto 0);
    signal tdms_p_s         : std_logic_vector( 3 downto 0);
    signal tdms_n_s         : std_logic_vector( 3 downto 0);
+
+   signal red_8bit_s       : std_logic_vector( 7 downto 0);
+   signal grn_8bit_s       : std_logic_vector( 7 downto 0);
+   signal blu_8bit_s       : std_logic_vector( 7 downto 0);
 
    -- Keyboard
    signal ps2_keys_s       : std_logic_vector(15 downto 0);
@@ -247,10 +305,10 @@ architecture behavior of phoenix_top is
    signal but_dot_s        : std_logic_vector( 0 downto 0);
    signal but_clear_s      : std_logic_vector( 0 downto 0);
    signal but_equal_s      : std_logic_vector( 0 downto 0);
-   
+
    -- CV core debug LED.
    signal cv_led_s         : std_logic;
-	
+
 	signal wait_n_s			: std_logic;
 
 begin
@@ -258,27 +316,73 @@ begin
    --
    -- PLL for master and video clocks.
    --
-   pll_1: entity work.pll1
-   port map (
-      clk_50m0_i     => clock_50_i,       --  50.000
-      clk_21m8_o     => clock_master_s,   --  21.47727 (21.739 PLL) MHz (6x NTSC)
-      clk_43m5_o     => clock_mem_s,      --  42.95454 (43.478 PLL) MHz
-      clk_25m0_o     => clk_25m0_s,       --  25.20000 (25.000 PLL) MHz
-      clk_100m0_o    => clk_100m0_s,      -- 100.0000 (100.000 PLL) MHz
-      clk_125m0_o    => clock_hdmi_s,     -- 126.0000 (125.000 PLL) MHz
-      clk_125m0_n_o  => clock_hdmi_n_s    -- 180o
-   );
+--   pll_1: entity work.pll1
+--   port map (
+--      clk_50m0_i     => clock_50m0_i_net, --  50.000
+--      clk_21m8_o     => clk_21m48_s,      --  21.47727 (21.739 PLL) MHz (6x NTSC)
+--      clk_43m5_o     => open,             --  42.95454 (43.478 PLL) MHz
+--      clk_25m0_o     => clk_25m0_s,       --  25.20000 (25.000 PLL) MHz
+--      clk_100m0_o    => clk_100m0_s,      -- 100.0000 (100.000 PLL) MHz
+--      clk_125m0_o    => clock_tmds_s,     -- 126.0000 (125.000 PLL) MHz
+--      clk_125m0_n_o  => clock_tmds_n_s    -- 180o
+--   );
 
 
    --
-   -- Clock enables.
+   -- Clocking for the CV core, F18A, and TMDS Video.
    --
-   clks: entity work.clocks
-   port map (
-      clock_i        => clock_master_s,
-      clock_3m_en_o  => clock_3m_en_s,
-      clock_wsg_en_o => clock_wsg_en_s
+   -- The original CV clock is based on a 7.15909MHz crystal, divided by two
+   -- which yields the 3.579545MHz CPU clock (generally rounded to 3.58MHz).
+   --
+   -- The 25MHz video clock divided by 7 is 3.571428MHz, which is only slightly
+   -- slower and will not affect the system.
+   --
+   -- Deriving all the clock signals from the same PLL, and generating the CPU
+   -- clock as a clock-enable signal, keeps the whole system synchronous.
+   --
+   clock_system : entity work.clk_sys_pll
+   port map
+   ( clk_50m0_i         => clock_50m0_i_net
+   , clk_25m0_o         => clk_25m0_s
+   , clk_100m0_o        => clk_100m0_s
+   , clk_125m0_o        => clock_tmds_s
+   , clk_125m0_n_o      => clock_tmds_n_s
    );
+
+
+   -- Create a registered CPU clock-enable by dividing the 25MHz video clock
+   -- by 7.
+   --
+   -- TODO
+   -- Depending on what the video clock changes to when the new F18A MK2 core
+   -- is done, there will be an error-correction to reduce the slightly faster
+   -- clock-enable closer to the desired 3.579MHz:
+   --
+   -- 25.175MHz = 640x480p @ 59.94Hz
+   -- 27.000MHz = 720x480p @ 59.94Hz
+   --
+   -- Pixel clock                          Error                    Skip count
+   -- 25.175MHz / 7 = 3596428 - 3579545 =  16883, 3596428 /  16883 = 213.0
+   -- 27.000MHz / 7 = 3857142 - 3579545 = 277597, 3857142 / 277597 =  13.89
+   --
+   -- TODO
+   -- The SD-Card slow clock divider will need to be adjusted if a 27MHz system
+   -- clock is used.
+
+   cnt3m58_x <= "000" when cnt3m58_r = 6 else cnt3m58_r + 1;
+   clk_3m58_en_s <= clk_3m58_en_r;
+
+   process ( clk_25m0_s )
+   begin
+   if rising_edge(clk_25m0_s) then
+      cnt3m58_r <= cnt3m58_x;
+      if cnt3m58_r = 6 then
+         clk_3m58_en_r <= '1';
+      else
+         clk_3m58_en_r <= '0';
+      end if;
+   end if;
+   end process;
 
 
    --
@@ -302,8 +406,8 @@ begin
 
    rst_cnt_x <= rst_cnt_r - 1;
 
-   process(clock_master_s)
-   begin if rising_edge(clock_master_s) then
+   process(clk_25m0_s)
+   begin if rising_edge(clk_25m0_s) then
       if rst_en_s = '1' then
          rst_cnt_r <= rst_cnt_x;
       end if;
@@ -352,100 +456,75 @@ begin
    -- ColecoVision Core
    --
    coleco : entity work.colecovision
-   generic map (
-      mach_id_g         => 8                 -- Phoenix board machine ID for port read.
+   generic map
+   ( mach_id_g       => 8 -- Phoenix board machine ID for port read.
    )
-   port map (
-      clock_i           => clock_master_s,   --  21.47727 (21.739 PLL) MHz
-      clock_mem_i       => clock_mem_s,      --  42.95454 (43.478 PLL) MHz
-      clk_100m0_i       => clk_100m0_s,
-      clk_25m0_i        => clk_25m0_s,
-      clk_en_3m58_i     => clock_3m_en_s,
-      clk_en_1m79_i     => clock_wsg_en_s,
-      reset_i           => reset_r,          -- Active high
-      por_n_i           => por_n_r,          -- Active low
-
-      -- Physical controller interface
-      ctrl_p1_i         => ctrl_p1_s,
-      ctrl_p2_i         => ctrl_p2_s,
-      ctrl_p3_i         => ctrl_p3_s,
-      ctrl_p4_i         => ctrl_p4_s,
-      ctrl_p5_o         => ctrl_p5_s,
-      ctrl_p6_i         => ctrl_p6_s,
-      ctrl_p7_i         => ctrl_p7_s,
-      ctrl_p8_o         => ctrl_p8_s,
-      ctrl_p9_i         => ctrl_p9_s,
-
---      -- CPU RAM Interface
---      ram_addr_o        => ram_addr_s,
---      ram_ce_o          => ram_ce_s,
---      ram_we_o          => ram_we_s,
---      ram_oe_o          => ram_oe_s,
---      ram_data_i        => d_to_cv_s,
---      ram_data_o        => d_to_ram_s,
-
---      -- Video RAM Interface
---      vram_addr_o       => vram_addr_s,
---      vram_ce_o         => vram_ce_s,
---      vram_oe_o         => vram_oe_s,
---      vram_we_o         => vram_we_s,
---      vram_data_i       => vram_do_s,
---      vram_data_o       => vram_di_s,
-
-      -- Physical cartridge interface
-      cart_addr_o       => cart_addr_o,
-      cart_dir_o        => cart_dir_o,
-      cart_data_io      => cart_data_io,
-      cart_oe_n_o       => cart_oe_n_o,
-      cart_en_80_n_o    => cart_en_80_n_o,
-      cart_en_a0_n_o    => cart_en_A0_n_o,
-      cart_en_c0_n_o    => cart_en_C0_n_o,
-      cart_en_e0_n_o    => cart_en_E0_n_o,
-
-      -- Audio output
-      audio_o           => open,
-      audio_signed_o    => audio_signed_s,
-
-      -- VGA output
-      blank_o           => vga_blank_s,
-      hsync_n_o         => vga_hsync_n_s,
-      vsync_n_o         => vga_vsync_n_s,
-      red_o             => vga_r_s,
-      grn_o             => vga_g_s,
-      blu_o             => vga_b_s,
-
-      -- External SRAM
-      sram_addr_o       => sram_addr_o,
-      sram_data_io      => sram_data_io,
-      sram_ce_n_o       => sram_ce_n_o,
-      sram_oe_n_o       => sram_oe_n_o,
-      sram_we_n_o       => sram_we_n_o,
-
-      -- SDcard SPI
-      sd_miso_i         => sd_miso_i,
-      sd_mosi_o         => sd_mosi_o,
-      sd_sclk_o         => sd_sclk_o,
-      sd_cs_n_o         => sd_cs_n_o,
-      sd_cd_n_i         => sd_cd_n_i,     -- Card detect, active low.
-      
-      led_o             => cv_led_s,
-	  wait_n_i			=> wait_n_s
+   port map
+   ( clk_25m0_i      => clk_25m0_s
+   , clk_100m0_i     => clk_100m0_s
+   , clk_3m58_en_i   => clk_3m58_en_s
+   , reset_i         => reset_r -- active high
+   , por_n_i         => por_n_r -- active low
+   -- Physical controller interface
+   , ctrl_p1_i       => ctrl_p1_s
+   , ctrl_p2_i       => ctrl_p2_s
+   , ctrl_p3_i       => ctrl_p3_s
+   , ctrl_p4_i       => ctrl_p4_s
+   , ctrl_p5_o       => ctrl_p5_s
+   , ctrl_p6_i       => ctrl_p6_s
+   , ctrl_p7_i       => ctrl_p7_s
+   , ctrl_p8_o       => ctrl_p8_s
+   , ctrl_p9_i       => ctrl_p9_s
+   -- Physical cartridge interface
+   , cart_addr_o     => cart_addr_o
+   , cart_dir_o      => cart_dir_o
+   , cart_data_io    => cart_data_io
+   , cart_oe_n_o     => cart_oe_n_o
+   , cart_en_80_n_o  => cart_en_80_n_o
+   , cart_en_a0_n_o  => cart_en_A0_n_o
+   , cart_en_c0_n_o  => cart_en_C0_n_o
+   , cart_en_e0_n_o  => cart_en_E0_n_o
+   -- Audio output
+   , pcm16_o         => pcm16_s
+   -- VGA output
+   , blank_o         => vga_blank_s
+   , hsync_n_o       => vga_hsync_n_s
+   , vsync_n_o       => vga_vsync_n_s
+   , red_o           => vga_r_s
+   , grn_o           => vga_g_s
+   , blu_o           => vga_b_s
+   -- External SRAM
+   , sram_addr_o     => sram_addr_o
+   , sram_data_io    => sram_data_io
+   , sram_ce_n_o     => sram_ce_n_o
+   , sram_oe_n_o     => sram_oe_n_o
+   , sram_we_n_o     => sram_we_n_o
+   -- SD-card SPI
+   , sd_miso_i       => sd_miso_i
+   , sd_mosi_o       => sd_mosi_o
+   , sd_sclk_o       => sd_sclk_o
+   , sd_cs_n_o       => sd_cs_n_o
+   , sd_cd_n_i       => sd_cd_n_i -- Card detect, active low.
+   -- Indication
+   , led_o           => cv_led_s
    );
 
 
+   --
    -- PS/2 keyboard interface
+   --
    ps2if_inst : entity work.colecoKeyboard
-   port map (
-      clk            => clock_master_s,
-      reset          => reset_r,          -- Active high
-      -- inputs from PS/2 port
-      ps2_clk        => ps2_clk_io,
-      ps2_data       => ps2_data_io,
-      -- user outputs
-      keys           => ps2_keys_s,
-      joy            => ps2_joy_s,
-      core_reload_o  => core_reload_s,
-      home_o         => homekey_s
+   port map
+   ( clk             => clk_25m0_s
+   , reset           => reset_r -- active high
+   -- inputs from PS/2 port
+   , ps2_clk         => ps2_clk_io
+   , ps2_data        => ps2_data_io
+   -- user outputs
+   , keys            => ps2_keys_s
+   , joy             => ps2_joy_s
+   , core_reload_o   => core_reload_s
+   , home_o          => homekey_s
    );
 
 
@@ -453,45 +532,45 @@ begin
    -- SNES Gamepad (TODO: implement NTT)
    --
    snespads_b : entity work.snespad
-   generic map (
-      num_pads_g        => 1,
-      reset_level_g     => 0,
-      button_level_g    => 0,
-      clocks_per_6us_g  => 128               -- 6us = 128 ciclos de 21.477MHz
+   generic map
+   ( num_pads_g         => 1
+   , reset_level_g      => 0
+   , button_level_g     => 0
+   , clocks_per_6us_g   => 150 -- 6us @ 25MHz = 150
    )
-   port map (
-      clk_i             => clock_master_s,
-      reset_i           => por_n_r,          -- Active low
-      pad_clk_o         => snesjoy_clock_o,
-      pad_latch_o       => snesjoy_latch_o,
-      pad_data_i(0)     => snesjoy_data_i,
-      but_a_o           => but_a_s,
-      but_b_o           => but_b_s,
-      but_x_o           => but_x_s,
-      but_y_o           => but_y_s,
-      but_start_o       => but_start_s,
-      but_sel_o         => but_sel_s,
-      but_tl_o          => but_tl_s,
-      but_tr_o          => but_tr_s,
-      but_up_o          => but_up_s,
-      but_down_o        => but_down_s,
-      but_left_o        => but_left_s,
-      but_right_o       => but_right_s,
-      but_0_o           => but_0_s,
-      but_1_o           => but_1_s,
-      but_2_o           => but_2_s,
-      but_3_o           => but_3_s,
-      but_4_o           => but_4_s,
-      but_5_o           => but_5_s,
-      but_6_o           => but_6_s,
-      but_7_o           => but_7_s,
-      but_8_o           => but_8_s,
-      but_9_o           => but_9_s,
-      but_star_o        => but_star_s,
-      but_num_o         => but_num_s,
-      but_dot_o         => but_dot_s,
-      but_clear_o       => but_clear_s,
-      but_equal_o       => but_equal_s
+   port map
+   ( clk_i              => clk_25m0_s
+   , reset_i            => por_n_r -- active low
+   , pad_clk_o          => snesjoy_clock_o
+   , pad_latch_o        => snesjoy_latch_o
+   , pad_data_i(0)      => snesjoy_data_i
+   , but_a_o            => but_a_s
+   , but_b_o            => but_b_s
+   , but_x_o            => but_x_s
+   , but_y_o            => but_y_s
+   , but_start_o        => but_start_s
+   , but_sel_o          => but_sel_s
+   , but_tl_o           => but_tl_s
+   , but_tr_o           => but_tr_s
+   , but_up_o           => but_up_s
+   , but_down_o         => but_down_s
+   , but_left_o         => but_left_s
+   , but_right_o        => but_right_s
+   , but_0_o            => but_0_s
+   , but_1_o            => but_1_s
+   , but_2_o            => but_2_s
+   , but_3_o            => but_3_s
+   , but_4_o            => but_4_s
+   , but_5_o            => but_5_s
+   , but_6_o            => but_6_s
+   , but_7_o            => but_7_s
+   , but_8_o            => but_8_s
+   , but_9_o            => but_9_s
+   , but_star_o         => but_star_s
+   , but_num_o          => but_num_s
+   , but_dot_o          => but_dot_s
+   , but_clear_o        => but_clear_s
+   , but_equal_o        => but_equal_s
    );
 
 
@@ -500,17 +579,18 @@ begin
    -- The GamePad and keyboard do not provide quadrature signals, those
    -- inputs are wired directly below this process.
    --
-   pad_ctrl: process (
-      ctrl_p5_s, ctrl_p8_s, ps2_keys_s, ps2_joy_s,
-      joy1_p1_i, joy1_p2_i, joy1_p3_i, joy1_p4_i, joy1_p6_i,
-      but_a_s, but_b_s, but_up_s, but_down_s, but_left_s, but_right_s,
-      but_x_s, but_y_s, but_sel_s, but_start_s, but_tl_s, but_tr_s, but_0_s,
-      but_1_s, but_2_s, but_3_s, but_4_s, but_5_s, but_6_s, but_7_s, but_8_s,
-      but_9_s, but_star_s, but_num_s, but_dot_s, but_clear_s, but_equal_s, wait_n_s
+   pad_ctrl: process
+   ( ctrl_p5_s, ctrl_p8_s, ps2_keys_s, ps2_joy_s
+   , joy1_p1_i, joy1_p2_i, joy1_p3_i, joy1_p4_i, joy1_p6_i
+   , but_a_s, but_b_s, but_up_s, but_down_s, but_left_s, but_right_s
+   , but_x_s, but_y_s, but_sel_s, but_start_s, but_tl_s, but_tr_s, but_0_s
+   , but_1_s, but_2_s, but_3_s, but_4_s, but_5_s, but_6_s, but_7_s, but_8_s
+   , but_9_s, but_star_s, but_num_s, but_dot_s, but_clear_s, but_equal_s, wait_n_s
    )
       variable key_v   : natural range cv_keys_t'range;
       variable fire1_v : std_logic;
       variable fire2_v : std_logic;
+
    begin
 
       -- Joy 1
@@ -559,7 +639,7 @@ begin
             key_v := cv_key_number_c;
          end if;
 
-         -- SNES joypad 
+         -- SNES joypad
          if but_tl_s(0) = '0' then           -- TL button pressed, numbers 1 to 6
             if    but_y_s(0) = '0' then
                -- KEY 1
@@ -701,56 +781,61 @@ begin
    -- Quadrature inputs for both controllers.
    ctrl_p7_s <= joy2_p7_i & joy1_p7_i;
    ctrl_p9_s <= joy2_p9_i & joy1_p9_i;
-   --ctrl_p7_s <= "11"; --disable encoder lines
-   --ctrl_p9_s <= "11"; --disable encoder lines
-   
+
    -- Output stick vs keypad selection.
    joy_p5_o <= ctrl_p5_s;
    joy_p8_o <= ctrl_p8_s;
 
 
    --
-   -- HDMI
+   -- TMDS
    --
 
-   audio_s <= std_logic_vector(unsigned(signed(audio_signed_s)+128));
-   sound_hdmi_s <= "0" & audio_s & "0000000";
+   red_8bit_s <= vga_r_s & vga_r_s;
+   grn_8bit_s <= vga_g_s & vga_g_s;
+   blu_8bit_s <= vga_b_s & vga_b_s;
 
-   hdmi: entity work.hdmi
-   generic map (
-      FREQ  => 25000000,   -- pixel clock frequency
-      FS    => 48000,      -- audio sample rate - should be 32000, 41000 or 48000 = 48KHz
-      CTS   => 25000,      -- CTS = Freq(pixclk) * N / (128 * Fs)
-      N     => 6144        -- N = 128 * Fs /1000,  128 * Fs /1500 <= N <= 128 * Fs /300 (Check HDMI spec 7.2 for details)
+   tmds : entity work.hdmi
+   generic map
+            -- Pixel clock frequency in Hertz
+   ( FREQ   => 25000000
+            -- Audio sample rate in Hertz, should be 32000, 41000 or 48000
+   , FS     => 48000
+            -- CTS = Freq(pixclk) * N / (128 * Fs)
+   , CTS    => 25000
+            -- N = 128 * Fs /1000,  128 * Fs /1500 <= N <= 128 * Fs /300
+            -- (Check specification section 7.2 for details)
+   , N      => 6144
    )
-   port map (
-      I_CLK_PIXEL    => clk_25m0_s,
-      I_R            => vga_r_s & vga_r_s,
-      I_G            => vga_g_s & vga_g_s,
-      I_B            => vga_b_s & vga_b_s,
-      I_BLANK        => vga_blank_s,
-      I_HSYNC        => vga_hsync_n_s,
-      I_VSYNC        => vga_vsync_n_s,
-      -- PCM audio
-      I_AUDIO_ENABLE => '1',
-      I_AUDIO_PCM_L  => sound_hdmi_s,
-      I_AUDIO_PCM_R  => sound_hdmi_s,
-      -- TMDS parallel pixel synchronous outputs (serialize LSB first)
-      O_RED          => tdms_r_s,
-      O_GREEN        => tdms_g_s,
-      O_BLUE         => tdms_b_s
+   port map
+   ( I_CLK_PIXEL     => clk_25m0_s
+   , I_R             => red_8bit_s
+   , I_G             => grn_8bit_s
+   , I_B             => blu_8bit_s
+   , I_BLANK         => vga_blank_s
+   , I_HSYNC         => vga_hsync_n_s
+   , I_VSYNC         => vga_vsync_n_s
+   -- PCM audio
+   , I_AUDIO_ENABLE  => '1',
+   , I_AUDIO_PCM_L   => pcm16_s,
+   , I_AUDIO_PCM_R   => pcm16_s,
+   -- TMDS parallel pixel synchronous outputs (serialize LSB first)
+   , O_RED           => tdms_r_s
+   , O_GREEN         => tdms_g_s
+   , O_BLUE          => tdms_b_s
    );
 
-   hdmio: entity work.hdmi_out_xilinx
-   port map (
-      clock_pixel_i     => clk_25m0_s,
-      clock_tdms_i      => clock_hdmi_s,
-      clock_tdms_n_i    => clock_hdmi_n_s,
-      red_i             => tdms_r_s,
-      green_i           => tdms_g_s,
-      blue_i            => tdms_b_s,
-      tmds_out_p        => hdmi_p_o,
-      tmds_out_n        => hdmi_n_o
+
+   tmds_out : entity work.hdmi_out_xilinx
+   port map
+   ( clock_pixel_i   => clk_25m0_s
+   , clock_tdms_i    => clock_tmds_s
+   , clock_tdms_n_i  => clock_tmds_n_s
+   , red_i           => tdms_r_s
+   , green_i         => tdms_g_s
+   , blue_i          => tdms_b_s
+   , tmds_out_p      => tmds_p_o
+   , tmds_out_n      => tmds_n_o
    );
 
 end architecture;

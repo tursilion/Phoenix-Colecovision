@@ -5,7 +5,7 @@
 //-- please contact me for explicit permission at me _at_ alsp.net.
 //-- This applies for source and binary form and derived works.
 //
-//-- Audio and infoframe packet generation mechanizms based on Charlie Cole 2015 
+//-- Audio and infoframe packet generation mechanizms based on Charlie Cole 2015
 //-- design of HDMI output for Neo Geo MVS
 
 //--
@@ -13,16 +13,16 @@
 //--
 //-- License to use granted to CollectorVision Phoenix Project
 //--
-module hdmidataencoder 
-#(parameter FREQ=25000000, FS=48000, CTS=25000, N=6144) 
+module hdmidataencoder
+#(parameter FREQ=25000000, FS=48000, CTS=25000, N=6144)
 (
 	input 			i_pixclk,
 	input 			i_hSync,
 	input 			i_vSync,
 	input 			i_blank,
-	input i_audio_enable,
+	input 			i_audio_enable,
 	input [15:0] 	i_audioL,
-	input [15:0] 	i_audioR,	
+	input [15:0] 	i_audioR,
 	output [3:0] 	o_d0,
 	output [3:0] 	o_d1,
 	output [3:0] 	o_d2,
@@ -170,28 +170,28 @@ begin
 		_timer <= _timer - CTS + 1;
 	end else begin
 		if (!oddLine) begin
-			packetHeader<=24'h0D0282;	// infoframe AVI packet	
+			packetHeader<=24'h0D0282;	// infoframe AVI packet
 			// Byte0: Checksum (256-(S%256))%256
 			// Byte1: 10 = 0(Y1:Y0<=0 RGB)(A0=1 active format valid)(B1:B0=00 No bar info)(S1:S0=00 No scan info)
 			// Byte2: 19 = (C1:C0=0 No colorimetry)(M1:M0=1 4:3)(R3:R0=9 4:3 center)
 			// Byte3: 00 = 0(SC1:SC0=0 No scaling)
-			// Byte4: 00 = 0(VIC6:VIC0=0 custom resolution)
+			// Byte4: 00 = 0(VIC6:VIC0=0 no info, 1=640x480@60Hz 4:3, 2=720x480@60Hz 4:3, 3=720x480@60Hz 16:9)
 			// Byte5: 00 = 0(PR5:PR0=0 No repeation)
 			subpacket[0]<=56'h00000000191046;
 			subpacket[1]<=56'h00000000000000;
 		end else begin
 			packetHeader<=24'h0A0184;	// infoframe audio packet
 			// Byte0: Checksum (256-(S%256))%256
-			// Byte1: 11 = (CT3:0=1 PCM)0(CC2:0=1 2ch)
+			// Byte1: 01 = (CT3:0 = refer to header, must be 0) (CC2:0 = chanel count - 1)
 			// Byte2: 00 = 000(SF2:0=0 As stream)(SS1:0=0 As stream)
 			// Byte3: 00 = LPCM doesn't use this
 			// Byte4-5: 00 Multichannel only (>2ch)
-			subpacket[0]<=56'h00000000001160;
+			subpacket[0]<=56'h00000000000170;
 			subpacket[1]<=56'h00000000000000;
 		end
 		subpacket[2]<=56'h00000000000000;
 		subpacket[3]<=56'h00000000000000;
-	end			
+	end
 end
 endtask
 
@@ -205,7 +205,7 @@ begin
 	audioLAvg <= i_audioL;
 	audioRAvg <= i_audioR;
 	audioAvgCnt <= 1;
-   
+
 end
 endtask
 
@@ -235,7 +235,7 @@ begin
 		end
 	end else begin
 		audioTimer<=audioTimer+`AUDIO_TIMER_ADDITION;
-		AproximateAudio();		
+		AproximateAudio();
 		samplesHead<=0;
 	end
 end
@@ -259,7 +259,7 @@ endtask
 
 always @(posedge i_pixclk)
 begin
-	
+
 	AudioGen();
 
 	// Send 2 packets each line
@@ -267,14 +267,14 @@ begin
 		SendPackets(tercData);
 	end else begin
 		tercData<=0;
-   end 	
+   end
 
-	ctsTimer <= ctsTimer + 1;	
+	ctsTimer <= ctsTimer + 1;
 
-	if((prevBlank == 0) && (i_blank == 1)) 
+	if((prevBlank == 0) && (i_blank == 1))
 		firstHSyncChange <= 1;
-	
-	if((prevBlank == 1) && (i_blank == 0)) 
+
+	if((prevBlank == 1) && (i_blank == 0))
 		allowGeneration <= 0;
 
 	if(prevHSync != i_hSync) begin
@@ -284,12 +284,12 @@ begin
 		   counterX  <= 0;
 			allowGeneration <= 1;
 		end else begin
-		   counterX  <= counterX + 1;	
+		   counterX  <= counterX + 1;
 		end
 		firstHSyncChange <= !firstHSyncChange;
-	end else 
-		counterX  <= counterX + 1;	
-	
+	end else
+		counterX  <= counterX + 1;
+
 	prevBlank <= i_blank;
 	prevHSync <= i_hSync;
 end

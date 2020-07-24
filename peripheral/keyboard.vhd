@@ -100,15 +100,16 @@ begin
 
    rst_n <= not reset;
 
+   -- MH July 2020, modified to 25MHz.
    -- produce a 1us tick from the 20MHz ref clock
    process (clk, reset)
-      variable count : integer range 0 to 19;
+      variable count : integer range 0 to 24; --19;
    begin
       if reset = '1' then
          tick1us <= '0';
          count := 0;
       elsif rising_edge (clk) then
-         if count = 19 then
+         if count = 24 then
             tick1us <= '1';
             count := 0;
          else

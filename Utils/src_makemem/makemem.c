@@ -1,10 +1,15 @@
 /**
+ * Utility to convert a binary ROM file into a format suitable to use with
+ * the Xilinx data2mem tool for merging into a bit-stream, or to generate
+ * VHDL BlockRAM initialization syntax to copy-n-paste into a source file.
+ *
+ * Matthew Hagerty, June 2019, Public Domain.
+ *
  * Unix/MinGW:
  * gcc -Wall -o makemem makemem.c
  *
  * Vistual Studio:
  * cl /W4 makemem.c
- *
  */
 #include <stdio.h>              // printf
 #include <stdlib.h>             // fopen, fclose, fgetc, fputc
@@ -16,6 +21,7 @@ main(int argc, char *argv[])
     {
         printf(
         "makemem by Matthew Hagerty, version 1.0\n\n"
+        "Convert a binary ROM file into a data2mem or VHDL code format.\n\n"
         "Use: makemem <format> <input rom file> <output mem file>\n\n"
         "format options:\n"
         "  m  - MEM format for data2mem\n"
@@ -50,7 +56,7 @@ main(int argc, char *argv[])
         if ( type == 'v' ) {
             fprintf(dst, "x\"%c%c\",", b2h[(c>>4)], b2h[(c&0xF)]);
         }
-        
+
         else
         {
             if ( (cnt % 2048) == 0 ) {
@@ -67,11 +73,11 @@ main(int argc, char *argv[])
     }
 
     DONE:
-    
+
     if ( src != NULL ) {
         fclose(src);
     }
-    
+
     if ( dst != NULL ) {
         fclose(dst);
     }

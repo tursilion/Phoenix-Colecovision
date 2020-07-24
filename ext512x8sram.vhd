@@ -32,50 +32,59 @@
 -- ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 -- POSSIBILITY OF SUCH DAMAGE.
 
+--
+-- A memory cycle takes two clock cycles, so the clock must be at least twice
+-- as fast as the CPU expects a cycles to take.
+--
+-- Maximum clock is 100MHz.  Tested up to 25MHz.
+--
+
 
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity ext512x8sram is
-   port (
-      clk_i          :  in    std_logic;  --  21.47727 (21.739 PLL) MHz
-      -- Z80 CPU
-      cpu_addr_i     :  in    std_logic_vector(18 downto 0);
-      cpu_en_i       :  in    std_logic;
-      cpu_we_n_i     :  in    std_logic;
-      cpu_data_i     :  in    std_logic_vector(7 downto 0);
-      cpu_data_o     :  out   std_logic_vector(7 downto 0);
-
-      -- External SRAM Interface
-      sram_addr_o    :  out   std_logic_vector(18 downto 0);
-      sram_data_io   :  inout std_logic_vector(7 downto 0);
-      sram_ce_n_o    :  out   std_logic := '1';
-      sram_oe_n_o    :  out   std_logic := '1';
-      sram_we_n_o    :  out   std_logic := '1'
-   );
+port
+   ( clk_i              : in     std_logic
+   -- CPU
+   ; cpu_addr_i         : in     std_logic_vector(18 downto 0)
+   ; cpu_en_i           : in     std_logic
+   ; cpu_we_n_i         : in     std_logic
+   ; cpu_data_i         : in     std_logic_vector(7 downto 0)
+   ; cpu_data_o         : out    std_logic_vector(7 downto 0)
+   -- External SRAM Interface
+   ; sram_addr_o        : out    std_logic_vector(18 downto 0)
+   ; sram_data_io       : inout  std_logic_vector(7 downto 0)
+   ; sram_ce_n_o        : out    std_logic := '1'
+   ; sram_oe_n_o        : out    std_logic := '1'
+   ; sram_we_n_o        : out    std_logic := '1'
+);
 end entity;
 
 architecture rtl of ext512x8sram is
 
-   signal addr_r, addr_x               : std_logic_vector(18 downto 0);
-   signal d_to_ext_r, d_to_ext_x       : std_logic_vector( 7 downto 0);
-   signal d_from_ext_r, d_from_ext_x   : std_logic_vector( 7 downto 0);
-   signal ce_n_r, ce_n_x               : std_logic := '1';
-   signal we_n_r, we_n_x               : std_logic := '1';
+   signal addr_r              : std_logic_vector(18 downto 0) := (others => '0');
+   signal addr_x              : std_logic_vector(18 downto 0);
+   signal d_to_ext_r          : std_logic_vector( 7 downto 0) := (others => '0');
+   signal d_to_ext_x          : std_logic_vector( 7 downto 0);
+   signal d_from_ext_r        : std_logic_vector( 7 downto 0) := (others => '0');
+   signal d_from_ext_x        : std_logic_vector( 7 downto 0);
+   signal ce_n_r              : std_logic := '1';
+   signal ce_n_x              : std_logic;
+   signal we_n_r              : std_logic := '1';
+   signal we_n_x              : std_logic;
 
    type ramfsm_t is (st_idle, st_rdwr);
-   signal ram_st_r, ram_st_x           : ramfsm_t := st_idle;
+   signal ram_st_r            : ramfsm_t := st_idle;
+   signal ram_st_x            : ramfsm_t;
 
 begin
 
-   -- The 21MHz clock is fast enough to multiplex access to the SRAM if
-   -- necessary and is not even half of the max speed of the SRAM.
-   
    -- The clock used should be synchronous to the input enable signal
    -- otherwise clock domain synchronization should be performed.
-   
-   -- SEt the external RAM outputs to be read/write controlled.
+
+   -- Set the external RAM outputs to be read/write controlled.
    sram_oe_n_o <= '0';
 
    -- External RAM data tri-state I/O.
@@ -85,14 +94,14 @@ begin
    sram_addr_o <= addr_r;
    sram_ce_n_o <= ce_n_r;
    sram_we_n_o <= we_n_r;
-   
+
    cpu_data_o  <= d_from_ext_r;
 
 
    process ( ram_st_r, cpu_en_i, cpu_addr_i, cpu_we_n_i, cpu_data_i,
              d_from_ext_r, sram_data_io )
    begin
-      
+
       ram_st_x       <= ram_st_r;
       addr_x         <= cpu_addr_i;
       d_to_ext_x     <= cpu_data_i;
