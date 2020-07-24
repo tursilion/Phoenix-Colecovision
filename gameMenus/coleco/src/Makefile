@@ -1,13 +1,20 @@
+# Build the Phoenix CV Core SD-Card Menu / Loader.
+#
+# MUST be run from a 64-bit Windows Command Prompt.  This Makefile will not work
+# with MinGW.
+#
+# SDCC and GNU make.exe have been included, so just type: make
+#
 # Built with SDCC 4.0.0 64-bit for Windows
 # GNU Make.exe from http://ftp.gnu.org/gnu/make/
-CFLAGS = -mz80 -c "-I../libti99coleco" --opt-code-size --max-allocs-per-node 18000 --std-sdcc99 --vc --fsigned-char
+CFLAGS = -mz80 -c "-I../libti99coleco" "-I../sdcc/include" --opt-code-size --max-allocs-per-node 18000 --std-sdcc99 --vc --fsigned-char
 
-CC = "c:/program files/sdcc/bin/sdcc"
-AS = "c:/program files/sdcc/bin/sdasz80"
-AR = "c:/program files/sdcc/bin/sdar"
-MB = "c:/program files/sdcc/bin/makebin"
+CC = "..\sdcc\bin\sdcc"
+AS = "..\sdcc\bin\sdasz80"
+AR = "..\sdcc\bin\sdar"
+MB = "..\sdcc\bin\makebin"
 AFLAGS = -plosgff
-RM = del /F 
+RM = del /F
 EXT=rel
 
 # make sure the crt0 is first!
