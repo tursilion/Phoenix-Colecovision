@@ -4,7 +4,7 @@ The Phoenix is an FPGA-based game system with several retro game system cores, m
 
 ### Phoenix Core Build Instructions
 
-Currently the build is a little lacking, and multiple steps are required.  Eventually the ISE steps will also be replaced with a Makefile.  A Windows-based MinGW or Msys environment is assumed, although a Unix system should work as well (untested).  The utilities will need to be rebuilt for a Unix environment, see the associated `Makefiles` in the `Utils/<utility>` directories.
+Currently the build is a little lacking, and multiple steps are required.  Eventually the ISE steps will also be replaced with a Makefile.
 
 ### 1. Phoenix ColecoVision Core bit-stream
 
@@ -16,10 +16,16 @@ Currently the build is a little lacking, and multiple steps are required.  Event
 
 ### 2. Phoenix Core Menu
 
-  - In a MinGW or Msys console, change to the `gameMenus/coleco/src` directory.
+  A Windows command prompt is necessary for this step, the `Makefile` is currently specific to Windows.  `make` and the necessary `SDCC` binaries are included.
+
+  - In a Windows console, change to the `gameMenus/coleco/src` directory.
   - Type `make`
 
+  Produces the `phoenixBoot.rom` file and it expected to be in this directory by the next step.
+
 ### 3. Phoenix Core
+
+  A MinGW or Msys environment is assumed for this step, although a Unix system should work as well (untested).  The utilities will need to be rebuilt for a Unix environment, see the associated `Makefiles` in the `Utils/<utility>` directories.
 
   - In a MinGW or Msys console, change to the `cores/phoenix` directory.
   - Type `make all`
