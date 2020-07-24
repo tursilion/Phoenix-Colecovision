@@ -20,10 +20,12 @@ BIN2PHX := ../../Utils/bin2phx
 COREREV	:= 8
 
 # Source bit-stream and output merged bit-stream directory.
-BMMDIR  := ../..
+BMMDIR  := ../../rtl
 BITDIR	:= ../../../collectorvision_ise
 # Phoenix Boot ROM directory.
 SDIR	:= ../../gameMenus/coleco/src
+# Where to put merged bit-stream and core files.
+OUTDIR  := ../..
 
 
 .ONESHELL:
@@ -43,11 +45,11 @@ corerom: CORE01.PHX
 
 # Make the CORE01.PHX Phoenix CV Menu core.
 CORE01.PHX: phoenix_top.merged.bin
-	$(BIN2PHX) $< $@ COLECOVISION $(COREREV)
+	$(BIN2PHX) $< $(OUTDIR)/$@ COLECOVISION $(COREREV)
 
 # Strip the bit-stream header.
 phoenix_top.merged.bin: phoenix_top.merged.bit
-	$(BIT2BIN) $(BMMDIR)/$< $@
+	$(BIT2BIN) $(OUTDIR)/$< $@
 
 
 # Merge the ROM with the CV bit-stream.
@@ -58,7 +60,7 @@ phoenix_top.merged.bit: phoenixBoot.mem
 		-bm $(BMMDIR)/romloader_bd.bmm \
 		-bt $(BITDIR)/phoenix_top.bit \
 		-bd $< tag phoenix.loader \
-		-o b $(BMMDIR)/$@
+		-o b $(OUTDIR)/$@
 
 # Create a Xilinx format MEM file from the binary ROM.
 phoenixBoot.mem: $(SDIR)/phoenixBoot.rom

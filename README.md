@@ -10,7 +10,7 @@ Currently the build is a little lacking, and multiple steps are required.  Event
 
   - Create an ISE 14.7 project in a directory parallel-to the Phoenix source called: `collectorvision-ise`
   - Choose the Spartan-6 SLX16, CSG-324, speed grade 2.
-  - Add all the HDL files in this repository to the project.  There will most likely be files that are not associated under the `phoenix_top`, just ignore or remove them from the project.
+  - Add all the HDL files in the `rtl` directory to the project.
   - Right-click the `Generate Programming File` process, choose `Process Properties -> Configuration Options`, and set the `Configuration Rate` to `26`, and `Unused IOB Pins` to `Float`. Click OK.
   - Double-click `Generate Programming File` to make a bit-stream.
 
@@ -21,7 +21,7 @@ Currently the build is a little lacking, and multiple steps are required.  Event
   - In a Windows console, change to the `gameMenus/coleco/src` directory.
   - Type `make`
 
-  Produces the `phoenixBoot.rom` file and it expected to be in this directory by the next step.
+  Produces the `phoenixBoot.rom` file in the same directory.  Do not move it, the location is known by the next step.
 
 ### 3. Phoenix Core
 
@@ -33,4 +33,4 @@ Currently the build is a little lacking, and multiple steps are required.  Event
 The result of these steps will be:
 
   1. A merged bit-stream in the main directory called `phoenix_top.merged.bit`, which can be loaded directly into the FPGA with a JTAG programming cable.
-  2. A core file called `CORE01.PHX` that can be loaded onto an SD-card and used directly with the Phoenix console to update the `COLECOVISION` core in the system.
+  2. A core file called `CORE01.PHX` in the main directory that can be loaded onto an SD-card and used directly with the Phoenix console to update the `COLECOVISION` core in the system.

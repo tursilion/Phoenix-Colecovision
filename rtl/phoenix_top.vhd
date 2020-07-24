@@ -163,9 +163,9 @@ port
    ; snesjoy_latch_o    : out    std_logic := '1'
    ; snesjoy_data_i     : in     std_logic
 
-   -- TMDS
-   ; tmds_p_o           : out    std_logic_vector(3 downto 0)
-   ; tmds_n_o           : out    std_logic_vector(3 downto 0)
+   -- LVDS
+   ; lvds_p_o           : out    std_logic_vector(3 downto 0)
+   ; lvds_n_o           : out    std_logic_vector(3 downto 0)
 
    -- Cartridge
    ; cart_addr_o        : out    std_logic_vector(14 downto 0) := (others => '0')
@@ -186,24 +186,18 @@ end entity;
 
 use work.cv_keys_pack.all;
 
-architecture behavior of phoenix_top is
+architecture rtl of phoenix_top is
 
    -- Clocks and enables
-   signal clk_15m909_s     : std_logic;
-   signal clk_15m909_nb_s  : std_logic;
-   signal clk_40m909_s     : std_logic;
-   signal clk_21m48_s      : std_logic;
-   signal clk_3m58_en_s    : std_logic;
-   signal clk_1m79_en_s    : std_logic;
-   signal clock_tmds_s     : std_logic;
-   signal clock_tmds_n_s   : std_logic;
    signal clk_25m0_s       : std_logic;
    signal clk_100m0_s      : std_logic;
+   signal clock_tmds_s     : std_logic;
+   signal clock_tmds_n_s   : std_logic;
 
+   signal clk_3m58_en_s    : std_logic;
    signal clk_3m58_en_r    : std_logic := '0';
    signal cnt3m58_r        : unsigned(2 downto 0) := "000";
    signal cnt3m58_x        : unsigned(2 downto 0);
-
 
    -- Resets
    signal rst_cnt_r        : unsigned(7 downto 0) := (others => '1');
@@ -216,30 +210,6 @@ architecture behavior of phoenix_top is
    signal ps2_reset_s      : std_logic;
    signal core_reload_s    : std_logic;
 
-   -- Internal BIOS
-   signal bios_addr_s      : std_logic_vector(12 downto 0);    -- 8K
-   signal d_from_bios_s    : std_logic_vector( 7 downto 0);
-   signal bios_ce_s        : std_logic;
-   signal bios_we_s        : std_logic;
-
-   signal d_to_cv_s        : std_logic_vector( 7 downto 0);
-
-   -- RAM memory
-   signal ram_addr_s       : std_logic_vector(16 downto 0);    -- 128K
-   signal d_from_ram_s     : std_logic_vector( 7 downto 0);
-   signal d_to_ram_s       : std_logic_vector( 7 downto 0);
-   signal ram_ce_s         : std_logic;
-   signal ram_oe_s         : std_logic;
-   signal ram_we_s         : std_logic;
-
-   -- VRAM memory
-   signal vram_addr_s      : std_logic_vector(13 downto 0);    -- 16K
-   signal vram_do_s        : std_logic_vector( 7 downto 0);
-   signal vram_di_s        : std_logic_vector( 7 downto 0);
-   signal vram_ce_s        : std_logic;
-   signal vram_oe_s        : std_logic;
-   signal vram_we_s        : std_logic;
-
    -- Audio
    signal pcm16_s          : std_logic_vector(15 downto 0);
 
@@ -250,12 +220,9 @@ architecture behavior of phoenix_top is
    signal vga_r_s          : std_logic_vector( 3 downto 0);
    signal vga_g_s          : std_logic_vector( 3 downto 0);
    signal vga_b_s          : std_logic_vector( 3 downto 0);
-   signal sound_tmds_s     : std_logic_vector(15 downto 0);
-   signal tdms_r_s         : std_logic_vector( 9 downto 0);
-   signal tdms_g_s         : std_logic_vector( 9 downto 0);
-   signal tdms_b_s         : std_logic_vector( 9 downto 0);
-   signal tdms_p_s         : std_logic_vector( 3 downto 0);
-   signal tdms_n_s         : std_logic_vector( 3 downto 0);
+   signal tmds_r_s         : std_logic_vector( 9 downto 0);
+   signal tmds_g_s         : std_logic_vector( 9 downto 0);
+   signal tmds_b_s         : std_logic_vector( 9 downto 0);
 
    signal red_8bit_s       : std_logic_vector( 7 downto 0);
    signal grn_8bit_s       : std_logic_vector( 7 downto 0);
@@ -309,24 +276,7 @@ architecture behavior of phoenix_top is
    -- CV core debug LED.
    signal cv_led_s         : std_logic;
 
-	signal wait_n_s			: std_logic;
-
 begin
-
-   --
-   -- PLL for master and video clocks.
-   --
---   pll_1: entity work.pll1
---   port map (
---      clk_50m0_i     => clock_50m0_i_net, --  50.000
---      clk_21m8_o     => clk_21m48_s,      --  21.47727 (21.739 PLL) MHz (6x NTSC)
---      clk_43m5_o     => open,             --  42.95454 (43.478 PLL) MHz
---      clk_25m0_o     => clk_25m0_s,       --  25.20000 (25.000 PLL) MHz
---      clk_100m0_o    => clk_100m0_s,      -- 100.0000 (100.000 PLL) MHz
---      clk_125m0_o    => clock_tmds_s,     -- 126.0000 (125.000 PLL) MHz
---      clk_125m0_n_o  => clock_tmds_n_s    -- 180o
---   );
-
 
    --
    -- Clocking for the CV core, F18A, and TMDS Video.
@@ -585,7 +535,7 @@ begin
    , but_a_s, but_b_s, but_up_s, but_down_s, but_left_s, but_right_s
    , but_x_s, but_y_s, but_sel_s, but_start_s, but_tl_s, but_tr_s, but_0_s
    , but_1_s, but_2_s, but_3_s, but_4_s, but_5_s, but_6_s, but_7_s, but_8_s
-   , but_9_s, but_star_s, but_num_s, but_dot_s, but_clear_s, but_equal_s, wait_n_s
+   , but_9_s, but_star_s, but_num_s, but_dot_s, but_clear_s, but_equal_s
    )
       variable key_v   : natural range cv_keys_t'range;
       variable fire1_v : std_logic;
@@ -816,13 +766,13 @@ begin
    , I_HSYNC         => vga_hsync_n_s
    , I_VSYNC         => vga_vsync_n_s
    -- PCM audio
-   , I_AUDIO_ENABLE  => '1',
-   , I_AUDIO_PCM_L   => pcm16_s,
-   , I_AUDIO_PCM_R   => pcm16_s,
+   , I_AUDIO_ENABLE  => '1'
+   , I_AUDIO_PCM_L   => pcm16_s
+   , I_AUDIO_PCM_R   => pcm16_s
    -- TMDS parallel pixel synchronous outputs (serialize LSB first)
-   , O_RED           => tdms_r_s
-   , O_GREEN         => tdms_g_s
-   , O_BLUE          => tdms_b_s
+   , O_RED           => tmds_r_s
+   , O_GREEN         => tmds_g_s
+   , O_BLUE          => tmds_b_s
    );
 
 
@@ -831,11 +781,11 @@ begin
    ( clock_pixel_i   => clk_25m0_s
    , clock_tdms_i    => clock_tmds_s
    , clock_tdms_n_i  => clock_tmds_n_s
-   , red_i           => tdms_r_s
-   , green_i         => tdms_g_s
-   , blue_i          => tdms_b_s
-   , tmds_out_p      => tmds_p_o
-   , tmds_out_n      => tmds_n_o
+   , red_i           => tmds_r_s
+   , green_i         => tmds_g_s
+   , blue_i          => tmds_b_s
+   , tmds_out_p      => lvds_p_o
+   , tmds_out_n      => lvds_n_o
    );
 
-end architecture;
+end rtl;
