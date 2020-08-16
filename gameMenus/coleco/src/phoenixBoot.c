@@ -475,8 +475,9 @@ void startTitle() {
         // -                JR NZ,CINIT1
         {
             unsigned char *pDst = (unsigned char*)(*((volatile unsigned int*)0x8008)) + 2;
-            memset(pDst, 0, 10);
-            memset((void*)0x7307, 0, 20);
+            pDst &= 0xEFFF;		// map to 0x6000 range, in case it's at 0x7000
+            if (pDst) memset(pDst, 0, 10);
+            memset((void*)0x6307, 0, 20);
         }
 
         // This part just zeros a few fixed addresses
@@ -487,7 +488,7 @@ void startTitle() {
         // -                LD [S1_C0],A    (0x73f0)
         // -                LD [S1_C1],A    (0x73f1)
         // -                RET
-        memset((void*)0x73eb, 0, 6);
+        memset((void*)0x63eb, 0, 6);
 
         // -        Clear defer writes
         // -            LD A,FALSE
