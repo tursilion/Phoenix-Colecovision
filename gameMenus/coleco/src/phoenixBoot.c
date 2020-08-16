@@ -474,8 +474,8 @@ void startTitle() {
         // -                DEC B
         // -                JR NZ,CINIT1
         {
-            unsigned char *pDst = (unsigned char*)(*((volatile unsigned int*)0x8008)) + 2;
-            pDst &= 0xEFFF;		// map to 0x6000 range, in case it's at 0x7000
+			// we need 0x6xxx, cause that's where the Coleco RAM is
+            unsigned char *pDst = (unsigned char*)(((*((volatile unsigned int*)0x8008)) + 2)&0xEFFF);
             if (pDst) memset(pDst, 0, 10);
             memset((void*)0x6307, 0, 20);
         }
