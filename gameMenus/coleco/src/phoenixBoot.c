@@ -17,7 +17,8 @@
 #undef HEADERS__
 
 // - stored in the F18A code - actual value of the 0x32 register (so it changes in text mode)
-extern unsigned char useScanlines;     // takes in real time but we need it after a reset
+extern unsigned char useScanlines;    // takes in real time but we need it after a reset
+unsigned char usePattern=0;			// init ram with a pattern instead of all zeros
 unsigned char useFlicker=0;            // can't enable this until we start a cartridge
 unsigned char text_width=32;           // needed for the menu popup
 extern void inc_palette();
@@ -179,8 +180,8 @@ void waitVblanks(unsigned char cnt) {
 void cfgMenu() {
     unsigned char lastkey = 0xff;
     unsigned int pos = GIMAGE+8*40;
-    unsigned int onoff;
-    unsigned char de1 = 0, de2 = 0;
+    unsigned int onoff, mempat;
+    unsigned char de1 = 0, de2 = 0, de3 = 0;
 
     // if we're in gfx mode, then the logo is up, which means we don't
     // have a character set. Rather than rewrite everything for the bitmap
@@ -196,27 +197,29 @@ void cfgMenu() {
 		vdpmemread(GIMAGE+8*40, lineBuffer, 8*40);		// backup screen
 		vdpmemset(GIMAGE+8*40, ' ', 8*40);				// clear it
 	}
-
+	
     // We might be in gfx or text mode, so we'll just left-align, sort of
     pos += text_width+3;
     vdpmemcpy(pos, "PRESS:", 6);
     pos += text_width+2;
     vdpmemcpy(pos, "1 TOGGLE SCANLINES", 18);
     pos += text_width;
-    vdpmemcpy(pos, "2 TOGGLE FLICKER (   )", 22);
+    vdpmemcpy(pos, "2 TOGGLE FLICKER (OFF)", 22);
     onoff = pos+18;
+    pos += text_width;
+    vdpmemcpy(pos, "3 DRAM PATTERN (0000)", 21);
+    mempat = pos+18;
     pos += text_width + text_width;
     vdpmemcpy(pos, "9 EXIT MENU", 11);
 
     for (;;) {
 		waitVblanks(1);
-		if (useFlicker) {
-			vdpmemcpy(onoff, "ON ", 3);
-		} else {
-			vdpmemcpy(onoff, "OFF", 3);
-		}
+		vdpmemcpy(onoff, useFlicker? "ON ":"OFF", 3);
+		vdpmemcpy(mempat, usePattern?"FF":"00", 2);
+
 		if (de1) --de1;
 		if (de2) --de2;
+		if (de3) --de3;
 
         readkeypad();
         if (MY_KEY != lastkey) {
@@ -236,6 +239,12 @@ void cfgMenu() {
 					// toggle flicker and update display
 					useFlicker = !useFlicker;
 					de2 = 15;
+				}
+            } else if (lastkey == '3') {
+				if (de3 == 0) {
+					// toggle flicker and update display
+					usePattern = !usePattern;
+					de3 = 15;
 				}
             }
         }
@@ -434,9 +443,16 @@ void startTitle() {
 
     // Clear ram with an alternating pattern to simulate dram init
     // A real Coleco is far more random, but this should do for now
-    for (idx=0x6000; idx<0x6400; idx+=2) {
-		*((volatile unsigned int*)(idx)) = 0x00ff;
-    }
+    if (usePattern) {
+		for (idx=0x6000; idx<0x6400; idx+=2) {
+			*((volatile unsigned int*)(idx)) = 0x00ff;
+		}
+	} else {
+		// user opted for clear mem
+		for (idx=0x6000; idx<0x6400; idx+=2) {
+			*((volatile unsigned int*)(idx)) = 0x0;
+		}
+	}
 
     // -    prepare system as per original BIOS:
     // -        In test mode, it doesn't do ANYTHING, it just jumps to the cart immediately (must honor to avoid pointers)

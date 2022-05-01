@@ -139,13 +139,16 @@ clrup:
 ; stack has return, dest, src, count
 ; for LDIR, we need destination in DE, src in HL, and count in BC
 _memcpy::
-    ld hl,#2
-    add hl,sp
-    ld sp,hl    ; stack ponts at dest
+	push ix
+    ld ix,#4
+    add ix,sp	; ix points at dest
 
-    pop de      ; get dest
-    pop hl      ; get src
-    pop bc      ; get count
+	ld e,(ix)
+	ld d,1(ix)	; get dest
+	ld l,2(ix)
+	ld h,3(ix)	; get src
+	ld c,4(ix)
+	ld b,5(ix)	; get count
 
     ld a,c      ; check count for zero
     or a,b
@@ -154,10 +157,7 @@ _memcpy::
 	ldir
 
 $mcp1:
-    ld hl,#-8
-    add hl,sp
-    ld sp,hl
-
+	pop ix
 	ret
 
 ;-------------------------------------------------
@@ -165,14 +165,17 @@ $mcp1:
 ; void *memset(void *dest, unsigned int val, unsigned int count)
 ; stack has return, dest, val, count
 _memset::
-    ld hl,#2
-    add hl,sp
-    ld sp,hl    ; stack points at dest
+	push ix
+    ld ix,#4
+    add ix,sp	; stack points at dest
 
 ;:7: unsigned char *work = buf;
-    pop hl          ; hl = pointer
-    pop de          ; e = ch
-    pop bc          ; bc = count
+	ld l,(ix)
+	ld h,1(ix)		; hl = pointer
+	ld e,2(ix)
+;	ld d,3(ix)		; e = ch
+	ld c,4(ix)
+	ld b,5(ix)		; bc = count
 
 ;:9: while (cnt&0x03) {
 $0001:
@@ -222,10 +225,7 @@ $0006:
 ;	ld	l,4 (ix)
 ;	ld	h,5 (ix)
 
-    ld hl,#-8
-    add hl,sp
-    ld sp,hl
-
+	pop ix
 	ret
 
 ;-------------------------------------------------
@@ -234,15 +234,18 @@ $0006:
 ; stack has return, dest, src, count
 ; for LDIR/LDDR, we need destination in DE, src in HL, and count in BC
 _memmove::
-    ld hl,#2
-    add hl,sp
-    ld sp,hl    ; stack points at dest
+	push ix
+    ld ix,#4
+    add ix,sp	; stack points at dest
 
-    pop de       ; dest in de
-    pop hl       ; src in hl
-    pop bc       ; count in bc
+	ld e,(ix)
+	ld d,1(ix)	; dest in de
+	ld l,2(ix)
+	ld h,3(ix)	; src in hl
+	ld c,4(ix)
+	ld b,5(ix)	; count in bc
 
-    ld a,c       ; test bc for zero
+    ld a,c      ; test bc for zero
     or a,b
     jp Z,00109$
 
@@ -256,7 +259,7 @@ _memmove::
 00139$:
 	jp	P,00108$    ; change/check sign, jump if became positive... was negative (ie: not zero)
 
-	push hl         ; this will overwrite count, bc is our only copy!
+	push hl
     ld	a,c
 	add	a,l
 	ld	l,a
@@ -311,10 +314,7 @@ _memmove::
 ;	ld	l,4 (ix)
 ;	ld	h,5 (ix)
 	
-    ld hl,#-8
-    add hl,sp
-    ld sp,hl
-
+	pop ix
 	ret
 
 ;-------------------------------------------------

@@ -7,18 +7,19 @@ __asm
 ; for OTIR we need port in C, src in HL and count in B
 _vdpmemcpyfast::
 ; save regs
+	push ix
     push hl
     push bc
     push de
     push af
 
 ; point sp at pAddr
-    ld hl,#10
-    add hl,sp
-    ld sp,hl	; sp pointing at pAddr
+    ld ix,#12
+    add ix,sp	; ix pointing at pAddr
 
 ; set the VDP address
-	pop de		; sp pointing at pSrc
+	ld e,(ix)
+	ld d,1(ix)
 	ld a,e
 	out (_VDPWA),a
 	ld a,d
@@ -26,10 +27,12 @@ _vdpmemcpyfast::
 	out (_VDPWA),a
 	
 ; get source into hl
-	pop hl		; sp pointing at cnt
+	ld l,2(ix)
+	ld h,3(ix)
 
 ; get count into de
-	pop de		; sp above stack frame
+	ld e,4(ix)
+	ld d,5(ix)
 
 ; get port into c
     ld c,#_VDPWD
@@ -58,14 +61,11 @@ $0002:
 	
 ; restore the stack and return
 $0003:
-	ld hl,#-16	; pointing at af
-    add hl,sp
-    ld sp,hl
-
 	pop af
 	pop de
 	pop bc
 	pop hl
+	pop ix
 
 __endasm;
 }

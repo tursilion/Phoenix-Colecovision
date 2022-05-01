@@ -77,7 +77,7 @@ void prepare_f18a() {
     // code that touches useScanlines at that point.
     VDP_SET_REGISTER(0x32, useScanlines);
 
-    // wait for an interrupt (or, if VDPST2 is active, RUNNING to clear)
+    // wait for an interrupt
 	while (VDPST & 0x80) {
 		VDP_SAFE_DELAY();
 	}
@@ -93,7 +93,6 @@ void loadpal_f18a(const unsigned int *ptr, unsigned char cnt) {
 
 	while (cnt-- > 0) {
 		VDPWD = ptr[0]>>8;
-		// normally we would need a delay here, but not on the F18A
 		VDPWD = ptr[0]&0xff;
 		ptr++;
 	}

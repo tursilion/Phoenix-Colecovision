@@ -854,7 +854,6 @@ char getUserSelection() {
 
     // start the loop
     for (;;) {
-        unsigned char oldSelect;
         // if we lose the SD card, abort
         if (disk_status() == STA_NODISK) {
             return 0;
@@ -863,94 +862,72 @@ char getUserSelection() {
         // VDP vblank wait
         waitVblanks(1);
 
-        // so we can check if we moved
-        oldSelect = listSelect;
-
         // scan the joysticks (both work)
         readkeypad();
+        
+        if (MY_JOYX | MY_JOYY) {
+			undrawSelect();     // clear the highlight
+			
+			if (MY_JOYY == JOY_UP) {
+				if (listSelect > 0) {
+					--listSelect;       // count down
+					if (listSelect < listOffset) {
+						listOffset--;
+						return -1;      // request redraw
+					}
+				}
+			} else if (MY_JOYY == JOY_DOWN) {
+				if (listSelect < listSize-1) {
+					++listSelect;
+					if (listSelect > listOffset+23) {
+						listOffset++;
+						return -1;      // request redraw
+					}
+				}
+			} else if (MY_JOYX == JOY_RIGHT) {
+				if (listOffset+23 < listSize-1) {
+					// page ahead, restrict to 8-bits
+					unsigned char add = listSize-1-listOffset;
+					if (add < 24) {
+						listOffset += add;
+						listSelect = listOffset;
+					} else {
+						listOffset += 24;
+						listSelect += 24;
+					}
+					return -1;          // request redraw
+				} else {
+					listSelect = listSize-1;
+				}
+			} else if (MY_JOYX == JOY_LEFT) {
+				if (listOffset > 0) {
+					// page back, restrict to 8 bits
+					if (listOffset < 24) {
+						listOffset = 0;
+						listSelect = 0;
+					} else {
+						listOffset -=24;
+						listSelect -=24;
+					}
+					return -1;          // request redraw
+				} else {
+					listSelect = 0;
+				}
+			}
 
-        if (MY_JOYY == JOY_UP) {
-            if (listSelect > 0) {
-                undrawSelect();     // clear the highlight
-                --listSelect;       // count down
-                if (listSelect < listOffset) {
-                    listOffset--;
-                    return -1;      // request redraw
-                }
-                drawSelect();
-            }
-            waitRelease();
-            cntDown = BLANK_TIME;
-            continue;
-        }
-
-        if (MY_JOYY == JOY_DOWN) {
-            if (listSelect < listSize-1) {
-                undrawSelect();
-                ++listSelect;
-                if (listSelect > listOffset+23) {
-                    listOffset++;
-                    return -1;      // request redraw
-                }
-                drawSelect();
-            }
-            waitRelease();
-            cntDown = BLANK_TIME;
-            continue;
-        }
-
-        if (MY_JOYX == JOY_RIGHT) {
-            if (listOffset+23 < listSize-1) {
-                // page ahead, restrict to 8-bits
-                unsigned char add = listSize-1-listOffset;
-                if (add < 24) {
-                    listOffset += add;
-                    listSelect = listOffset;
-                } else {
-                    listOffset += 24;
-                    listSelect += 24;
-                }
-                return -1;          // request redraw
-            } else {
-                undrawSelect();
-                listSelect = listSize-1;
-                drawSelect();
-            }
-            waitRelease();
-            cntDown = BLANK_TIME;
-            continue;
-        }
-
-        if (MY_JOYX == JOY_LEFT) {
-            if (listOffset > 0) {
-                // page back, restrict to 8 bits
-                if (listOffset < 24) {
-                    listOffset = 0;
-                    listSelect = 0;
-                } else {
-                    listOffset -=24;
-                    listSelect -=24;
-                }
-                return -1;          // request redraw
-            } else {
-                undrawSelect();
-                listSelect = 0;
-                drawSelect();
-            }
-            waitRelease();
-            cntDown = BLANK_TIME;
-            continue;
-        }
+			drawSelect();
+			waitRelease();
+			cntDown = BLANK_TIME;
+			continue;
+		} else {
+            // no joystick move, so reset the auto-repeat
+            // a little hacky here, but it will work.
+            repeatTimeout = 45;
+		}
 
         // check fire button
         if (MY_KEY == JOY_FIRE) {
             return 1;   // selected
-        }
-
-        if (oldSelect == listSelect) {
-            // no joystick move, so reset the auto-repeat
-            // a little hacky here, but it will work.
-            repeatTimeout = 45;
         }
 
         // check if it's time to blank the screen
