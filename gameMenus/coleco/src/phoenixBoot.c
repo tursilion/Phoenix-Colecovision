@@ -194,8 +194,8 @@ void cfgMenu() {
         vdpmemcpy(GPATTERN+' '*8, &FATFONT[(' '-29)*8], ('X'-' '+1)*8);		// fix char set
         pos = GIMAGE+8*32;
     } else {
-		vdpmemread(GIMAGE+8*40, lineBuffer, 8*40);		// backup screen
-		vdpmemset(GIMAGE+8*40, ' ', 8*40);				// clear it
+		vdpmemread(GIMAGE+8*40, lineBuffer, 9*40);		// backup screen
+		vdpmemset(GIMAGE+8*40, ' ', 9*40);				// clear it
 	}
 	
     // We might be in gfx or text mode, so we'll just left-align, sort of
@@ -209,6 +209,8 @@ void cfgMenu() {
     pos += text_width;
     vdpmemcpy(pos, "3 DRAM PATTERN (0000)", 21);
     mempat = pos+18;
+    pos += text_width;
+    vdpmemcpy(pos, "0 SOFT RESET", 12);
     pos += text_width + text_width;
     vdpmemcpy(pos, "9 EXIT MENU", 11);
 
@@ -246,6 +248,9 @@ void cfgMenu() {
 					usePattern = !usePattern;
 					de3 = 15;
 				}
+            } else if (lastkey == '0') {
+                const void (*pf)() = 0;
+                pf();
             }
         }
     }
@@ -259,7 +264,7 @@ void cfgMenu() {
         unrle(GPATTERN, PAT0, SIZE_OF_PAT0RLE);		// reload character set
 		vdpmemcpy(GIMAGE+8*32, lineBuffer, 16*32);	// restore display
     } else {
-		vdpmemcpy(GIMAGE+8*40, lineBuffer, 8*40);	// restore display
+		vdpmemcpy(GIMAGE+8*40, lineBuffer, 9*40);	// restore display
     }
 }
 
