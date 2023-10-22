@@ -897,6 +897,11 @@ void runCartHeader() {
     startCartridge();
 }
 
+// we need to manually reset the AY, there's some kind of shadow register
+// bug on the volume and mixer regs
+volatile __sfr __at 0x50 AY_REGISTER;
+volatile __sfr __at 0x51 AY_DATA_WRITE;
+
 // This is where we start!
 void main() {
 	unsigned char x,idx;
@@ -906,8 +911,15 @@ void main() {
 
     // we expect VRAM to be cleared out
     vdpmemset(0, 0, 16384);
-
-    // I'm told we don't need to mute the AY or the SEX, and reset also turns off the SGM.
+    
+    // we were lied to, initialize the AY chip to avoid an error with software
+    // that doesn't fully initialize the AY chip. We can just zero the registers,
+    // that seems to be enough. (Just zeroing the volume registers fixes the observed
+    // bug in the pac-mappy clone)
+	for (x=0; x<16; ++x) {
+        AY_REGISTER=x;
+        AY_DATA_WRITE=0;
+    }
 
 	// we must do this first - in case the user was running F18A software
 	// and pressed reset, otherwise old settings will still be active.
