@@ -14,7 +14,7 @@ AS = "..\sdcc\bin\sdasz80"
 AR = "..\sdcc\bin\sdar"
 MB = "..\sdcc\bin\makebin"
 AFLAGS = -plosgff
-RM = del /F
+RM = cmd /c del /F
 EXT=rel
 
 # make sure the crt0 is first!
@@ -123,7 +123,7 @@ tursi: bios fatfs
 	"../parseMap.exe" phoenixBoot.map
 
 bios: $(MAIN_OBJS) fatfs f18a.h memset.h phoenix.h
-	$(RM) phoenixBoot.ihx
+	@$(RM) phoenixBoot.ihx
 	$(CC) -mz80 --no-std-crt0 --code-loc 0x0090 --data-loc 0x6400 -l../libti99coleco/libti99.a -lfatfs.a $(MAIN_OBJS) -o phoenixBoot.ihx
 
 fatfs: $(FAT_OBJS) fatFs/ff.h fatFs/ffconf.h fatFs/diskio.h
@@ -131,8 +131,8 @@ fatfs: $(FAT_OBJS) fatFs/ff.h fatFs/ffconf.h fatFs/diskio.h
 
 # Recipe to clean all compiled objects
 .phony clean:
-	$(RM) *.rel *.map *.lst *.lnk *.sym *.asm *~ *.o *.obj *.ihx *.rom *.rel *.a *.lib
-	$(RM) fatFs\*.rel fatFs\*.map fatFs\*.lst fatFs\*.lnk fatFs\*.sym fatFs\*.asm fatFs\*~ fatFs\*.o fatFs\*.obj fatFs\*.ihx fatFs\*.rom fatFs\*.rel fatFs\*.a fatFs\*.lib
+	@$(RM) *.rel *.map *.lst *.lnk *.sym *.asm *~ *.o *.obj *.ihx *.rom *.rel *.a *.lib
+	@$(RM) fatFs\*.rel fatFs\*.map fatFs\*.lst fatFs\*.lnk fatFs\*.sym fatFs\*.asm fatFs\*~ fatFs\*.o fatFs\*.obj fatFs\*.ihx fatFs\*.rom fatFs\*.rel fatFs\*.a fatFs\*.lib
 
 # Recipe to compile all C files
 %.rel: %.c

@@ -54,7 +54,7 @@ dummyIRQ:
     reti
     .db 0xff, 0xff, 0xff, 0xff, 0xff
 
-; Just some random noise to pad
+; Just some random noise to pad - this padding is required to line up the NMI
     .ascii 'Deae Lunae: Benedicite noctes decora..'
 
 nmi:

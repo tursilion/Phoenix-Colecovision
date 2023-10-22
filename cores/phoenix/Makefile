@@ -17,7 +17,7 @@ BIT2BIN := ../../Utils/bit2bin
 BIN2PHX := ../../Utils/bin2phx
 
 # Phoenix CV core revision.
-COREREV	:= 8
+COREREV	:= 9
 
 # Source bit-stream and output merged bit-stream directory.
 BMMDIR  := ../../rtl

@@ -270,6 +270,7 @@ void cfgMenu() {
 
 // wrapper for kscan that knows about our hot config keys and reads both sticks
 // this allows them to work at pretty much any time automatically
+extern unsigned char showExt;
 void readkeypad() {
     static unsigned char lastret = 0xff;
     static unsigned char inCfg = 0;
@@ -290,7 +291,12 @@ void readkeypad() {
         } else if (MY_KEY == '0') {
 			// toggle palette
 			inc_palette();
-		}
+		} else if (MY_KEY == '1') {
+            // toggle extensions
+            showExt = ! showExt;
+            // hacky return for getUserSelection to redraw
+            MY_JOYX = 0x80;
+        }
     }
 }
 
@@ -707,6 +713,9 @@ void startTitle() {
 
     // Don't use the stack or RAM variables anymore if we can help it. In particular there
     // are tables at 0x73b9 we mustn't mess with, or some carts will crash
+    // Using memcpy and a function call here does sort of violate that, but
+    // the trampoline will reset the stack pointer to the default anyway. it does mean
+    // carts could detect the traces of the trampoline in RAM... ;)
 
     // after the above, NMI interrupts are disabled
     // -    load init code to RAM and continue from there
@@ -716,7 +725,7 @@ void startTitle() {
     // -        LD HL,[0x800A]      2A800A
     // -        JP [HL]             E9
     memcpy((void*)0x6000, trampoline, sizeof(trampoline));
-    ((void(*)())0x6000)();  // never returns
+    ((void(*)())0x6000)();
 }
 
 // start a hardware cartridge
@@ -915,7 +924,7 @@ void main() {
     // we were lied to, initialize the AY chip to avoid an error with software
     // that doesn't fully initialize the AY chip. We can just zero the registers,
     // that seems to be enough. (Just zeroing the volume registers fixes the observed
-    // bug in the pac-mappy clone)
+    // bug in the test app)
 	for (x=0; x<16; ++x) {
         AY_REGISTER=x;
         AY_DATA_WRITE=0;

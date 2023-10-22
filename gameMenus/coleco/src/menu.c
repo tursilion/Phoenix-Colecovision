@@ -123,6 +123,9 @@ FIL fil;
 DIR dir;
 FILINFO finfo;
 
+// config
+unsigned char showExt = 0;
+
 // --- static data ---
 
 // foldername to search for - MUST be uppercase, no numbers or punctuation
@@ -164,7 +167,7 @@ const unsigned int MENU_INVERT[] = {
     0x0000,         // text
     0x0444,         // directory
     0x0eee,         // background
-    0x0ccc          // hilite
+    0x0aaa          // hilite
     // we don't need to define the rest
 };
 
@@ -222,6 +225,7 @@ void vdpStrOut(const char *p, unsigned char cnt) {
     ++cnt;  // account for pre-decrement so we stop at 0
     while ((*p >= ' ') && (--cnt)) {
         VDPWD = *(p++);
+        if ((*p=='.')&&(!showExt)) break;   // make sure we always show at least 1 character
     }
     if (cnt) {
         while (--cnt) {
@@ -368,7 +372,7 @@ repeatDir:
             memset(lastFilename, 0, 128);
             lastFilename[0]='.';
             lastFilename[1]='.';
-            lastFilename[127]=0;    // directory flag
+            //lastFilename[127]=0;    // directory flag (already done by the memset)
             lastFilename+=128;
         }
 
@@ -460,27 +464,27 @@ void drawTitles() {
     for (idx = listOffset; idx < listOffset+24; ++idx) {
         unsigned char *ptr;
 
+        // draw text attributes (will replace below if directory)
+        if (idx&1) {
+            vdpmemset(atvdp , (COLORTEXT<<4) | COLORLINE2, 40);
+        } else {
+            vdpmemset(atvdp , (COLORTEXT<<4) | COLORLINE1, 40);
+        }
+
         if (idx >= listSize) {
-            // draw a blank line with text attribute
-            if (idx&1) {
-                vdpmemset(atvdp , (COLORTEXT<<4) | COLORLINE2, 40);
-            } else {
-                vdpmemset(atvdp , (COLORTEXT<<4) | COLORLINE1, 40);
-            }
-            atvdp+=40;
             // write a blank line
             VDP_SET_ADDRESS_WRITE(vdp);
-            vdp+=40;
-            vdpStrOut("", 40);
+            vdpStrOut("", 40);  // to erase the line
             // dealing with unsigned char limit is faster here than
             // upscaling it to a 16-bit int
             if (idx == 0xff) {
                 idx--;      // so the loop doesn't wrap around
-                if (vdp == 24*40) break;
+                if (vdp == 23*40) break;
             }
         } else {
             ptr = sortedList[idx];
 
+            // a little hacky to redraw the attributes, but we are fighting for bytes of ROM here
             if (ptr[127] == 0) {
                 // change the attributes to include directory
                 if (idx&1) {
@@ -488,22 +492,15 @@ void drawTitles() {
                 } else {
                     vdpmemset(atvdp , (COLORDIRECTORY<<4) | COLORLINE1, 40);
                 }
-            } else {
-                // text attributes (we have to rewrite it in case it was previously a dir)
-                if (idx&1) {
-                    vdpmemset(atvdp , (COLORTEXT<<4) | COLORLINE2, 40);
-                } else {
-                    vdpmemset(atvdp , (COLORTEXT<<4) | COLORLINE1, 40);
-                }
             }
-            atvdp+=40;
 
             // this will stop at the directory flag byte or end of the line
             // TODO: we should scroll the currently selected title so long filenames are readable
             VDP_SET_ADDRESS_WRITE(vdp);
-            vdp+=40;
             vdpStrOut(ptr, 40);
         }
+        atvdp+=40;
+        vdp+=40;
     }
 }
 
@@ -868,6 +865,11 @@ char getUserSelection() {
         if (MY_JOYX | MY_JOYY) {
 			undrawSelect();     // clear the highlight
 			
+			if (MY_JOYX == 0x80) {
+                // special flag to indicate redraw without move
+                return -1;
+            }
+			
 			if (MY_JOYY == JOY_UP) {
 				if (listSelect > 0) {
 					--listSelect;       // count down
@@ -953,7 +955,6 @@ void inc_palette() {
 	if (currentPalette >= sizeof(MENU_COLOR_SETS)/sizeof(MENU_COLOR_SETS[0])) currentPalette = 0;
 	load_palette();
 }
-
 
 // run the menu itself
 // this function is long and uses gotos. Don't look if you're academic in nature :)
