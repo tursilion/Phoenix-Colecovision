@@ -1,3 +1,9 @@
+# Warning
+
+This repo is currently unofficial. The current build is in the sdcc4 branch. It does not merge into the public repo and at this time I haven't sorted out why. It runs on my version 1 Phoenix but I am the menu guy, I don't know what's different in the HDL on the version 2 Phoenix and don't yet have a build for that. Until that's sorted, I can't release this new version.
+
+The primary fix is to just initialize the AY sound chip. If you are writing software that supports the AY sound chip in the Super Game Module, please initialize the chip by muting all the registers before you start to use it. Otherwise you may get unexpected tones out of the Phoenix one with the current core. ;)
+
 # Phoenix
 
 The Phoenix is an FPGA-based game system with several retro game system cores, most notably the ColecoVision game console and the Atari 2600.  The files here are the open source HDL for the system.
