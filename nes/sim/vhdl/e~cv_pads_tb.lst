@@ -1,0 +1,16 @@
+>/tmp/claude-1000/-mnt-d-work-phoenix-repo-collectorvision-game-system/1bb82dc5-3a1e-436f-b77b-b1773d2264c6/scratchpad/tools/oss-cad-suite/lib/ghdl/std/v08/
+../../src/std/v08/textio.vhdl
+>/tmp/claude-1000/-mnt-d-work-phoenix-repo-collectorvision-game-system/1bb82dc5-3a1e-436f-b77b-b1773d2264c6/scratchpad/tools/oss-cad-suite/lib/ghdl/std/v08/
+../../src/std/v08/textio-body.vhdl
+>/tmp/claude-1000/-mnt-d-work-phoenix-repo-collectorvision-game-system/1bb82dc5-3a1e-436f-b77b-b1773d2264c6/scratchpad/tools/oss-cad-suite/lib/ghdl/ieee/v08/
+../../src/ieee2008/std_logic_1164.vhdl
+>/tmp/claude-1000/-mnt-d-work-phoenix-repo-collectorvision-game-system/1bb82dc5-3a1e-436f-b77b-b1773d2264c6/scratchpad/tools/oss-cad-suite/lib/ghdl/ieee/v08/
+../../src/ieee2008/std_logic_1164-body.vhdl
+>/tmp/claude-1000/-mnt-d-work-phoenix-repo-collectorvision-game-system/1bb82dc5-3a1e-436f-b77b-b1773d2264c6/scratchpad/ghdl_pads/
+cv_pads_tb.vhd
+>/tmp/claude-1000/-mnt-d-work-phoenix-repo-collectorvision-game-system/1bb82dc5-3a1e-436f-b77b-b1773d2264c6/scratchpad/tools/oss-cad-suite/lib/ghdl/ieee/v08/
+../../src/ieee2008/numeric_std.vhdl
+>/tmp/claude-1000/-mnt-d-work-phoenix-repo-collectorvision-game-system/1bb82dc5-3a1e-436f-b77b-b1773d2264c6/scratchpad/tools/oss-cad-suite/lib/ghdl/ieee/v08/
+../../src/ieee2008/numeric_std-body.vhdl
+>/tmp/claude-1000/-mnt-d-work-phoenix-repo-collectorvision-game-system/1bb82dc5-3a1e-436f-b77b-b1773d2264c6/scratchpad/ghdl_pads/
+../../rtl/cv_pads.vhd

@@ -1,0 +1,7 @@
+Vendored from https://github.com/strigeus/fpganes
+Upstream commit: bb36b11 (2025-08-08)
+License: GPLv2 (see LICENSE)
+
+Files copied unmodified except where a "PHOENIX:" comment marks a change.
+Not copied (Nexys4 board-specific): NES_Nexys4.v, vga.v, hq2x.v, dsp.v,
+hw_led.v, hw_sound.v, hw_uart.v, clk_wiz_v3_6.v, Nexys4_Master.ucf, loader/.

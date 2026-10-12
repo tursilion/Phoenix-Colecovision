@@ -1,0 +1,326 @@
+ASxxxx Linker V03.00 + NoICE + sdld,  page 1.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+.  .ABS.                            00000000    00000000 =           0. bytes (ABS,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     00000000  .__.ABS.                           diskio_diskioctl
+     00000000  l__CABS                         
+     00000000  l__DABS                         
+     00000000  l__HEADER                       
+     00000000  l__HEAP                         
+     00000000  s__CABS                         
+     00000000  s__DABS                         
+     00000000  s__HEADER                       
+     00000000  s__HEADER0                      
+     00000001  l__BSS                          
+     00000001  l__GSFINAL                      
+     00000005  l__INITIALIZED                  
+     00000005  l__INITIALIZER                  
+     00000010  l__GSINIT                       
+     00000088  l__HEADER0                      
+     00000090  s__CODE                         
+     000001FE  l__HOME                         
+     000006A3  l__DATA                         
+     00005A63  l__CODE                         
+     00005AF3  s__HOME                         
+     00005CF1  s__INITIALIZER                  
+     00005CF6  s__GSINIT                       
+     00005D06  s__GSFINAL                      
+     00007000  s__DATA                         
+     000076A3  s__BSS                          
+     000076A4  s__HEAP                         
+     000076A4  s__INITIALIZED                  
+ASxxxx Linker V03.00 + NoICE + sdld,  page 2.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+_CODE                               00000090    00005A63 =       23139. bytes (REL,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     000000AE  _memcpy                            crt0
+     000000C2  _memset                            crt0
+     000000F0  _memmove                           crt0
+     0000012C  _my_set_graphics                   dumperbios
+     00000196  _dly_50us                          dumperbios
+     000001AE  _waitVblanks                       dumperbios
+     000001D5  _waitSDCard                        dumperbios
+     000001F3  _unrle                             dumperbios
+     0000029F  _readkeypad                        dumperbios
+     000002B9  _textout                           dumperbios
+     000002FB  _centerString                      dumperbios
+     00000369  _clrscr                            dumperbios
+     0000037A  _makeFilename                      dumperbios
+     00000436  _displayAddress                    dumperbios
+     000004E0  _dump32k                           dumperbios
+     0000063D  _dumpMegacart                      dumperbios
+     000008CB  _dumpSgm                           dumperbios
+     00000A1B  _main                              dumperbios
+     00000D10  _unlock_f18a                       f18a
+     00000D21  _DEFAULT_PALETTE                   f18a
+     00000D41  _GPUTEST                           f18a
+     00000D4D  _reset_f18a                        f18a
+     00000D56  _lock_f18a                         f18a
+     00000D5F  _prepare_f18a                      f18a
+     00000D9A  _test_f18a                         f18a
+     00000DE9  _loadpal_f18a                      f18a
+     00000E28  _FATFONT                           mattfont
+     00001118  _DONTCOPY                          dontcopy
+     00001886  _DONTCOPYMAP                       dontcopymap
+     00001A0A  _dummyfunc                         vdp_memcpyfast
+     00001A0A  _vdpmemcpyfast                     vdp_memcpyfast
+     00001A3C  _my_nmi                            vdp_ints
+     00001A58  _setUserIntHook                    vdp_ints
+     00001A69  _clearUserIntHook                  vdp_ints
+     00001A70  _vdpinit                           vdp_ints
+     00001AAA  _disk_status                       diskio_diskstatus
+     00001ABA  _f_write                           ff_fwrite
+     00002117  _disk_write                        diskio_diskwrite
+     0000221F  _f_open                            ff_fopen
+     000027A7  _f_mount                           ff_fmount
+     000027EB  _joystfast                         joystfast
+     00002843  _send_cmd                          diskio_sendcmd
+     00002991  _kscanfast                         kscanfast
+     000029E8  _keys                              kscanfast
+     000029F8  _select                            diskio_select
+     00002A20  _dir_register                      ff_dirregister
+     00002ACA  _xmit_datablock                    diskio_xmitdatablock
+     00002B38  _disk_initialize                   diskio_diskinit
+     00002CCE  _deselect                          diskio_dselect
+     00002CE4  ___sdcc_call_hl                    
+ASxxxx Linker V03.00 + NoICE + sdld,  page 3.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+_CODE                               00000090    00005A63 =       23139. bytes (REL,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     00002CE5  _validate                          ff_validate
+     00002D5C  _ld_dword                          ff_lddword
+     00002E1D  _ExCvt                             ff_vars
+     00002E9D  _vdpmemset                         vdp_memset
+     00002EBF  _create_chain                      ff_createchain
+     0000338E  _clst2sect                         ff_clst2sect
+     00003448  _find_volume                       ff_findvolume
+     00003E9C  ___sdcc_enter_ix                   
+     00003EA6  _rcvr_mmc                          diskio_rcvrmmc
+     00003EA6  _rcvr_mmc_dummy                    diskio_rcvrmmc
+     00003ECF  _ld_clust                          ff_ldclust
+     00003F60  _get_fat                           ff_getfat
+     0000410C  _f_close                           ff_fclose
+     0000413E  _xmit_mmc                          diskio_xmitmmc
+     00004153  _follow_path                       ff_followpath
+     0000427E  _st_dword                          ff_stdword
+     00004303  _disk_read                         diskio_diskread
+     000043C9  _dir_alloc                         ff_diralloc
+     000044AC  _wait_ready                        diskio_waitready
+     000044E8  _move_window                       ff_movewindow
+     00004586  _remove_chain                      ff_removechain
+     0000476D  _st_clust                          ff_stclust
+     000047C4  _put_fat                           ff_putfat
+     0000499A  _sync_window                       ff_syncwindow
+     00004AB0  _create_name                       ff_createname
+     00004C66  _check_fs                          ff_checkfs
+     00004D30  __mulint                           
+     00004D38  __mul16                            
+     00004D4C  _dir_find                          ff_dirfind
+     00004E1F  _rcvr_datablock                    diskio_rcvrdatablock
+     00004E86  _st_word                           ff_stword
+     00004EB1  _f_sync                            ff_fsync
+     00005024  _chk_chr                           ff_chkchr
+     0000504A  _dir_next                          ff_dirnext
+     000053A1  _mem_cmp                           ff_memcmp
+     000053F0  _dir_sdi                           ff_dirsdi
+     00005718  _dir_clear                         ff_dirclear
+     00005813  _sync_fs                           ff_syncfs
+     0000594D  _disk_ioctl                        diskio_diskioctl
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 4.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+_HEADER0                            00000000    00000088 =         136. bytes (ABS,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+ASxxxx Linker V03.00 + NoICE + sdld,  page 5.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+_HOME                               00005AF3    000001FE =         510. bytes (REL,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     00005AF3  __mullong                          _mullong
+     00005C71  __divulong                         _divulong
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 6.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+_INITIALIZER                        00005CF1    00000005 =           5. bytes (REL,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+ASxxxx Linker V03.00 + NoICE + sdld,  page 7.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+_GSINIT                             00005CF6    00000010 =          16. bytes (REL,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     00005CF6  gsinit                             crt0
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 8.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+_GSFINAL                            00005D06    00000001 =           1. bytes (REL,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+ASxxxx Linker V03.00 + NoICE + sdld,  page 9.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+_DATA                               00007000    000006A3 =        1699. bytes (REL,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     00007000  _fatFs                             dumperbios
+     0000722E  _fil                               dumperbios
+     00007450  _dir                               dumperbios
+     00007478  _finfo                             dumperbios
+     0000748E  _path                              dumperbios
+     0000768E  _adr                               dumperbios
+     00007697  _f18a                              dumperbios
+     00007698  _KSCAN_KEY                         joystfast
+     00007699  _KSCAN_JOYY                        joystfast
+     0000769A  _KSCAN_JOYX                        joystfast
+     0000769B  _KSCAN_STATUS                      joystfast
+     0000769C  _csHigh                            diskio_diskinit
+     0000769D  _csLow                             diskio_diskinit
+     0000769E  _CardType                          diskio_diskinit
+     0000769F  _FatFs                             ff_vars
+     000076A1  _Fsid                              ff_vars
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 10.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+_BSS                                000076A3    00000001 =           1. bytes (REL,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     000076A3  _vdpLimi                           crt0
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 11.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+_INITIALIZED                        000076A4    00000005 =           5. bytes (REL,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     000076A4  _VDP_STATUS_MIRROR                 vdp_ints
+     000076A7  _VDP_INT_COUNTER                   vdp_ints
+     000076A8  _Stat                              diskio_diskinit
+ASxxxx Linker V03.00 + NoICE + sdld,  page 12.
+
+Files Linked                              [ module(s) ]
+
+crt0_bios.rel                             [ crt0 ]
+dumperbios.rel                            [ dumperbios ]
+f18a.rel                                  [ f18a ]
+mattfont.rel                              [ mattfont ]
+dontcopy.rel                              [ dontcopy ]
+dontcopymap.rel                           [ dontcopymap ]
+vdp_memcpyfast.rel                        [ vdp_memcpyfast ]
+
+
+Libraries Linked                          [ object file ]
+
+../libti99coleco/libti99.a                [ vdp_ints ]
+fatfs.a                                   [ diskio_diskstatus ]
+fatfs.a                                   [ ff_fwrite ]
+fatfs.a                                   [ diskio_diskwrite ]
+fatfs.a                                   [ ff_fopen ]
+fatfs.a                                   [ ff_fmount ]
+../libti99coleco/libti99.a                [ joystfast ]
+fatfs.a                                   [ diskio_sendcmd ]
+../libti99coleco/libti99.a                [ kscanfast ]
+fatfs.a                                   [ diskio_select ]
+fatfs.a                                   [ ff_dirregister ]
+fatfs.a                                   [ diskio_xmitdatablock ]
+fatfs.a                                   [ diskio_diskinit ]
+fatfs.a                                   [ diskio_dselect ]
+c:/program files/sdcc/bin\..\lib\z80\z80.lib
+                                          [ __sdcc_call_hl.rel ]
+fatfs.a                                   [ ff_validate ]
+fatfs.a                                   [ ff_lddword ]
+fatfs.a                                   [ ff_vars ]
+../libti99coleco/libti99.a                [ vdp_memset ]
+fatfs.a                                   [ ff_createchain ]
+fatfs.a                                   [ ff_clst2sect ]
+fatfs.a                                   [ ff_findvolume ]
+c:/program files/sdcc/bin\..\lib\z80\z80.lib
+                                          [ crtenter.rel ]
+fatfs.a                                   [ diskio_rcvrmmc ]
+fatfs.a                                   [ ff_ldclust ]
+fatfs.a                                   [ ff_getfat ]
+fatfs.a                                   [ ff_fclose ]
+c:/program files/sdcc/bin\..\lib\z80\z80.lib
+                                          [ _mullong.rel ]
+fatfs.a                                   [ diskio_xmitmmc ]
+fatfs.a                                   [ ff_followpath ]
+fatfs.a                                   [ ff_stdword ]
+fatfs.a                                   [ diskio_diskread ]
+fatfs.a                                   [ ff_diralloc ]
+fatfs.a                                   [ diskio_waitready ]
+fatfs.a                                   [ ff_movewindow ]
+fatfs.a                                   [ ff_removechain ]
+fatfs.a                                   [ ff_stclust ]
+fatfs.a                                   [ ff_putfat ]
+fatfs.a                                   [ ff_syncwindow ]
+fatfs.a                                   [ ff_createname ]
+fatfs.a                                   [ ff_checkfs ]
+c:/program files/sdcc/bin\..\lib\z80\z80.lib
+                                          [ mul.rel ]
+fatfs.a                                   [ ff_dirfind ]
+fatfs.a                                   [ diskio_rcvrdatablock ]
+fatfs.a                                   [ ff_stword ]
+fatfs.a                                   [ ff_fsync ]
+c:/program files/sdcc/bin\..\lib\z80\z80.lib
+                                          [ _divulong.rel ]
+fatfs.a                                   [ ff_chkchr ]
+fatfs.a                                   [ ff_dirnext ]
+fatfs.a                                   [ ff_memcmp ]
+fatfs.a                                   [ ff_dirsdi ]
+fatfs.a                                   [ ff_dirclear ]
+fatfs.a                                   [ ff_syncfs ]
+fatfs.a                                   [ diskio_diskioctl ]
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 13.
+
+User Base Address Definitions
+
+_CODE = 0x0090
+_DATA = 0x7000
+
+

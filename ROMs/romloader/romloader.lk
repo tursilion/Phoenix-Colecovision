@@ -1,0 +1,10 @@
+-mjwx
+-i romloader.ihx
+-b _CODE = 0x0100
+-b _DATA = 0x6000
+-k c:\Program Files\SDCC\bin\..\lib\z80
+-l z80
+obj/crt0.rel
+obj/main.rel
+
+-e

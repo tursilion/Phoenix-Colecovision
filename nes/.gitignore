@@ -1,0 +1,16 @@
+# loader build
+loader/nes_boot.bin
+loader/nes_boot.map
+loader/*.o
+loader/pff/*.o
+
+# simulation
+sim/obj_dir/
+sim/*.img
+sim/*.ppm
+sim/*.png
+sim/oam_palette.txt
+
+# ISE build (everything but the Makefile)
+build/*
+!build/Makefile

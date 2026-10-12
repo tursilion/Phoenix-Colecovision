@@ -1,0 +1,806 @@
+clrmamepro (
+	name "Coleco ColecoVision - Commercial Games"
+	description "Coleco ColecoVision - Commercial Games (TOSEC-v2014-08-16)"
+	category "Coleco ColecoVision - Commercial Games"
+	version 2014-08-16
+	author "Ikrananka"
+)
+
+game (
+	name "2010 - The Graphic Action Game (1984)(Coleco)"
+	description "2010 - The Graphic Action Game (1984)(Coleco)"
+	rom ( name "2010 - The Graphic Action Game (1984)(Coleco).bin" size 32768 crc c575a831 md5 0dfb83c1353481d297dfcc6123978533 sha1 b1621d39a2a6d1cda7eceb882a612a4baf3da70c )
+)
+
+game (
+	name "Alcazar - The Forgotten Fortress (1985)(Telegames)"
+	description "Alcazar - The Forgotten Fortress (1985)(Telegames)"
+	rom ( name "Alcazar - The Forgotten Fortress (1985)(Telegames).bin" size 16384 crc fce3aa06 md5 803914bbde6822ebf113d5b1d1cf7011 sha1 c3a820e6a73ef42dc88982d835c60c36b4b9505f )
+)
+
+game (
+	name "Antarctic Adventure (1984)(Coleco)"
+	description "Antarctic Adventure (1984)(Coleco)"
+	rom ( name "Antarctic Adventure (1984)(Coleco).bin" size 16384 crc 275c800e md5 1ea45edc04bc4df444a38e50f8a75d5d sha1 00db7cf9bd66aecac3d9368dd205680781b2e542 )
+)
+
+game (
+	name "Aquattack (1984)(Interphase)"
+	description "Aquattack (1984)(Interphase)"
+	rom ( name "Aquattack (1984)(Interphase).bin" size 16384 crc 947437ec md5 c152cd482635307598c465dfc3c97c54 sha1 4782f1d6225d9b6501a9ab1ab72f9e66f3ff66d8 )
+)
+
+game (
+	name "Artillery Duel (1983)(Xonox)"
+	description "Artillery Duel (1983)(Xonox)"
+	rom ( name "Artillery Duel (1983)(Xonox).bin" size 16384 crc 6f88fcf0 md5 fabbbf6dfcb0628fa33b476750a492f8 sha1 a2494b1ade772fe45779bd500139ff847dfe7afa )
+)
+
+game (
+	name "BC's Quest for Tires (1983)(Sierra On-Line)"
+	description "BC's Quest for Tires (1983)(Sierra On-Line)"
+	rom ( name "BC's Quest for Tires (1983)(Sierra On-Line).bin" size 16384 crc 4359a3e5 md5 737c5247b06a7af4f9c59f46791f3bc2 sha1 683973d7e24cb0383132acf2562d3ebef739018f )
+)
+
+game (
+	name "BC's Quest for Tires (1983)(Coleco Canada)"
+	description "BC's Quest for Tires (1983)(Coleco Canada)"
+	rom ( name "BC's Quest for Tires (1983)(Coleco Canada).bin" size 16384 crc 0ae39f2c md5 a1fa161de97e6084691f3bc6f5f46f55 sha1 05ffcf0c84381fa26f504cb163b25a8670c6c4ac )
+)
+
+game (
+	name "BC's Quest for Tires II - Grog's Revenge (1984)(Coleco)"
+	description "BC's Quest for Tires II - Grog's Revenge (1984)(Coleco)"
+	rom ( name "BC's Quest for Tires II - Grog's Revenge (1984)(Coleco).bin" size 24576 crc d464e5e4 md5 a67908b20a85451a47154bdbcf0cd4fd sha1 57b145e2b88e29c6284754d3da16e1cffbab38a5 )
+)
+
+game (
+	name "BC's Quest for Tires II - Grog's Revenge (1984)(Coleco Canada)"
+	description "BC's Quest for Tires II - Grog's Revenge (1984)(Coleco Canada)"
+	rom ( name "BC's Quest for Tires II - Grog's Revenge (1984)(Coleco Canada).bin" size 24576 crc 1ca853d5 md5 dcc316df4898d4836c1e430692fd9fd5 sha1 6c7c8cd782eb5a27dc5224679d4563978cb3280c )
+)
+
+game (
+	name "Beamrider (1983)(Activision)"
+	description "Beamrider (1983)(Activision)"
+	rom ( name "Beamrider (1983)(Activision).bin" size 16384 crc 7a93c6e5 md5 b3949ef4ab2b65224d5011c49b755d96 sha1 9e18d51855b721298cc4efad0786df65e8ed6fd7 )
+)
+
+game (
+	name "Blockade Runner (1984)(Interphase)"
+	description "Blockade Runner (1984)(Interphase)"
+	rom ( name "Blockade Runner (1984)(Interphase).bin" size 16384 crc df65fc87 md5 93d5326c54f1a92a18e843838aee441f sha1 28fc9bf517bce3d901c61d6fd1e297d2af421c70 )
+)
+
+game (
+	name "Boulder Dash (1987)(Telegames)"
+	description "Boulder Dash (1987)(Telegames)"
+	rom ( name "Boulder Dash (1987)(Telegames).bin" size 16384 crc 9b547ba8 md5 ff055f329760980900bbe2f973a9ece6 sha1 bad7a976f37df875f4fa9646e5426c45344ec102 )
+)
+
+game (
+	name "Buck Rogers - Planet of Zoom (1983)(Coleco)"
+	description "Buck Rogers - Planet of Zoom (1983)(Coleco)"
+	rom ( name "Buck Rogers - Planet of Zoom (1983)(Coleco).bin" size 24576 crc 00b37475 md5 d032d6e0a34d427f7885e88d308f8d92 sha1 2e1fa3bc105b0fd8d10a5195fed63b9cb2773444 )
+)
+
+game (
+	name "Bump 'n' Jump (1984)(Coleco)"
+	description "Bump 'n' Jump (1984)(Coleco)"
+	rom ( name "Bump 'n' Jump (1984)(Coleco).bin" size 20480 crc 9e1fab59 md5 d365cf7b774679842a9f99953b97ab0a sha1 8df20c9c151b01b0d859c0ab4753d5cce3956224 )
+)
+
+game (
+	name "Burgertime (1984)(Coleco)"
+	description "Burgertime (1984)(Coleco)"
+	rom ( name "Burgertime (1984)(Coleco).bin" size 16384 crc 91346341 md5 927ce5ba5bf3e0f6c8c5a115db51f264 sha1 6ebf0d23f2d7cf60897ba6fe13b2293421c0a589 )
+)
+
+game (
+	name "Cabbage Patch Kids - Adventures in the Park (1984)(Coleco)"
+	description "Cabbage Patch Kids - Adventures in the Park (1984)(Coleco)"
+	rom ( name "Cabbage Patch Kids - Adventures in the Park (1984)(Coleco).bin" size 16384 crc 6af19e75 md5 6f612e24b83a98096b67aaf6bb9083a3 sha1 ca240633ec6ecf732cbc28c9394459a722d6edcb )
+)
+
+game (
+	name "Campaign '84 (1983)(Sunrise Software)"
+	description "Campaign '84 (1983)(Sunrise Software)"
+	rom ( name "Campaign '84 (1983)(Sunrise Software).bin" size 16384 crc 5aa22d66 md5 a7f6a6bd45c7ebfc7f8fc0f11eeea000 sha1 2e08245802c4c5aa87774ad3740fd56ac5b25bd1 )
+)
+
+game (
+	name "Carnival (1982)(Coleco)"
+	description "Carnival (1982)(Coleco)"
+	rom ( name "Carnival (1982)(Coleco).bin" size 16384 crc 70f315c2 md5 f44e87fd71785824ac2ffb9927337886 sha1 d4f34382d43897774101e3620384a402dd3d2ec1 )
+)
+
+game (
+	name "Centipede (1983)(Atarisoft)"
+	description "Centipede (1983)(Atarisoft)"
+	rom ( name "Centipede (1983)(Atarisoft).bin" size 16384 crc 17edbfd4 md5 25ef922aa95b246d6894f5c4c5b29c97 sha1 d89c49bbbf002e075c5964ca74d7c94a502740ff )
+)
+
+game (
+	name "Choplifter! (1984)(Coleco)"
+	description "Choplifter! (1984)(Coleco)"
+	rom ( name "Choplifter! (1984)(Coleco).bin" size 16384 crc 030e0d48 md5 b3719118e9cfcc1234cd01c1e3fb84cf sha1 3a7e5ea50495a666bac8df0b3b2c82b5be65ad18 )
+)
+
+game (
+	name "Chuck Norris Superkicks (1983)(Xonox)"
+	description "Chuck Norris Superkicks (1983)(Xonox)"
+	rom ( name "Chuck Norris Superkicks (1983)(Xonox).bin" size 16384 crc 5eeb81de md5 5a539c992ec8040b914098d0a9b23d09 sha1 e9ccabc76be96279b322586f5a569d7fe3b0fa25 )
+)
+
+game (
+	name "Congo Bongo (1984)(Coleco)"
+	description "Congo Bongo (1984)(Coleco)"
+	rom ( name "Congo Bongo (1984)(Coleco).bin" size 24576 crc 4e8b4c1d md5 1e5dc0f3a8b974b20340bdf8593b309b sha1 4ad44dbf2651415f68c5e82289ecbc0122c51a19 )
+)
+
+game (
+	name "Cosmic Avenger (1982)(Coleco)"
+	description "Cosmic Avenger (1982)(Coleco)"
+	rom ( name "Cosmic Avenger (1982)(Coleco).bin" size 16384 crc 39d4215b md5 cfbd4a478e7019422c306837444d2e46 sha1 c8c2a70d3eab8a68ab1db04e766a6c70f02f02ca )
+)
+
+game (
+	name "Cosmic Crisis (1983)(Bit Corp.)(EU)"
+	description "Cosmic Crisis (1983)(Bit Corp.)(EU)"
+	rom ( name "Cosmic Crisis (1983)(Bit Corp.)(EU).bin" size 16384 crc 7c2c7c41 md5 3ae1ddd596faaced37274dd407d5523c sha1 081a40414021a51b3219e8957e948163680a9ada )
+)
+
+game (
+	name "Dam Busters, The (1984)(Coleco)"
+	description "Dam Busters, The (1984)(Coleco)"
+	rom ( name "Dam Busters, The (1984)(Coleco).bin" size 32768 crc 890682b3 md5 d6e826d832e13c13073dfba3b26d899e sha1 84b3631078575c5fd490426271b7fc5941d38fc3 )
+)
+
+game (
+	name "Dam Busters, The (1984)(Coleco Canada)"
+	description "Dam Busters, The (1984)(Coleco Canada)"
+	rom ( name "Dam Busters, The (1984)(Coleco Canada).bin" size 32768 crc c75fad5a3 md5 dd01108c4b4a62d64b2da39424896b6a sha1 bcb8c003a5c8acdf62105c15d25163dff017d6c3 )
+)
+
+game (
+	name "Decathlon (1983)(Activision)"
+	description "Decathlon (1983)(Activision)"
+	rom ( name "Decathlon (1983)(Activision).bin" size 16384 crc 51fe49c8 md5 db88c443599a57c1f436f146b632caa7 sha1 b011b213bd86317a4a06b565d3c193a562f67c84 )
+)
+
+game (
+	name "Defender (1983)(Atarisoft)"
+	description "Defender (1983)(Atarisoft)"
+	rom ( name "Defender (1983)(Atarisoft).bin" size 24576 crc 6cf594e5 md5 00123e08f138b7094601ea8d13d5336d sha1 12b1fb517d8f7308d18f355e0c54796e4b5225a0 )
+)
+
+game (
+	name "Defender (1983)(Atarisoft)[f PAL & ADAM]"
+	description "Defender (1983)(Atarisoft)[f PAL & ADAM]"
+	rom ( name "Defender (1983)(Atarisoft)[f PAL & ADAM].bin" size 24576 crc 46a909cc md5 ad5000952034853819769ce22b9cf788 sha1 6a640c652378950f4f0b95e38cb1e4ba003e3f3a )
+)
+
+game (
+	name "Destructor (1984)(Coleco)"
+	description "Destructor (1984)(Coleco)"
+	rom ( name "Destructor (1984)(Coleco).bin" size 32768 crc 56c358a6 md5 ec72a0e3bebe07ba631a8dcb750c1591 sha1 35283c51f448d877625049266c0c4687bf57ab42 )
+)
+
+game (
+	name "Donkey Kong (1982)(Coleco)[24K]"
+	description "Donkey Kong (1982)(Coleco)[24K]"
+	rom ( name "Donkey Kong (1982)(Coleco)[24K].bin" size 24576 crc 94c4cd4a md5 8c61804e1ad57ef3d415d1ba11395507 sha1 795a63360e71e3a51317f108f504b21f5b11c3c9 )
+)
+
+game (
+	name "Donkey Kong (1983)(Coleco)[16K]"
+	description "Donkey Kong (1983)(Coleco)[16K]"
+	rom ( name "Donkey Kong (1983)(Coleco)[16K].bin" size 16384 crc 3c77198c md5 613a3e457758e274a0e0819ff6aa2d43 sha1 46b7aa1cedac273f2b96bad4a0768554733972bf )
+)
+
+game (
+	name "Donkey Kong Junior (1983)(Coleco)"
+	description "Donkey Kong Junior (1983)(Coleco)"
+	rom ( name "Donkey Kong Junior (1983)(Coleco).bin" size 16384 crc fd11508d md5 1eb2b9c2d1d113f3860f345a07baeb42 sha1 113c1ead67b2679ddad9b99506e801526245af05 )
+)
+
+game (
+	name "DragonFire (1984)(Imagic)"
+	description "DragonFire (1984)(Imagic)"
+	rom ( name "DragonFire (1984)(Imagic).bin" size 16384 crc dcb8f9e8 md5 37c56fabd85c91f365bf2f1152f59081 sha1 b623a970164d9739c0135d0cf37f9f0b3c67b17c )
+)
+
+game (
+	name "Dukes of Hazzard, The (1984)(Coleco)"
+	description "Dukes of Hazzard, The (1984)(Coleco)"
+	rom ( name "Dukes of Hazzard, The (1984)(Coleco).bin" size 32768 crc 4025ac94 md5 dbd4f21702be17775e84b2fb6c534c94 sha1 162c7ad3266e02aa88983fa4ece7a77bc1cb9c7a )
+)
+
+game (
+	name "Evolution (1983)(Coleco Canada)"
+	description "Evolution (1983)(Coleco Canada)"
+	rom ( name "Evolution (1983)(Coleco Canada).bin" size 16384 crc 4cd4e185 md5 627d22dce35311aae18b0c085f1a3b21 sha1 5c775dd65722be72436d0b6dd99bd0143c938b33 )
+)
+
+game (
+	name "Evolution (198x)(Telegames)"
+	description "Evolution (198x)(Telegames)"
+	rom ( name "Evolution (198x)(Telegames).bin" size 16384 crc 4c933007 md5 e0d1ff37974fa017a6c78c174925643a sha1 809befaad2bb341241d58fcd4e0409d690e4b6ce )
+)
+
+game (
+	name "Fathom (1983)(Imagic)"
+	description "Fathom (1983)(Imagic)"
+	rom ( name "Fathom (1983)(Imagic).bin" size 16384 crc b3b767ae md5 43d37801db445b5411488ac399bbc20c sha1 145d1758347306e36a8039671a1088841bccaad5 )
+)
+
+game (
+	name "Flipper Slipper (1983)(Spectravideo)"
+	description "Flipper Slipper (1983)(Spectravideo)"
+	rom ( name "Flipper Slipper (1983)(Spectravideo).bin" size 16384 crc 2a49f507 md5 9cd9153748b24d0b5fd877686a3e5c67 sha1 e78e370fc7b3138010606f2eb9db1ea40fc37c5c )
+)
+
+game (
+	name "Flipper Slipper (198x)(Telegames)"
+	description "Flipper Slipper (198x)(Telegames)"
+	rom ( name "Flipper Slipper (198x)(Telegames).bin" size 16384 crc 9788bca7 md5 92771526eeb3814178c5c36d7babb934 sha1 65b532fe1f0d249e97117580638083731e1ff767 )
+)
+
+game (
+	name "Frantic Freddy (1983)(Spectravideo)"
+	description "Frantic Freddy (1983)(Spectravideo)"
+	rom ( name "Frantic Freddy (1983)(Spectravideo).bin" size 16384 crc 8615c6e8 md5 721b56f46c0b5714aebef48049c6ae80 sha1 4f4ef29dbb730583bdf6da75aa7fe7b4f144216a )
+)
+
+game (
+	name "Frenzy (1983)(Coleco)"
+	description "Frenzy (1983)(Coleco)"
+	rom ( name "Frenzy (1983)(Coleco).bin" size 20480 crc 3cacddfb md5 ec8f7fea2f00df94ded932d49bd8a7f9 sha1 9fae20696149c1dba5203e1600565917c8981d81 )
+)
+
+game (
+	name "Frogger (1983)(Parker Brothers)"
+	description "Frogger (1983)(Parker Brothers)"
+	rom ( name "Frogger (1983)(Parker Brothers).bin" size 12288 crc 798002a2 md5 ade03210d571409ecb18d5bfaefdad03 sha1 c808284b8a161e8405da093884e861fcde4220e9 )
+)
+
+game (
+	name "Frogger II - Threeedeep! (1984)(Parker Brothers)"
+	description "Frogger II - Threeedeep! (1984)(Parker Brothers)"
+	rom ( name "Frogger II - Threeedeep! (1984)(Parker Brothers).bin" size 16384 crc 4229ea5a md5 48f68ea0446584dc330f8be85f660194 sha1 c899debdda6bfb7e2ed0d1c327ab574b9cbc70ae )
+)
+
+game (
+	name "Frontline (1983)(Coleco)"
+	description "Frontline (1983)(Coleco)"
+	rom ( name "Frontline (1983)(Coleco).bin" size 24576 crc d0110137 md5 4520ee5d8d0fcf151a3332966f7ebda0 sha1 62ca275776e4184032224e61b6d01d0636d7e846 )
+)
+
+game (
+	name "Galaxian (1983)(Atarisoft)"
+	description "Galaxian (1983)(Atarisoft)"
+	rom ( name "Galaxian (1983)(Atarisoft).bin" size 20480 crc 6a7a162a md5 26dff388cd543b79a4d35662064ddaf7 sha1 287013140f2896516acb095157389f681d9c5150 )
+)
+
+game (
+	name "Gateway to Apshai (1984)(Epyx)"
+	description "Gateway to Apshai (1984)(Epyx)"
+	rom ( name "Gateway to Apshai (1984)(Epyx).bin" size 12288 crc fdb75be6 md5 7262176bb5917af526243438f6c8d9e4 sha1 837a192ee27ab78c4ab914b45b9ba55e5847cf37 )
+)
+
+game (
+	name "Gorf (1983)(Coleco)"
+	description "Gorf (1983)(Coleco)"
+	rom ( name "Gorf (1983)(Coleco).bin" size 16384 crc ff46becc md5 e751e5d60a2259334b80ce63d2b69c3a sha1 f0406171923072e75d89ae43621ec18bbd9f154c )
+)
+
+game (
+	name "Gust Buster (1983)(Sunrise Software)"
+	description "Gust Buster (1983)(Sunrise Software)"
+	rom ( name "Gust Buster (1983)(Sunrise Software).bin" size 16384 crc 29fea563 md5 c1c390a00802e041fbee750a33ac9030 sha1 c6506f48a4f33761d0a39c65f0fd092429756f2b )
+)
+
+game (
+	name "Gyruss (1984)(Parker Brothers)"
+	description "Gyruss (1984)(Parker Brothers)"
+	rom ( name "Gyruss (1984)(Parker Brothers).bin" size 16384 crc 27cbf26d md5 fd499d2d7ed864f81c6f01a9ad4b4442 sha1 9d34b9a55f9b6c8443696114a8e69724e5106b5a )
+)
+
+game (
+	name "H.E.R.O. (1984)(Activision)"
+	description "H.E.R.O. (1984)(Activision)"
+	rom ( name "H.E.R.O. (1984)(Activision).bin" size 16384 crc 685ab9b5 md5 e39e7552b8681346aa107c1279911750 sha1 1febd0de031402c2d2dc88f0c60d18c35feee6f3 )
+)
+
+game (
+	name "Heist, The (1983)(Micro Fun)"
+	description "Heist, The (1983)(Micro Fun)"
+	rom ( name "Heist, The (1983)(Micro Fun).bin" size 24576 crc 987491ce md5 ad7d739299287f4dd72efb1f000b3352 sha1 55cce8d6a61c1b028555ae0da8cdf629a3b19982 )
+)
+
+game (
+	name "Illusions (1984)(Coleco)"
+	description "Illusions (1984)(Coleco)"
+	rom ( name "Illusions (1984)(Coleco).bin" size 16384 crc 2787516d md5 369d9eccc683aaf56afec83a16d32ae3 sha1 314be140b495de538ffdf01c9faee4aeef1ecb83 )
+)
+
+game (
+	name "It's Only Rock 'n' Roll (1984)(Xonox)"
+	description "It's Only Rock 'n' Roll (1984)(Xonox)"
+	rom ( name "It's Only Rock 'n' Roll (1984)(Xonox).bin" size 16384 crc cc43ebf7 md5 f127f45209247a1f351eb2dbd2fb24db sha1 96be6f4a0818a94dfa5ea9cb01928a66f755c278 )
+)
+
+game (
+	name "James Bond 007 (1984)(Parker Brothers)"
+	description "James Bond 007 (1984)(Parker Brothers)"
+	rom ( name "James Bond 007 (1984)(Parker Brothers).bin" size 16384 crc a3205f21 md5 d6c263a445bbbd87d156ae40fc4b930b sha1 23823b4f564cb916ab411d8822531eb3a1a57346 )
+)
+
+game (
+	name "Jumpman Junior (1984)(Epyx)"
+	description "Jumpman Junior (1984)(Epyx)"
+	rom ( name "Jumpman Junior (1984)(Epyx).bin" size 16384 crc 060c69e8 md5 5454538f617f2ccf56cb7e0f5a45d11b sha1 b79d4312e2d5fc30e37ee46916dc31908c84590e )
+)
+
+game (
+	name "Jungle Hunt (1983)(Atarisoft)"
+	description "Jungle Hunt (1983)(Atarisoft)"
+	rom ( name "Jungle Hunt (1983)(Atarisoft).bin" size 24576 crc 58e886d2 md5 d6f4df2726159c5aedae9efd21307f09 sha1 8271203fa88e36dbee9423981f580c11b110001a )
+)
+
+game (
+	name "Ken Uston Blackjack-Poker (1983)(Coleco)"
+	description "Ken Uston Blackjack-Poker (1983)(Coleco)"
+	rom ( name "Ken Uston Blackjack-Poker (1983)(Coleco).bin" size 16384 crc 8c7b7803 md5 9266e9fac663332ed330b19a87841f0b sha1 282c8b5186a7dbbb69b4b7dacd2095e1eaa5b4cd )
+)
+
+game (
+	name "Keystone Kapers (1984)(Activision)"
+	description "Keystone Kapers (1984)(Activision)"
+	rom ( name "Keystone Kapers (1984)(Activision).bin" size 16384 crc 69fc2966 md5 7fc266ca1e05305c7d0244f663495f7d sha1 4591c2927131338ff2f602fc8aebb2dda0407a8c )
+)
+
+game (
+	name "Lady Bug (1982)(Coleco)"
+	description "Lady Bug (1982)(Coleco)"
+	rom ( name "Lady Bug (1982)(Coleco).bin" size 16384 crc 2c3097b8 md5 013cc5515769b0a099dd38506983f1ab sha1 afa8e2f119d63463dbdd0c88be6873b0c6a27594 )
+)
+
+game (
+	name "Looping (1983)(Coleco)"
+	description "Looping (1983)(Coleco)"
+	rom ( name "Looping (1983)(Coleco).bin" size 16384 crc 6a2d637b md5 c4b08b67aec8b8835e8f0e6aeb85260c sha1 83ee624c22dd42650bcd585b9cc8cc87da6811d5 )
+)
+
+game (
+	name "Meteoric Shower (1983)(Bit Corp.)(EU)"
+	description "Meteoric Shower (1983)(Bit Corp.)(EU)"
+	rom ( name "Meteoric Shower (1983)(Bit Corp.)(EU).bin" size 12288 crc e51f464f md5 8f1f9e8267b51d8b9b29fb62f0c050ec sha1 36ddc3d1805e1f03ac8a23ede247e33114b0a106 )
+)
+
+game (
+	name "Miner 2049er (1983)(Micro Fun)"
+	description "Miner 2049er (1983)(Micro Fun)"
+	rom ( name "Miner 2049er (1983)(Micro Fun).bin" size 24576 crc b24f10fd md5 3a1ef8e754016c87ead2335d7641f27a sha1 b29cd441e9edebc37abc08c3fd932f1d4185bacd )
+)
+
+game (
+	name "Miner 2049er (1983)(Micro Fun)[a]"
+	description "Miner 2049er (1983)(Micro Fun)[a]"
+	rom ( name "Miner 2049er (1983)(Micro Fun)[a].bin" size 24576 crc f37af58c md5 124d464a25dbe7d94a95ffa96b24d7db sha1 591a08c17bbd716e13770e3b14e57a0c21229fc4 )
+)
+
+game (
+	name "Montezuma's Revenge (1984)(Parker Brothers)"
+	description "Montezuma's Revenge (1984)(Parker Brothers)"
+	rom ( name "Montezuma's Revenge (1984)(Parker Brothers).bin" size 12288 crc ced0d16e md5 f7f5da82e247df6f5097755deffde0ed sha1 44862334e171bccd80d41a2afbc5d7af46d68d07 )
+)
+
+game (
+	name "Moonsweeper (1983)(Imagic)"
+	description "Moonsweeper (1983)(Imagic)"
+	rom ( name "Moonsweeper (1983)(Imagic).bin" size 16384 crc 8a303f5a md5 42447cf41e7afb267c262e578f0f24b1 sha1 eeccf73225e03ce10f6f6a02a808dc04f5bb0242 )
+)
+
+game (
+	name "Motocross Racer (1984)(Xonox)"
+	description "Motocross Racer (1984)(Xonox)"
+	rom ( name "Motocross Racer (1984)(Xonox).bin" size 16384 crc 0f4d800a md5 08dbf281e89c73802da5b508960c08f4 sha1 89b6f5f482f8f79c10ef9d3ffdeac1ded47a2362 )
+)
+
+game (
+	name "Mountain King (1984)(Sunrise Software)"
+	description "Mountain King (1984)(Sunrise Software)"
+	rom ( name "Mountain King (1984)(Sunrise Software).bin" size 16384 crc c173bbec md5 bb79207c51e772fd26276712cc4e6927 sha1 46602df46117513d7166eba81e2e3546246adf94 )
+)
+
+game (
+	name "Mouse Trap (1982)(Coleco)"
+	description "Mouse Trap (1982)(Coleco)"
+	rom ( name "Mouse Trap (1982)(Coleco).bin" size 12288 crc de47c29f md5 c8f0d1ee5494dab146c82a4ebecaff4a sha1 36686b5f84c8ecfe9e6468ca0f2402ce0c03150c )
+)
+
+game (
+	name "Mr. Do! (1983)(Coleco)"
+	description "Mr. Do! (1983)(Coleco)"
+	rom ( name "Mr. Do! (1983)(Coleco).bin" size 24576 crc 461ab6ad md5 de0b1b1ec005bb1765e1ceffdfa3e92e sha1 d40a69f4d010636de50fdc1d43a0682141286cbd )
+)
+
+game (
+	name "Mr. Do!'s Castle (1984)(Parker Brothers)"
+	description "Mr. Do!'s Castle (1984)(Parker Brothers)"
+	rom ( name "Mr. Do!'s Castle (1984)(Parker Brothers).bin" size 12288 crc 546f2c54 md5 7eaa827c9976e24e47ef49e2b1e2f0f7 sha1 e94e5d8dd549cae8b70d02170502eca4e90a3c30 )
+)
+
+game (
+	name "Nova Blast (1983)(Imagic)"
+	description "Nova Blast (1983)(Imagic)"
+	rom ( name "Nova Blast (1983)(Imagic).bin" size 12288 crc 4491a35b md5 745067096d2dda2c62874b60bab4f625 sha1 2c35f5b2eb5914a14e544e00c67d4cb5582832d8 )
+)
+
+game (
+	name "Oil's Well (1984)(Sierra On-Line)"
+	description "Oil's Well (1984)(Sierra On-Line)"
+	rom ( name "Oil's Well (1984)(Sierra On-Line).bin" size 16384 crc add10242 md5 e7d10b763454692ea8a6da95fccdbd87 sha1 779e43f183dbdb692dc26ae41dde6b35891f8f8b )
+)
+
+game (
+	name "Omega Race (1983)(Coleco)"
+	description "Omega Race (1983)(Coleco)"
+	rom ( name "Omega Race (1983)(Coleco).bin" size 16384 crc 0a0511c7 md5 28ed941c2746d50e62dd3acd29c7675e sha1 d0b00ee7b4368ef3dbd74fbace4f8e061ed632f4 )
+)
+
+game (
+	name "One-on-One (1984)(Micro Fun)"
+	description "One-on-One (1984)(Micro Fun)"
+	rom ( name "One-on-One (1984)(Micro Fun).bin" size 24576 crc ef50e1c5 md5 0b70e3e59f72137a4a017f3761b24ff7 sha1 2c59bcd829c97948b88b45f447c4c57870d6bd77 )
+)
+
+game (
+	name "Pepper II (1983)(Coleco)"
+	description "Pepper II (1983)(Coleco)"
+	rom ( name "Pepper II (1983)(Coleco).bin" size 16384 crc 53b85e20 md5 679f02b1d1a7d68af42735d67cbccaff sha1 0983d0a562ccb3d4ac88d8ae26cf29a465075067 )
+)
+
+game (
+	name "Pitfall! (1983)(Activision)"
+	description "Pitfall! (1983)(Activision)"
+	rom ( name "Pitfall! (1983)(Activision).bin" size 16384 crc d4f180df md5 40187a21b1243686c68fa2aa11efba41 sha1 964a3551121cd33ce72624c5414d1406ee75ca35 )
+)
+
+game (
+	name "Pitfall II - Lost Caverns (1984)(Activision)"
+	description "Pitfall II - Lost Caverns (1984)(Activision)"
+	rom ( name "Pitfall II - Lost Caverns (1984)(Activision).bin" size 16384 crc 851a455f md5 9dc247f82da83e03c8d0592825f03d52 sha1 2642c458899c1cafa2f3b9e0959b9ead5829aa68 )
+)
+
+game (
+	name "Pitstop (1983)(Epyx)(US)[Imagic cart shell]"
+	description "Pitstop (1983)(Epyx)(US)[Imagic cart shell]"
+	rom ( name "Pitstop (1983)(Epyx)(US)[Imagic cart shell].bin" size 16384 crc e627fcf0 md5 3b5cf3a345abbb2b23c68181953f4710 sha1 f5a649238057fb354512da2f5336bcb4b09216e5 )
+)
+
+game (
+	name "Pitstop (1983)(Epyx - CBS Electronics)(CA-EU-US)"
+	description "Pitstop (1983)(Epyx - CBS Electronics)(CA-EU-US)"
+	rom ( name "Pitstop (1983)(Epyx - CBS Electronics)(CA-EU-US).bin" size 16384 crc 81be4f55 md5 871bc6498639031d782f84775cb3745c sha1 bc449bf923cc6b1695598b1ffa7a328618a4ad85 )
+)
+
+game (
+	name "Popeye (1983)(Parker Brothers)"
+	description "Popeye (1983)(Parker Brothers)"
+	rom ( name "Popeye (1983)(Parker Brothers).bin" size 16384 crc a095454d md5 a7773e1265e0089bc8f148527256a20e sha1 f54f110ba5864bb3418f84e1c2cdc5c856dda771 )
+)
+
+game (
+	name "Q-bert (1983)(Parker Brothers)"
+	description "Q-bert (1983)(Parker Brothers)"
+	rom ( name "Q-bert (1983)(Parker Brothers).bin" size 8192 crc 532f61ba md5 249e88fa4361edea2a98056954371c72 sha1 6243fc5593f40d7285ea6b69c541307d3fc583ac )
+)
+
+game (
+	name "Q-Bert's QUBES (1984)(Parker Brothers)"
+	description "Q-Bert's QUBES (1984)(Parker Brothers)"
+	rom ( name "Q-Bert's QUBES (1984)(Parker Brothers).bin" size 12288 crc 79d90d26 md5 d6ef0832f3ff45b6358c445be645dc11 sha1 523fd9fce7047ae76dd4219cdb89a4f298fe14ab )
+)
+
+game (
+	name "Quest for Quintana Roo (1983)(Sunrise Software)"
+	description "Quest for Quintana Roo (1983)(Sunrise Software)"
+	rom ( name "Quest for Quintana Roo (1983)(Sunrise Software).bin" size 16384 crc eec81c42 md5 446256285c3b1dcf012d36b26f8fdb6b sha1 1aef03f7d0bdaa701517a1ad6a75ab8820674f15 )
+)
+
+game (
+	name "River Raid (1984)(Activision)"
+	description "River Raid (1984)(Activision)"
+	rom ( name "River Raid (1984)(Activision).bin" size 16384 crc fe897f9c md5 aebf917b911086bcf0b818d7b888d87d sha1 00a5b9dc41e3a684a874b65cf29121984f10f327 )
+)
+
+game (
+	name "Robin Hood (1984)(Xonox)"
+	description "Robin Hood (1984)(Xonox)"
+	rom ( name "Robin Hood (1984)(Xonox).bin" size 16384 crc cdb8d3cf md5 a3bb14317c4a3f1788d550859d4bbe9d sha1 f987591f915eb0d3547b85f3767fff2d4fd0540f )
+)
+
+game (
+	name "Roc 'n Rope (1984)(Coleco)"
+	description "Roc 'n Rope (1984)(Coleco)"
+	rom ( name "Roc 'n Rope (1984)(Coleco).bin" size 24576 crc af885d76 md5 e2c60e37df1e7205eecba716dd3d5f84 sha1 6598592f1f4debccce5bccfff406bf10970ffdac )
+)
+
+game (
+	name "Rock 'n Bolt (1984)(Telegames)"
+	description "Rock 'n Bolt (1984)(Telegames)"
+	rom ( name "Rock 'n Bolt (1984)(Telegames).bin" size 16384 crc af49a0c3 md5 ce4466aa6bc973c5021577578d881aed sha1 2b2f337ba597af5eee2b10e70a129638b4679c9e )
+)
+
+game (
+	name "Rocky - Super Action Boxing (1983)(Coleco)"
+	description "Rocky - Super Action Boxing (1983)(Coleco)"
+	rom ( name "Rocky - Super Action Boxing (1983)(Coleco).bin" size 20480 crc 37f144d3 md5 d35fdb81f4a733925b0a33dfb53d9d78 sha1 11def2adb622bbf62bfd2ac14d8151c8f2f772eb )
+)
+
+game (
+	name "Rolloverture (1983)(Sunrise Software)"
+	description "Rolloverture (1983)(Sunrise Software)"
+	rom ( name "Rolloverture (1983)(Sunrise Software).bin" size 16384 crc 0364fb81 md5 09b1fbd8e7b09d423894c155a24c569f sha1 5bd7c21d64eee044c88ae438479d22802a510677 )
+)
+
+game (
+	name "Sammy Lightfoot (1983)(Sierra On-Line)"
+	description "Sammy Lightfoot (1983)(Sierra On-Line)"
+	rom ( name "Sammy Lightfoot (1983)(Sierra On-Line).bin" size 16384 crc 3563286b md5 78f37e95058f08c4995cf95598ee2a4f sha1 b011dc446bb20bcdf5ee8404919d039b690d976b )
+)
+
+game (
+	name "Sector Alpha (1983)(Spectravideo)"
+	description "Sector Alpha (1983)(Spectravideo)"
+	rom ( name "Sector Alpha (1983)(Spectravideo).bin" size 20480 crc 0ec63a5c md5 09bf95c028205bc218bbb67116cdf688 sha1 990967a4ef5795733a29efbacddb23e4d4dd3c15 )
+)
+
+game (
+	name "Sewer Sam (1984)(Interphase)"
+	description "Sewer Sam (1984)(Interphase)"
+	rom ( name "Sewer Sam (1984)(Interphase).bin" size 24576 crc 4591f393 md5 5de08cbdc916708999328e720ea2e703 sha1 407c2a1bef81522dfd88ace7abd7d80c0f7de357 )
+)
+
+game (
+	name "Sir Lancelot (1983)(Xonox)"
+	description "Sir Lancelot (1983)(Xonox)"
+	rom ( name "Sir Lancelot (1983)(Xonox).bin" size 16384 crc df84ffb5 md5 ae936b4f13874715d5fbebee379febfb sha1 15e6f8197caee5a500c6ce33952d51beca6a43cc )
+)
+
+game (
+	name "Skiing (1986)(Telegames)"
+	description "Skiing (1986)(Telegames)"
+	rom ( name "Skiing (1986)(Telegames).bin" size 8192 crc b37d48bd md5 a9e17aac9858dcc504879e45f50bd3ac sha1 2cfd62a4b403fc2f5344d0e095d1028cc11e4ecc )
+)
+
+game (
+	name "Slither (1983)(Coleco)"
+	description "Slither (1983)(Coleco)"
+	rom ( name "Slither (1983)(Coleco).bin" size 16384 crc 53d2651c md5 7cdc148dff40389fa1ad012d4734ceed sha1 b11de2476f867c7c4efb2977777e12fcb454f10b )
+)
+
+game (
+	name "Slurpy (1984)(Xonox)"
+	description "Slurpy (1984)(Xonox)"
+	rom ( name "Slurpy (1984)(Xonox).bin" size 16384 crc 8871e9fd md5 5fac2d8e197b781b65a5a9aa6984d003 sha1 b56ccdd5a6df3ad753b3f552daad70e1d7bd7e4d )
+)
+
+game (
+	name "Smurf Rescue in Gargamel's Castle (1982)(Coleco)"
+	description "Smurf Rescue in Gargamel's Castle (1982)(Coleco)"
+	rom ( name "Smurf Rescue in Gargamel's Castle (1982)(Coleco).bin" size 16384 crc 42850379 md5 c29e282c81ce9b40f39f493f51725d3c sha1 f0740e1916d2351537c6725b37ba3c1b321f15eb )
+)
+
+game (
+	name "Space Fury (1983)(Coleco)"
+	description "Space Fury (1983)(Coleco)"
+	rom ( name "Space Fury (1983)(Coleco).bin" size 16384 crc df8de30f md5 f821cf20b7faa5c2cb738cd8aa90dc95 sha1 f400e1e368ae420a97015674a28db91b4bea15a6 )
+)
+
+game (
+	name "Space Panic (1983)(Coleco)"
+	description "Space Panic (1983)(Coleco)"
+	rom ( name "Space Panic (1983)(Coleco).bin" size 16384 crc 5bdf2997 md5 2a1f023ee4798230e59bfa14cf6c497a sha1 530870501f322f1d72e820a722790d300f43a6de )
+)
+
+game (
+	name "Spectron (1983)(Spectravideo)"
+	description "Spectron (1983)(Spectravideo)"
+	rom ( name "Spectron (1983)(Spectravideo).bin" size 16384 crc a6401c46 md5 cb7b1a5906a00c6b246de20c21aa646b sha1 fb092284a0a6cdabd1b10e6c4127125fe74c7b96 )
+)
+
+game (
+	name "Spy Hunter (1984)(Coleco)"
+	description "Spy Hunter (1984)(Coleco)"
+	rom ( name "Spy Hunter (1984)(Coleco).bin" size 32768 crc 36478923 md5 f96a21f920e889d1e21abbf00f4d381d sha1 97865d067bd531209857c3c8502c1260e0a30366 )
+)
+
+game (
+	name "Squish'em Featuring Sam (1984)(Interphase)"
+	description "Squish'em Featuring Sam (1984)(Interphase)"
+	rom ( name "Squish'em Featuring Sam (1984)(Interphase).bin" size 16384 crc ac92862d md5 90e1b27110a1b89cb1ad3e225db20832 sha1 ae25507b840b15ca3a832ba0bd8e1cbfdf4634a6 )
+)
+
+game (
+	name "Star Trek - Strategic Operations Simulator (1984)(Coleco)"
+	description "Star Trek - Strategic Operations Simulator (1984)(Coleco)"
+	rom ( name "Star Trek - Strategic Operations Simulator (1984)(Coleco).bin" size 24576 crc 95824f1e md5 45006eaf52ee16ddcadd1dca68b265c8 sha1 d37140e1abd1a0402af5c9e02ab3e4d0c6afe598 )
+)
+
+game (
+	name "Star Wars - The Arcade Game (1984)(Parker Brothers)"
+	description "Star Wars - The Arcade Game (1984)(Parker Brothers)"
+	rom ( name "Star Wars - The Arcade Game (1984)(Parker Brothers).bin" size 16384 crc 0e75b3bf md5 3addc2a93bcb803ac136801ab1b8695a sha1 da0567bee88bd1991481a755ac8292a115ed15ac )
+)
+
+game (
+	name "Strike It! (1986)(Telegames)"
+	description "Strike It! (1986)(Telegames)"
+	rom ( name "Strike It! (1986)(Telegames).bin" size 16384 crc d247a1c8 md5 2425b11952e79c247f13e341297f48bf sha1 a455e93e5ce6e562092d2c0b06070a746296395b )
+)
+
+game (
+	name "Subroc (1983)(Coleco)"
+	description "Subroc (1983)(Coleco)"
+	rom ( name "Subroc (1983)(Coleco).bin" size 20480 crc a417f25f md5 b86bcbbd27f9574d3f0c8dd3cdfba45d sha1 d3dca3dab60a386156d823bf1905e5542ac1aa21 )
+)
+
+game (
+	name "Super Action Baseball (1983)(Coleco)"
+	description "Super Action Baseball (1983)(Coleco)"
+	rom ( name "Super Action Baseball (1983)(Coleco).bin" size 20480 crc b3bcf3f9 md5 4c4b25a93301e59b86decb0df7a0ee51 sha1 4829d304cbb752031bf5b4b1d48eed2ad06f222e )
+)
+
+game (
+	name "Super Action Football (1984)(Coleco)(CA-US)"
+	description "Super Action Football (1984)(Coleco)(CA-US)"
+	rom ( name "Super Action Football (1984)(Coleco)(CA-US).bin" size 32768 crc 62619dc0 md5 bee90a110d14b29d2e64f0ff0f303bc6 sha1 4c16f4e233db50e3d9b3a191f4f408338640ac19 )
+)
+
+game (
+	name "Super Action Football (1984)(CBS Electronics)(EU)"
+	description "Super Action Football (1984)(CBS Electronics)(EU)"
+	rom ( name "Super Action Football (1984)(CBS Electronics)(EU).bin" size 32768 crc 4d6c0458 md5 8aabed060476fde3cc706c6463f02980 sha1 5f43180c243039eecef024ab1f4e70a2e2502fc1 )
+)
+
+game (
+	name "Super Cobra (1983)(Parker Brothers)"
+	description "Super Cobra (1983)(Parker Brothers)"
+	rom ( name "Super Cobra (1983)(Parker Brothers).bin" size 8192 crc f84622d2 md5 3f79a5be2f84d9856a99b9ae31f36ba1 sha1 3bf730acbfb0404d2e2411169c8fc6a81b907053 )
+)
+
+game (
+	name "Super Cobra (1983)(Parker Brothers)[f ADAM]"
+	description "Super Cobra (1983)(Parker Brothers)[f ADAM]"
+	rom ( name "Super Cobra (1983)(Parker Brothers)[f ADAM].bin" size 8192 crc 653f79e7 md5 0d11de05821c895b9f34425291bbedad sha1 d5fe20060be49cfbda2742460e64e4cafa07a937 )
+)
+
+game (
+	name "Super Cross Force (1983)(Spectravideo)"
+	description "Super Cross Force (1983)(Spectravideo)"
+	rom ( name "Super Cross Force (1983)(Spectravideo).bin" size 12288 crc 84350129 md5 633d8d532b8c2435ec6635be1fff1391 sha1 42a22d2314081450e8cb2a5e8ba4aa0987971063 )
+)
+
+game (
+	name "Tank Wars (1983)(Bit Corp.)(EU)"
+	description "Tank Wars (1983)(Bit Corp.)(EU)"
+	rom ( name "Tank Wars (1983)(Bit Corp.)(EU).bin" size 12288 crc af6bbc7e md5 3016b5b55ce162ae47f03af71fbb5c0d sha1 0a32a17a3e5e6c220de91e4dcf036d7d02ad8e30 )
+)
+
+game (
+	name "Tapper (1984)(Coleco)"
+	description "Tapper (1984)(Coleco)"
+	rom ( name "Tapper (1984)(Coleco).bin" size 32768 crc 8afd7db2 md5 6cdb3a03f8d66bedbd29899895d83f94 sha1 bbb25e64aefa3adaff9f864713ecabe3b6f0316b )
+)
+
+game (
+	name "Tarzan (1984)(Coleco)"
+	description "Tarzan (1984)(Coleco)"
+	rom ( name "Tarzan (1984)(Coleco).bin" size 24576 crc 7cd7a702 md5 61a2cb023a393446d8e8b8b1147bec48 sha1 59cb8dec033c3b1df476c7c93109aba9562ba3d4 )
+)
+
+game (
+	name "Threshold (1983)(Sierra On-Line)"
+	description "Threshold (1983)(Sierra On-Line)"
+	rom ( name "Threshold (1983)(Sierra On-Line).bin" size 16384 crc 1593f7df md5 e932f6f176f98f5fe85ced5401c51750 sha1 7f71c024d7d85627b893d28131d284dde25577b8 )
+)
+
+game (
+	name "Time Pilot (1983)(Coleco)"
+	description "Time Pilot (1983)(Coleco)"
+	rom ( name "Time Pilot (1983)(Coleco).bin" size 16384 crc b3a1eacb md5 91c7b5d4ea94092f6e18da4775656d4b sha1 3b7cbc5c0d47027ecd5e6f5d1485af436ab02ad1 )
+)
+
+game (
+	name "TOMARC The Barbarian (1984)(Xonox)"
+	description "TOMARC The Barbarian (1984)(Xonox)"
+	rom ( name "TOMARC The Barbarian (1984)(Xonox).bin" size 16384 crc 1e14397e md5 05bb27ab721b0cfd8ce5157102f73e39 sha1 44b285d438854dfa0186c7fe6e21872e2dde13f1 )
+)
+
+game (
+	name "Tournament Tennis (1984)(Imagic)"
+	description "Tournament Tennis (1984)(Imagic)"
+	rom ( name "Tournament Tennis (1984)(Imagic).bin" size 16384 crc c1d5a702 md5 b85e0c632b351c3d42a2be4198cfa663 sha1 0f113cda3b12253d1d42e994896db3f88a5b884d )
+)
+
+game (
+	name "Turbo (1982)(Coleco)"
+	description "Turbo (1982)(Coleco)"
+	rom ( name "Turbo (1982)(Coleco).bin" size 16384 crc bd6ab02a md5 6f146d9bd3f64bbc006a761f59e2a1cf sha1 27f39b9e42cce0cead88c0d0691d56ce46b97111 )
+)
+
+game (
+	name "Tutankham (1983)(Parker Brothers)"
+	description "Tutankham (1983)(Parker Brothers)"
+	rom ( name "Tutankham (1983)(Parker Brothers).bin" size 12288 crc 0408f58c md5 79db029b4e77bc2752ab97bd4df03428 sha1 a668ff92e6f83e37f44178260618bbc650ca61c9 )
+)
+
+game (
+	name "Up'n Down (1984)(Sega)"
+	description "Up'n Down (1984)(Sega)"
+	rom ( name "Up'n Down (1984)(Sega).bin" size 16384 crc fdd52ca0 md5 90e261510765deecaeac8283aa88d815 sha1 96d83945d041f6f795a3107904a9986de86df8a6 )
+)
+
+game (
+	name "Venture (1982)(Coleco)"
+	description "Venture (1982)(Coleco)"
+	rom ( name "Venture (1982)(Coleco).bin" size 16384 crc 8e5a4aa3 md5 ad22023a11a3bcb107610d2af5a6be77 sha1 9cf7e7439d1719152ed28c1123ae8ad68175412f )
+)
+
+game (
+	name "Victory (1983)(Coleco)(US)"
+	description "Victory (1983)(Coleco)(US)"
+	rom ( name "Victory (1983)(Coleco)(US).bin" size 20480 crc 70142655 md5 200aa603996bfd2734e353098ebe8dd5 sha1 7144c65cb57eeb846f4771aeb402469494f8f56f )
+)
+
+game (
+	name "Victory (1983)(CBS Electronics)(EU)"
+	description "Victory (1983)(CBS Electronics)(EU)"
+	rom ( name "Victory (1983)(CBS Electronics)(EU).bin" size 20480 crc b1fda1c5 md5 a31facd8adc1134942d9f4102dd3fa9f sha1 589b130410faadcb3f6cdb68a58353f4fb3a7e5f )
+)
+
+game (
+	name "War Games (1984)(Coleco)"
+	description "War Games (1984)(Coleco)"
+	rom ( name "War Games (1984)(Coleco).bin" size 24576 crc fd25adb3 md5 000c7331d4598b0fa414be5fb2a603b5 sha1 1e3b525f2d895105727fee76076dd5ecccbf1778 )
+)
+
+game (
+	name "War Room (1983)(Probe 2000)"
+	description "War Room (1983)(Probe 2000)"
+	rom ( name "War Room (1983)(Probe 2000).bin" size 24576 crc 261b7d56 md5 0d59da8c315d22f58909c73b851299ee sha1 031eaec9188105150460ff354fe50e22ce738c53 )
+)
+
+game (
+	name "Wing War (1983)(Imagic)"
+	description "Wing War (1983)(Imagic)"
+	rom ( name "Wing War (1983)(Imagic).bin" size 16384 crc 29ec00c9 md5 70672a0737c4986d31589b1ed0108cb1 sha1 eb7764ef6f50885e2eaffaff42ab9fcf760a77e1 )
+)
+
+game (
+	name "Word Feud (1984)(Xonox)"
+	description "Word Feud (1984)(Xonox)"
+	rom ( name "Word Feud (1984)(Xonox).bin" size 8192 crc f7a29c01 md5 8148c6e4ea8e1e38e43a4f9576468ff5 sha1 9a6188511ae54e6886222b84185714d2ead8cfbc )
+)
+
+game (
+	name "Zaxxon (1982)(Coleco)"
+	description "Zaxxon (1982)(Coleco)"
+	rom ( name "Zaxxon (1982)(Coleco).bin" size 24576 crc 8cb0891a md5 7c677f80c4ee957559d7abebd8ee1be1 sha1 1733b3407939f5c37e39d5494abfa4137f500707 )
+)
+
+game (
+	name "Zaxxon (19xx)(Taiwan Cooper)"
+	description "Zaxxon (19xx)(Taiwan Cooper)"
+	rom ( name "Zaxxon (19xx)(Taiwan Cooper).bin" size 24576 crc 5b0e2adf md5 1206093901f2cfb36ac5442db264c9f91 sha1 5b6bde9746d7b57291a9acc519962717e2c12aaa )
+)
+
+game (
+	name "Zenji (1984)(Activision)"
+	description "Zenji (1984)(Activision)"
+	rom ( name "Zenji (1984)(Activision).bin" size 16384 crc 6e523e50 md5 5595dc8acc25f51aaed0d72bbb96e68b sha1 9119f3a485eb4215e7d41c7cf0e412d903458647 )
+)
+
