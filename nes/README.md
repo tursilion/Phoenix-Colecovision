@@ -5,7 +5,7 @@ by Ludvig Strigeus (GPLv2).
 
 Status: runs in simulation (boots from an SD card image and shows a test
 cartridge pixel-exact) and builds with ISE 14.7 (timing met, about 52% of the
-LUTs and 18 of 32 block RAMs). Not yet tried on hardware.
+LUTs and 18 of 32 block RAMs). Proven on V1 hardware.
 
 ## Using it
 
