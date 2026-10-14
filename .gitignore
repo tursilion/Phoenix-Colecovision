@@ -1,5 +1,12 @@
 itch
+*.LD
 CORE03.PHX
+CORE04.PHX
+CORE05.PHX
+CORE06.PHX
+CORE07.PHX
+CORE08.PHX
+CORE09.PHX
 .vscode
 Thumbs.db
 *_bd.bmm

@@ -1,0 +1,21 @@
+Space Ace Rev. A3 ROM image
+
+Dumped by Warren Ondras - warren@dragons-lair-project.com
+7/20/01
+
+Notes from Jeff Kulczycki - jeffkul@dragons-lair-project.com - The only change in this ROM revision is in U1.
+
+There are only four bytes that are different between ROM revision A2 and A3.
+The first 2 bytes that changed are the checksum, which simply accounts for the other 2 bytes that changed.
+The other 2 bytes that changed are the pointers to the RAM locations that store the scene pointers.
+It seems they were using A070-A08F to save these pointers but they corrected themselves and moved these pointers to A080-A08F.
+This was changed because there were some data already being stored at A060-A072, causing an overlap of two bytes.
+The two locations that overlap are A071 and A072.
+In one case these locations only get used if Player1 makes it to some of the highest levels (not sure which ones in particular).
+And in the other case these bytes store the order of which scenes to play.
+So, if Player1 was making it torward the end of the game and Player2 was still at the beginning then all hell would break loose.
+
+For a description of what actually happens to the game and the steps to take see actually see this bug when using ROM revision A2,
+check Tony M. Victorino's post on the Dragon's Lair Project message board at the link below.
+
+http://www.dragons-lair-project.com/community/forums/board/default.asp?Action=View&MessageID=24150
