@@ -1,0 +1,7 @@
+INFILE=/workspace/rtl/build/phoenix_top.ncd
+OUTFILE=/workspace/rtl/build/phoenix_top.bit
+FAMILY=Spartan6
+PART=xc6slx16-2csg324
+WORKINGDIR=/workspace/rtl/build
+LICENSE=WebPack
+USER_INFO=211634681_0_0_058

@@ -31,81 +31,81 @@ MAIN_OBJS =\
 # By building FatFS as a library with distinct files, any functions
 # we dont use are automatically stripped from the output
 FAT_OBJS =\
-    fatFs\diskio_diskinit.$(EXT) \
-    fatFs\diskio_diskioctl.$(EXT) \
-    fatFs\diskio_diskread.$(EXT) \
-    fatFs\diskio_diskstatus.$(EXT) \
-    fatFs\diskio_diskwrite.$(EXT) \
-    fatFs\diskio_dselect.$(EXT) \
-    fatFs\diskio_rcvrdatablock.$(EXT) \
-    fatFs\diskio_rcvrmmc.$(EXT) \
-    fatFs\diskio_select.$(EXT) \
-    fatFs\diskio_sendcmd.$(EXT) \
-    fatFs\diskio_waitready.$(EXT) \
-    fatFs\diskio_xmitdatablock.$(EXT) \
-    fatFs\diskio_xmitmmc.$(EXT) \
-    fatFs\ff_checkfs.$(EXT) \
-    fatFs\ff_chkchr.$(EXT) \
-    fatFs\ff_closedir.$(EXT) \
-    fatFs\ff_clst2sect.$(EXT) \
-    fatFs\ff_cmplfn.$(EXT) \
-    fatFs\ff_createchain.$(EXT) \
-    fatFs\ff_createname.$(EXT) \
-    fatFs\ff_diralloc.$(EXT) \
-    fatFs\ff_dirclear.$(EXT) \
-    fatFs\ff_dirfind.$(EXT) \
-    fatFs\ff_dirnext.$(EXT) \
-    fatFs\ff_dirread.$(EXT) \
-    fatFs\ff_dirregister.$(EXT) \
-    fatFs\ff_dirsdi.$(EXT) \
-    fatFs\ff_fchdir.$(EXT) \
-    fatFs\ff_fchdrive.$(EXT) \
-    fatFs\ff_fclose.$(EXT) \
-    fatFs\ff_findvolume.$(EXT) \
-    fatFs\ff_fgetfree.$(EXT) \
-    fatFs\ff_fmkdir.$(EXT) \
-    fatFs\ff_fmount.$(EXT) \
-    fatFs\ff_followpath.$(EXT) \
-    fatFs\ff_fopen.$(EXT) \
-    fatFs\ff_fread.$(EXT) \
-    fatFs\ff_frename.$(EXT) \
-    fatFs\ff_fsync.$(EXT) \
-    fatFs\ff_ftruncate.$(EXT) \
-    fatFs\ff_funlink.$(EXT) \
-    fatFs\ff_fwrite.$(EXT) \
-    fatFs\ff_gennumname.$(EXT) \
-    fatFs\ff_getfat.$(EXT) \
-    fatFs\ff_getfileinfo.$(EXT) \
-    fatFs\ff_getldnumber.$(EXT) \
-    fatFs\ff_loadobjxdir.$(EXT) \
-    fatFs\ff_ldclust.$(EXT) \
-    fatFs\ff_lddword.$(EXT) \
-    fatFs\ff_ldword.$(EXT) \
-    fatFs\ff_lseek.$(EXT) \
-    fatFs\ff_memcmp.$(EXT) \
-    fatFs\ff_movewindow.$(EXT) \
-    fatFs\ff_opendir.$(EXT) \
-    fatFs\ff_picklfn.$(EXT) \
-    fatFs\ff_putfat.$(EXT) \
-    fatFs\ff_putlfn.$(EXT) \
-    fatFs\ff_pututf.$(EXT) \
-    fatFs\ff_readdir.$(EXT) \
-    fatFs\ff_removechain.$(EXT) \
-    fatFs\ff_stclust.$(EXT) \
-    fatFs\ff_storexdir.$(EXT) \
-    fatFs\ff_stdword.$(EXT) \
-    fatFs\ff_stword.$(EXT) \
-    fatFs\ff_syncfs.$(EXT) \
-    fatFs\ff_syncwindow.$(EXT) \
-    fatFs\ff_sumsfn.$(EXT) \
-    fatFs\ff_tchar2uni.$(EXT) \
-    fatFs\ff_validate.$(EXT) \
-    fatFs\ff_vars.$(EXT) \
-    fatFs\ff_xsum32.$(EXT) \
-    fatFs\ffunicode_cp.$(EXT) \
-    fatFs\ffunicode_ffoem2uni.$(EXT) \
-    fatFs\ffunicode_ffuni2oem.$(EXT) \
-    fatFs\ffunicode_ffwtoupper.$(EXT)
+    fatFS/diskio_diskinit.$(EXT) \
+    fatFS/diskio_diskioctl.$(EXT) \
+    fatFS/diskio_diskread.$(EXT) \
+    fatFS/diskio_diskstatus.$(EXT) \
+    fatFS/diskio_diskwrite.$(EXT) \
+    fatFS/diskio_dselect.$(EXT) \
+    fatFS/diskio_rcvrdatablock.$(EXT) \
+    fatFS/diskio_rcvrmmc.$(EXT) \
+    fatFS/diskio_select.$(EXT) \
+    fatFS/diskio_sendcmd.$(EXT) \
+    fatFS/diskio_waitready.$(EXT) \
+    fatFS/diskio_xmitdatablock.$(EXT) \
+    fatFS/diskio_xmitmmc.$(EXT) \
+    fatFS/ff_checkfs.$(EXT) \
+    fatFS/ff_chkchr.$(EXT) \
+    fatFS/ff_closedir.$(EXT) \
+    fatFS/ff_clst2sect.$(EXT) \
+    fatFS/ff_cmplfn.$(EXT) \
+    fatFS/ff_createchain.$(EXT) \
+    fatFS/ff_createname.$(EXT) \
+    fatFS/ff_diralloc.$(EXT) \
+    fatFS/ff_dirclear.$(EXT) \
+    fatFS/ff_dirfind.$(EXT) \
+    fatFS/ff_dirnext.$(EXT) \
+    fatFS/ff_dirread.$(EXT) \
+    fatFS/ff_dirregister.$(EXT) \
+    fatFS/ff_dirsdi.$(EXT) \
+    fatFS/ff_fchdir.$(EXT) \
+    fatFS/ff_fchdrive.$(EXT) \
+    fatFS/ff_fclose.$(EXT) \
+    fatFS/ff_findvolume.$(EXT) \
+    fatFS/ff_fgetfree.$(EXT) \
+    fatFS/ff_fmkdir.$(EXT) \
+    fatFS/ff_fmount.$(EXT) \
+    fatFS/ff_followpath.$(EXT) \
+    fatFS/ff_fopen.$(EXT) \
+    fatFS/ff_fread.$(EXT) \
+    fatFS/ff_frename.$(EXT) \
+    fatFS/ff_fsync.$(EXT) \
+    fatFS/ff_ftruncate.$(EXT) \
+    fatFS/ff_funlink.$(EXT) \
+    fatFS/ff_fwrite.$(EXT) \
+    fatFS/ff_gennumname.$(EXT) \
+    fatFS/ff_getfat.$(EXT) \
+    fatFS/ff_getfileinfo.$(EXT) \
+    fatFS/ff_getldnumber.$(EXT) \
+    fatFS/ff_loadobjxdir.$(EXT) \
+    fatFS/ff_ldclust.$(EXT) \
+    fatFS/ff_lddword.$(EXT) \
+    fatFS/ff_ldword.$(EXT) \
+    fatFS/ff_lseek.$(EXT) \
+    fatFS/ff_memcmp.$(EXT) \
+    fatFS/ff_movewindow.$(EXT) \
+    fatFS/ff_opendir.$(EXT) \
+    fatFS/ff_picklfn.$(EXT) \
+    fatFS/ff_putfat.$(EXT) \
+    fatFS/ff_putlfn.$(EXT) \
+    fatFS/ff_pututf.$(EXT) \
+    fatFS/ff_readdir.$(EXT) \
+    fatFS/ff_removechain.$(EXT) \
+    fatFS/ff_stclust.$(EXT) \
+    fatFS/ff_storexdir.$(EXT) \
+    fatFS/ff_stdword.$(EXT) \
+    fatFS/ff_stword.$(EXT) \
+    fatFS/ff_syncfs.$(EXT) \
+    fatFS/ff_syncwindow.$(EXT) \
+    fatFS/ff_sumsfn.$(EXT) \
+    fatFS/ff_tchar2uni.$(EXT) \
+    fatFS/ff_validate.$(EXT) \
+    fatFS/ff_vars.$(EXT) \
+    fatFS/ff_xsum32.$(EXT) \
+    fatFS/ffunicode_cp.$(EXT) \
+    fatFS/ffunicode_ffoem2uni.$(EXT) \
+    fatFS/ffunicode_ffuni2oem.$(EXT) \
+    fatFS/ffunicode_ffwtoupper.$(EXT)
 
 # Recipe to compile the app
 .phony all: link
@@ -132,7 +132,7 @@ fatfs: $(FAT_OBJS) fatFs/ff.h fatFs/ffconf.h fatFs/diskio.h
 # Recipe to clean all compiled objects
 .phony clean:
 	@$(RM) *.rel *.map *.lst *.lnk *.sym *.asm *~ *.o *.obj *.ihx *.rom *.rel *.a *.lib
-	@$(RM) fatFs\*.rel fatFs\*.map fatFs\*.lst fatFs\*.lnk fatFs\*.sym fatFs\*.asm fatFs\*~ fatFs\*.o fatFs\*.obj fatFs\*.ihx fatFs\*.rom fatFs\*.rel fatFs\*.a fatFs\*.lib
+	@$(RM) fatFS/*.rel fatFS/*.map fatFS/*.lst fatFS/*.lnk fatFS/*.sym fatFS/*.asm fatFS/*~ fatFS/*.o fatFS/*.obj fatFS/*.ihx fatFS/*.rom fatFS/*.rel fatFS/*.a fatFS/*.lib
 
 # Recipe to compile all C files
 %.rel: %.c

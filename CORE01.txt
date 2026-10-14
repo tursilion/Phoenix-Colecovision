@@ -1,0 +1,4 @@
+2026-10-14
+- fix AY audio init
+- add PS/2 keyboard reads (set port 0x54 to 0x04 for normal Coleco or 0x05 for SGM - bit 0x04 enables the keyboard. Read scancodes from port 0x80).
+- add SGM cart support - filename must end in ".sgm" and it must be padded to 16k like megacarts.

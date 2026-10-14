@@ -1,0 +1,861 @@
+Release 14.7 Map P.20131013 (lin64)
+Xilinx Mapping Report File for Design 'phoenix_top'
+
+Design Information
+------------------
+Command Line   : map -p xc6slx16-2-csg324 -w -ol high -pr b -o
+phoenix_top_map.ncd phoenix_top.ngd phoenix_top.pcf 
+Target Device  : xc6slx16
+Target Package : csg324
+Target Speed   : -2
+Mapper Version : spartan6 -- $Revision: 1.55 $
+Mapped Date    : Wed Oct 14 06:49:25 2026
+
+Design Summary
+--------------
+Number of errors:      0
+Number of warnings:    5
+Slice Logic Utilization:
+  Number of Slice Registers:                 3,256 out of  18,224   17%
+    Number used as Flip Flops:               3,239
+    Number used as Latches:                      0
+    Number used as Latch-thrus:                  0
+    Number used as AND/OR logics:               17
+  Number of Slice LUTs:                      5,826 out of   9,112   63%
+    Number used as logic:                    5,688 out of   9,112   62%
+      Number using O6 output only:           4,240
+      Number using O5 output only:             211
+      Number using O5 and O6:                1,237
+      Number used as ROM:                        0
+    Number used as Memory:                     103 out of   2,176    4%
+      Number used as Dual Port RAM:             72
+        Number using O6 output only:            40
+        Number using O5 output only:             0
+        Number using O5 and O6:                 32
+      Number used as Single Port RAM:           10
+        Number using O6 output only:             3
+        Number using O5 output only:             1
+        Number using O5 and O6:                  6
+      Number used as Shift Register:            21
+        Number using O6 output only:             5
+        Number using O5 output only:             0
+        Number using O5 and O6:                 16
+    Number used exclusively as route-thrus:     35
+      Number with same-slice register load:     13
+      Number with same-slice carry load:        22
+      Number with other load:                    0
+
+Slice Logic Distribution:
+  Number of occupied Slices:                 1,934 out of   2,278   84%
+  Number of MUXCYs used:                     1,120 out of   4,556   24%
+  Number of LUT Flip Flop pairs used:        6,172
+    Number with an unused Flip Flop:         3,150 out of   6,172   51%
+    Number with an unused LUT:                 346 out of   6,172    5%
+    Number of fully used LUT-FF pairs:       2,676 out of   6,172   43%
+    Number of unique control sets:             254
+    Number of slice register sites lost
+      to control set restrictions:             700 out of  18,224    3%
+
+  A LUT Flip Flop pair for this architecture represents one LUT paired with
+  one Flip Flop within a slice.  A control set is a unique combination of
+  clock, reset, set, and enable signals for a registered element.
+  The Slice Logic Distribution report is not meaningful if the design is
+  over-mapped for a non-slice resource or if Placement fails.
+
+IO Utilization:
+  Number of bonded IOBs:                        99 out of     232   42%
+    Number of LOCed IOBs:                       99 out of      99  100%
+    IOB Flip Flops:                             47
+    IOB Master Pads:                             4
+    IOB Slave Pads:                              4
+
+Specific Feature Utilization:
+  Number of RAMB16BWERs:                        26 out of      32   81%
+  Number of RAMB8BWERs:                          4 out of      64    6%
+  Number of BUFIO2/BUFIO2_2CLKs:                 1 out of      32    3%
+    Number used as BUFIO2s:                      1
+    Number used as BUFIO2_2CLKs:                 0
+  Number of BUFIO2FB/BUFIO2FB_2CLKs:             0 out of      32    0%
+  Number of BUFG/BUFGMUXs:                       4 out of      16   25%
+    Number used as BUFGs:                        4
+    Number used as BUFGMUX:                      0
+  Number of DCM/DCM_CLKGENs:                     0 out of       4    0%
+  Number of ILOGIC2/ISERDES2s:                  21 out of     248    8%
+    Number used as ILOGIC2s:                    21
+    Number used as ISERDES2s:                    0
+  Number of IODELAY2/IODRP2/IODRP2_MCBs:         0 out of     248    0%
+  Number of OLOGIC2/OSERDES2s:                  26 out of     248   10%
+    Number used as OLOGIC2s:                    26
+    Number used as OSERDES2s:                    0
+  Number of BSCANs:                              0 out of       4    0%
+  Number of BUFHs:                               0 out of     128    0%
+  Number of BUFPLLs:                             0 out of       8    0%
+  Number of BUFPLL_MCBs:                         0 out of       4    0%
+  Number of DSP48A1s:                            5 out of      32   15%
+  Number of ICAPs:                               0 out of       1    0%
+  Number of MCBs:                                0 out of       2    0%
+  Number of PCILOGICSEs:                         0 out of       2    0%
+  Number of PLL_ADVs:                            1 out of       2   50%
+  Number of PMVs:                                0 out of       1    0%
+  Number of STARTUPs:                            0 out of       1    0%
+  Number of SUSPEND_SYNCs:                       0 out of       1    0%
+
+Average Fanout of Non-Clock Nets:                4.24
+
+Peak Memory Usage:  821 MB
+Total REAL time to MAP completion:  43 secs 
+Total CPU time to MAP completion:   42 secs 
+
+Table of Contents
+-----------------
+Section 1 - Errors
+Section 2 - Warnings
+Section 3 - Informational
+Section 4 - Removed Logic Summary
+Section 5 - Removed Logic
+Section 6 - IOB Properties
+Section 7 - RPMs
+Section 8 - Guide Report
+Section 9 - Area Group and Partition Summary
+Section 10 - Timing Report
+Section 11 - Configuration String Information
+Section 12 - Control Set Information
+Section 13 - Utilization by Hierarchy
+
+Section 1 - Errors
+------------------
+
+Section 2 - Warnings
+--------------------
+WARNING:PhysDesignRules:367 - The signal
+   <coleco/inst_t80/u0/Regs/Mram_RegsL11_RAMD_D1_O> is incomplete. The signal
+   does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal
+   <coleco/inst_f18a/inst_tiles/Mram_fifo1_RAMD_D1_O> is incomplete. The signal
+   does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal
+   <coleco/inst_t80/u0/Regs/Mram_RegsH11_RAMD_D1_O> is incomplete. The signal
+   does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal <coleco/Mram_kbd_fifo_r1_RAMD_D1_O> is
+   incomplete. The signal does not drive any load pins in the design.
+WARNING:PhysDesignRules:2410 - This design is using one or more 9K Block RAMs
+   (RAMB8BWER).  9K Block RAM initialization data, both user defined and
+   default, may be incorrect and should not be used.  For more information,
+   please reference Xilinx Answer Record 39999.
+
+Section 3 - Informational
+-------------------------
+INFO:LIT:243 - Logical network coleco/Mram_kbd_fifo_r22/SPO has no load.
+INFO:LIT:395 - The above info message is repeated 7 more times for the following
+   (max. 5 shown):
+   coleco/Mram_kbd_fifo_r21/SPO,
+   coleco/inst_t80/u0/Regs/Mram_RegsH122/SPO,
+   coleco/inst_t80/u0/Regs/Mram_RegsH121/SPO,
+   coleco/inst_t80/u0/Regs/Mram_RegsL122/SPO,
+   coleco/inst_t80/u0/Regs/Mram_RegsL121/SPO
+   To see the details of these info messages, please use the -detail switch.
+INFO:MapLib:562 - No environment variables are currently set.
+INFO:LIT:244 - All of the single ended outputs in this design are using slew
+   rate limited output drivers. The delay on speed critical single ended outputs
+   can be dramatically reduced by designating them as fast outputs.
+INFO:Pack:1716 - Initializing temperature to 85.000 Celsius. (default - Range:
+   0.000 to 85.000 Celsius)
+INFO:Pack:1720 - Initializing voltage to 1.140 Volts. (default - Range: 1.140 to
+   1.260 Volts)
+INFO:Map:215 - The Interim Design Summary has been generated in the MAP Report
+   (.mrp).
+INFO:Pack:1650 - Map created a placed design.
+
+Section 4 - Removed Logic Summary
+---------------------------------
+ 157 block(s) removed
+   2 block(s) optimized away
+ 130 signal(s) removed
+
+Section 5 - Removed Logic
+-------------------------
+
+The trimmed logic report below shows the logic removed from your design due to
+sourceless or loadless signals, and VCC or ground connections.  If the removal
+of a signal or symbol results in the subsequent removal of an additional signal
+or symbol, the message explaining that second removal will be indented.  This
+indentation will be repeated as a chain of related logic is removed.
+
+To quickly locate the original cause for the removal of a chain of logic, look
+above the place where that logic is listed in the trimming report, then locate
+the lines that are least indented (begin at the leftmost edge).
+
+Loadless block "coleco/inst_f18a/inst_cpu/inst_gpu/Madd_bml_addr<2:15>13" (ROM)
+removed.
+Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd213" (ROM)
+removed.
+Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd511" (ROM)
+removed.
+ The signal "coleco/sn76489_audio_inst/level_a_s<11>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_a_s31" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_b_s<11>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_b_s31" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd_114" is loadless
+and has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_xor<11>"
+(XOR) removed.
+   The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<10>" is
+loadless and has been removed.
+    Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<10>" (MUX)
+removed.
+     The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<9>" is
+loadless and has been removed.
+      Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<9>" (MUX)
+removed.
+       The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<8>" is
+loadless and has been removed.
+        Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<8>" (MUX)
+removed.
+         The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<7>" is
+loadless and has been removed.
+          Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<7>" (MUX)
+removed.
+           The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<6>" is
+loadless and has been removed.
+            Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<6>" (MUX)
+removed.
+             The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<5>" is
+loadless and has been removed.
+              Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<5>" (MUX)
+removed.
+               The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<4>" is
+loadless and has been removed.
+                Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<4>" (MUX)
+removed.
+                 The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<3>" is
+loadless and has been removed.
+                  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<3>" (MUX)
+removed.
+                   The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<2>" is
+loadless and has been removed.
+                    Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<2>" (MUX)
+removed.
+                     The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<1>" is
+loadless and has been removed.
+                      Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<1>" (MUX)
+removed.
+                       The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<0>" is
+loadless and has been removed.
+                        Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_cy<0>" (MUX)
+removed.
+                         The signal "coleco/sn76489_audio_inst/level_c_s<0>" is loadless and has been
+removed.
+                          Loadless block "coleco/sn76489_audio_inst/level_c_s<0>1" (ROM) removed.
+                         The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<0>" is
+loadless and has been removed.
+                          Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<0>" (ROM)
+removed.
+                           The signal "coleco/sn76489_audio_inst/noise_level_r<0>" is loadless and has been
+removed.
+                            Loadless block "coleco/sn76489_audio_inst/noise_level_r_0" (FF) removed.
+                       The signal "coleco/sn76489_audio_inst/level_c_s<1>" is loadless and has been
+removed.
+                        Loadless block "coleco/sn76489_audio_inst/level_c_s<1>1" (ROM) removed.
+                       The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<1>" is
+loadless and has been removed.
+                        Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<1>" (ROM)
+removed.
+                     The signal "coleco/sn76489_audio_inst/level_c_s<2>" is loadless and has been
+removed.
+                      Loadless block "coleco/sn76489_audio_inst/level_c_s<2>1" (ROM) removed.
+                     The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<2>" is
+loadless and has been removed.
+                      Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<2>" (ROM)
+removed.
+                   The signal "coleco/sn76489_audio_inst/level_c_s<3>" is loadless and has been
+removed.
+                    Loadless block "coleco/sn76489_audio_inst/level_c_s<3>1" (ROM) removed.
+                   The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<3>" is
+loadless and has been removed.
+                    Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<3>" (ROM)
+removed.
+                 The signal "coleco/sn76489_audio_inst/level_c_s<4>" is loadless and has been
+removed.
+                  Loadless block "coleco/sn76489_audio_inst/level_c_s<4>1" (ROM) removed.
+                 The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<4>" is
+loadless and has been removed.
+                  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<4>" (ROM)
+removed.
+               The signal "coleco/sn76489_audio_inst/level_c_s<5>" is loadless and has been
+removed.
+                Loadless block "coleco/sn76489_audio_inst/level_c_s<5>1" (ROM) removed.
+               The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<5>" is
+loadless and has been removed.
+                Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<5>" (ROM)
+removed.
+             The signal "coleco/sn76489_audio_inst/level_c_s<6>" is loadless and has been
+removed.
+              Loadless block "coleco/sn76489_audio_inst/level_c_s<6>1" (ROM) removed.
+             The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<6>" is
+loadless and has been removed.
+              Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<6>" (ROM)
+removed.
+           The signal "coleco/sn76489_audio_inst/level_c_s<7>" is loadless and has been
+removed.
+            Loadless block "coleco/sn76489_audio_inst/level_c_s<7>1" (ROM) removed.
+           The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<7>" is
+loadless and has been removed.
+            Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<7>" (ROM)
+removed.
+         The signal "coleco/sn76489_audio_inst/level_c_s<8>" is loadless and has been
+removed.
+          Loadless block "coleco/sn76489_audio_inst/level_c_s<8>1" (ROM) removed.
+         The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<8>" is
+loadless and has been removed.
+          Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<8>" (ROM)
+removed.
+       The signal "coleco/sn76489_audio_inst/level_c_s<9>" is loadless and has been
+removed.
+        Loadless block "coleco/sn76489_audio_inst/level_c_s<9>1" (ROM) removed.
+       The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<9>" is
+loadless and has been removed.
+        Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<9>" (ROM)
+removed.
+     The signal "coleco/sn76489_audio_inst/level_c_s<10>" is loadless and has been
+removed.
+      Loadless block "coleco/sn76489_audio_inst/level_c_s<10>1" (ROM) removed.
+     The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<10>" is
+loadless and has been removed.
+      Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<10>"
+(ROM) removed.
+   The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<11>" is
+loadless and has been removed.
+    Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_lut<11>"
+(ROM) removed.
+Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd5_lut<0>1"
+(ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_a_s<1>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_a_s41" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_b_s<1>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_b_s41" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd_17" is loadless
+and has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_xor<1>" (XOR)
+removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd5" is loadless and
+has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd5" (ROM)
+removed.
+   The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd_04" is loadless
+and has been removed.
+    Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_xor<0>" (XOR)
+removed.
+Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd5_lut<0>10"
+(ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_a_s<10>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_a_s21" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_b_s<10>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_b_s21" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd_104" is loadless
+and has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_xor<10>"
+(XOR) removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd59" is loadless and
+has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd59" (ROM)
+removed.
+   The signal "coleco/sn76489_audio_inst/level_a_s<9>" is loadless and has been
+removed.
+    Loadless block "coleco/sn76489_audio_inst/Mmux_level_a_s121" (ROM) removed.
+   The signal "coleco/sn76489_audio_inst/level_b_s<9>" is loadless and has been
+removed.
+    Loadless block "coleco/sn76489_audio_inst/Mmux_level_b_s121" (ROM) removed.
+   The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd_94" is loadless
+and has been removed.
+    Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_xor<9>" (XOR)
+removed.
+Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd5_lut<0>11"
+(ROM) removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd510" is loadless
+and has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd510" (ROM)
+removed.
+Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd5_lut<0>2"
+(ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_a_s<2>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_a_s51" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_b_s<2>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_b_s51" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd_24" is loadless
+and has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_xor<2>" (XOR)
+removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd51" is loadless and
+has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd51" (ROM)
+removed.
+Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd5_lut<0>3"
+(ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_a_s<3>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_a_s61" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_b_s<3>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_b_s61" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd_34" is loadless
+and has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_xor<3>" (XOR)
+removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd52" is loadless and
+has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd52" (ROM)
+removed.
+Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd5_lut<0>4"
+(ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_a_s<4>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_a_s71" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_b_s<4>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_b_s71" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd_44" is loadless
+and has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_xor<4>" (XOR)
+removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd53" is loadless and
+has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd53" (ROM)
+removed.
+Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd5_lut<0>5"
+(ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_a_s<5>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_a_s81" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_b_s<5>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_b_s81" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd_54" is loadless
+and has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_xor<5>" (XOR)
+removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd54" is loadless and
+has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd54" (ROM)
+removed.
+Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd5_lut<0>6"
+(ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_a_s<6>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_a_s91" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_b_s<6>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_b_s91" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd_64" is loadless
+and has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_xor<6>" (XOR)
+removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd55" is loadless and
+has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd55" (ROM)
+removed.
+Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd5_lut<0>7"
+(ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_a_s<7>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_a_s101" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_b_s<7>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_b_s101" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd_74" is loadless
+and has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_xor<7>" (XOR)
+removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd56" is loadless and
+has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd56" (ROM)
+removed.
+Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd5_lut<0>8"
+(ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_a_s<8>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_a_s111" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/level_b_s<8>" is loadless and has been
+removed.
+  Loadless block "coleco/sn76489_audio_inst/Mmux_level_b_s111" (ROM) removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd_84" is loadless
+and has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd4_xor<8>" (XOR)
+removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd57" is loadless and
+has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd57" (ROM)
+removed.
+Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd5_lut<0>9"
+(ROM) removed.
+ The signal "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd58" is loadless and
+has been removed.
+  Loadless block "coleco/sn76489_audio_inst/ADDERTREE_INTERNAL_Madd58" (ROM)
+removed.
+Loadless block "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT11"
+(ROM) removed.
+ The signal "coleco/ym2149_audio_inst/dac_a_r<11>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_a_r_11" (SFF) removed.
+   The signal "coleco/ym2149_audio_inst/_n0666" is loadless and has been removed.
+    Loadless block "coleco/ym2149_audio_inst/_n06661" (ROM) removed.
+ The signal "coleco/ym2149_audio_inst/dac_b_r<11>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_b_r_11" (SFF) removed.
+   The signal "coleco/ym2149_audio_inst/_n0668" is loadless and has been removed.
+    Loadless block "coleco/ym2149_audio_inst/_n06681" (ROM) removed.
+ The signal "coleco/ym2149_audio_inst/dac_c_r<11>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_c_r_11" (SFF) removed.
+   The signal "coleco/ym2149_audio_inst/_n0670" is loadless and has been removed.
+    Loadless block "coleco/ym2149_audio_inst/_n06701" (ROM) removed.
+Loadless block
+"coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT_lut<0>1" (ROM)
+removed.
+ The signal "coleco/ym2149_audio_inst/dac_a_r<1>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_a_r_1" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_b_r<1>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_b_r_1" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_c_r<1>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_c_r_1" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT" is
+loadless and has been removed.
+  Loadless block "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT"
+(ROM) removed.
+   The signal "coleco/ym2149_audio_inst/dac_a_r<0>" is loadless and has been
+removed.
+    Loadless block "coleco/ym2149_audio_inst/dac_a_r_0" (SFF) removed.
+   The signal "coleco/ym2149_audio_inst/dac_b_r<0>" is loadless and has been
+removed.
+    Loadless block "coleco/ym2149_audio_inst/dac_b_r_0" (SFF) removed.
+   The signal "coleco/ym2149_audio_inst/dac_c_r<0>" is loadless and has been
+removed.
+    Loadless block "coleco/ym2149_audio_inst/dac_c_r_0" (SFF) removed.
+Loadless block
+"coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT_lut<0>10" (ROM)
+removed.
+ The signal "coleco/ym2149_audio_inst/dac_a_r<10>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_a_r_10" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_b_r<10>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_b_r_10" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_c_r<10>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_c_r_10" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT9" is
+loadless and has been removed.
+  Loadless block "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT9"
+(ROM) removed.
+   The signal "coleco/ym2149_audio_inst/dac_a_r<9>" is loadless and has been
+removed.
+    Loadless block "coleco/ym2149_audio_inst/dac_a_r_9" (SFF) removed.
+   The signal "coleco/ym2149_audio_inst/dac_b_r<9>" is loadless and has been
+removed.
+    Loadless block "coleco/ym2149_audio_inst/dac_b_r_9" (SFF) removed.
+   The signal "coleco/ym2149_audio_inst/dac_c_r<9>" is loadless and has been
+removed.
+    Loadless block "coleco/ym2149_audio_inst/dac_c_r_9" (SFF) removed.
+Loadless block
+"coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT_lut<0>11" (ROM)
+removed.
+ The signal "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT10" is
+loadless and has been removed.
+  Loadless block "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT10"
+(ROM) removed.
+Loadless block
+"coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT_lut<0>2" (ROM)
+removed.
+ The signal "coleco/ym2149_audio_inst/dac_a_r<2>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_a_r_2" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_b_r<2>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_b_r_2" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_c_r<2>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_c_r_2" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT1" is
+loadless and has been removed.
+  Loadless block "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT1"
+(ROM) removed.
+Loadless block
+"coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT_lut<0>3" (ROM)
+removed.
+ The signal "coleco/ym2149_audio_inst/dac_a_r<3>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_a_r_3" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_b_r<3>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_b_r_3" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_c_r<3>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_c_r_3" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT2" is
+loadless and has been removed.
+  Loadless block "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT2"
+(ROM) removed.
+Loadless block
+"coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT_lut<0>4" (ROM)
+removed.
+ The signal "coleco/ym2149_audio_inst/dac_a_r<4>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_a_r_4" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_b_r<4>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_b_r_4" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_c_r<4>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_c_r_4" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT3" is
+loadless and has been removed.
+  Loadless block "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT3"
+(ROM) removed.
+Loadless block
+"coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT_lut<0>5" (ROM)
+removed.
+ The signal "coleco/ym2149_audio_inst/dac_a_r<5>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_a_r_5" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_b_r<5>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_b_r_5" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_c_r<5>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_c_r_5" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT4" is
+loadless and has been removed.
+  Loadless block "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT4"
+(ROM) removed.
+Loadless block
+"coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT_lut<0>6" (ROM)
+removed.
+ The signal "coleco/ym2149_audio_inst/dac_a_r<6>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_a_r_6" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_b_r<6>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_b_r_6" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_c_r<6>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_c_r_6" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT5" is
+loadless and has been removed.
+  Loadless block "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT5"
+(ROM) removed.
+Loadless block
+"coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT_lut<0>7" (ROM)
+removed.
+ The signal "coleco/ym2149_audio_inst/dac_a_r<7>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_a_r_7" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_b_r<7>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_b_r_7" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_c_r<7>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_c_r_7" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT6" is
+loadless and has been removed.
+  Loadless block "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT6"
+(ROM) removed.
+Loadless block
+"coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT_lut<0>8" (ROM)
+removed.
+ The signal "coleco/ym2149_audio_inst/dac_a_r<8>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_a_r_8" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_b_r<8>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_b_r_8" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/dac_c_r<8>" is loadless and has been
+removed.
+  Loadless block "coleco/ym2149_audio_inst/dac_c_r_8" (SFF) removed.
+ The signal "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT7" is
+loadless and has been removed.
+  Loadless block "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT7"
+(ROM) removed.
+Loadless block
+"coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT_lut<0>9" (ROM)
+removed.
+ The signal "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT8" is
+loadless and has been removed.
+  Loadless block "coleco/ym2149_audio_inst/Madd_GND_50_o_GND_50_o_add_220_OUT8"
+(ROM) removed.
+Loadless block
+"coleco/ym2149_audio_inst/Madd_sign_a_r[11]_sign_c_r[11]_add_249_OUT13" (ROM)
+removed.
+
+Optimized Block(s):
+TYPE 		BLOCK
+GND 		XST_GND
+VCC 		XST_VCC
+
+To enable printing of redundant blocks removed and signals merged, set the
+detailed map report option and rerun map.
+
+Section 6 - IOB Properties
+--------------------------
+
++---------------------------------------------------------------------------------------------------------------------------------------------------------+
+| IOB Name                           | Type             | Direction | IO Standard          | Diff  | Drive    | Slew | Reg (s)      | Resistor | IOB      |
+|                                    |                  |           |                      | Term  | Strength | Rate |              |          | Delay    |
++---------------------------------------------------------------------------------------------------------------------------------------------------------+
+| btn_reset_n_i                      | IOB              | INPUT     | LVCMOS33             |       |          |      |              |          |          |
+| cart_addr_o<0>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_addr_o<1>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_addr_o<2>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_addr_o<3>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_addr_o<4>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_addr_o<5>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_addr_o<6>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_addr_o<7>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_addr_o<8>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_addr_o<9>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_addr_o<10>                    | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_addr_o<11>                    | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_addr_o<12>                    | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_addr_o<13>                    | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_addr_o<14>                    | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_data_io<0>                    | IOB              | BIDIR     | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_data_io<1>                    | IOB              | BIDIR     | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_data_io<2>                    | IOB              | BIDIR     | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_data_io<3>                    | IOB              | BIDIR     | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_data_io<4>                    | IOB              | BIDIR     | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_data_io<5>                    | IOB              | BIDIR     | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_data_io<6>                    | IOB              | BIDIR     | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_data_io<7>                    | IOB              | BIDIR     | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_dir_o                         | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_en_80_n_o                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_en_A0_n_o                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_en_C0_n_o                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_en_E0_n_o                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| cart_oe_n_o                        | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| clock_50m0_i_net                   | IOB              | INPUT     | LVCMOS33             |       |          |      |              |          |          |
+| joy1_p1_i                          | IOB              | INPUT     | LVCMOS33             |       |          |      |              | PULLUP   |          |
+| joy1_p2_i                          | IOB              | INPUT     | LVCMOS33             |       |          |      |              | PULLUP   |          |
+| joy1_p3_i                          | IOB              | INPUT     | LVCMOS33             |       |          |      |              | PULLUP   |          |
+| joy1_p4_i                          | IOB              | INPUT     | LVCMOS33             |       |          |      |              | PULLUP   |          |
+| joy1_p6_i                          | IOB              | INPUT     | LVCMOS33             |       |          |      |              | PULLUP   |          |
+| joy1_p7_i                          | IOB              | INPUT     | LVCMOS33             |       |          |      | IFF          | PULLUP   |          |
+| joy1_p9_i                          | IOB              | INPUT     | LVCMOS33             |       |          |      | IFF          |          |          |
+| joy2_p1_i                          | IOB              | INPUT     | LVCMOS33             |       |          |      | IFF          | PULLUP   |          |
+| joy2_p2_i                          | IOB              | INPUT     | LVCMOS33             |       |          |      | IFF          | PULLUP   |          |
+| joy2_p3_i                          | IOB              | INPUT     | LVCMOS33             |       |          |      | IFF          | PULLUP   |          |
+| joy2_p4_i                          | IOB              | INPUT     | LVCMOS33             |       |          |      | IFF          | PULLUP   |          |
+| joy2_p6_i                          | IOB              | INPUT     | LVCMOS33             |       |          |      | IFF          | PULLUP   |          |
+| joy2_p7_i                          | IOB              | INPUT     | LVCMOS33             |       |          |      | IFF          | PULLUP   |          |
+| joy2_p9_i                          | IOB              | INPUT     | LVCMOS33             |       |          |      | IFF          |          |          |
+| joy_p5_o                           | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| joy_p8_o                           | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| led_o                              | IOB              | OUTPUT    | LVCMOS33             |       | 8        | SLOW |              |          |          |
+| lvds_n_o<0>                        | IOBS             | OUTPUT    | LVDS_33              |       |          |      |              |          |          |
+| lvds_n_o<1>                        | IOBS             | OUTPUT    | LVDS_33              |       |          |      |              |          |          |
+| lvds_n_o<2>                        | IOBS             | OUTPUT    | LVDS_33              |       |          |      |              |          |          |
+| lvds_n_o<3>                        | IOBS             | OUTPUT    | LVDS_33              |       |          |      |              |          |          |
+| lvds_p_o<0>                        | IOBM             | OUTPUT    | LVDS_33              |       |          |      | ODDR         |          |          |
+| lvds_p_o<1>                        | IOBM             | OUTPUT    | LVDS_33              |       |          |      | ODDR         |          |          |
+| lvds_p_o<2>                        | IOBM             | OUTPUT    | LVDS_33              |       |          |      | ODDR         |          |          |
+| lvds_p_o<3>                        | IOBM             | OUTPUT    | LVDS_33              |       |          |      | ODDR         |          |          |
+| ps2_clk_io                         | IOB              | INPUT     | LVCMOS33             |       |          |      | IFF          |          |          |
+| ps2_data_io                        | IOB              | INPUT     | LVCMOS33             |       |          |      | IFF          |          |          |
+| rgb_led_o<0>                       | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| rgb_led_o<1>                       | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| rgb_led_o<2>                       | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| sd_cd_n_i                          | IOB              | INPUT     | LVCMOS33             |       |          |      | IFF          |          |          |
+| sd_cs_n_o                          | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sd_miso_i                          | IOB              | INPUT     | LVCMOS33             |       |          |      |              |          |          |
+| sd_mosi_o                          | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| sd_sclk_o                          | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| snesjoy_clock_o                    | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| snesjoy_data_i                     | IOB              | INPUT     | LVCMOS33             |       |          |      | IFF          |          |          |
+| snesjoy_latch_o                    | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<0>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<1>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<2>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<3>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<4>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<5>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<6>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<7>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<8>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<9>                     | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<10>                    | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<11>                    | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<12>                    | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<13>                    | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<14>                    | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<15>                    | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<16>                    | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<17>                    | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_addr_o<18>                    | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW | OFF          |          |          |
+| sram_ce_n_o                        | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| sram_data_io<0>                    | IOB              | BIDIR     | LVCMOS33             |       | 12       | SLOW | IFF          |          |          |
+| sram_data_io<1>                    | IOB              | BIDIR     | LVCMOS33             |       | 12       | SLOW | IFF          |          |          |
+| sram_data_io<2>                    | IOB              | BIDIR     | LVCMOS33             |       | 12       | SLOW | IFF          |          |          |
+| sram_data_io<3>                    | IOB              | BIDIR     | LVCMOS33             |       | 12       | SLOW | IFF          |          |          |
+| sram_data_io<4>                    | IOB              | BIDIR     | LVCMOS33             |       | 12       | SLOW | IFF          |          |          |
+| sram_data_io<5>                    | IOB              | BIDIR     | LVCMOS33             |       | 12       | SLOW | IFF          |          |          |
+| sram_data_io<6>                    | IOB              | BIDIR     | LVCMOS33             |       | 12       | SLOW | IFF          |          |          |
+| sram_data_io<7>                    | IOB              | BIDIR     | LVCMOS33             |       | 12       | SLOW | IFF          |          |          |
+| sram_oe_n_o                        | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
+| sram_we_n_o                        | IOB              | OUTPUT    | LVCMOS33             |       | 12       | SLOW |              |          |          |
++---------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+Section 7 - RPMs
+----------------
+
+Section 8 - Guide Report
+------------------------
+Guide not run on this design.
+
+Section 9 - Area Group and Partition Summary
+--------------------------------------------
+
+Partition Implementation Status
+-------------------------------
+
+  No Partitions were found in this design.
+
+-------------------------------
+
+Area Group Information
+----------------------
+
+  No area groups were found in this design.
+
+----------------------
+
+Section 10 - Timing Report
+--------------------------
+A logic-level (pre-route) timing report can be generated by using Xilinx static
+timing analysis tools, Timing Analyzer (GUI) or TRCE (command line), with the
+mapped NCD and PCF files. Please note that this timing report will be generated
+using estimated delay information. For accurate numbers, please generate a
+timing report with the post Place and Route NCD file.
+
+For more information about the Timing Analyzer, consult the Xilinx Timing
+Analyzer Reference Manual; for more information about TRCE, consult the Xilinx
+Command Line Tools User Guide "TRACE" chapter.
+
+Section 11 - Configuration String Details
+-----------------------------------------
+Use the "-detail" map option to print out Configuration Strings
+
+Section 12 - Control Set Information
+------------------------------------
+Use the "-detail" map option to print out Control Set Information.
+
+Section 13 - Utilization by Hierarchy
+-------------------------------------
+Use the "-detail" map option to print out the Utilization by Hierarchy section.

@@ -17,7 +17,7 @@ PART         := xc6slx16-2-csg324
 TOP          := nes_phoenix_top
 CORE_FILE    ?= CORE03.PHX
 CORE_NAME    := NES
-CORE_ISSUE   := 0
+CORE_ISSUE   ?= 0
 
 REPO := ../..
 RTL  := $(REPO)/rtl
@@ -66,7 +66,18 @@ BITGEN_OPTS := \
   -g ConfigRate:26 \
   -g UnusedPin:Pullnone
 
+# ISE tools come from ISE_SETTINGS when ISE is installed; otherwise each
+# tool runs in the docked-ise-147 Docker image with the repo mounted.
+ifneq ($(wildcard $(ISE_SETTINGS)),)
 ISE = . $(ISE_SETTINGS) > /dev/null &&
+else
+ISE_IMAGE ?= docked-ise-147
+ISE_LIC   ?= $(HOME)/Docked-ISE-147/Xilinx.lic
+REPO_ABS  := $(abspath $(REPO))
+ISE = docker run --rm -u 0 -v $(REPO_ABS):/workspace \
+  -v $(ISE_LIC):/root/.Xilinx/Xilinx.lic \
+  -w /workspace/$(patsubst $(REPO_ABS)/%,%,$(CURDIR)) $(ISE_IMAGE)
+endif
 
 all: $(CORE_FILE)
 
@@ -77,10 +88,13 @@ nes_palette.txt: $(NRTL)/fpganes/nes_palette.txt
 oam_palette.txt: $(NRTL)/fpganes/oam_palette.txt
 	cp $< $@
 
+# Only replaced when the contents change, so editing the Makefile (e.g. for
+# the issue number) doesn't re-run synthesis.
 $(TOP).prj: Makefile
-	rm -f $@
-	for f in $(VHDL); do echo "vhdl work \"$$f\"" >> $@; done
-	for f in $(VERILOG); do echo "verilog work \"$$f\"" >> $@; done
+	rm -f $@.new
+	for f in $(VHDL); do echo "vhdl work \"$$f\"" >> $@.new; done
+	for f in $(VERILOG); do echo "verilog work \"$$f\"" >> $@.new; done
+	cmp -s $@.new $@ && rm $@.new || mv $@.new $@
 
 $(TOP).xst: Makefile
 	printf '%s\n' \
@@ -95,7 +109,8 @@ $(TOP).xst: Makefile
 	  '-opt_mode Speed' \
 	  '-opt_level 1' \
 	  '-vlgincdir {"$(NRTL)/fpganes"}' \
-	  > $@
+	  > $@.new
+	cmp -s $@.new $@ && rm $@.new || mv $@.new $@
 
 $(TOP).ngc: $(TOP).prj $(TOP).xst $(VHDL) $(VERILOG) $(VINCLUDES) $(MEMFILES)
 	mkdir -p xst_tmp xst_hdp
@@ -119,7 +134,7 @@ $(TOP).bin: $(TOP).bit
 bin2phx: $(REPO)/Utils/src_bin2phx/bin2phx.c
 	gcc -Wall -O2 -o $@ $<
 
-$(CORE_FILE): $(TOP).bit bin2phx
+$(CORE_FILE): $(TOP).bit bin2phx FORCE
 	./bin2phx $(TOP).bin $@ $(CORE_NAME) $(CORE_ISSUE)
 
 loader:
@@ -131,4 +146,6 @@ clean:
 	  *.twr *.twx *.bgn *.drc *.bit *.bin *.xml *.xrpt *.html *.csv *.txt \
 	  *_pad.* *.PHX bin2phx $(MEMFILES) webtalk.log usage_statistics_webtalk.html
 
-.PHONY: all loader clean
+FORCE:
+
+.PHONY: all loader clean FORCE

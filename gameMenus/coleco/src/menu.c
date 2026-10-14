@@ -80,11 +80,6 @@ extern unsigned char text_width;
 #define CART_FIRST_PAGE 1       // 0 is SGM, 1 is cart memory
 #define CART_LAST_PAGE 15       // for 512k megacart (minus 32k)
 
-// how long to sit idle before blanking (on no SD card or cartridge)
-#define BLANK_TIME 5400    // about 3 minutes @ 30hz
-
-
-
 // --- work buffers ---
 
 // Current path, and a temporary for manipulating it
@@ -259,27 +254,6 @@ void waitAnyFirePressed() {
         readkeypad();
         if (MY_KEY == JOY_FIRE) break;
     }
-}
-
-// Blank the screen and wait for an input, then restore the screen
-void handleBlanking(unsigned char mode) {
-    unsigned char disk = disk_status();
-
-    // blank the screen, cause all 9918 systems seem to
-    VDP_SET_REGISTER(VDP_REG_MODE1, mode&(~0x40));
-
-    // wait for any input to clear it
-    for (;;) {
-        readkeypad();
-        if (MY_KEY != 0xff) break;
-        if ((MY_JOYY)||(MY_JOYX)) break;
-
-        // even SD insert or remove - no need to sleep here
-        if (disk_status() != disk) break;
-    }
-
-    // re-enable the screen
-    VDP_SET_REGISTER(VDP_REG_MODE1, mode);  // as above, plus unblank
 }
 
 // use the sprite layer to display an error at the bottom of the screen
@@ -580,9 +554,8 @@ void sortDir() {
     }
 }
 
-// wait for an SD card to be inserted (with screen blank)
+// wait for an SD card to be inserted
 void waitSDCard() {
-    unsigned int cntDown;   // used to count down to screen blank timeout
     unsigned char debounce; // make sure card detect is stable if we see insertion
 
     // - If card can't be accessed:
@@ -593,19 +566,11 @@ void waitSDCard() {
     textout(GSPRITEPAT+(0*8)+(4*16), "Insert SD or turn system");
     textout(GSPRITEPAT+(1*8)+(1*16), "off before inserting cartridge");
 
-    cntDown = BLANK_TIME;
     debounce = 0;
     while (debounce < 2) {
         // -    Check for SD card periodically
         // -    When detected, jump back to the 'reading SD card' line
         waitVblanks(2);
-
-        // countdown screen timeout
-        if (--cntDown == 0) {
-            handleBlanking(0xe2);
-            cntDown = BLANK_TIME;
-            debounce = 0;
-        }
 
         // check for and debounce SD card detect
         if (disk_status() == STA_NODISK) {
@@ -683,15 +648,19 @@ void copyPage(unsigned char a, unsigned char b) {
 // note it's likely both the initial block reads are wasted
 // on return (failure), we return the page we reached, which
 // lets us decide whether to reload the directory
-unsigned char loadMegacartRom(unsigned char fsize) {
+unsigned char loadMegacartRom(unsigned char fsize, unsigned char isSGM) {
     unsigned char *p;
     unsigned char page;
     UINT br;
     FSIZE_t ofs;
 
     clrscrbottom();
-    centerString(0, "reading megacart...");
-
+    if (!isSGM) {
+        centerString(0, "reading megacart...");
+    } else {
+        centerString(0, "reading sgm...");
+    }
+    
     // seek offset. In the case of a 512k image,
     // we have to skip the first 32k and hope for the best.
     ofs = 0;
@@ -742,7 +711,7 @@ unsigned char loadMegacartRom(unsigned char fsize) {
                 } else {
                     // we ran out of space
                     f_close(&fil);
-                    displayErrorString("Megacart ROM too large", 0);
+                    displayErrorString("Cart ROM too large", 0);
                     return page;
                 }
             }
@@ -757,37 +726,40 @@ unsigned char loadMegacartRom(unsigned char fsize) {
     // instead of the fixed size approach, we just set a register mask
     // Valid sizes then are 32k, 64k, 128k, 256k, 512k, so fsize is:
     //                       2    4    8    16    32 
-    // The question is whether we want to support oddball sizes. We
-    // could TRY to here...
+    // masks are doubled for SGM's 8k pages
     switch (fsize) {
         case 2: 
-            phCartMask = 0x01;  // 2 pages
+            phCartMask = isSGM ? 0x03 : 0x01;  // 2 pages
             break;
 
         case 4: 
-            phCartMask = 0x3;   // 4 pages
+            phCartMask = isSGM ? 0x07 : 0x3;   // 4 pages
             break;
 
         case 8: 
-            phCartMask = 0x07;  // 8 pages
+            phCartMask = isSGM ? 0x0f : 0x07;  // 8 pages
             break;
         
         case 16:
-            phCartMask = 0x0f;  // 16 pages
+            phCartMask = isSGM ? 0x1f : 0x0f;  // 16 pages
             break;
 
         case 30:    // should be 32, but we hacked it up
-            phCartMask = 0x1f;  // 32 pages
+            phCartMask = isSGM ? 0x3f : 0x1f;  // 32 pages
             break;
 
         default:
             f_close(&fil);
-            displayErrorString("Megacart images must be padded", fsize);
+            displayErrorString("Banked images must be padded", fsize);
             return page;
     }
 
     // - set the mappers appropriately
-    phBankingScheme = PH_BANK_MEGACART | PH_UPPER_EXPROM;
+    if (isSGM) {
+        phBankingScheme = PH_BANK_SGM | PH_UPPER_EXPROM;
+    } else {
+        phBankingScheme = PH_BANK_MEGACART | PH_UPPER_EXPROM;
+    }    
     phRAMBankSelect = CART_FIRST_PAGE;  // this is not necessarily enforced on real megacarts
 
     // - jump to "execute title" as above
@@ -844,8 +816,6 @@ void undrawSelect() {
 //   1 = user made a selection
 //  -1/-2  = user paged the directory (redraw needed, indicates which stick)
 char getUserSelection() {
-    unsigned int cntDown = BLANK_TIME;
-
     // draw the selection bar
     drawSelect();
 
@@ -919,7 +889,6 @@ char getUserSelection() {
 
 			drawSelect();
 			waitRelease();
-			cntDown = BLANK_TIME;
 			continue;
 		} else {
             // no joystick move, so reset the auto-repeat
@@ -930,15 +899,6 @@ char getUserSelection() {
         // check fire button
         if (MY_KEY == JOY_FIRE) {
             return 1;   // selected
-        }
-
-        // check if it's time to blank the screen
-        --cntDown;
-        if (cntDown == 0) {
-            // yes, it is
-            handleBlanking(0xf2);
-            cntDown = BLANK_TIME;
-            continue;
         }
 
         // and repeat
@@ -1201,10 +1161,21 @@ drawLoop:
         // -    if 55AA or AA55 is detected, we have a valid ROM:
         if ( ((pRom(0x8000) == 0xaa) && (pRom(0x8001) == 0x55)) ||
              ((pRom(0x8000) == 0x55) && (pRom(0x8001) == 0xaa)) ) {
-            loadCartridgeRom();
-            // if we return, then the cartridge load failed
-            // 32k carts can't overwrite our directory, so just resume!
-            goto drawLoop;
+            if (0 == mystrcmp(s1-4, ".sgm")) {
+                // SGM - ride on the megacart code. if we return, then the cartridge load failed
+                if (loadMegacartRom(fsize, 1) >= DIRECTORY_PAGE) {
+                    // the load potentially corrupted the directory, so reload it
+                    goto dirLoop;
+                } else {
+                    // the directory should be safe!
+                    goto drawLoop;
+                }
+            } else {
+                loadCartridgeRom();
+                // if we return, then the cartridge load failed
+                // 32k carts can't overwrite our directory, so just resume!
+                goto drawLoop;
+            }
         }
 
         // -    read EOF-16k block to next free memory, as test
@@ -1235,7 +1206,7 @@ drawLoop:
                  ((pRom(0x8200) == 0x55) && (pRom(0x8201) == 0xaa)) ) {
 
                 // if we return, then the cartridge load failed
-                if (loadMegacartRom(fsize) >= DIRECTORY_PAGE) {
+                if (loadMegacartRom(fsize, 0) >= DIRECTORY_PAGE) {
                     // the load potentially corrupted the directory, so reload it
                     goto dirLoop;
                 } else {
@@ -1250,6 +1221,4 @@ drawLoop:
         displayErrorString("Unrecognized file type.", 0);
         goto drawLoop;
     }
-
-    // TODO: other cartridge banking types? Megacart only for now.
 }

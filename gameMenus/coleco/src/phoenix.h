@@ -14,7 +14,7 @@ volatile __sfr __at 0x54 phRAMBankSelect;       // 32k RAM bank select. 0 and 1 
 volatile __sfr __at 0x55 phBankingScheme;       // cartridge emulation control (also read it to disable Phoenix BIOS)
 #define PH_BANK_CART        0                 // hardware physical cart port (any other disables)
 #define PH_BANK_MEGACART    1                 // banking scheme megacart
-#define PH_BANK_SGM         2                 // banking scheme SGM (?)
+#define PH_BANK_SGM         2                 // banking scheme SGM
 #define PH_BANK_ATARI       3                 // banking scheme Atari (?)
 #define PH_UPPER_INTRAM     0x00              // 32k RAM, banking ignored (uses port 0x54)
 #define PH_UPPER_EXPROM     0x10              // banked cartridge emulation

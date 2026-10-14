@@ -232,6 +232,11 @@ architecture rtl of phoenix_top is
    signal ps2_keys_s       : std_logic_vector(15 downto 0);
    signal ps2_joy_s        : std_logic_vector(15 downto 0);
    signal homekey_s        : std_logic;
+   signal kbd_raw_keys_s   : std_logic_vector(15 downto 0);
+   signal kbd_raw_joy_s    : std_logic_vector(15 downto 0);
+   signal kbd_byte_s       : std_logic_vector( 7 downto 0);
+   signal kbd_stb_s        : std_logic;
+   signal kbd_mode_s       : std_logic;
 
    -- Controller
    signal ctrl_p1_s        : std_logic_vector( 2 downto 1);
@@ -455,6 +460,10 @@ begin
    , sd_sclk_o       => sd_sclk_o
    , sd_cs_n_o       => sd_cs_n_o
    , sd_cd_n_i       => sd_cd_n_i -- Card detect, active low.
+   -- PS/2 keyboard
+   , kbd_byte_i      => kbd_byte_s
+   , kbd_stb_i       => kbd_stb_s
+   , kbd_mode_o      => kbd_mode_s
    -- Indication
    , led_o           => cv_led_s
    );
@@ -471,11 +480,18 @@ begin
    , ps2_clk         => ps2_clk_io
    , ps2_data        => ps2_data_io
    -- user outputs
-   , keys            => ps2_keys_s
-   , joy             => ps2_joy_s
+   , keys            => kbd_raw_keys_s
+   , joy             => kbd_raw_joy_s
    , core_reload_o   => core_reload_s
    , home_o          => homekey_s
+   , rx_byte_o       => kbd_byte_s
+   , rx_stb_o        => kbd_stb_s
    );
+
+   -- In keyboard mode (port >53 bit >04) the keyboard no longer emulates
+   -- controller 1 or soft resets with ESC; the scan codes go to port >80.
+   ps2_keys_s <= kbd_raw_keys_s when kbd_mode_s = '0' else (others => '0');
+   ps2_joy_s  <= kbd_raw_joy_s  when kbd_mode_s = '0' else (others => '0');
 
 
    --

@@ -1,0 +1,30 @@
+Coleco build:
+
+How the build works: I added rtl/build/Makefile, modeled on the NES one. Run it in Docker:
+  sg docker -c "docker run --rm -u 0 -v <repo>:/workspace -v
+  /home/tursi/Docked-ISE-147/Xilinx.lic:/root/.Xilinx/Xilinx.lic -w /workspace/rtl/build docked-ise-147 make"
+  - It runs xst, then ngdbuild (with romloader.bmm), map, par, trce and bitgen.
+  - Then data2mem merges your pre-built gameMenus/coleco/src/phoenixBoot.rom into the loader block RAM, and bit2bin and
+    bin2phx package the result. bin2phx stamps it COLECOVISION, issue 9, the same as COREREV in cores/phoenix/Makefile.
+  - If you rebuild the menu ROM, delete phoenix_top.merged.bit and run make again. It only re-merges and repackages,
+    with no new synthesis.
+  - The makemem, bit2bin and bin2phx tools are compiled from Utils/src_* with gcc, so none of the Windows .exe files are
+    used.
+
+  Results:
+  - Timing: every constraint is met.
+  - Size: 5,811 LUTs (63%), 1,930 slices (84%), 26 of 32 RAMB16.
+  - The menu ROM is in the merged bitstream: about 26K bytes differ from the build without it.
+  - The .PHX file is the same size as the shipped one (471,040 bytes).
+  - Warnings are only the usual ones: PhysDesignRules 2410/367 and XST trimming constant flip-flops.
+
+  Files for testing:
+  - rtl/build/CORE01.PHX for the SD-card update (slot 1).
+  - rtl/build/phoenix_top.merged.bit for JTAG.
+
+  Housekeeping:
+  - The many modified files under rtl/ were already modified before I started. The only things I added are rtl/build/
+    and its build outputs, which are untracked; I didn't touch rtl/romloader_bd.bmm.
+  - The NES Makefile still uses Disable. It boots fine, but you can switch it to match.
+  - I updated the phoenix-core skill notes to use Enable and to point at this Makefile.
+  

@@ -1,0 +1,10 @@
+set -tmpdir xst_tmp
+set -xsthdpdir xst_hdp
+run
+-ifn phoenix_top.prj
+-ofn phoenix_top
+-ofmt NGC
+-p xc6slx16-2-csg324
+-top phoenix_top
+-opt_mode Speed
+-opt_level 1

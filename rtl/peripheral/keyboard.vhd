@@ -61,7 +61,10 @@ entity colecoKeyboard is
       keys           : out   std_logic_vector(15 downto 0);
       joy            : out   std_logic_vector(15 downto 0);
       core_reload_o  : out   std_logic;
-      home_o         : out std_logic
+      home_o         : out std_logic;
+      -- raw scan code bytes (set 2, including E0/E1/F0 prefixes)
+      rx_byte_o      : out   std_logic_vector(7 downto 0);
+      rx_stb_o       : out   std_logic   -- one clock per byte
 
    );
 end colecoKeyboard;
@@ -79,7 +82,8 @@ architecture SYN of colecoKeyboard is
          reset    : out std_logic;
          press    : out std_logic;
          release  : out std_logic;
-         scancode : out std_logic_vector(7 downto 0)
+         scancode : out std_logic_vector(7 downto 0);
+         received : out std_logic
       );
    end component;
 
@@ -207,8 +211,11 @@ begin
       reset       => ps2_reset,
       press       => ps2_press,
       release     => ps2_release,
-      scancode    => ps2_scancode
+      scancode    => ps2_scancode,
+      received    => rx_stb_o
    );
+
+   rx_byte_o <= ps2_scancode;
 
    home_o <= home_s;
 

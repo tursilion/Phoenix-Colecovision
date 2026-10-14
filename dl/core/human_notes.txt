@@ -1,0 +1,87 @@
+https://github.com/hutch31/tv80 - MIT
+https://github.com/jotego/jt49  - GPLv3
+
+  Should work as is (same board, LD-V1000, same disc file):
+
+  +-----------------------------------------------------------------------------------------------------------------+
+  ¦         Game          ¦                                          Notes                                          ¦
+  +-----------------------+-----------------------------------------------------------------------------------------¦
+  ¦ Dragon's Lair rev E,  ¦ Same code base as F2; DSW B bit 3 selects the LD-V1000. Uses the same lair.txt video.   ¦
+  ¦ F                     ¦                                                                                         ¦
+  +-----------------------+-----------------------------------------------------------------------------------------¦
+  ¦ Dragon's Lair rev D   ¦ LD-V1000 only. Hypseus itself marks it "also LD-V1000?", so a little less certain.      ¦
+  +-----------------------+-----------------------------------------------------------------------------------------¦
+  ¦ Space Ace rev A, A2   ¦ Differ from A3 only in u1. Uses ace.txt.                                                ¦
+  +-----------------------+-----------------------------------------------------------------------------------------¦
+  ¦ Dragon's Lair         ¦ Fan-made ROMs, four 8K chips, played with the Lair disc. Hypseus's own fast-boot patch  ¦
+  ¦ Enhanced 1.1 / 2.0 /  ¦ for DLE 1.1 changes the same two bytes as mkdisc's, so the patch may well match there   ¦
+  ¦ 2.1                   ¦ too.                                                                                    ¦
+  +-----------------------+-----------------------------------------------------------------------------------------¦
+  ¦ Space Ace '91         ¦ Ace disc; Hypseus's DIP defaults are A=66, B=98.                                        ¦
+  ¦ Enhanced              ¦                                                                                         ¦
+  +-----------------------------------------------------------------------------------------------------------------+
+
+  Caveats for these:
+  - DIP switches: mkdisc.py --game only knows lair and ace, so these other ROMs need their DIP values passed by hand
+    with --dsw-a / --dsw-b until I add them as games. The enhanced ROMs' DIPs don't mean the same as the originals'.
+  - Fast boot: mkdisc checks the ROM bytes before patching the start-up wait. On a ROM it doesn't recognise, it prints a
+    warning and leaves the full 35 s wait in place.
+  - Disc frames: the enhanced ROMs may use disc frames the originals never touch. mkdisc encodes every frame up to
+    34,000 for Lair (40,000 for Ace), so that's covered unless one reaches past that.
+
+  Needs a small addition: Dragon's Lair rev A, B, C. These drive only the older Pioneer PR-7820 player. That's a simpler
+  interface than the LD-V1000: command bytes, a ready line on C010 bit 7, and no strobes. Hypseus's pr7820.cpp is
+  short, so it's maybe a day's work, mostly testing.
+
+  Won't work: different hardware
+  - European Dragon's Lair and Space Ace: the Atari/Sidam board, with a Z80 CTC/SIO, a Philips 22VP932 player and an
+    on-screen character display. That's the hardware in your lair/disassembly/ folder.
+  - Other laserdisc games such as Dragon's Lair II, Thayer's Quest, Cobra Command, Badlands, Astron Belt and Super Don
+    Quixote. Each needs its own board emulation, often with graphics overlay hardware. The LD-V1000 and streaming parts
+    would carry over for the ones that use that player.
+    
+  How it's built:
+  - CPU and sound: a 4 MHz Z80 and 2 MHz AY, both open-source Verilog (tv80 and jt49). The IRQ runs at 30.52 Hz and the
+    memory map follows MAME.
+  - Laserdisc player: an LD-V1000 that behaves like the one in Hypseus (Daphne's successor), including its per-field
+    strobes and status codes.
+  - Streaming: a hardware SD streamer reads up to 7 frames ahead with multi-block reads at 25 MHz. That gives about 2.5
+    MB/s; playback needs 1.38 MB/s.
+  - Picture: 320×240 coded as 4×4 cells of 4 palette colours, shown doubled at 640×480. The scoreboard row overlays the
+    bottom and can be toggled with keypad 0.
+
+  Things to know:
+  - Free play is on by default. With the stock Lair DIP settings it takes two coins per credit; --coins in
+    tools/mkdisc.py puts that back.
+  - Slow start-up is normal. After a reset, Dragon's Lair waits about 35 seconds before anything appears, like the real
+    machine while its player spins up.
+  - My earlier frame estimates are wrong. The 30.52 Hz IRQ comes from MAME and Hypseus, which both run the real discs.
+    That means one script tick is about 0.98 disc frames, not 0.815. The frame ranges in scenes.txt and ace_scenes.txt
+    were computed with 0.815, so their end frames run short. I haven't changed the decoders yet; the real video will
+    settle it.
+  - Not yet proven on hardware: whether the 25 MHz SD reads hold up on real cards (the slower 12.5 MHz mode is there as
+    a fallback), and how ODDR2 behaves on the board.
+
+  To try it on the Phoenix:
+  1. Install build/CORE04.PHX with the Phoenix boot loader.
+  2. Make a test disc file. It takes seconds and shows frame numbers instead of video, so it's good for checking the SD
+     streaming:
+  tools/mkdisc.py LAIR.LD --game lair --rom ../lair/dl_f2_u{1,2,3,4}.bin --test
+  3. For the real game you'll need the Daphne/Hypseus video (.m2v and .ogg). Make the file with 
+  tools/mkdisc.py LAIR.LD --game lair --rom ../lair/dl_f2_u{1,2,3,4}.bin --framefile /mnt/d/emu/Daphne/vldp_dl/lair/lair.txt; 
+  encoding takes about 0.2 s per frame per CPU core. tools/ldview.py shows any frame exactly as the core will decode it.
+  4. Copy the .LD files to a freshly formatted card so they aren't fragmented.
+
+  Controls are in dl/core/README.md.
+  
+
+  1. Install the new dl/core/build/CORE04.PHX.
+  2. Re-encode the disc. A full Lair disc took 37 s per 1349 frames here, so about 15 minutes on your 24 cores:
+  tools/mkdisc.py LAIR.LD --game lair --rom ../lair/dl_f2_u{1,2,3,4}.bin \
+      --framefile /mnt/d/emu/Daphne/vldp_dl/lair/lair.txt
+  3. Copy it to the card.
+
+  One correction to my last message. I said a script tick was about 0.98 disc frames and that the decoders' 0.815 was
+  wrong. At 23.976 fps a tick is 23.976 / 30.52 = 0.786 frames, so your measured 0.815 was close all along. I've added
+  the explanation to lair/analysis/NOTES.md and left the decoders unchanged.
+      

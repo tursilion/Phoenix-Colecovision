@@ -1,0 +1,9 @@
+Service Menu (11/23/19) Rev A0
+
+SERVICE.PHX 
+
+Install by pressing # to go to service menu and then press 3 to install service.
+
+Changes:
+
+-Added core revision display on install and load core screens 

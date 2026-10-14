@@ -488,9 +488,9 @@ begin
          reg_addr_r      <= (others => '0');
          data_o_r        <= (others => '0');
          env_shape_wr_r  <= '0';
-         ch_a_level_r    <= x"800"; -- Default to half-range for 0 level.
-         ch_b_level_r    <= x"800"; -- Default to half-range for 0 level.
-         ch_c_level_r    <= x"800"; -- Default to half-range for 0 level.
+         ch_a_level_r    <= x"000"; -- Level 0, matches the zeroed R8-R10.
+         ch_b_level_r    <= x"000"; -- Level 0, matches the zeroed R8-R10.
+         ch_c_level_r    <= x"000"; -- Level 0, matches the zeroed R8-R10.
 
          reg_file_ar(0)  <= x"00";
          reg_file_ar(1)  <= x"00";

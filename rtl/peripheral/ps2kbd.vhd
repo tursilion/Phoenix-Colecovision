@@ -60,7 +60,8 @@ entity ps2kbd is
 		Press		: out std_logic;
 		Release		: out std_logic;
 		Reset		: out std_logic;
-		ScanCode	: out std_logic_vector(7 downto 0));
+		ScanCode	: out std_logic_vector(7 downto 0);
+		Received	: out std_logic);  -- pulses for every byte, including E0/F0
 end ps2kbd;
 
 architecture rtl of ps2kbd is
@@ -77,6 +78,7 @@ architecture rtl of ps2kbd is
 begin
 
 	ScanCode <= RX_ShiftReg;
+	Received <= RX_Received;
 
 	process (Clk, Rst_n)
 		variable PS2_Data_r		: std_logic_vector(1 downto 0);

@@ -1,0 +1,7 @@
+Updated CV Core (07/21/20) Rev 7
+
+CORE01.PHX 460
+
+-Re-written SN and AY sound modules
+
+-Fix for early Opcode games (Magical Tree, Road Fighter, and sky jaguar) 

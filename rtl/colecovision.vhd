@@ -115,6 +115,11 @@ port
    ; sd_cs_n_o             : out std_logic
    ; sd_cd_n_i             : in  std_logic -- Card detect, active low.
 
+   -- PS/2 keyboard raw scan code bytes
+   ; kbd_byte_i            : in  std_logic_vector( 7 downto 0)
+   ; kbd_stb_i             : in  std_logic -- one clock per received byte
+   ; kbd_mode_o            : out std_logic -- 1 = keyboard at port >80, 0 = joystick emulation
+
    ; led_o                 : out std_logic -- debug LED
 );
 end entity;
@@ -223,6 +228,20 @@ architecture rtl of colecovision is
    signal ctrl_en_joy_n_s                 : std_logic;
    signal ctrl_int_n_s                    : std_logic;
 
+   -- PS/2 keyboard.  A small FIFO holds the bytes of one key sequence (the
+   -- longest is Pause, 8 bytes), so it can be read at port >80 one byte at a
+   -- time without losing prefix bytes.  This is not a typing buffer.
+   type kbd_fifo_t is array (0 to 7) of std_logic_vector(7 downto 0);
+   signal kbd_fifo_r                      : kbd_fifo_t;
+   signal kbd_wr_ptr_r                    : unsigned(2 downto 0) := "000";
+   signal kbd_rd_ptr_r                    : unsigned(2 downto 0) := "000";
+   signal kbd_count_r                     : unsigned(3 downto 0) := "0000";
+   signal kbd_data_r                      : std_logic_vector(7 downto 0) := x"00";
+   signal kbd_rd_s                        : std_logic;
+   signal kbd_rd_r                        : std_logic := '0';
+   signal kbd_mode_r                      : std_logic := '0';
+   signal kbd_mode_x                      : std_logic;
+
    -- Upper memory selection and bank schemes
    signal real_cart_r                     : std_logic := '1'; -- '1' when using a real cartridge
    signal real_cart_x                     : std_logic;
@@ -233,14 +252,30 @@ architecture rtl of colecovision is
    signal upmem_we_inhibit_s              : std_logic;
 
    -- MegaCart banking support
-   signal mc_mem_size_r                   : std_logic_vector( 4 downto 0) := "01111"; -- 256K
-   signal mc_mem_size_x                   : std_logic_vector( 4 downto 0);
+   -- Page mask from port >59: 16K pages for MegaCart (5 bits used), 8K pages
+   -- for SGM (6 bits).
+   signal mc_mem_size_r                   : std_logic_vector( 5 downto 0) := "001111"; -- 256K
+   signal mc_mem_size_x                   : std_logic_vector( 5 downto 0);
    signal mc_bank_r                       : std_logic_vector( 4 downto 0) := "11111";
    signal mc_bank_x                       : std_logic_vector( 4 downto 0);
    signal mc_addr_r                       : std_logic_vector( 4 downto 0) := "11111";
    signal mc_addr_x                       : std_logic_vector( 4 downto 0);
    signal mc_en_r                         : std_logic := '0';
    signal mc_en_x                         : std_logic;
+
+   -- SGM banking support: 8K pages at >A000, >C000, >E000 (>8000 is page 0)
+   signal sgmbk_en_r                      : std_logic := '0';
+   signal sgmbk_en_x                      : std_logic;
+   signal sgmbk_a_r                       : std_logic_vector( 5 downto 0) := "000001";
+   signal sgmbk_a_x                       : std_logic_vector( 5 downto 0);
+   signal sgmbk_c_r                       : std_logic_vector( 5 downto 0) := "000010";
+   signal sgmbk_c_x                       : std_logic_vector( 5 downto 0);
+   signal sgmbk_e_r                       : std_logic_vector( 5 downto 0) := "000011";
+   signal sgmbk_e_x                       : std_logic_vector( 5 downto 0);
+   signal sgmbk_wr_a_s                    : std_logic;  -- CPU write to >FFFC
+   signal sgmbk_wr_c_s                    : std_logic;  -- CPU write to >FFFD
+   signal sgmbk_wr_e_s                    : std_logic;  -- CPU write to >FFFE
+   signal sgmbk_addr_s                    : std_logic_vector( 5 downto 0);
 
 begin
 
@@ -683,13 +718,23 @@ begin
    -- specify the bank.  The CV does not provide read or write enables to the
    -- cartridge port, so the enable for updating the bank select register is
    -- any access to the specified memory range.
+   --
+   --
+   -- SGM Banking
+   --
+   -- 8K pages: >8000 is always page 0 of the ROM, and >A000, >C000, >E000
+   -- show the pages selected by CPU *writes* to >FFFC, >FFFD, >FFFE (reads
+   -- do not change the banks).  The three bank registers are also
+   -- accessible at ports >54 (only while SGM banking is active), >5A, >5B.
+   -- Like the MegaCart, the ROM is loaded at the top of the 512K, and the
+   -- 8K page mask in port >59 maps a page to (page AND mask) OR (NOT mask).
 
    memory_decode : process
    ( cpu_addr_s, mreq_n_s, rfsh_n_s, wr_n_s
    , d_from_loader_s, d_from_bios_s, d_from_cv_ram1k_r, cart_data_io
    , d_from_ext512_s, sgm_en_r, sgm_8k_en_r
    , ext_ram_bank_r, rom_loader_en_r, real_cart_r, upmem_mode_r
-   , mc_bank_r, mc_addr_r, mc_en_r
+   , mc_bank_r, mc_addr_r, mc_en_r, sgmbk_en_r, sgmbk_addr_s
    , cart_en_80_n_s, cart_en_A0_n_s, upmem_we_inhibit_s
    ) begin
 
@@ -724,6 +769,9 @@ begin
                -- Upper 16K of the upper 32K, use the selected bank.
                ext_ram_addr_s <= mc_addr_r & cpu_addr_s(13 downto 0);
             end if;
+         elsif sgmbk_en_r = '1' then
+            -- SGM banking, 8K pages.
+            ext_ram_addr_s <= sgmbk_addr_s & cpu_addr_s(12 downto 0);
          else
             -- Use the 32K bank register.
             ext_ram_addr_s <= ext_ram_bank_r & cpu_addr_s(14 downto 0);
@@ -743,6 +791,11 @@ begin
 
       -- MegaCart bank select register.
       mc_bank_x         <= mc_bank_r;
+
+      -- SGM bank register writes.
+      sgmbk_wr_a_s      <= '0';
+      sgmbk_wr_c_s      <= '0';
+      sgmbk_wr_e_s      <= '0';
 
 
       -- Memory access that is not a refresh cycle.
@@ -872,6 +925,16 @@ begin
                mc_bank_x <= cpu_addr_s(4 downto 0);
             end if;
 
+            -- SGM bank registers, writes only.
+            if sgmbk_en_r = '1' and wr_n_s = '0' then
+               case cpu_addr_s(12 downto 0) is
+               when "1111111111100" => sgmbk_wr_a_s <= '1';
+               when "1111111111101" => sgmbk_wr_c_s <= '1';
+               when "1111111111110" => sgmbk_wr_e_s <= '1';
+               when others => null;
+               end case;
+            end if;
+
          when others => null;
          end case;
       end if;
@@ -886,7 +949,7 @@ begin
    -- where the ROM data is loaded.
    megacart : process ( mc_mem_size_r, mc_bank_r )
    begin
-      case ( mc_mem_size_r ) is
+      case ( mc_mem_size_r(4 downto 0) ) is
       when "00001" => mc_addr_x <= "1111" & mc_bank_r(0);            -- >01 = 32K
       when "00011" => mc_addr_x <= "111"  & mc_bank_r(1 downto 0);   -- >03 = 64K
       when "00111" => mc_addr_x <= "11"   & mc_bank_r(2 downto 0);   -- >07 = 128K
@@ -896,13 +959,29 @@ begin
    end process;
 
 
+   -- SGM 8K page for the addressed upper-memory window, masked to the ROM
+   -- size and placed at the top of the 512K.
+   sgm_banking : process ( cpu_addr_s, sgmbk_a_r, sgmbk_c_r, sgmbk_e_r, mc_mem_size_r )
+      variable page_v : std_logic_vector(5 downto 0);
+   begin
+      case cpu_addr_s(14 downto 13) is
+      when "00"   => page_v := "000000";   -- >8000 fixed page 0
+      when "01"   => page_v := sgmbk_a_r;  -- >A000
+      when "10"   => page_v := sgmbk_c_r;  -- >C000
+      when others => page_v := sgmbk_e_r;  -- >E000
+      end case;
+      sgmbk_addr_s <= (page_v and mc_mem_size_r) or (not mc_mem_size_r);
+   end process;
+
+
    -- CV I/O Decode
    --
    -- A7 A6 A5 WR
    -- EN 4  2  1
    -- -----------
    -- 1  0  0  0  >80 .. >9F  (W) set controllers to keypad mode
-   -- 1  0  0  1  >80 .. >9F  (R) not connected
+   -- 1  0  0  1  >80 .. >9F  (R) keyboard scan code when port >53 bit >04 = 1
+   --                             (next byte, 0 when none), else not connected
    -- 1  0  1  0  >A0 .. >BF  (W) VDP csw_n, A0==mode
    -- 1  0  1  1  >A0 .. >BF  (R) VDP csr_n, A0==mode
    -- 1  1  0  0  >C0 .. >DF  (W) set controllers to joystick mode
@@ -913,9 +992,10 @@ begin
 
    io_decode_s <= cpu_addr_s(6 downto 5) & wr_n_s;
 
-   process ( cpu_addr_s, io_decode_s, iorq_n_s, m1_n_s,
-             d_from_ctrl_s, d_from_vdp_s )
+   process ( cpu_addr_s, io_decode_s, iorq_n_s, m1_n_s, rd_n_s,
+             d_from_ctrl_s, d_from_vdp_s, kbd_mode_r, kbd_data_r )
    begin
+      kbd_rd_s          <= '0';
       vdp_w_n_s         <= '1';
       vdp_r_n_s         <= '1';
       sn489_we_n_s      <= '1';
@@ -926,6 +1006,10 @@ begin
       if iorq_n_s = '0' and m1_n_s = '1' and cpu_addr_s(7) = '1' then
          case io_decode_s is
          when "000" =>  ctrl_en_key_n_s   <= '0';
+         when "001" =>  if kbd_mode_r = '1' then
+                           kbd_rd_s       <= not rd_n_s;
+                           io_data_mux_s  <= kbd_data_r;
+                        end if;
          when "010" =>  vdp_w_n_s         <= '0';
          when "011" =>  vdp_r_n_s         <= '0';
                         io_data_mux_s     <= d_from_vdp_s;
@@ -946,9 +1030,13 @@ begin
    --  >52  RRRRRRRR (R) WSG / SGM-PSG Data Read
    --  >53  xxxxxx_W (W) 0 = SGM disable, 1 = SGM enable
    --       xxxxxxW_ (W) 0 = SGM Sound AY-8910, 1 = SGM Sound SEX-7264
+   --       xxxxxWxx (W) 0 = PS/2 keyboard emulates joystick 1,
+   --                    1 = PS/2 scan codes readable at port >80
    --
    --  >54  xxxxWWWW (W) 32K RAM bank select, 0000 is ignored
    --       xxxxRRRR (R) current bank
+   --       xxWWWWWW (W) SGM banking active: 8K page at >A000 (as >FFFC)
+   --       00RRRRRR (R) SGM banking active: 8K page at >A000
    --
    --  >55  xxxxxxxx (R) Loader disable, PoR re-enabled ROM loader
    --       xx__xxWW (W) Banking scheme
@@ -978,6 +1066,12 @@ begin
    --          00111     128K,  8 16K-banks
    --          00011      64K,  4 16K-banks
    --          00001      32K,  2 16K-banks (same as original cart)
+   --       xxWWWWWW (W) SGM page mask, 8K pages, e.g. 001111 = 128K, 111111 = 512K
+   --
+   --  >5A  xxWWWWWW (W) SGM 8K page at >C000 (as >FFFD)
+   --       00RRRRRR (R)
+   --  >5B  xxWWWWWW (W) SGM 8K page at >E000 (as >FFFE)
+   --       00RRRRRR (R)
    --
    --  >7F  xxxxxxWx (W) 0 = 8K SGM RAM, 1 = 8K CV BIOS
    --
@@ -987,10 +1081,13 @@ begin
    , ext_ram_bank_r, rom_loader_en_r
    , d_from_sd_s, sd_detect_r, sd_slow_clk_r, sd_spi_ss_n_r
    , real_cart_r, bank_mode_r, upmem_mode_r
-   , mc_mem_size_r, mc_en_r
+   , mc_mem_size_r, mc_en_r, kbd_mode_r
+   , sgmbk_en_r, sgmbk_a_r, sgmbk_c_r, sgmbk_e_r
+   , sgmbk_wr_a_s, sgmbk_wr_c_s, sgmbk_wr_e_s
    ) begin
       sgm_en_x          <= sgm_en_r;
       sgm_8k_en_x       <= sgm_8k_en_r;
+      kbd_mode_x        <= kbd_mode_r;
 
       ext_ram_bank_x    <= ext_ram_bank_r;
 
@@ -1014,6 +1111,15 @@ begin
       -- MegaCart support.
       mc_mem_size_x     <= mc_mem_size_r;
       mc_en_x           <= mc_en_r;
+
+      -- SGM banking, bank registers also written via >FFFC..>FFFE.
+      sgmbk_en_x        <= sgmbk_en_r;
+      sgmbk_a_x         <= sgmbk_a_r;
+      sgmbk_c_x         <= sgmbk_c_r;
+      sgmbk_e_x         <= sgmbk_e_r;
+      if sgmbk_wr_a_s = '1' then sgmbk_a_x <= d_from_cpu_s(5 downto 0); end if;
+      if sgmbk_wr_c_s = '1' then sgmbk_c_x <= d_from_cpu_s(5 downto 0); end if;
+      if sgmbk_wr_e_s = '1' then sgmbk_e_x <= d_from_cpu_s(5 downto 0); end if;
 
 
       if iorq_n_s = '0' and m1_n_s = '1' then
@@ -1046,18 +1152,29 @@ begin
 
                if wr_n_s = '0' then
                   sgm_en_x       <= d_from_cpu_s(0);
+                  kbd_mode_x     <= d_from_cpu_s(2);
                end if;
 
             when x"4" =>                  -- port >54 external RAM bank select
 
-               if rd_n_s = '0' then
-                  ex_data_mux_s  <= "0000" & ext_ram_bank_r;
-               end if;
+               if sgmbk_en_r = '1' then
+                  -- SGM banking: the >A000 8K page register.
+                  if rd_n_s = '0' then
+                     ex_data_mux_s  <= "00" & sgmbk_a_r;
+                  end if;
+                  if wr_n_s = '0' then
+                     sgmbk_a_x <= d_from_cpu_s(5 downto 0);
+                  end if;
+               else
+                  if rd_n_s = '0' then
+                     ex_data_mux_s  <= "0000" & ext_ram_bank_r;
+                  end if;
 
-               -- Page 0 is reserved for the SGM and cannot be
-               -- directly selected.
-               if wr_n_s = '0' and d_from_cpu_s(3 downto 0) /= "0000" then
-                  ext_ram_bank_x <= d_from_cpu_s(3 downto 0);
+                  -- Page 0 is reserved for the SGM and cannot be
+                  -- directly selected.
+                  if wr_n_s = '0' and d_from_cpu_s(3 downto 0) /= "0000" then
+                     ext_ram_bank_x <= d_from_cpu_s(3 downto 0);
+                  end if;
                end if;
 
             when x"5" =>                  -- port >55 ROM loader disable
@@ -1076,6 +1193,9 @@ begin
 
                   -- MegaCart enable, true when MegaCart mode, and upper memory
                   -- is set to recognize banking.
+                  -- SGM banking enable, same idea.
+                  sgmbk_en_x     <= d_from_cpu_s(1) and (not d_from_cpu_s(0)) and
+                                    (d_from_cpu_s(5) xor d_from_cpu_s(4));
                   mc_en_x        <= (not d_from_cpu_s(1)) and d_from_cpu_s(0) and
                                     (d_from_cpu_s(5) xor d_from_cpu_s(4));
                end if;
@@ -1106,10 +1226,28 @@ begin
                   ex_data_mux_s  <= machine_id_c;
                end if;
 
-            when x"9" =>                  -- port >59 MegaCart memory size
+            when x"9" =>                  -- port >59 MegaCart / SGM page mask
 
                if wr_n_s = '0' then
-                  mc_mem_size_x  <= d_from_cpu_s(4 downto 0);
+                  mc_mem_size_x  <= d_from_cpu_s(5 downto 0);
+               end if;
+
+            when x"A" =>                  -- port >5A SGM page at >C000
+
+               if rd_n_s = '0' then
+                  ex_data_mux_s  <= "00" & sgmbk_c_r;
+               end if;
+               if wr_n_s = '0' then
+                  sgmbk_c_x      <= d_from_cpu_s(5 downto 0);
+               end if;
+
+            when x"B" =>                  -- port >5B SGM page at >E000
+
+               if rd_n_s = '0' then
+                  ex_data_mux_s  <= "00" & sgmbk_e_r;
+               end if;
+               if wr_n_s = '0' then
+                  sgmbk_e_x      <= d_from_cpu_s(5 downto 0);
                end if;
 
             when others => null;
@@ -1143,6 +1281,7 @@ begin
       if reset_i = '1' then
          sgm_en_r          <= '0';           -- disable SGM on reset
          sgm_8k_en_r       <= '0';           -- BIOS over SGM 8K RAM at >0000
+         kbd_mode_r        <= '0';           -- keyboard emulates the joystick
          ext_ram_bank_r    <= "0001";        -- external RAM bank select
          rom_loader_en_r   <= '1';           -- enabled ROM loader
          sd_detect_r       <= '0';           -- no card until sampled
@@ -1151,14 +1290,19 @@ begin
          real_cart_r       <= '1';           -- default to a real cartridge
          bank_mode_r       <= "00";          -- no banking
          upmem_mode_r      <= "00";          -- upper memory selection does not matter
-         mc_mem_size_r     <= "01111";       -- default to 256K
+         mc_mem_size_r     <= "001111";      -- default to 256K
          mc_bank_r         <= "11111";       -- default to top bank
          mc_addr_r         <= "11111";       -- default to top of 512K memory
          mc_en_r           <= '0';           -- disable MegaCart
+         sgmbk_en_r        <= '0';           -- disable SGM banking
+         sgmbk_a_r         <= "000001";      -- SGM pages 1, 2, 3 (linear)
+         sgmbk_c_r         <= "000010";
+         sgmbk_e_r         <= "000011";
 
       elsif clk_3m58_en_i = '1' then
          sgm_en_r          <= sgm_en_x;
          sgm_8k_en_r       <= sgm_8k_en_x;
+         kbd_mode_r        <= kbd_mode_x;
          ext_ram_bank_r    <= ext_ram_bank_x;
          rom_loader_en_r   <= rom_loader_en_x;
          sd_detect_r       <= not sd_cd_n_i; -- sample and invert input directly
@@ -1171,7 +1315,62 @@ begin
          mc_bank_r         <= mc_bank_x;
          mc_addr_r         <= mc_addr_x;
          mc_en_r           <= mc_en_x;
+         sgmbk_en_r        <= sgmbk_en_x;
+         sgmbk_a_r         <= sgmbk_a_x;
+         sgmbk_c_r         <= sgmbk_c_x;
+         sgmbk_e_r         <= sgmbk_e_x;
 
+      end if;
+   end if;
+   end process;
+
+
+   --
+   -- PS/2 keyboard FIFO, only active in keyboard mode.  The byte is taken
+   -- (and removed) at the start of a port >80 read and held for the rest of
+   -- the read cycle, so a byte arriving during the read is not lost.  When
+   -- full, new bytes are dropped.
+   --
+   kbd_mode_o <= kbd_mode_r;
+
+   process (clk_25m0_i)
+      variable push_v, pop_v : boolean;
+   begin
+   if rising_edge(clk_25m0_i) then
+      if reset_i = '1' or kbd_mode_r = '0' then
+         kbd_wr_ptr_r   <= "000";
+         kbd_rd_ptr_r   <= "000";
+         kbd_count_r    <= "0000";
+         kbd_data_r     <= x"00";
+         kbd_rd_r       <= '0';
+      else
+         kbd_rd_r <= kbd_rd_s;
+
+         push_v := kbd_stb_i = '1' and kbd_count_r /= 8;
+         pop_v  := kbd_rd_s = '1' and kbd_rd_r = '0' and kbd_count_r /= 0;
+
+         if kbd_rd_s = '1' and kbd_rd_r = '0' then
+            if kbd_count_r /= 0 then
+               kbd_data_r <= kbd_fifo_r(to_integer(kbd_rd_ptr_r));
+            else
+               kbd_data_r <= x"00";
+            end if;
+         end if;
+
+         if push_v then
+            kbd_fifo_r(to_integer(kbd_wr_ptr_r)) <= kbd_byte_i;
+            kbd_wr_ptr_r <= kbd_wr_ptr_r + 1;
+         end if;
+
+         if pop_v then
+            kbd_rd_ptr_r <= kbd_rd_ptr_r + 1;
+         end if;
+
+         if push_v and not pop_v then
+            kbd_count_r <= kbd_count_r + 1;
+         elsif pop_v and not push_v then
+            kbd_count_r <= kbd_count_r - 1;
+         end if;
       end if;
    end if;
    end process;

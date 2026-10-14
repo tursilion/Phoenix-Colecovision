@@ -1,0 +1,33 @@
+The video change is the HDMI output driver. The revA0 service core drives the four HDMI pairs as TMDS_33 and the
+2nd-batch core drives them as LVDS_33. Nothing else in the configuration changed.
+
+How I got there
+1. Bitstream options: after the sync word, every configuration register is the same in both files (COR1/2, the
+ watchdog, startup settings). The 256-byte headers differ only in the issue byte: 0 for revA0, 1 for the 2nd batch.
+2. Logic frames: almost every logic frame differs because the design was fully re-placed and re-routed. A direct diff
+ of those frames can't show what changed.
+3. Block RAM: I built reference bitstreams in the ISE Docker image with known BRAM contents to learn how BRAM data is
+ laid out. That let me decode all 32 RAMB16s in both files. All 18 used BRAMs have the same contents; they just sit
+ at different sites. The only one that looked different is the F18A power-on "F18A V1.9" banner ROM, and it's the
+ same bitmap stored in the other half of a block RAM. So both cores use the same F18A 1.9, and the ROMs, fonts and
+ palettes are unchanged.
+4. Pin configuration: across all the pin (IOB) configuration frames, exactly 4 bytes differ: 0x09 in revA0 and 0x05 in
+ the 2nd batch. That's one byte for each of the four HDMI output pairs (T6/V6, U7/V7, U8/V8, U5/V5 in
+ rtl/phoenix.ucf). A bank-level setting also differs.
+5. Confirmation: I built the same four output pairs with TMDS_33, LVDS_33, LVDS_25 and MINI_LVDS_33. TMDS_33 matches
+ revA0 on all the differing bits, including the bank-level ones. LVDS_33 matches the 2nd batch. LVDS_25 sets the
+ same bits as LVDS_33, but the bank runs at 3.3 V and the repo's UCF uses LVDS_33, so it's almost certainly LVDS_33.
+ MINI_LVDS_33 doesn't match.
+
+What it means: TMDS_33 is the standard HDMI driver and relies on the TV's 50 O pull-ups to 3.3 V, so it needs a
+direct, DC-coupled connection. LVDS_33 is a push-pull driver that sets its own voltage level. That fits the second
+board's reworked HDMI isolation circuitry, which would no longer pass the TV's pull-ups straight through to the FPGA.
+
+The repo's cores (CV, NES, laserdisc) use LVDS_33, which suits 2nd-batch boards. Whether they also work on revA0
+boards depends on that board's HDMI circuit, which I can't tell from the bitstreams. If revA0 owners report no picture
+or flaky HDMI, building those cores with TMDS_33 is the first thing to try.
+  
+Basically, the HDMI pins changed from pull up to push-pull, perhaps due to improved HDMI isolation. It appears to work 
+fine on revA0 boards, but won't work the other way around because without the pullups, the data for HDMI is invalid. 
+My cores are all using the second model so that appears to work fine.
+

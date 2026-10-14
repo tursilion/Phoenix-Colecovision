@@ -1,0 +1,253 @@
+Release 14.7 par P.20131013 (lin64)
+Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
+
+c4f528d0b775::  Wed Oct 14 06:50:10 2026
+
+par -w -ol high phoenix_top_map.ncd phoenix_top.ncd phoenix_top.pcf 
+
+
+Constraints file: phoenix_top.pcf.
+Loading device for application Rf_Device from file '6slx16.nph' in environment /opt/Xilinx/14.7/ISE_DS/ISE/.
+   "phoenix_top" is an NCD, version 3.2, device xc6slx16, package csg324, speed -2
+
+Initializing temperature to 85.000 Celsius. (default - Range: 0.000 to 85.000 Celsius)
+Initializing voltage to 1.140 Volts. (default - Range: 1.140 to 1.260 Volts)
+
+
+Device speed data version:  "PRODUCTION 1.23 2013-10-13".
+
+
+
+Device Utilization Summary:
+
+Slice Logic Utilization:
+  Number of Slice Registers:                 3,256 out of  18,224   17%
+    Number used as Flip Flops:               3,239
+    Number used as Latches:                      0
+    Number used as Latch-thrus:                  0
+    Number used as AND/OR logics:               17
+  Number of Slice LUTs:                      5,826 out of   9,112   63%
+    Number used as logic:                    5,688 out of   9,112   62%
+      Number using O6 output only:           4,240
+      Number using O5 output only:             211
+      Number using O5 and O6:                1,237
+      Number used as ROM:                        0
+    Number used as Memory:                     103 out of   2,176    4%
+      Number used as Dual Port RAM:             72
+        Number using O6 output only:            40
+        Number using O5 output only:             0
+        Number using O5 and O6:                 32
+      Number used as Single Port RAM:           10
+        Number using O6 output only:             3
+        Number using O5 output only:             1
+        Number using O5 and O6:                  6
+      Number used as Shift Register:            21
+        Number using O6 output only:             5
+        Number using O5 output only:             0
+        Number using O5 and O6:                 16
+    Number used exclusively as route-thrus:     35
+      Number with same-slice register load:     13
+      Number with same-slice carry load:        22
+      Number with other load:                    0
+
+Slice Logic Distribution:
+  Number of occupied Slices:                 1,934 out of   2,278   84%
+  Number of MUXCYs used:                     1,120 out of   4,556   24%
+  Number of LUT Flip Flop pairs used:        6,172
+    Number with an unused Flip Flop:         3,150 out of   6,172   51%
+    Number with an unused LUT:                 346 out of   6,172    5%
+    Number of fully used LUT-FF pairs:       2,676 out of   6,172   43%
+    Number of slice register sites lost
+      to control set restrictions:               0 out of  18,224    0%
+
+  A LUT Flip Flop pair for this architecture represents one LUT paired with
+  one Flip Flop within a slice.  A control set is a unique combination of
+  clock, reset, set, and enable signals for a registered element.
+  The Slice Logic Distribution report is not meaningful if the design is
+  over-mapped for a non-slice resource or if Placement fails.
+
+IO Utilization:
+  Number of bonded IOBs:                        99 out of     232   42%
+    Number of LOCed IOBs:                       99 out of      99  100%
+    IOB Flip Flops:                             47
+    IOB Master Pads:                             4
+    IOB Slave Pads:                              4
+
+Specific Feature Utilization:
+  Number of RAMB16BWERs:                        26 out of      32   81%
+  Number of RAMB8BWERs:                          4 out of      64    6%
+  Number of BUFIO2/BUFIO2_2CLKs:                 1 out of      32    3%
+    Number used as BUFIO2s:                      1
+    Number used as BUFIO2_2CLKs:                 0
+  Number of BUFIO2FB/BUFIO2FB_2CLKs:             0 out of      32    0%
+  Number of BUFG/BUFGMUXs:                       4 out of      16   25%
+    Number used as BUFGs:                        4
+    Number used as BUFGMUX:                      0
+  Number of DCM/DCM_CLKGENs:                     0 out of       4    0%
+  Number of ILOGIC2/ISERDES2s:                  21 out of     248    8%
+    Number used as ILOGIC2s:                    21
+    Number used as ISERDES2s:                    0
+  Number of IODELAY2/IODRP2/IODRP2_MCBs:         0 out of     248    0%
+  Number of OLOGIC2/OSERDES2s:                  26 out of     248   10%
+    Number used as OLOGIC2s:                    26
+    Number used as OSERDES2s:                    0
+  Number of BSCANs:                              0 out of       4    0%
+  Number of BUFHs:                               0 out of     128    0%
+  Number of BUFPLLs:                             0 out of       8    0%
+  Number of BUFPLL_MCBs:                         0 out of       4    0%
+  Number of DSP48A1s:                            5 out of      32   15%
+  Number of ICAPs:                               0 out of       1    0%
+  Number of MCBs:                                0 out of       2    0%
+  Number of PCILOGICSEs:                         0 out of       2    0%
+  Number of PLL_ADVs:                            1 out of       2   50%
+  Number of PMVs:                                0 out of       1    0%
+  Number of STARTUPs:                            0 out of       1    0%
+  Number of SUSPEND_SYNCs:                       0 out of       1    0%
+
+
+Overall effort level (-ol):   High 
+Router effort level (-rl):    High 
+
+Starting initial Timing Analysis.  REAL time: 3 secs 
+Finished initial Timing Analysis.  REAL time: 3 secs 
+
+WARNING:Par:288 - The signal coleco/inst_t80/u0/Regs/Mram_RegsL11_RAMD_D1_O has no load.  PAR will not attempt to route this signal.
+WARNING:Par:288 - The signal coleco/inst_f18a/inst_tiles/Mram_fifo1_RAMD_D1_O has no load.  PAR will not attempt to route this signal.
+WARNING:Par:288 - The signal coleco/inst_t80/u0/Regs/Mram_RegsH11_RAMD_D1_O has no load.  PAR will not attempt to route this signal.
+WARNING:Par:288 - The signal coleco/Mram_kbd_fifo_r1_RAMD_D1_O has no load.  PAR will not attempt to route this signal.
+Starting Router
+
+
+Phase  1  : 35840 unrouted;      REAL time: 3 secs 
+
+Phase  2  : 31989 unrouted;      REAL time: 4 secs 
+
+Phase  3  : 15588 unrouted;      REAL time: 9 secs 
+
+Phase  4  : 15588 unrouted; (Setup:0, Hold:0, Component Switching Limit:0)     REAL time: 9 secs 
+
+Updating file: phoenix_top.ncd with current fully routed design.
+
+Phase  5  : 0 unrouted; (Setup:0, Hold:0, Component Switching Limit:0)     REAL time: 17 secs 
+
+Phase  6  : 0 unrouted; (Setup:0, Hold:0, Component Switching Limit:0)     REAL time: 17 secs 
+
+Phase  7  : 0 unrouted; (Setup:0, Hold:0, Component Switching Limit:0)     REAL time: 17 secs 
+
+Phase  8  : 0 unrouted; (Setup:0, Hold:0, Component Switching Limit:0)     REAL time: 17 secs 
+
+Phase  9  : 0 unrouted; (Setup:0, Hold:0, Component Switching Limit:0)     REAL time: 17 secs 
+
+Phase 10  : 0 unrouted; (Setup:0, Hold:0, Component Switching Limit:0)     REAL time: 18 secs 
+Total REAL time to Router completion: 18 secs 
+Total CPU time to Router completion: 19 secs 
+
+Partition Implementation Status
+-------------------------------
+
+  No Partitions were found in this design.
+
+-------------------------------
+
+Generating "PAR" statistics.
+
+**************************
+Generating Clock Report
+**************************
+
++---------------------+--------------+------+------+------------+-------------+
+|        Clock Net    |   Resource   |Locked|Fanout|Net Skew(ns)|Max Delay(ns)|
++---------------------+--------------+------+------+------------+-------------+
+|         clk_100m0_s |  BUFGMUX_X2Y2| No   |  546 |  0.067     |  1.140      |
++---------------------+--------------+------+------+------------+-------------+
+|          clk_25m0_s |  BUFGMUX_X2Y4| No   |  672 |  0.707     |  1.780      |
++---------------------+--------------+------+------+------------+-------------+
+|        clock_tmds_s | BUFGMUX_X3Y13| No   |   16 |  0.577     |  1.690      |
++---------------------+--------------+------+------+------------+-------------+
+|      clock_tmds_n_s |  BUFGMUX_X2Y3| No   |    4 |  0.031     |  1.751      |
++---------------------+--------------+------+------+------------+-------------+
+
+* Net Skew is the difference between the minimum and maximum routing
+only delays for the net. Note this is different from Clock Skew which
+is reported in TRCE timing report. Clock Skew is the difference between
+the minimum and maximum path delays which includes logic delays.
+
+* The fanout is the number of component pins not the individual BEL loads,
+for example SLICE loads not FF loads.
+
+Timing Score: 0 (Setup: 0, Hold: 0, Component Switching Limit: 0)
+
+Number of Timing Constraints that were not applied: 2
+
+Asterisk (*) preceding a constraint indicates it was not met.
+   This may be due to a setup or hold violation.
+
+----------------------------------------------------------------------------------------------------------
+  Constraint                                |    Check    | Worst Case |  Best Case | Timing |   Timing   
+                                            |             |    Slack   | Achievable | Errors |    Score   
+----------------------------------------------------------------------------------------------------------
+  TS_clock_system_clkout1 = PERIOD TIMEGRP  | SETUP       |     0.226ns|     9.774ns|       0|           0
+  "clock_system_clkout1"         TS_clock_5 | HOLD        |     0.081ns|            |       0|           0
+  0m0_i_net / 2 HIGH 50%                    |             |            |            |        |            
+----------------------------------------------------------------------------------------------------------
+  TS_clock_system_clkout0 = PERIOD TIMEGRP  | SETUP       |     2.194ns|    31.224ns|       0|           0
+  "clock_system_clkout0"         TS_clock_5 | HOLD        |     0.250ns|            |       0|           0
+  0m0_i_net / 0.5 HIGH 50%                  |             |            |            |        |            
+----------------------------------------------------------------------------------------------------------
+  TS_clock_system_clkout2 = PERIOD TIMEGRP  | SETUP       |     3.712ns|     4.288ns|       0|           0
+  "clock_system_clkout2"         TS_clock_5 | HOLD        |     0.023ns|            |       0|           0
+  0m0_i_net / 2.5 HIGH 50%                  |             |            |            |        |            
+----------------------------------------------------------------------------------------------------------
+  TS_clock_50m0_i_net = PERIOD TIMEGRP "clo | MINLOWPULSE |    15.000ns|     5.000ns|       0|           0
+  ck_50m0_i_net" 20 ns HIGH 50%             |             |            |            |        |            
+----------------------------------------------------------------------------------------------------------
+  TS_clock_system_clkout3 = PERIOD TIMEGRP  | MINPERIOD   |     5.334ns|     2.666ns|       0|           0
+  "clock_system_clkout3"         TS_clock_5 |             |            |            |        |            
+  0m0_i_net / 2.5 PHASE 4 ns HIGH 50%       |             |            |            |        |            
+----------------------------------------------------------------------------------------------------------
+
+
+Derived Constraint Report
+Review Timing Report for more details on the following derived constraints.
+To create a Timing Report, run "trce -v 12 -fastpaths -o design_timing_report design.ncd design.pcf"
+or "Run Timing Analysis" from Timing Analyzer (timingan).
+Derived Constraints for TS_clock_50m0_i_net
++-------------------------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+
+|                               |   Period    |       Actual Period       |      Timing Errors        |      Paths Analyzed       |
+|           Constraint          | Requirement |-------------+-------------|-------------+-------------|-------------+-------------|
+|                               |             |   Direct    | Derivative  |   Direct    | Derivative  |   Direct    | Derivative  |
++-------------------------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+
+|TS_clock_50m0_i_net            |     20.000ns|      5.000ns|     19.548ns|            0|            0|            0|      3985357|
+| TS_clock_system_clkout3       |      8.000ns|      2.666ns|          N/A|            0|            0|            0|            0|
+| TS_clock_system_clkout1       |     10.000ns|      9.774ns|          N/A|            0|            0|       113409|            0|
+| TS_clock_system_clkout0       |     40.000ns|     31.224ns|          N/A|            0|            0|      3871710|            0|
+| TS_clock_system_clkout2       |      8.000ns|      4.288ns|          N/A|            0|            0|          238|            0|
++-------------------------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+
+
+All constraints were met.
+
+
+Generating Pad Report.
+
+All signals are completely routed.
+
+WARNING:Par:283 - There are 4 loadless signals in this design. This design will cause Bitgen to issue DRC warnings.
+
+Total REAL time to PAR completion: 20 secs 
+Total CPU time to PAR completion: 20 secs 
+
+Peak Memory Usage:  741 MB
+
+Placer: Placement generated during map.
+Routing: Completed - No errors found.
+Timing: Completed - No errors found.
+
+Number of error messages: 0
+Number of warning messages: 6
+Number of info messages: 0
+
+Writing design to file phoenix_top.ncd
+
+
+
+PAR done!

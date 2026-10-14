@@ -1,0 +1,15 @@
+ Updated CV Core (11/23/19) Rev 6
+
+CORE01.PHX 
+
+Changes:
+
+-Changed Keyboard detection fix from port 30 to 31 to fix issue with Courtney
+
+-Changed back to Courtney sound chip from generic AY chip
+
+-Speech in Wizard of Wor and QBIQS fixed
+
+-still might need a few audio mixing tweaks
+
+-Fixes to F18a settings menu 
