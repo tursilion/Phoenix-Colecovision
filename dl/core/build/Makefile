@@ -15,9 +15,9 @@
 ISE_SETTINGS ?= /opt/Xilinx/14.7/ISE_DS/settings64.sh
 PART         := xc6slx16-2-csg324
 TOP          := dl_phoenix_top
-CORE_FILE    ?= CORE04.PHX
+CORE_FILE    ?= CORE05.PHX
 CORE_NAME    := LASERDISC
-CORE_ISSUE   := 0
+CORE_ISSUE   := 1001
 
 REPO := ../../..
 RTL  := $(REPO)/rtl

@@ -63,7 +63,7 @@ https://github.com/jotego/jt49  - GPLv3
     a fallback), and how ODDR2 behaves on the board.
 
   To try it on the Phoenix:
-  1. Install build/CORE04.PHX with the Phoenix boot loader.
+  1. Install build/CORE05.PHX with the Phoenix boot loader.
   2. Make a test disc file. It takes seconds and shows frame numbers instead of video, so it's good for checking the SD
      streaming:
   tools/mkdisc.py LAIR.LD --game lair --rom ../lair/dl_f2_u{1,2,3,4}.bin --test
@@ -75,7 +75,7 @@ https://github.com/jotego/jt49  - GPLv3
   Controls are in dl/core/README.md.
   
 
-  1. Install the new dl/core/build/CORE04.PHX.
+  1. Install the new dl/core/build/CORE05.PHX.
   2. Re-encode the disc. A full Lair disc took 37 s per 1349 frames here, so about 15 minutes on your 24 cores:
   tools/mkdisc.py LAIR.LD --game lair --rom ../lair/dl_f2_u{1,2,3,4}.bin \
       --framefile /mnt/d/emu/Daphne/vldp_dl/lair/lair.txt

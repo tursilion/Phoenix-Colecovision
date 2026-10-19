@@ -11,7 +11,7 @@ LUTs and 18 of 32 block RAMs). Proven on V1 hardware.
 
 1. Put `.NES` files (iNES format) on a FAT16 or FAT32 SD card, in any
    folders.
-2. Install the core file (`build/CORE03.PHX` by default) with the Phoenix boot
+2. Install the core file (`build/CORE04.PHX` by default) with the Phoenix boot
    loader, like the other cores.
 3. Power up with the card inserted. The menu lists the folders and `.NES`
    files of the current folder, folders first, sorted by name (up to 256
@@ -74,7 +74,7 @@ the file.
 [Docked-ISE-147](https://github.com/I-A-S/Docked-ISE-147) Docker image):
 
     docker run --rm -v "$REPO":/workspace -v /path/to/Xilinx.lic:/root/.Xilinx/Xilinx.lic \
-      -w /workspace/nes/build docked-ise-147 make CORE_FILE=CORE03.PHX
+      -w /workspace/nes/build docked-ise-147 make CORE_FILE=CORE04.PHX
 
 or, with ISE installed locally, `make ISE_SETTINGS=.../settings64.sh` in
 `build/`. This makes `nes_phoenix_top.bit` (JTAG) and the core file. The

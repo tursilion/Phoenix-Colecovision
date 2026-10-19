@@ -149,14 +149,13 @@ shows anything, like the real machine while its player spins up.
   - The testbench makes up test-disc frames from the first frame's sector
     on, so a small image can stand in for the whole disc.
 - `build/`: the ISE command-line build. The default core file is
-  `CORE04.PHX`.
+  `CORE05.PHX`.
 
 ## Building
 
 - **Core:** use ISE 14.7, the same way as the NES core:
 
-      docker run --rm -v "$REPO":/workspace -v /path/to/Xilinx.lic:/root/.Xilinx/Xilinx.lic \
-        -w /workspace/dl/core/build docked-ise-147 make
+      docker run --rm -v "$REPO":/workspace -v /path/to/Xilinx.lic:/root/.Xilinx/Xilinx.lic -w /workspace/dl/core/build docked-ise-147 make
 
 - **Boot loader and font:** these need sdcc 4.x, and are only rebuilt
   after changing `loader/`:

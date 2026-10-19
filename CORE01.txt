@@ -1,3 +1,10 @@
+Unofficial ColecoVision core for CollectorVision Phoenix
+Should be compatible with both releases of hardware.
+
+Supports colecovision and SNES pads as well as PS/2 keyboard for games.
+As noted below, PS/2 keyboard can be enabled as a full keyboard by supporting titles.
+Supports F18A graphics and SGM hardware and software.
+
 2026-10-14
 - fix AY audio init
 - add PS/2 keyboard reads (set port 0x54 to 0x04 for normal Coleco or 0x05 for SGM - bit 0x04 enables the keyboard. Read scancodes from port 0x80).
