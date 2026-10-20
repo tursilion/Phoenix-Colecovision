@@ -4,25 +4,38 @@
 #   make test       boot the test cartridge from FAT16, FAT32 and MBR images
 #                   and check the picture
 #
-# Needs verilator, mkfs.fat, python3 with pyfatfs, and cc65 (for testrom).
+# Needs mkfs.fat, python3 with pyfatfs (tools/python/setup.sh), cc65 (for
+# testrom), and either verilator on the PATH or the docked-ise-147 Docker image:
+# then Verilator runs in the image (its g++ is too old to compile the result)
+# and the C++ is compiled here against tools/verilator.
 
-VERILATOR ?= verilator
-PYTHON    ?= python3
+ROOT           := $(abspath ../..)
+VERILATOR      ?= $(shell command -v verilator)
+DOCKER_IMAGE   ?= docked-ise-147
+VERILATOR_ROOT ?= $(ROOT)/tools/verilator
+PYTHON    ?= $(if $(wildcard $(ROOT)/tools/python/venv/bin/python),$(ROOT)/tools/python/venv/bin/python,python3)
 CL65      ?= cl65
 
 RTL  := ../rtl
-SRCS := $(RTL)/nes_phoenix.v $(RTL)/fpganes/nes.v $(RTL)/fpganes/game_loader.v xilinx_prims.v
+SRCS := $(RTL)/nes_phoenix.v $(RTL)/apu_filter.v $(RTL)/fpganes/nes.v $(RTL)/fpganes/game_loader.v xilinx_prims.v
 
 SIM  := obj_dir/Vnes_phoenix
 
 all: $(SIM)
 
-$(SIM): $(SRCS) tb.cpp $(RTL)/nes_boot.hex
-	$(VERILATOR) --cc --exe --build -j 0 -O3 -Wno-fatal -Wno-lint -Wno-style \
+VARGS := --cc --exe -O3 -Wno-fatal -Wno-lint -Wno-style \
 	  --top-module nes_phoenix -I$(RTL)/fpganes \
 	  -GBOOTROM_FILE='"$(RTL)/nes_boot.hex"' \
 	  -GPALETTE_FILE='"$(RTL)/fpganes/nes_palette.txt"' \
 	  $(SRCS) tb.cpp
+
+$(SIM): $(SRCS) tb.cpp $(RTL)/nes_boot.hex
+ifneq ($(VERILATOR),)
+	$(VERILATOR) $(VARGS) --build -j 0
+else
+	docker run --rm -u $$(id -u):$$(id -g) -v $(ROOT):/w -w /w/nes/sim $(DOCKER_IMAGE) verilator $(VARGS)
+	$(MAKE) -C obj_dir -f Vnes_phoenix.mk -j 8 VERILATOR_ROOT=$(VERILATOR_ROOT)
+endif
 
 testrom/testrom.nes: testrom/testrom.s testrom/testrom.cfg
 	$(CL65) -t none -C testrom/testrom.cfg -o $@ $<

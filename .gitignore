@@ -1,6 +1,5 @@
 itch
 *.LD
-CORE03.PHX
 CORE04.PHX
 CORE05.PHX
 CORE06.PHX
@@ -33,3 +32,7 @@ Thumbs.db
 /ROMs/multcart/*.noi
 /ROMs/multcart/obj
 backup
+*.zip
+dist/coleco/colecovision_for_phoenix/
+dist/dl/laserdisc_for_phoenix/
+dist/nes/nes_for_phoenix/

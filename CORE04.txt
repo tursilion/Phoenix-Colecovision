@@ -1,0 +1,11 @@
+Unofficial NES core for CollectorVision Phoenix
+Should be compatible with both releases of hardware.
+
+1 and 2 are start and select. Left and Right are B and A.
+Hold RESET for 4 seconds to return to file menu.
+
+2026-10-14
+- renumbered to core 04 so it doesn't conflict with the Pencil core. (You are free to rename to any number you like.)
+- supports most common mappers up to 512k 
+- supports subdirectories and 8.3 filenames only
+

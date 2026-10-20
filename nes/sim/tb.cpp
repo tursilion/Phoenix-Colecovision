@@ -1,7 +1,9 @@
 // Verilator testbench for nes_phoenix.
 //
 //   tb [--sd image] [--frames n] [--ppm prefix] [--press-a frame] [--check]
-//      [--pad frame:buttons,...] [--menu-reset frame]
+//      [--pad frame:buttons,...] [--menu-reset frame] [--wav prefix] [--ppm-every n]
+//      [--start-after-sound frames]   press Start this long after the audio
+//                                     first changes (after frame 400)
 //
 // --pad sets controller 1 to the hex NES button byte (bit 0 = A ... bit 7 =
 // Right) from each given frame on, e.g. --pad 60:01,62:00.
@@ -132,6 +134,32 @@ struct SdCard {
 };
 
 // ---------------------------------------------------------------------------
+// Audio capture: <prefix>_48k.wav point-samples the audio port at 48 kHz like
+// the HDMI encoder does; <prefix>_raw.wav averages blocks of 64 clocks
+// (390.625 kHz) to show what the APU produces above 24 kHz.
+
+struct Wav {
+    FILE *f = nullptr;
+    uint32_t n = 0, rate = 0;
+    bool open(const std::string &name, uint32_t r) {
+        f = fopen(name.c_str(), "wb");
+        rate = r;
+        if (f) header();
+        return f != nullptr;
+    }
+    void header() {
+        uint32_t bytes = n * 2;
+        auto u32 = [&](uint32_t v) { fwrite(&v, 4, 1, f); };
+        auto u16 = [&](uint16_t v) { fwrite(&v, 2, 1, f); };
+        fseek(f, 0, SEEK_SET);
+        fwrite("RIFF", 1, 4, f); u32(36 + bytes); fwrite("WAVEfmt ", 1, 8, f);
+        u32(16); u16(1); u16(1); u32(rate); u32(rate * 2); u16(2); u16(16);
+        fwrite("data", 1, 4, f); u32(bytes);
+        fseek(f, 0, SEEK_END);
+    }
+    void put(int16_t s) { if (f) { fwrite(&s, 2, 1, f); ++n; } }
+    void close() { if (f) { header(); fclose(f); f = nullptr; } }
+};
 
 static const uint32_t W = 640, H = 480;
 
@@ -139,8 +167,9 @@ struct Pixel { uint8_t r, g, b; };
 
 int main(int argc, char **argv)
 {
-    const char *sd_path = nullptr, *ppm = nullptr;
-    int frames = 30, press_a = -1, menu_reset = -1;
+    const char *sd_path = nullptr, *ppm = nullptr, *wav = nullptr;
+    int frames = 30, press_a = -1, menu_reset = -1, ppm_every = 1;
+    int start_after_sound = -1, sound_frame = -1, sound_after = 400;
     bool check = false;
     std::vector<std::pair<int, int>> pad_script;
 
@@ -148,7 +177,10 @@ int main(int argc, char **argv)
         if (!strcmp(argv[i], "--sd") && i + 1 < argc) sd_path = argv[++i];
         else if (!strcmp(argv[i], "--frames") && i + 1 < argc) frames = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--ppm") && i + 1 < argc) ppm = argv[++i];
+        else if (!strcmp(argv[i], "--ppm-every") && i + 1 < argc) ppm_every = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--press-a") && i + 1 < argc) press_a = atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--wav") && i + 1 < argc) wav = argv[++i];
+        else if (!strcmp(argv[i], "--start-after-sound") && i + 1 < argc) start_after_sound = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--check")) check = true;
         else if (!strcmp(argv[i], "--menu-reset") && i + 1 < argc) menu_reset = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--pad") && i + 1 < argc) {
@@ -179,6 +211,14 @@ int main(int argc, char **argv)
     int last_led = 0;
     long clocks = 0;
     int result = 0;
+
+    Wav wav48, wavraw;
+    if (wav) {
+        wav48.open(std::string(wav) + "_48k.wav", 48000);
+        wavraw.open(std::string(wav) + "_raw.wav", 390625);
+    }
+    uint32_t audio_timer = 0;                       // 25 MHz -> 48 kHz, as in hdmidataencoder.v
+    int64_t raw_sum = 0;
 
     top->clk = 0;
     top->reset = 1;
@@ -213,6 +253,24 @@ int main(int argc, char **argv)
             sram[top->sram_addr] = top->sram_dout;
         sd.step(top->sd_cs_n, top->sd_sclk, top->sd_mosi);
 
+        if (start_after_sound >= 0 && sound_frame < 0 && frame >= sound_after) {
+            static int16_t settled = 0;
+            static bool have = false;
+            if (!have) { settled = (int16_t)top->audio; have = true; }
+            else if ((int16_t)top->audio != settled) {
+                sound_frame = frame;
+                printf("sound starts at frame %d; Start at frame %d\n", frame, frame + start_after_sound);
+            }
+        }
+
+        if (wav) {
+            int16_t s = (int16_t)top->audio;
+            audio_timer += 48;
+            if (audio_timer >= 25000) { audio_timer -= 25000; wav48.put(s); }
+            raw_sum += s;
+            if ((clocks & 63) == 0) { wavraw.put((int16_t)(raw_sum / 64)); raw_sum = 0; }
+        }
+
         if (!boot_reported && !top->boot_mode) {
             boot_reported = true;
             printf("boot done: frame %d (%.2f s), %ld SD reads\n",
@@ -236,7 +294,7 @@ int main(int argc, char **argv)
 
         if (!top->vid_vsync_n && last_vsync_n) {
             if (y == H) {
-                if (ppm) {
+                if (ppm && frame % ppm_every == 0) {
                     char name[512];
                     snprintf(name, sizeof(name), "%s%03d.ppm", ppm, frame);
                     FILE *f = fopen(name, "wb");
@@ -254,12 +312,16 @@ int main(int argc, char **argv)
             for (auto &p : pad_script)
                 if (frame >= p.first) pad = p.second;
             if (press_a >= 0 && frame >= press_a) pad |= 0x01;
+            if (sound_frame >= 0 && frame >= sound_frame + start_after_sound &&
+                frame < sound_frame + start_after_sound + 4) pad |= 0x08;
             top->joy1 = pad;
         }
         last_vsync_n = top->vid_vsync_n;
     }
 
     printf("%d frames, %ld clocks, boot_mode=%d\n", frame, clocks, top->boot_mode);
+    wav48.close();
+    wavraw.close();
 
     if (check) {
         // Picture of sim/testrom, in NES coordinates.

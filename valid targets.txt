@@ -16,3 +16,4 @@ TurboGraphics - maybe
 Master System - probably
 Game Gear - just a variant of Master System
 Vextrex - probably - remember to add modern banking
+Gyruss Arcade - maybe

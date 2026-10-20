@@ -232,8 +232,15 @@ NES nes(clk, nes_reset, nes_ce,
         dbgadr, dbgctr,
         ext_addr, ext_dout, ext_write, ext_cs, ext_din);
 
-// Unsigned APU output to signed PCM.
-assign audio = {~sample[15], sample[14:0]};
+// APU output to signed PCM, filtered before the HDMI encoder's 48 kHz
+// sampling (see apu_filter.v).  The APU runs on every third nes_ce.
+reg  [1:0] apu_div = 0;
+wire       apu_rate_ce = nes_ce && (apu_div == 2'd2);
+always @(posedge clk)
+  if (nes_ce)
+    apu_div <= (apu_div == 2'd2) ? 2'd0 : apu_div + 2'd1;
+
+apu_filter apu_filter(clk, apu_rate_ce, sample, audio);
 
 // Joypads, as in fpganes's NES_Nexys4.v.
 always @(posedge clk) begin

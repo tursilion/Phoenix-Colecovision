@@ -1,0 +1,5 @@
+# Python packages used by tools/ and nes/sim (wheels for Python 3.11 / x86-64 Linux are in wheels/)
+skoolkit==10.1      # Z80 disassembler/assembler (service menu ROM)
+z80==1.2.0          # Z80 emulator (service menu FAT tests)
+pyfatfs==1.1.0      # writes test SD card images (nes/sim/mksd.py, service_menu/mkimages.py)
+numpy==2.4.6        # audio and CRC analysis

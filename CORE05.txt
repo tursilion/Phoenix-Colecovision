@@ -1,0 +1,68 @@
+Unofficial Laserdisc core for CollectorVision Phoenix
+Should be compatible with both releases of hardware.
+
+2026-10-17
+- Dragon's Lair only wants ROM version 'f2' (ie: dl_f2_u1.bin, etc) - commonly "lair.zip" contains these.
+- Space Ace only wants ROM version 'a3' (ie: sa_a3_u1.bin, etc) - commonly "ace.zip" contains these.
+- You will need separate audio and video tracks alone with a "frame file" that contains the starting offset.
+
+You can install the core like any other by putting it on an SD card and using the '#' menu to install it, but you will also need LD files on the SD card to play.
+
+You can use Daphne to get legal copies of these files, assuming you already own a qualifying DVD. Here is the process:
+
+Daphne download from: http://www.daphne-emu.com/site3/index_hi.php
+
+I'll be using the Windows version and downloading the zip. On my machine I download to c:\new\daphne\daphne-1.0v-win32.zip
+
+I expect the zip file to the same folder, creating a lot of files. I run "DaphneLoader.exe" - it will ask to self update. Allow it. When it comes back it may ask for network access - you'll have to allow that too.
+
+Go to Dragon's Lair and hit start - and it will tell you a list of discs it can use. I can't help with converting those, we're going to download directly. Just hit okay and it will ask about downloading from the Internet. Hit ok again.
+
+This works, but it will take a while. if you get a warning about slow download but it is working, disregard it. This is for making the torrent connection faster. During the download Daphne will remind you what disc you need to own to make these files legal. At the end of the download, it will ask to verify the disc, and you'll have to insert it. (If you don't, it won't finish the downloaded files.) It will take a moment and validate the DVD (pretty much all of it.)
+
+Daphne will then verify it's game files, which you can complete if you like. It will give you a working PC version as well in the end. (My copy updated one more time.) It will then say 'game is ready to begin', and then a new window will ask to "parse your video files". You're done with Daphne, so it's up to you whether you want to or not. Press escape to quit. We need to do our own parse for Phoenix anyway.
+
+You can repeat for Space Ace, or close the Daphne loader.
+
+If you are skilled - the next steps are much easier in a Linux-based shell than Windows, as most Linux systems already have ffmpeg and python installed. Python needs numpy and pillow - also usually already installed.
+
+You will need to install Python 3 and ffmpeg - if you know you have them you can skip ahead.
+
+In the search window at the top, type 'python' and press enter. Look for "python 3.13" or later, but keep it in the "python 3" family. Don't worry about 'instant' or 'manager', you're only going to use it once. Python is a scripting language - good to learn if you want it, but you don't need to. Select it and click 'get'. Wait for it to finish (just a few seconds), then you can close the store.
+
+ffmpeg isn't quite as simple. Visit https://ffmpeg.org/download.html - and click Windows under the 'get packages & executable files'. I found "windows builds by btbn" the easier link. Scroll down and select "ffmpeg-master-lastest-win64-gpl-shared" (you will need a 64 bit version of Windows - they don't support 32 anymore).
+
+Open and extract the folder somewhere convenient. In this example I'll use \new\daphne\ffmpeg... the actual name they use is 'ffmpeg-master-latest-win64-gpl-shared' - make sure that's what it's called. The batch file will look for it there.
+
+Now we can start working. In your download folder \new\daphne (or where you put it), the folders we care about are "ffmpeg-master-lastest-win64-gpl-shared", "roms", and "vldp_dl".
+
+First go into 'roms'. Rather than make you also install a zip application, I'll make you unpack the roms directly. Open the 'lair.zip' file, and copy the files from it into "vldp_dl\lair" - you should be adding 4 files. Careful to use 'lair' and not 'lair2', which isn't supported.
+
+Also make sure you got a lair.m2v (about 852MB), a lair.ogg (about 26MB), and a lair.txt (about 19 bytes) - Daphne should have created these for you.
+
+From your Phoenix core folder, copy tools\mkdisc.py and tools\mkdisclair.bat into the lair folder. Then double-click mkdisclair.bat. 
+
+This will take a long time depending on your PC - as much as 30-45 minutes. But you only have to do it once.
+
+NOTE: if you get an access denied your anti-virus may be blocking access for the script to run ffmpeg. You may need to permit access to the ffmpeg folder. This happened to me!
+
+Once you see the line "23.976 fps, disc frames 151-..." etc, it has started working. You should get an update every 500 frames and the first line tells you where it will end.
+
+The output will be LAIR.LD - this file includes the ROMs and the video. Store it with your Phoenix core, and place it on the SD card when you are ready to play.
+
+VERY IMPORTANT: the laserdisc files must be completely non-fragmented. The core will check when starting up, but the best way to ensure it is to format a blank SD card, and make sure they are the first files you copy. If you are doing both Dragon's Lair and Space Ace, do them both before you copy in other ROMs.
+
+For Space Ace, you will repeat the above process, except using "ace.zip" from the roms folder, which will give you 5 files. Drop them into vldp_dl\ace. The files to verify you have from Daphne are "ace.m2v" (959MB), "ace.ogg" (27MB) and "ace.txt" (24 bytes). And from the Phoenix tools folder copy "mkdisc.py" and "mkdiscace.bat". Double-click "mkdiscace.bat" in the vldp_al\ace folder.
+
+Once you select the LD file in the Phoenix, it will check the core, spend a few moments calibrating, and then start up in free play. You can press '1' for 1 player or '2' for two players. Be aware that Space Ace expects 8-directional inputs, so diagonals matter.
+
+Other games, other ROM versions, and especially other disc files have not been tested. The script will try but results are not likely to work.
+
+PLAYING:
+
+Dragon's Lair - four way joystick and fire for Sword. Press '1' for one player or '2' for two player.
+Space Acer - eight way joystick and fire for gun/energize. Press '1' for one player or '2' for two player, then press '1-3' for skill level (1 is easiest). If you take too long it will time out and play skill 2.
+
+Both - you can toggle the score/lives display with '*'.
+
+Hold RESET for 4 seconds to return to the file select menu.

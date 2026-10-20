@@ -1,0 +1,60 @@
+SD driver ($0A13 init, $0A86 read sector), compared with the CV menu's FatFs driver:
+
+  1. It never changes the SPI clock speed. The control port ($60) is only ever written with $FF or $FE (chip select off/on). If the
+     service core's hardware works like the CV core's (bit 1 = slow clock), the menu runs entirely at about 390 kHz: slow but
+     safe. If that hardware has no slow mode, card setup runs at full speed, which breaks the SD spec's 400 kHz limit and is a
+     classic cause of "some cards fail". The program alone can't tell me which.
+  2. Chip-select handling is minimal. It selects the card once at the start of setup and never releases it after reads. It never
+     waits for the card to report ready before a command, and it never sends the extra clock byte after release. FatFs releases,
+     clocks, reselects and waits for ready before every command.
+  3. Card setup cuts corners:
+     - No power-up delay before setup. FatFs waits 10 ms, but the menu starts setup the instant the core boots.
+     - CMD0 (the reset command) is retried 16 times back to back with no pause.
+     - The card's CMD8 echo isn't checked.
+     - Older SD v1 cards get CMD1, the MMC-style setup command, instead of ACMD41. Some cards reject CMD1.
+
+  Filesystem probe ($053C), probably the bigger problem in the field:
+
+  - FAT32 only. FAT16 cards fail with error 3, or error 9 when there's no partition table. Most cards of 2 GB or less ship as
+    FAT16, and the later cores accept it.
+  - It only reads the first partition entry and doesn't check its type. GPT cards fail with error 2 and exFAT cards (the default
+    for 64 GB and up) with error 3.
+  - End-of-file in the FAT chain is only recognised as exactly 0x0FFFFFFF. Other valid end markers (0x0FFFFFF8–FE) aren't, and then
+    it follows the chain into garbage.
+  - It only searches the root directory, by 8.3 name, and keeps scanning past the end-of-directory marker.
+
+  A quick way to sort the failures: "no sd card" means setup or the sector-0 read failed (the driver issues). "sd card error NN"
+  means the filesystem probe rejected the card:
+
+  +-----------------------------------------------+
+  ¦ Code ¦                Meaning                 ¦
+  +------+----------------------------------------¦
+  ¦ 2    ¦ Bad boot sector jump (GPT and similar) ¦
+  +------+----------------------------------------¦
+  ¦ 3    ¦ Not FAT32 (includes exFAT)             ¦
+  +------+----------------------------------------¦
+  ¦ 4    ¦ Unsupported bytes per sector           ¦
+  +------+----------------------------------------¦
+  ¦ 5    ¦ Bad sectors per cluster                ¦
+  +------+----------------------------------------¦
+  ¦ 6–9  ¦ FAT12/16-style fields                  ¦
+  +-----------------------------------------------+
+
+  The code 9 check runs before the jump check. So a FAT16 card without a partition table shows 9, not 2 or 3.
+
+  To force FAT32, run this from an admin command prompt (the Disk Management GUI sometimes hides FAT32 for small volumes):
+
+  format X: /FS:FAT32 /Q
+  
+I've confirmed it's a right-shifting, LSB-first, 22-bit CRC based on the shift relationship between the two neighbouring
+  references, and there's a second CRC word at the frame's end. Before brute-forcing the polynomial, I'll quickly check if
+  fpgatools already documents it.  
+  
+  This confirms the CRC processes a full word per step rather than bit-by-bit, which explains why the serial models didn't work.
+  I'll use the impulse response one frame (65 words) later to derive an equation I can solve directly.
+
+  I've identified the CRC as a left-shifting 22-bit polynomial (taps 0x9081, G = x²²+x¹5+x¹²+x7+1), where each word shifts the
+  register once and XORs in a 22-bit value combining the 6-bit register address and 16-bit data. Now I'll verify this against every
+  stored CRC I have.  
+
+  

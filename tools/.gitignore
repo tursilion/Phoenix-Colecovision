@@ -1,0 +1,4 @@
+python/venv/
+python/wheels/
+service_menu/images/
+__pycache__/

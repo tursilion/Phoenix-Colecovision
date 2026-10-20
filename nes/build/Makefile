@@ -44,6 +44,7 @@ VHDL := \
 VERILOG := \
   $(RTL)/HDMI/hdmidataencoder.v \
   $(NRTL)/nes_phoenix.v \
+  $(NRTL)/apu_filter.v \
   $(NRTL)/fpganes/nes.v \
   $(NRTL)/fpganes/game_loader.v
 
