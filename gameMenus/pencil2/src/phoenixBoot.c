@@ -15,6 +15,11 @@
 // Uses libti99Coleco - https://github.com/tursilion/libti99coleco - cef5a4dbef4bb873b088ca290c3592be8ebb69c4
 // Note: we have 24k now per the new memory layout, and 8k RAM at 0x6000 (First 1k is true Coleco RAM)
 
+
+// Pencil notes: https://www.colecovisionadam.com/Coleco/adam/HanimexPencilII.php
+// memory map same as Coleco, except 2k at 0x6000
+// Doesn't describe how the keyboard works. MAME?
+
 #include "memset.h"
 #include "vdp.h"
 #include "phoenix.h"

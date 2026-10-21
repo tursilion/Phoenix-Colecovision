@@ -1,0 +1,517 @@
+// Gyruss for the Phoenix: clocks, frame lock, memories, boot loader
+// interface and video output.  The boards are gyruss_main.v and
+// gyruss_sound.v.
+//
+// Everything runs from the 25MHz pixel clock.
+//
+// Clocks
+//   - The main board's 12.288MHz enable is fractional: 768 per 1590 clocks,
+//     so a 384-pixel line takes 1590 clocks and a 264-line frame 419,760,
+//     240 fewer than one 640x480 HDMI frame (420,000).  The game waits for
+//     the HDMI output at the end of each frame (h = 176, v = 511) until HDMI
+//     line 486, which locks it to 59.52Hz (the original is 60.6Hz).  Lines
+//     go through an 8-line buffer and are shown doubled: 256x224 becomes
+//     512x448, centred.
+//   - The sound board runs at its own rate: Z80 3.5797MHz, AY 1.79MHz,
+//     8039 crystal 8MHz.
+//
+// External SRAM
+//   00000-05FFF main CPU ROM      08000-09FFF KONAMI-1 ROM
+//   0A000-0AFFF 8039 ROM (copy)   0C000-0FFFF sound CPU ROM
+//   20000-21FFF boot loader copy (the loader runs from here once it starts)
+// Reads are pipelined: the address goes out on one clock and the data is
+// captured on the next, one read per clock in turn for the main CPU, the
+// KONAMI-1 and the sound CPU (each is served within 4 clocks, well inside
+// their bus cycles).  The loader's writes take 3 clocks.
+//
+// Boot mode (after power-on, or reset held for a second): the other CPUs
+// are held in reset and the main Z80 runs the boot loader, at first from
+// the tile ROM's block RAM (which is initialized with it), then from its
+// copy in the SRAM, so that it can load the tile ROM.  Memory map:
+//   0000-1FFF boot loader        8000-87FF video RAM (8400-877F = text)
+//   9000-9FFF RAM                A000-A7FF RAM
+//   C000 R SPI received byte             W SPI transfer byte (starts it)
+//   C001 R b7 SPI busy, b6 card present  W b0 SD select, b1 fast (12.5MHz)
+//   C002 R b0 SRAM write pending         W load address 7:0
+//   C003 R b0 vertical blank             W load address 15:8
+//   C004 W load address 17:16
+//   C005 W load data: write it, then address + 1
+//   C006 R player 1 (active low, as the game reads it)
+//   C007 R system inputs (active low)
+//   C008-C00A W DIP switches 1-3
+//   C00B W b0 error LED
+//   C00C W b0 run the loader from its SRAM copy
+//   C00F W start the game
+//   I/O read, any port:  the SPI received byte, and start the next transfer
+//                        (sending 0xFF), for INIR block reads
+//   I/O write, any port: load data, as C005 (for OTIR)
+// Load addresses: 00000-0FFFF and 20000-3FFFF go to the SRAM (0A000-0AFFF
+// also to the 8039's ROM); 10000-1A2FF are the graphics ROMs and PROMs
+// (see gyruss_main.v).
+
+`timescale 1ns / 1ps
+
+module gyruss_phoenix
+   ( input             clk          // 25MHz
+   , input             reset        // power-on reset, re-enters boot mode
+   , input             game_reset   // reset the game only
+
+   // Controls, 1 = pressed: b0 up b1 down b2 left b3 right b4 fire
+   , input       [4:0] joy1
+   , input       [4:0] joy2
+   , input       [4:0] sys          // b0 coin1 b1 coin2 b2 service b3 start1 b4 start2
+
+   // External SRAM
+   , output reg [18:0] sram_addr = 0
+   , output reg  [7:0] sram_dout = 0
+   , input       [7:0] sram_din
+   , output reg        sram_doe = 0
+   , output reg        sram_we_n = 1
+   , output reg        sram_oe_n = 1
+
+   // SD card
+   , output reg        sd_cs_n = 1
+   , output reg        sd_sclk = 0
+   , output reg        sd_mosi = 1
+   , input             sd_miso
+   , input             sd_cd_n
+
+   // 640x480 video
+   , output reg  [7:0] vid_r = 0
+   , output reg  [7:0] vid_g = 0
+   , output reg  [7:0] vid_b = 0
+   , output reg        vid_hsync_n = 1
+   , output reg        vid_vsync_n = 1
+   , output reg        vid_blank = 1
+
+   // Audio
+   , output     [15:0] audio_l
+   , output     [15:0] audio_r
+
+   , output reg        boot_mode = 1
+   , output reg        led_err = 0
+   );
+
+// ---------------------------------------------------------------------------
+// HDMI timing: 800 x 525, visible 640 x 480
+
+reg [9:0] hc = 0;
+reg [9:0] vc = 0;
+
+always @(posedge clk) begin
+  if (hc == 10'd799) begin
+    hc <= 0;
+    vc <= (vc == 10'd524) ? 10'd0 : vc + 1'd1;
+  end else
+    hc <= hc + 1'd1;
+end
+
+wire release_line = (hc == 10'd0 && vc == 10'd486);
+
+// ---------------------------------------------------------------------------
+// Main board clock enable and frame lock
+
+wire [8:0] g_h, g_v;
+wire       g_d0;
+reg        cen12 = 0;
+reg [11:0] acc12 = 0;
+reg        go = 0;
+
+wire wait_pt = (g_h == 9'd176 && g_v == 9'd511 && !g_d0);
+wire run     = !wait_pt || go;
+wire ovf12   = (acc12 + 12'd768 >= 12'd1590);
+
+always @(posedge clk) begin
+  cen12 <= 0;
+  if (run) begin
+    acc12 <= ovf12 ? acc12 + 12'd768 - 12'd1590 : acc12 + 12'd768;
+    cen12 <= ovf12;
+  end
+  if (release_line)
+    go <= 1;
+  else if (cen12 && wait_pt)
+    go <= 0;
+end
+
+// Sound board enables
+reg [15:0] acc_snd = 0;
+reg        cen_snd = 0;
+reg  [5:0] acc_8m = 0;
+reg        cen_8m = 0;
+
+always @(posedge clk) begin
+  {cen_snd, acc_snd} <= {1'b0, acc_snd} + 17'd9384;    // 25MHz * 9384 / 65536
+  if (acc_8m + 6'd8 >= 6'd25) begin
+    acc_8m <= acc_8m + 6'd8 - 6'd25;
+    cen_8m <= 1;
+  end else begin
+    acc_8m <= acc_8m + 6'd8;
+    cen_8m <= 0;
+  end
+end
+
+// ---------------------------------------------------------------------------
+// Resets
+
+reg       start_game = 0;
+reg [7:0] rst_cnt = 8'hff;
+wire      cpu_reset = (rst_cnt != 0);
+
+always @(posedge clk) begin
+  if (reset)
+    boot_mode <= 1;
+  else if (start_game)
+    boot_mode <= 0;
+
+  if (reset || start_game || (game_reset && !boot_mode))
+    rst_cnt <= 8'hff;
+  else if (rst_cnt != 0)
+    rst_cnt <= rst_cnt - 1'd1;
+end
+
+wire main_reset = cpu_reset;
+wire sub_reset  = cpu_reset || boot_mode;
+
+// ---------------------------------------------------------------------------
+// Inputs and DIP switches
+
+reg [7:0] dsw1 = 8'hff, dsw2 = 8'h3b, dsw3 = 8'hfe;
+
+wire [7:0] in_sys = {3'b111, ~sys[4], ~sys[3], ~sys[2], ~sys[1], ~sys[0]};
+wire [7:0] in_p1  = {3'b111, ~joy1[4], ~joy1[1], ~joy1[0], ~joy1[3], ~joy1[2]};
+wire [7:0] in_p2  = {3'b111, ~joy2[4], ~joy2[1], ~joy2[0], ~joy2[3], ~joy2[2]};
+
+// ---------------------------------------------------------------------------
+// Main board
+
+wire [15:0] A;
+wire  [7:0] z_dout;
+wire        z_mreq_n, z_iorq_n, z_rd_n, z_wr_n, z_m1_n, z_rfsh_n;
+wire [15:0] k1_a;
+reg   [7:0] rom_q0 = 8'hff, rom_q1 = 8'hff, rom_q2 = 8'hff;
+reg         boot_sel;
+reg   [7:0] boot_q;
+wire  [7:0] snd_latch;
+wire        snd_irq;
+reg         ld_we = 0;
+reg  [17:0] ld_a = 0;
+reg   [7:0] ld_d = 0;
+wire  [7:0] tile_rd_q;
+reg  [10:0] text_a = 0;
+wire  [7:0] text_q;
+wire        g_cen6, g_hblk, g_vblk;
+wire  [4:0] g_pixel;
+wire  [4:0] pal_a;
+wire  [7:0] pal_q;
+
+gyruss_main main
+  ( .clk(clk), .reset(main_reset), .cen12(cen12), .boot_mode(boot_mode)
+  , .in_sys(in_sys), .in_p1(in_p1), .in_p2(in_p2)
+  , .dsw1(dsw1), .dsw2(dsw2), .dsw3(dsw3)
+  , .z80_a(A), .z80_dout(z_dout), .z80_mreq_n(z_mreq_n), .z80_iorq_n(z_iorq_n)
+  , .z80_rd_n(z_rd_n), .z80_wr_n(z_wr_n), .z80_m1_n(z_m1_n), .z80_rfsh_n(z_rfsh_n)
+  , .rom1_q(rom_q0), .boot_sel(boot_sel), .boot_q(boot_q)
+  , .k1_a(k1_a), .rom4_q(rom_q1)
+  , .snd_latch(snd_latch), .snd_irq(snd_irq)
+  , .ld_we(ld_we), .ld_a(ld_a), .ld_d(ld_d)
+  , .tile_rd_a(A[12:0]), .tile_rd_q(tile_rd_q)
+  , .text_a(text_a), .text_q(text_q)
+  , .h_cnt(g_h), .v_cnt(g_v), .cen6(g_cen6), .d0(g_d0), .hblk(g_hblk), .vblk(g_vblk)
+  , .pixel(g_pixel), .pal_a(pal_a), .pal_q(pal_q)
+  );
+
+// ---------------------------------------------------------------------------
+// Sound board
+
+wire [15:0] s_a;
+
+gyruss_sound sound
+  ( .clk(clk), .reset(sub_reset), .cen_z80(cen_snd), .cen_8m(cen_8m)
+  , .latch(snd_latch), .irq_trigger(snd_irq)
+  , .rom_a(s_a), .rom_q(rom_q2)
+  , .ld_we(ld_we && ld_a[17:12] == 6'b001010), .ld_a(ld_a[11:0]), .ld_d(ld_d)
+  , .audio_l(audio_l), .audio_r(audio_r)
+  );
+
+// ---------------------------------------------------------------------------
+// SRAM
+
+reg        exec_sram = 0;          // boot loader runs from its SRAM copy
+
+wire [18:0] m0_addr = boot_mode ? {6'b010000, A[12:0]} : {4'b0000, A[14:0]};   // 20000 / 00000
+wire [18:0] m1_addr = {6'b000100, k1_a[12:0]};                                    // 08000
+wire [18:0] m2_addr = {5'b00011, s_a[13:0]};                                      // 0C000
+
+reg        b_pend = 0;
+reg [18:0] b_addr = 0;
+reg  [7:0] b_data = 0;
+reg  [1:0] wst = 0;
+reg  [1:0] slot = 0;
+reg  [1:0] rtag = 0;               // 1-3: read issued last clock for master 0-2
+
+always @(posedge clk) begin
+  rtag <= 0;
+  case (rtag)
+  2'd1: rom_q0 <= sram_din;
+  2'd2: rom_q1 <= sram_din;
+  2'd3: rom_q2 <= sram_din;
+  default: ;
+  endcase
+
+  case (wst)
+  2'd0:
+    if (b_pend) begin
+      sram_addr <= b_addr;
+      sram_dout <= b_data;
+      sram_doe  <= 1;
+      sram_oe_n <= 1;
+      b_pend    <= 0;
+      wst       <= 2'd1;
+    end else begin
+      sram_doe  <= 0;
+      sram_oe_n <= 0;
+      sram_addr <= (slot == 2'd0) ? m0_addr : (slot == 2'd1) ? m1_addr : m2_addr;
+      rtag      <= slot + 1'd1;
+      slot      <= (slot == 2'd2) ? 2'd0 : slot + 1'd1;
+    end
+  2'd1: begin sram_we_n <= 0; wst <= 2'd2; end
+  default: begin sram_we_n <= 1; wst <= 2'd0; end
+  endcase
+
+  if (ld_we && (ld_a[17:16] == 2'b00 || ld_a[17])) begin
+    b_pend <= 1;
+    b_addr <= {1'b0, ld_a};
+    b_data <= ld_d;
+  end
+
+  if (reset) begin
+    wst       <= 0;
+    sram_we_n <= 1;
+    sram_doe  <= 0;
+    b_pend    <= 0;
+  end
+end
+
+// ---------------------------------------------------------------------------
+// SPI (SD card), mode 0: about 390kHz or 12.5MHz
+
+reg  [7:0] spi_tx = 8'hff;
+reg  [7:0] spi_sr = 8'hff;
+reg  [7:0] spi_rx = 8'hff;
+reg        spi_fast = 0;
+reg        spi_start = 0;
+reg        spi_busy = 0;
+reg  [3:0] spi_cnt = 0;            // half bits left
+reg  [4:0] spi_div = 0;
+
+always @(posedge clk) begin
+  if (spi_start) begin
+    spi_busy <= 1;
+    spi_sr   <= spi_tx;
+    sd_mosi  <= spi_tx[7];
+    sd_sclk  <= 0;
+    spi_cnt  <= 4'd15;
+    spi_div  <= 0;
+  end else if (spi_busy) begin
+    spi_div <= spi_div + 1'd1;
+    if (spi_fast || spi_div == 5'd31) begin
+      spi_div <= 0;
+      if (!sd_sclk) begin                    // rising edge: sample
+        sd_sclk <= 1;
+        spi_sr  <= {spi_sr[6:0], sd_miso};   // valid a clock after the falling edge
+      end else begin                         // falling edge: next bit
+        sd_sclk <= 0;
+        sd_mosi <= spi_sr[7];
+      end
+      if (spi_cnt == 0) begin
+        spi_busy <= 0;
+        spi_rx   <= spi_sr;                    // the last tick is a falling edge
+      end else
+        spi_cnt <= spi_cnt - 1'd1;
+    end
+  end
+end
+
+// ---------------------------------------------------------------------------
+// Boot loader registers
+
+wire vblank_out = (vc >= 10'd480);
+
+wire mem_rd  = !z_mreq_n && !z_rd_n && z_rfsh_n;
+wire a_c0    = (A[15:8] == 8'hC0);
+reg  wr_n_d  = 1;
+wire wr_stb  = !z_mreq_n && !z_wr_n && wr_n_d;
+always @(posedge clk) wr_n_d <= z_wr_n;
+
+wire [7:0] boot_io =
+  (A[4:0] == 5'h00) ? spi_rx :
+  (A[4:0] == 5'h01) ? {spi_busy, !sd_cd_n, 6'd0} :
+  (A[4:0] == 5'h02) ? {7'd0, b_pend} :
+  (A[4:0] == 5'h03) ? {7'd0, vblank_out} :
+  (A[4:0] == 5'h06) ? in_p1 :
+  (A[4:0] == 5'h07) ? in_sys : 8'hff;
+
+reg  io_rd_d = 0;
+reg  [7:0] io_q = 8'hff;           // frozen during the cycle: the next transfer may end first
+wire io_rd = boot_mode && !z_iorq_n && !z_rd_n && z_m1_n;
+wire io_rd_stb = io_rd && !io_rd_d;
+reg  io_wr_d = 0;
+wire io_wr = boot_mode && !z_iorq_n && !z_wr_n;
+wire io_wr_stb = io_wr && !io_wr_d;
+
+always @(posedge clk) begin
+  io_rd_d <= io_rd;
+  io_wr_d <= io_wr;
+  if (!io_rd)
+    io_q <= spi_rx;
+end
+
+always @* begin
+  boot_sel = 0;
+  boot_q   = 8'hff;
+  if (io_rd) begin
+    boot_sel = 1;
+    boot_q   = io_rd_stb ? spi_rx : io_q;
+  end else if (boot_mode && mem_rd && A[15:13] == 3'b000) begin
+    boot_sel = 1;
+    boot_q   = exec_sram ? rom_q0 : tile_rd_q;
+  end else if (boot_mode && mem_rd && a_c0) begin
+    boot_sel = 1;
+    boot_q   = boot_io;
+  end
+end
+
+always @(posedge clk) begin
+  spi_start  <= 0;
+  start_game <= 0;
+  ld_we      <= 0;
+
+  if (ld_we)
+    ld_a <= ld_a + 1'd1;
+
+  if (io_rd_stb) begin
+    spi_tx    <= 8'hff;
+    spi_start <= 1;
+  end
+
+  if (io_wr_stb) begin
+    ld_d  <= z_dout;
+    ld_we <= 1;
+  end
+
+  if (wr_stb && boot_mode && a_c0) begin
+    case (A[4:0])
+    5'h00: begin spi_tx <= z_dout; spi_start <= 1; end
+    5'h01: begin sd_cs_n <= !z_dout[0]; spi_fast <= z_dout[1]; end
+    5'h02: ld_a[7:0]   <= z_dout;
+    5'h03: ld_a[15:8]  <= z_dout;
+    5'h04: ld_a[17:16] <= z_dout[1:0];
+    5'h05: begin ld_d <= z_dout; ld_we <= 1; end
+    5'h08: dsw1 <= z_dout;
+    5'h09: dsw2 <= z_dout;
+    5'h0A: dsw3 <= z_dout;
+    5'h0B: led_err <= z_dout[0];
+    5'h0C: exec_sram <= z_dout[0];
+    5'h0F: start_game <= 1;
+    default: ;
+    endcase
+  end
+
+  if (reset) begin
+    sd_cs_n   <= 1;
+    spi_fast  <= 0;
+    led_err   <= 0;
+    exec_sram <= 0;
+  end
+end
+
+`ifdef GY_SIM_PC
+reg m1_d = 1;
+always @(posedge clk) begin
+  m1_d <= z_m1_n;
+  if (!z_m1_n && m1_d) $display("PC %04x boot=%0d sram=%0d t=%0t", A, boot_mode, exec_sram, $time);
+  if (wr_stb) $display("  W %04x <- %02x", A, z_dout);
+  if (io_wr_stb) $display("  OUT %02x -> ld %05x", z_dout, ld_a);
+end
+`endif
+
+// ---------------------------------------------------------------------------
+// Line buffer: 8 lines of 256 pixels, written by the main board, read
+// twice per line by the HDMI output.
+
+reg [4:0] lbuf [0:2047];
+wire [7:0] g_x = (g_h >= 9'd269) ? g_h - 9'd269 : g_h + 9'd115;
+
+always @(posedge clk)
+  if (g_cen6 && !g_hblk && !g_vblk)
+    lbuf[{g_v[2:0], g_x}] <= g_pixel;
+
+// Output pipeline
+//   stage 1: line buffer / video RAM address
+//   stage 2: their data; palette / font lookup
+//   stage 3: RGB out (the palette entry is registered in stage 2)
+wire       in_area = (hc >= 10'd64 && hc < 10'd576 && vc >= 10'd16 && vc < 10'd464);
+wire [9:0] ax = hc - 10'd64;
+wire [9:0] ay = vc - 10'd16;
+
+reg  [4:0] lb_q = 0;
+reg        area1 = 0, area2 = 0;
+reg  [2:0] fx1 = 0, fx2 = 0;
+reg  [2:0] fy1 = 0, fy2 = 0;
+reg  [1:0] hs = 2'b11, vs = 2'b11, bl = 2'b11;
+reg  [7:0] pal_r = 0;
+reg  [7:0] font [0:511];
+initial $readmemh("font64.hex", font);
+
+always @(posedge clk) begin
+  lb_q   <= lbuf[{vc[3:1], ax[8:1]}];
+  text_a <= {1'b1, ay[8:4], ax[8:4]};
+  area1  <= in_area;
+  fx1    <= ax[3:1];
+  fy1    <= ay[3:1];
+  hs[0]  <= !(hc >= 10'd656 && hc < 10'd752);
+  vs[0]  <= !(vc == 10'd490 || vc == 10'd491);
+  bl[0]  <= (hc >= 10'd640 || vc >= 10'd480);
+  hs[1]  <= hs[0];
+  vs[1]  <= vs[0];
+  bl[1]  <= bl[0];
+  area2  <= area1;
+  pal_r  <= pal_q;
+  fx2    <= fx1;
+  fy2    <= fy1;
+end
+
+assign pal_a = lb_q;
+
+// Colour PROM: red and green bits 1K, 470, 220 ohm, blue 470, 220 ohm
+// (weights as MAME computes them, with the 470 ohm load).
+function [7:0] rg_level(input [2:0] b);
+  rg_level = (b[0] ? 8'd33 : 8'd0) + (b[1] ? 8'd71 : 8'd0) + (b[2] ? 8'd151 : 8'd0);
+endfunction
+function [7:0] b_level(input [1:0] b);
+  b_level = (b[0] ? 8'd79 : 8'd0) + (b[1] ? 8'd168 : 8'd0);
+endfunction
+
+wire [7:0] glyph = font[{text_q[5:0] - 6'd32, fy2}];
+wire       ink   = glyph[3'd7 - fx2];
+
+always @(posedge clk) begin
+  vid_hsync_n <= hs[1];
+  vid_vsync_n <= vs[1];
+  vid_blank   <= bl[1];
+  if (!area2) begin
+    vid_r <= 0; vid_g <= 0; vid_b <= 0;
+  end else if (boot_mode) begin
+    if (ink) begin
+      vid_r <= 8'hff; vid_g <= 8'hff; vid_b <= text_q[7] ? 8'h00 : 8'hff;
+    end else begin
+      vid_r <= 8'h00; vid_g <= 8'h00; vid_b <= 8'h60;
+    end
+  end else begin
+    vid_r <= rg_level(pal_r[2:0]);
+    vid_g <= rg_level(pal_r[5:3]);
+    vid_b <= b_level(pal_r[7:6]);
+  end
+end
+
+endmodule
