@@ -128,8 +128,9 @@ static void set_load_addr(unsigned long a)
 
 void main(void)
 {
-    BYTE i, row;
+    BYTE i, row, tries;
     UINT br;
+    const char *err;
     const struct rom *r;
 
     cls();
@@ -144,13 +145,23 @@ void main(void)
     for (i = 0; i < NROMS; ++i) {
         r = &roms[i];
         text(2, row, r->name_ce, 0);
-        if (!open_rom(r))
-            fail(row + 1, "NOT FOUND:", path);
-        if (fs.fsize != r->size)
-            fail(row + 1, "WRONG SIZE:", path);
-        set_load_addr(r->addr);
-        if (pf_read(0, r->size, &br) != FR_OK || br != r->size)
-            fail(row + 1, "READ ERROR:", path);
+        /* A failed card read can look like a missing file: try 3 times. */
+        for (tries = 0; ; ++tries) {
+            err = 0;
+            if (!open_rom(r))
+                err = "NOT FOUND:";
+            else if (fs.fsize != r->size)
+                err = "WRONG SIZE:";
+            else {
+                set_load_addr(r->addr);
+                if (pf_read(0, r->size, &br) != FR_OK || br != r->size)
+                    err = "READ ERROR:";
+            }
+            if (!err)
+                break;
+            if (tries == 2)
+                fail(row + 1, err, path);
+        }
         text(14, row, "OK", 0);
         if (++row == 21)
             row = 3;

@@ -1,6 +1,5 @@
 build/*
 !build/Makefile
-!build/CORE06.PHX
 sim/obj_dir/
 sim/obj_pc/
 sim/obj_vhdl/

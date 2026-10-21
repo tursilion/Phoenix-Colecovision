@@ -1,7 +1,9 @@
 // Verilator testbench for gyruss_phoenix.
 //
 //   tb --sd image [--frames n] [--ppm prefix] [--ppm-every k] [--wav file]
-//      [--pad frame:joy1:sys,...] [--trace-pc]
+//      [--pad frame:joy1:sys,...] [--rot frame,...] [--dump-sram file]
+//
+// --rot toggles the picture rotation at the start of each given frame.
 //
 // Models the 512Kx8 SRAM and an SDHC card in SPI mode (CMD0/8/55/41/58/16,
 // CMD17), backed by a disk image.
@@ -196,6 +198,7 @@ int main(int argc, char **argv)
     int frames = 30, ppm_every = 1;
     struct Pad { int frame, joy, sys; };
     std::vector<Pad> pad_script;
+    std::vector<int> rot_frames;
 
     for (int i = 1; i < argc; ++i) {
         if (!strcmp(argv[i], "--sd") && i + 1 < argc) sd_path = argv[++i];
@@ -204,6 +207,10 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[i], "--ppm-every") && i + 1 < argc) ppm_every = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--wav") && i + 1 < argc) wav = argv[++i];
         else if (!strcmp(argv[i], "--dump-sram") && i + 1 < argc) dump = argv[++i];
+        else if (!strcmp(argv[i], "--rot") && i + 1 < argc) {
+            for (char *t = strtok(argv[++i], ","); t; t = strtok(nullptr, ","))
+                rot_frames.push_back(atoi(t));
+        }
         else if (!strcmp(argv[i], "--pad") && i + 1 < argc) {
             for (char *t = strtok(argv[++i], ","); t; t = strtok(nullptr, ",")) {
                 Pad p;
@@ -243,6 +250,7 @@ int main(int argc, char **argv)
     top->joy1 = 0;
     top->joy2 = 0;
     top->sys = 0;
+    top->rot_toggle = 0;
     top->sd_cd_n = sd.present ? 0 : 1;
     top->sd_miso = 1;
     top->sram_din = 0;
@@ -257,8 +265,9 @@ int main(int argc, char **argv)
         top->clk = 0;
         top->eval();
         ++clocks;
+        top->rot_toggle = 0;
 
-        if (!top->sram_we_n && top->sram_doe)
+        if (top->sram_wpulse && top->sram_doe)
             sram[top->sram_addr] = top->sram_dout;
         sd.step(top->sd_cs_n, top->sd_sclk, false, top->sd_mosi);
 
@@ -313,6 +322,8 @@ int main(int argc, char **argv)
             x = 0;
             for (auto &p : pad_script)
                 if (frame >= p.frame) { top->joy1 = p.joy; top->sys = p.sys; }
+            for (int f : rot_frames)
+                if (frame == f) top->rot_toggle = 1;   // one clock
             if (frame % 60 == 0) {
                 printf("frame %d (%.1f s): %ld SD blocks\n", frame, clocks / 25e6, sd.reads);
                 fflush(stdout);

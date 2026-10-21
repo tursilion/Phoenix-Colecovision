@@ -166,10 +166,13 @@ BYTE sd_read_sector(BYTE *dst, DWORD sector)
 
 DRESULT disk_readp(BYTE *buff, DWORD sector, UINT offset, UINT count)
 {
+    BYTE tries;
+
     if (!cache_valid || cache_sector != sector) {
         cache_valid = 0;
-        if (!sd_read_sector(SECTOR_CACHE, sector))
-            return RES_ERROR;
+        for (tries = 0; !sd_read_sector(SECTOR_CACHE, sector); )
+            if (++tries == 5)
+                return RES_ERROR;
         cache_sector = sector;
         cache_valid = 1;
     }

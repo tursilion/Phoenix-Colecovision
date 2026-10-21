@@ -37,6 +37,7 @@ gen: obj_dir/Vgyruss_phoenix.mk
 obj_dir/Vgyruss_phoenix.mk: $(SRCS) tb.cpp gyruss_boot.hex font64.hex
 	$(VERILATOR) --cc --exe -O3 -Wno-fatal -Wno-lint -Wno-style \
 	  --top-module gyruss_phoenix $(SRCS) tb.cpp
+	touch $@
 
 $(SIM): obj_dir/Vgyruss_phoenix.mk tb.cpp
 	$(MAKE) -C obj_dir -f Vgyruss_phoenix.mk

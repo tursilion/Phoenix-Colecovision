@@ -6,10 +6,10 @@ Otherwise the cut off is mostly RAM size.
 03 - Pencil - preexisting alpha (keyboard update?)
 04 - NES - working
 05 - Daphne - Dragon's Lair and Space Ace only - working (user must create LD images)
+06 - Gyruss Arcade - working
 
 Future work depends on free time and community response.
 
-Gyruss Arcade - maybe
 Intellivision - probably
 Gameboy - most games
 Lynx - probably
@@ -20,3 +20,5 @@ Vextrex - probably - remember to add modern banking
 Galaga Arcade - maybe
 Robotron and Joust Arcade - maybe
 Star Wars Arcade - maybe
+Time Pilot 84 - maybe
+Bubble Bobble - maybe

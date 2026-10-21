@@ -8,9 +8,10 @@ Status:
 - **Simulation:** it loads the ROMs, runs the power-on test, the title
   screen and the attract demo with sound, and takes a coin and a start into
   stage 1.
-- **ISE:** 89% of the LUTs and 31 of 32 block RAMs, with timing met.
-- **Hardware:** not tried yet.
-- **Picture:** not rotated. The game is vertical, so it shows on its side.
+- **ISE:** 92% of the LUTs and 31 of 32 block RAMs, with timing met.
+- **Hardware:** works, both pictures, and the loader loaded 5 times out of 5.
+- **Picture:** the game's native sideways picture by default. Keyboard 0,
+  SNES L or R, or keypad 0 switch to an upright picture and back.
 
 ## Using it
 
@@ -30,6 +31,7 @@ the LED lights.
 | player 2 | port 2 stick and fire | | |
 | coin | keypad 5 | Select | 5 |
 | start 1 / 2 | keypad 1 / 2 | Start | 1 / 2 |
+| rotate picture | keypad 0 | L or R | 0 |
 
 The reset button or ESC restarts the game. Hold either for a second to load
 it again. Power-cycle to change cores.
@@ -64,11 +66,26 @@ set in `loader/main.c`.
     frame is then 240 clocks shorter than a 640x480 HDMI frame. The board
     waits at the end of each frame until the HDMI output reaches line 486.
   - The game therefore runs at 59.52 Hz, against 60.6 Hz on the PCB.
-  - The 256x224 picture goes through an 8-line buffer and is shown doubled
-    and centred.
+  - Native picture (the default): the 256x224 frame goes through an 8-line buffer and is
+    shown doubled (512x448) and centred.
+  - Rotated picture: the frame is turned 90 degrees
+    clockwise to 224x256.
+    - Each frame is written into one of two frame buffers in the SRAM (at
+      40000 and 50000). The other, finished one is shown, so there is no
+      tearing, at the cost of one frame of delay.
+    - Each HDMI line is prefetched from the SRAM into the line buffer during
+      the line before. It shows one source column, pixels doubled to 448
+      wide and centred.
+    - The 256 columns are spread over the 480 lines, a 15/8 scale. Some
+      columns show on one line instead of two.
 - **Memory:**
-  - The CPU ROMs are in the external SRAM. Its reads are pipelined at one
-    per clock, taken in turn by the three CPUs.
+  - The CPU ROMs are in the external SRAM.
+    - A CPU's read is made when its address changes, with the address out on
+      one clock and the data in on the next.
+    - Writes take two clocks: an ODDR2 in the top level pulses WE in the
+      second half of the first one.
+    - Priority: CPU reads, then writes (the loader's and the frame
+      buffer's), then the display line prefetch.
   - The graphics ROMs, the 8039 ROM and the PROMs are block RAM and LUT RAM.
   - The core uses 31 of the 32 block RAMs.
 - **Boot loader** (`loader/`, Z80 C with sdcc and Petit FatFs):
@@ -77,13 +94,15 @@ set in `loader/main.c`.
   - It first copies itself to the SRAM and continues from that copy, so
     that the tile ROM can be loaded over it.
   - Its screen is a text overlay drawn from the video RAM.
+  - It reads the card at 6.25 MHz. It retries a failed sector read 5 times
+    and a failed file 3 times.
 
 ## Layout
 
 - `rtl/gyruss_phoenix_top.vhd`: the top level, with clocks, resets,
   controllers and HDMI. It uses the shared `rtl/phoenix.ucf`.
 - `rtl/gyruss_phoenix.v`: clocks, frame lock, SRAM, loader registers, SPI and
-  video output.
+  video output, including the rotation.
 - `rtl/gyruss_main.v`, `gyruss_sound.v`, `ay5x.v`: the boards.
 - `rtl/cv_pads.vhd`: the ColecoVision controllers.
 - Vendored cores:
@@ -112,4 +131,5 @@ set in `loader/main.c`.
   - Compile it with a recent g++ by running `make VERILATOR_ROOT=...`. The
     image's g++ 7 is too old for its Verilator.
   - Then run `make run`.
+  - `--rot frame,...` toggles the rotation at those frames.
   - GHDL cannot convert the T48, so the 8039 is a silent stub in simulation.

@@ -31,7 +31,7 @@
 //   0000-1FFF boot loader        8000-87FF video RAM (8400-877F = text)
 //   9000-9FFF RAM                A000-A7FF RAM
 //   C000 R SPI received byte             W SPI transfer byte (starts it)
-//   C001 R b7 SPI busy, b6 card present  W b0 SD select, b1 fast (12.5MHz)
+//   C001 R b7 SPI busy, b6 card present  W b0 SD select, b1 fast (6.25MHz)
 //   C002 R b0 SRAM write pending         W load address 7:0
 //   C003 R b0 vertical blank             W load address 15:8
 //   C004 W load address 17:16
@@ -60,13 +60,14 @@ module gyruss_phoenix
    , input       [4:0] joy1
    , input       [4:0] joy2
    , input       [4:0] sys          // b0 coin1 b1 coin2 b2 service b3 start1 b4 start2
+   , input             rot_toggle   // pulse: switch between the rotated and the native picture
 
    // External SRAM
    , output reg [18:0] sram_addr = 0
    , output reg  [7:0] sram_dout = 0
    , input       [7:0] sram_din
    , output reg        sram_doe = 0
-   , output reg        sram_we_n = 1
+   , output reg        sram_wpulse = 0   // pulse WE low in the second half of this clock
    , output reg        sram_oe_n = 1
 
    // SD card
@@ -245,38 +246,100 @@ wire [18:0] m2_addr = {5'b00011, s_a[13:0]};                                    
 reg        b_pend = 0;
 reg [18:0] b_addr = 0;
 reg  [7:0] b_data = 0;
-reg  [1:0] wst = 0;
-reg  [1:0] slot = 0;
-reg  [1:0] rtag = 0;               // 1-3: read issued last clock for master 0-2
+
+// Rotated display: frame buffers and the line prefetch (see the video
+// output below)
+reg        rot = 0;                // 1 = rotated picture (toggled at run time)
+reg        wbank = 0, rbank = 0, rbank_next = 0;
+reg  [4:0] fq_d [0:7];             // pixel write queue
+reg [15:0] fq_a [0:7];             // {line, x}
+reg        fq_b [0:7];             // bank
+reg  [2:0] fq_wp = 0, fq_rp = 0;
+wire       fq_empty = (fq_wp == fq_rp);
+reg        rd_pend = 0;            // prefetching a display line
+reg  [7:0] rd_u = 0;               // next pixel of that line
+reg  [7:0] rd_x = 0;               // its source column
+reg        rd_half = 0;
+reg        pf_go = 0;              // start a line prefetch
+reg  [7:0] rt_u = 0;               // pixel of the read issued last clock
+reg        rt_half = 0;
+
+// CPU ROM reads are made when a CPU's address changes; served_n is the
+// address its data register holds.
+reg [18:0] s0_addr = 0, s1_addr = 0, s2_addr = 0;
+reg        s0_ok = 0, s1_ok = 0, s2_ok = 0;
+wire       p0 = !s0_ok || s0_addr != m0_addr;
+wire       p1 = !s1_ok || s1_addr != m1_addr;
+wire       p2 = !s2_ok || s2_addr != m2_addr;
+
+reg        wph = 0;                // second clock of a write
+reg  [2:0] rtag = 0;               // read issued last clock: 1-3 CPU 0-2, 4 frame buffer
+reg        lb_we = 0;
+reg [10:0] lb_wa = 0;
+reg  [4:0] lb_wd = 0;
 
 always @(posedge clk) begin
-  rtag <= 0;
+  rtag        <= 0;
+  sram_wpulse <= 0;
+  lb_we       <= 0;
   case (rtag)
-  2'd1: rom_q0 <= sram_din;
-  2'd2: rom_q1 <= sram_din;
-  2'd3: rom_q2 <= sram_din;
+  3'd1: rom_q0 <= sram_din;
+  3'd2: rom_q1 <= sram_din;
+  3'd3: rom_q2 <= sram_din;
+  3'd4: begin lb_we <= 1; lb_wa <= {2'b00, rt_half, rt_u}; lb_wd <= sram_din[4:0]; end
   default: ;
   endcase
 
-  case (wst)
-  2'd0:
-    if (b_pend) begin
+  if (wph) begin
+    wph <= 0;                              // address and data held, WE high
+  end else if (p0 || p1 || p2) begin
+    sram_doe  <= 0;
+    sram_oe_n <= 0;
+    if (p0) begin
+      sram_addr <= m0_addr; s0_addr <= m0_addr; s0_ok <= 1; rtag <= 3'd1;
+    end else if (p1) begin
+      sram_addr <= m1_addr; s1_addr <= m1_addr; s1_ok <= 1; rtag <= 3'd2;
+    end else begin
+      sram_addr <= m2_addr; s2_addr <= m2_addr; s2_ok <= 1; rtag <= 3'd3;
+    end
+  end else if (b_pend || !fq_empty) begin
+    // write: WE pulses low in the second half of this clock (ODDR2 in the
+    // top level), then one more clock with the address held
+    sram_doe    <= 1;
+    sram_oe_n   <= 1;
+    sram_wpulse <= 1;
+    wph         <= 1;
+    if (b_pend) begin                      // loader write: the CPUs' data may be stale
+      s0_ok     <= 0;
+      s1_ok     <= 0;
+      s2_ok     <= 0;
       sram_addr <= b_addr;
       sram_dout <= b_data;
-      sram_doe  <= 1;
-      sram_oe_n <= 1;
       b_pend    <= 0;
-      wst       <= 2'd1;
     end else begin
-      sram_doe  <= 0;
-      sram_oe_n <= 0;
-      sram_addr <= (slot == 2'd0) ? m0_addr : (slot == 2'd1) ? m1_addr : m2_addr;
-      rtag      <= slot + 1'd1;
-      slot      <= (slot == 2'd2) ? 2'd0 : slot + 1'd1;
+      sram_addr <= {2'b10, fq_b[fq_rp], fq_a[fq_rp]};
+      sram_dout <= {3'b000, fq_d[fq_rp]};
+      fq_rp     <= fq_rp + 1'd1;
     end
-  2'd1: begin sram_we_n <= 0; wst <= 2'd2; end
-  default: begin sram_we_n <= 1; wst <= 2'd0; end
-  endcase
+  end else if (rd_pend) begin
+    sram_doe  <= 0;
+    sram_oe_n <= 0;
+    sram_addr <= {2'b10, rbank, 8'd223 - rd_u, rd_x};
+    rtag      <= 3'd4;
+    rt_u      <= rd_u;
+    rt_half   <= rd_half;
+    rd_u      <= rd_u + 1'd1;
+    if (rd_u == 8'd223)
+      rd_pend <= 0;
+  end else begin
+    sram_doe  <= 0;
+    sram_oe_n <= 0;
+  end
+
+  if (pf_go) begin
+    rd_pend <= 1;
+    rd_u    <= 0;
+  end
 
   if (ld_we && (ld_a[17:16] == 2'b00 || ld_a[17])) begin
     b_pend <= 1;
@@ -285,15 +348,14 @@ always @(posedge clk) begin
   end
 
   if (reset) begin
-    wst       <= 0;
-    sram_we_n <= 1;
-    sram_doe  <= 0;
-    b_pend    <= 0;
+    wph      <= 0;
+    sram_doe <= 0;
+    b_pend   <= 0;
   end
 end
 
 // ---------------------------------------------------------------------------
-// SPI (SD card), mode 0: about 390kHz or 12.5MHz
+// SPI (SD card), mode 0: about 390kHz or 6.25MHz
 
 reg  [7:0] spi_tx = 8'hff;
 reg  [7:0] spi_sr = 8'hff;
@@ -314,7 +376,7 @@ always @(posedge clk) begin
     spi_div  <= 0;
   end else if (spi_busy) begin
     spi_div <= spi_div + 1'd1;
-    if (spi_fast || spi_div == 5'd31) begin
+    if ((spi_fast && spi_div[0]) || spi_div == 5'd31) begin
       spi_div <= 0;
       if (!sd_sclk) begin                    // rising edge: sample
         sd_sclk <= 1;
@@ -436,21 +498,94 @@ end
 `endif
 
 // ---------------------------------------------------------------------------
-// Line buffer: 8 lines of 256 pixels, written by the main board, read
-// twice per line by the HDMI output.
+// Native picture (rot = 0, the default): 8 lines of 256 pixels in lbuf, written by the
+// main board and read twice per line by the HDMI output (512x448, centred).
+//
+// Rotated picture (rot = 1): the game is a vertical game, so
+// its 256x224 frame is turned 90 degrees clockwise to 224x256.  Each frame
+// is written to one of two frame buffers in the SRAM (40000 / 50000,
+// address {line, x}) while the other, finished one is shown, so frames
+// never tear.  Each HDMI line is prefetched from the SRAM into lbuf during
+// the line before; it shows one source column, pixels doubled to 448 wide
+// (centred), and the 256 columns are spread over the 480 lines (15/8).
 
 reg [4:0] lbuf [0:2047];
 wire [7:0] g_x = (g_h >= 9'd269) ? g_h - 9'd269 : g_h + 9'd115;
+wire [8:0] g_y = g_v - 9'd272;
+wire       g_pix = g_cen6 && !g_hblk && !g_vblk;
 
-always @(posedge clk)
-  if (g_cen6 && !g_hblk && !g_vblk)
+always @(posedge clk) begin
+  if (lb_we)
+    lbuf[lb_wa] <= lb_wd;
+  else if (g_pix && !rot)
     lbuf[{g_v[2:0], g_x}] <= g_pixel;
+end
+
+// Pixel write queue (written here, emptied by the SRAM arbiter)
+always @(posedge clk) begin
+  if (g_pix && rot && !boot_mode) begin
+    fq_d[fq_wp] <= g_pixel;
+    fq_a[fq_wp] <= {g_y[7:0], g_x};
+    fq_b[fq_wp] <= wbank;
+    fq_wp <= fq_wp + 1'd1;
+  end
+end
+
+`ifdef GY_SIM_FB
+reg [31:0] fq_ovf = 0, rd_late = 0;
+always @(posedge clk) begin
+  if (g_pix && rot && !boot_mode && (fq_wp + 1'd1) == fq_rp) begin
+    fq_ovf <= fq_ovf + 1;
+    if (fq_ovf[11:0] == 0) $display("FIFO overflow %0d (v=%0d) t=%0t", fq_ovf, g_v, $time);
+  end
+  if (pf_go && rd_pend) begin
+    rd_late <= rd_late + 1;
+    if (rd_late[7:0] == 0) $display("prefetch late %0d at u=%0d vc=%0d", rd_late, rd_u, vc);
+  end
+end
+`endif
+
+// Frame buffer swap: at the start of the game's vertical blank the frame
+// just written becomes the one to show from the next HDMI frame.
+reg g_vblk_d = 1;
+always @(posedge clk) begin
+  g_vblk_d <= g_vblk;
+  if (g_vblk && !g_vblk_d) begin
+    wbank      <= !wbank;
+    rbank_next <= wbank;
+  end
+  if (hc == 10'd0 && vc == 10'd0)
+    rbank <= rbank_next;
+  if (rot_toggle)
+    rot <= !rot;
+end
+
+// Line prefetch: at the start of HDMI line vc, fetch line vc + 1, which
+// shows source column x = floor(8 * line / 15).
+reg [3:0] rd_r = 0;                // 8 * line mod 15
+always @(posedge clk) begin
+  pf_go <= 0;
+  if (hc == 10'd0 && (vc == 10'd524 || vc < 10'd479)) begin
+    pf_go   <= rot && !boot_mode;
+    rd_half <= (vc == 10'd524) ? 1'b0 : !vc[0];
+    if (vc == 10'd524) begin
+      rd_x <= 0;
+      rd_r <= 0;
+    end else if (rd_r >= 4'd7) begin
+      rd_x <= rd_x + 1'd1;
+      rd_r <= rd_r - 4'd7;
+    end else
+      rd_r <= rd_r + 4'd8;
+  end
+end
 
 // Output pipeline
 //   stage 1: line buffer / video RAM address
 //   stage 2: their data; palette / font lookup
 //   stage 3: RGB out (the palette entry is registered in stage 2)
 wire       in_area = (hc >= 10'd64 && hc < 10'd576 && vc >= 10'd16 && vc < 10'd464);
+wire       in_rot  = (hc >= 10'd96 && hc < 10'd544 && vc < 10'd480);
+wire [9:0] rx = hc - 10'd96;
 wire [9:0] ax = hc - 10'd64;
 wire [9:0] ay = vc - 10'd16;
 
@@ -464,9 +599,9 @@ reg  [7:0] font [0:511];
 initial $readmemh("font64.hex", font);
 
 always @(posedge clk) begin
-  lb_q   <= lbuf[{vc[3:1], ax[8:1]}];
+  lb_q   <= (rot && !boot_mode) ? lbuf[{2'b00, vc[0], rx[8:1]}] : lbuf[{vc[3:1], ax[8:1]}];
   text_a <= {1'b1, ay[8:4], ax[8:4]};
-  area1  <= in_area;
+  area1  <= (rot && !boot_mode) ? in_rot : in_area;
   fx1    <= ax[3:1];
   fy1    <= ay[3:1];
   hs[0]  <= !(hc >= 10'd656 && hc < 10'd752);

@@ -1,0 +1,8 @@
+Unofficial Gyruss Core for CollectorVision Phoenix
+Should be compatible with both releases of hardware.
+
+You will need to provide Gyruss ROMs, in a folder on the SD card named GYRUSS or GYRUSSCE, depending on which set you have. Make sure to unzip them into the folder.
+
+The game will start in its native vertical orientation. You can toggle to horizontal monitor at any time by pressing '0' on the Coleco controller (or keyboard), or using either should button on the SNES pad.
+
+'5' key or SELECT will add a credit. '1' or START for a 1 player game. '2' for a two player game.

@@ -13,6 +13,7 @@
 --   player 2      port 2 stick, fire
 --   start 1 / 2   keypad 1 / 2           Start / -   1 / 2
 --   coin          keypad 5               Select      5
+--   rotate        keypad 0               L or R      0     (picture upright / on its side)
 --   reset game    reset button                       ESC   (hold 1 s: reload)
 --
 -- Power cycle to change cores.
@@ -21,6 +22,9 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
+library unisim;
+use unisim.vcomponents.all;
 
 entity gyruss_phoenix_top is
 port
@@ -101,11 +105,12 @@ architecture rtl of gyruss_phoenix_top is
       ; joy1          : in  std_logic_vector(4 downto 0)
       ; joy2          : in  std_logic_vector(4 downto 0)
       ; sys           : in  std_logic_vector(4 downto 0)
+      ; rot_toggle    : in  std_logic
       ; sram_addr     : out std_logic_vector(18 downto 0)
       ; sram_dout     : out std_logic_vector(7 downto 0)
       ; sram_din      : in  std_logic_vector(7 downto 0)
       ; sram_doe      : out std_logic
-      ; sram_we_n     : out std_logic
+      ; sram_wpulse   : out std_logic
       ; sram_oe_n     : out std_logic
       ; sd_cs_n       : out std_logic
       ; sd_sclk       : out std_logic
@@ -129,6 +134,7 @@ architecture rtl of gyruss_phoenix_top is
    constant KEY_1_c        : std_logic_vector(3 downto 0) := "0111";
    constant KEY_2_c        : std_logic_vector(3 downto 0) := "1011";
    constant KEY_5_c        : std_logic_vector(3 downto 0) := "1001";
+   constant KEY_0_c        : std_logic_vector(3 downto 0) := "1100";
 
    -- Clocks
    signal clk_25m0_s       : std_logic;
@@ -149,6 +155,9 @@ architecture rtl of gyruss_phoenix_top is
    -- SRAM
    signal sram_dout_s      : std_logic_vector(7 downto 0);
    signal sram_doe_s       : std_logic;
+   signal sram_wpulse_s    : std_logic;
+   signal sram_we_d1_s     : std_logic;
+   signal clk_25m0_n_s     : std_logic;
 
    -- Video and audio
    signal vid_r_s          : std_logic_vector(7 downto 0);
@@ -182,6 +191,11 @@ architecture rtl of gyruss_phoenix_top is
    signal but_b_s          : std_logic_vector(0 downto 0);
    signal but_x_s          : std_logic_vector(0 downto 0);
    signal but_y_s          : std_logic_vector(0 downto 0);
+   signal but_l_s          : std_logic_vector(0 downto 0);
+   signal but_r_s          : std_logic_vector(0 downto 0);
+   signal rot_key_s        : std_logic;
+   signal rot_key_r        : std_logic := '0';
+   signal rot_toggle_s     : std_logic;
    signal but_start_s      : std_logic_vector(0 downto 0);
    signal but_sel_s        : std_logic_vector(0 downto 0);
    signal but_up_s         : std_logic_vector(0 downto 0);
@@ -262,11 +276,12 @@ begin
    , joy1          => joy1_s
    , joy2          => joy2_s
    , sys           => sys_s
+   , rot_toggle    => rot_toggle_s
    , sram_addr     => sram_addr_o
    , sram_dout     => sram_dout_s
    , sram_din      => sram_data_io
    , sram_doe      => sram_doe_s
-   , sram_we_n     => sram_we_n_o
+   , sram_wpulse   => sram_wpulse_s
    , sram_oe_n     => sram_oe_n_o
    , sd_cs_n       => sd_cs_n_o
    , sd_sclk       => sd_sclk_o
@@ -287,6 +302,29 @@ begin
 
    sram_data_io <= sram_dout_s when sram_doe_s = '1' else (others => 'Z');
    sram_ce_n_o  <= '0';
+
+   -- SRAM write enable: low in the second half of a write clock, so the
+   -- address and data are set up half a clock before and held half a clock
+   -- after.
+   clk_25m0_n_s <= not clk_25m0_s;
+   sram_we_d1_s <= not sram_wpulse_s;
+
+   sram_we_ddr : ODDR2
+   generic map
+   ( DDR_ALIGNMENT   => "NONE"
+   , INIT            => '1'
+   , SRTYPE          => "SYNC"
+   )
+   port map
+   ( Q   => sram_we_n_o
+   , C0  => clk_25m0_s
+   , C1  => clk_25m0_n_s
+   , CE  => '1'
+   , D0  => '1'
+   , D1  => sram_we_d1_s
+   , R   => '0'
+   , S   => '0'
+   );
 
 
    --
@@ -358,8 +396,8 @@ begin
    , but_y_o            => but_y_s
    , but_start_o        => but_start_s
    , but_sel_o          => but_sel_s
-   , but_tl_o           => open
-   , but_tr_o           => open
+   , but_tl_o           => but_l_s
+   , but_tr_o           => but_r_s
    , but_up_o           => but_up_s
    , but_down_o         => but_down_s
    , but_left_o         => but_left_s
@@ -400,6 +438,18 @@ begin
    sys_s(2) <= '0';                                                                  -- service
    sys_s(3) <= key_is(cv1_s, cv2_s, KEY_1_c) or not but_start_s(0) or ps2_keys_s(13); -- start 1
    sys_s(4) <= key_is(cv1_s, cv2_s, KEY_2_c) or ps2_keys_s(7);                       -- start 2
+
+   -- Picture rotation: keyboard 0, SNES L or R, keypad 0
+   rot_key_s <= key_is(cv1_s, cv2_s, KEY_0_c) or not but_l_s(0) or not but_r_s(0) or ps2_keys_s(10);
+
+   process (clk_25m0_s)
+   begin
+   if rising_edge(clk_25m0_s) then
+      rot_key_r <= rot_key_s;
+   end if;
+   end process;
+
+   rot_toggle_s <= rot_key_s and not rot_key_r;
 
 
    --
