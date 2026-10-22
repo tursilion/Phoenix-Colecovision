@@ -1,0 +1,1 @@
+Petit FatFs R0.03a from http://elm-chan.org/fsw/ff/00index_p.html, unmodified except pffconf.h (PF_USE_DIR=1, PF_FS_FAT32=1).
