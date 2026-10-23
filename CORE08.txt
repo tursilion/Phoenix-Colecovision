@@ -1,0 +1,11 @@
+Unofficial Galaga core for CollectorVision Phoenix
+Should be compatible with both releases of hardware.
+
+You will need to provide Galga ROMS - GALAGA, GALAGAO or GALAGAMW sets should work.
+
+After the initial self-test, press reset to clear the information screen and start the game.
+
+5 or SELECT for coin up. 1 or START for player 1 start, 2 for player 2 start.
+
+The arcade is vertical. 0 or SNES shoulder button to rotate screen.
+

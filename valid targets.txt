@@ -7,6 +7,8 @@ Otherwise the cut off is mostly RAM size.
 04 - NES - working
 05 - Daphne - Dragon's Lair and Space Ace only - working (user must create LD images)
 06 - Gyruss Arcade - working
+07 - Time Pilot 84 - working
+08 - Galaga Arcade - working
 
 Future work depends on free time and community response.
 
@@ -16,9 +18,8 @@ Lynx - probably
 TurboGraphics - maybe
 Master System - probably
 Game Gear - just a variant of Master System
-Vextrex - probably - remember to add modern banking
-Galaga Arcade - maybe
+Vectrex - probably - remember to add modern banking
 Robotron and Joust Arcade - maybe
-Star Wars Arcade - maybe
-Time Pilot 84 - maybe
 Bubble Bobble - maybe
+Star Wars Arcade - maybe
+Empire Arcade - maybe
