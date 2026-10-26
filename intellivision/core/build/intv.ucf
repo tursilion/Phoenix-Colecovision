@@ -1,0 +1,7 @@
+# Intellivision core: the 25MHz and 42.857MHz domains only meet in
+# synchronizers and dual-clock block RAMs (see rtl/intv_phoenix.v).
+NET "clk_25m0_s" TNM_NET = "GRP_25";
+NET "clk_i_s"    TNM_NET = "GRP_INTV";
+NET "clk_g_s"    TNM_NET = "GRP_INTV";
+TIMESPEC "TS_25_to_intv_ignore" = FROM "GRP_25"   TO "GRP_INTV" TIG;
+TIMESPEC "TS_intv_to_25_ignore" = FROM "GRP_INTV" TO "GRP_25"   TIG;

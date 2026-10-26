@@ -1,0 +1,7 @@
+# Intellivision BIOS and game images: not distributed
+*.bin
+*.BIN
+*.CFG
+*.cfg
+*.rom
+*.ROM

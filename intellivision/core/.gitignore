@@ -1,0 +1,17 @@
+# loader build
+loader/intv_boot.bin
+loader/intv_boot.map
+loader/*.o
+loader/pff/*.o
+
+# simulation
+sim/obj_dir/
+sim/gen/
+sim/out/
+sim/*.img
+sim/*.hex
+
+# ISE build (everything but the Makefile and the extra constraints)
+build/*
+!build/Makefile
+!build/intv.ucf
