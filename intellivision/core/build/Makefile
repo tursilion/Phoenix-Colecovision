@@ -8,8 +8,8 @@
 # runs in the docked-ise-147 Docker image.  The core file goes to
 # $(CORE_FILE); its slot number is in the name.
 #
-# The EXEC and GROM ROMs are built into the bitstream from ../../exec.bin
-# and ../../grom.bin (BIOS=... to use others).
+# The BIOS ROMs are built into the bitstream from ../../exec.bin, grom.bin,
+# ecs.bin and sp0256-012.bin (BIOS=dir to use others).
 #
 # Outputs (in this directory):
 #   intv_phoenix_top.bit    for JTAG (iMPACT)
@@ -50,6 +50,8 @@ VHDL := \
   $(NRTL)/intv/cp1610.vhd \
   $(NRTL)/intv/snd.vhd \
   $(NRTL)/intv/stic.vhd \
+  $(NRTL)/intv/ivoice.vhd \
+  $(NRTL)/intv/jlp.vhd \
   $(NRTL)/intv_cart.vhd \
   $(NRTL)/intv_core.vhd \
   $(NRTL)/intv_phoenix_top.vhd
@@ -94,8 +96,8 @@ all: $(CORE_FILE)
 intv_boot.hex: $(NRTL)/intv_boot.hex
 	cp $< $@
 
-intv_roms_pack.vhd grom.hex: $(BIOS)/exec.bin $(BIOS)/grom.bin ../tools/mkroms.py
-	python3 ../tools/mkroms.py $(BIOS)/exec.bin $(BIOS)/grom.bin .
+intv_roms_pack.vhd grom.hex: $(BIOS)/exec.bin $(BIOS)/grom.bin $(BIOS)/ecs.bin $(BIOS)/sp0256-012.bin ../tools/mkroms.py
+	python3 ../tools/mkroms.py $(BIOS) .
 
 $(TOP).prj: Makefile
 	rm -f $@

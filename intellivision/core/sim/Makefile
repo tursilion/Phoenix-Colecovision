@@ -25,6 +25,7 @@ BIOS := ../..
 RTL  := ../rtl
 VHDL := $(RTL)/intv/base_pack.vhd gen/intv_roms_pack.vhd $(RTL)/intv/cp1610_pack.vhd \
         $(RTL)/intv/cp1610.vhd $(RTL)/intv/snd.vhd $(RTL)/intv/stic.vhd \
+        $(RTL)/intv/ivoice.vhd $(RTL)/intv/jlp.vhd \
         $(RTL)/intv_cart.vhd $(RTL)/intv_core.vhd
 SRCS := $(RTL)/intv_phoenix.v $(RTL)/cpu6502/cpu.v $(RTL)/cpu6502/ALU.v gen/intv_core_syn.v
 
@@ -34,9 +35,9 @@ ROMS   ?=
 
 all: $(SIM)
 
-gen/intv_roms_pack.vhd gen/grom.hex: $(BIOS)/exec.bin $(BIOS)/grom.bin ../tools/mkroms.py
+gen/intv_roms_pack.vhd gen/grom.hex: $(BIOS)/exec.bin $(BIOS)/grom.bin $(BIOS)/ecs.bin $(BIOS)/sp0256-012.bin ../tools/mkroms.py
 	mkdir -p gen
-	python3 ../tools/mkroms.py $(BIOS)/exec.bin $(BIOS)/grom.bin gen
+	python3 ../tools/mkroms.py $(BIOS) gen
 
 YOSYS_SCRIPT := ghdl --std=93c -fexplicit $(VHDL) -e intv_core; write_verilog -noattr gen/intv_core_syn.v
 

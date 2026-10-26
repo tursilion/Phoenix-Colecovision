@@ -37,9 +37,12 @@
 //  $5008-$500A W  load address, bits 7:0, 15:8, 18:16
 //  $500B-$500C W  paged zone mask (intv_cart.vhd), bits 7:0, 15:8
 //  $500D W  bit0 swap the hand controllers (port 1 = right controller)
+//  $500E W  bit0 ECS, bit1 JLP for the game
 //  $5010 R  menu buttons: bit0 A, 1 B, 2 select, 3 start, 4 up, 5 down,
 //           6 left, 7 right
 //  $5011-$5014 R  CRC-32 (zlib) of the bytes since $5003, bits 7:0 first
+//  $5015 R  keypad key held on either ColecoVision controller: 0-9, 10 *,
+//           11 #, $FF none; also the keyboard's digits, SNES L = 1, R = 2
 //
 // Boot memory: RAM $0000-$07FF and $6000-$7FFF, text screen $4000-$43FF
 // (32 x 30 characters, 16 x 16 pixels each), ROM $C000-$FFFF (mirrored at
@@ -65,6 +68,8 @@ module intv_phoenix
    , input      [11:0] snes        // 0 A 1 B 2 X 3 Y 4 start 5 select 6 L 7 R 8 up 9 down 10 left 11 right
    , input      [15:0] kb_keys     // colecoKeyboard keys
    , input       [4:0] kb_joy      // colecoKeyboard arrows + Z
+   , input       [7:0] kb_byte     // PS/2 scan code bytes (set 2), for the ECS keyboard
+   , input             kb_stb      // one clk25 per byte
 
    // External SRAM.  The data bus tri-state is done at the top level.
    , output reg [18:0] sram_addr
@@ -247,30 +252,55 @@ wire [7:0] kb_pad = disc(kb_joy[0], kb_joy[1], kb_joy[2], kb_joy[3]) |
                     (kb_keys[9]  ? KCLR : 8'h00) | (kb_keys[6] ? KENT : 8'h00);
 
 reg [7:0] ctl1 = 0, ctl2 = 0, menu_pad = 0;
+reg [7:0] menu_key = 8'hff;
+reg       ecs_on = 0;          // from clk_g, slow
+reg       ecs_g = 0, jlp_g = 0; // clk_g: the game's extensions ($500E)
+
+// ColecoVision key code (pins 4..1) to the key number for the menu
+function [7:0] cv_num(input [3:0] k);
+  case (k)
+  4'b1100: cv_num = 0;  4'b0111: cv_num = 1;  4'b1011: cv_num = 2;
+  4'b0110: cv_num = 3;  4'b1000: cv_num = 4;  4'b1001: cv_num = 5;
+  4'b1110: cv_num = 6;  4'b0011: cv_num = 7;  4'b0001: cv_num = 8;
+  4'b1101: cv_num = 9;  4'b0101: cv_num = 10; 4'b1010: cv_num = 11;
+  default: cv_num = 8'hff;
+  endcase
+endfunction
 
 always @(posedge clk25) begin
-  ctl1 <= cv_pad(cv1) | snes_pad | kb_pad;
+  menu_key <= (cv1[9:6] != 4'b1111) ? cv_num(cv1[9:6]) :
+              (cv2[9:6] != 4'b1111) ? cv_num(cv2[9:6]) :
+              snes[6] ? 8'd1 : snes[7] ? 8'd2 :
+              kb_keys[10] ? 8'd0 : kb_keys[13] ? 8'd1 : kb_keys[7] ? 8'd2 : 8'hff;
+  ecs_on <= ecs_g;
+end
+
+always @(posedge clk25) begin
+  ctl1 <= cv_pad(cv1) | snes_pad | (ecs_on ? 8'h00 : kb_pad);
   ctl2 <= cv_pad(cv2);
-  // Menu: A = left fire, SNES A or X, Z, keypad # or 1; B = right fire,
-  // SNES B or Y, X, keypad *; select = keypad 0 or SNES select.
+  // Menu: A = left fire, SNES A or X, Z, keypad #; B = right fire,
+  // SNES B or Y, X, keypad *; select = SNES select.  The keypad keys
+  // themselves are in menu_key.
   menu_pad <= { cv1[3] | cv2[3] | snes[11] | kb_joy[3],
                 cv1[2] | cv2[2] | snes[10] | kb_joy[2],
                 cv1[1] | cv2[1] | snes[9]  | kb_joy[1],
                 cv1[0] | cv2[0] | snes[8]  | kb_joy[0],
                 snes[4] | kb_keys[13] | (cv1[9:6] == 4'b1010) | (cv2[9:6] == 4'b1010),
-                snes[5] | (cv1[9:6] == 4'b1100) | (cv2[9:6] == 4'b1100) | kb_keys[10],
+                snes[5],
                 cv1[5] | cv2[5] | snes[1] | snes[3] | kb_keys[0] | (cv1[9:6] == 4'b0101) | (cv2[9:6] == 4'b0101),
                 cv1[4] | cv2[4] | snes[0] | snes[2] | kb_joy[4] };
 end
 
 // To clk_g: take a value once it has been the same for two clocks.
 reg [7:0] ctl1_m, ctl1_s, ctl1_g = 0, ctl2_m, ctl2_s, ctl2_g = 0, menu_m, menu_s, menu_g = 0;
+reg [7:0] mkey_m, mkey_s, mkey_g = 8'hff;
 reg       swap = 0;
 
 always @(posedge clk_g) begin
   ctl1_m <= ctl1;  ctl1_s <= ctl1_m;  if (ctl1_s == ctl1_m) ctl1_g <= ctl1_s;
   ctl2_m <= ctl2;  ctl2_s <= ctl2_m;  if (ctl2_s == ctl2_m) ctl2_g <= ctl2_s;
   menu_m <= menu_pad; menu_s <= menu_m; if (menu_s == menu_m) menu_g <= menu_s;
+  mkey_m <= menu_key; mkey_s <= mkey_m; if (mkey_s == mkey_m) mkey_g <= mkey_s;
 end
 
 // ColecoVision port 1 (with the SNES pad and the keyboard) is player 1, the
@@ -278,6 +308,91 @@ end
 // ($1FE).  swap exchanges them.
 wire [7:0] pa = ~(swap ? ctl1_g : ctl2_g);
 wire [7:0] pb = ~(swap ? ctl2_g : ctl1_g);
+
+// ECS keyboard, from the PS/2 scan codes.  Matrix (the MiSTer core's):
+// row = the ECS AY's port A bit pulled low, columns bit 7..0 on port B:
+//   row 6: shift
+//   row 5: a ctrl right 1 q up down space
+//   row 4: d e 2 3 w s z x
+//   row 3: g t 4 5 r f c v
+//   row 2: j u 6 7 y h b n
+//   row 1: l o 8 9 i k m ,
+//   row 0: - enter 0 esc p ; . left
+reg [63:0] ecs_keys = 0;        // {row, column}, 1 = down
+reg        kb_rel = 0, kb_ext = 0;
+reg  [5:0] kb_pos;
+reg        kb_hit;
+
+always @* begin
+  kb_hit = 1;
+  case ({kb_ext, kb_byte})
+  9'h012, 9'h059: kb_pos = {3'd6, 3'd7};             // shift
+  9'h01C: kb_pos = {3'd5, 3'd7};  9'h014: kb_pos = {3'd5, 3'd6};  // a ctrl
+  9'h114: kb_pos = {3'd5, 3'd6};  9'h174: kb_pos = {3'd5, 3'd5};  // rctrl right
+  9'h016: kb_pos = {3'd5, 3'd4};  9'h015: kb_pos = {3'd5, 3'd3};  // 1 q
+  9'h175: kb_pos = {3'd5, 3'd2};  9'h172: kb_pos = {3'd5, 3'd1};  // up down
+  9'h029: kb_pos = {3'd5, 3'd0};                                  // space
+  9'h023: kb_pos = {3'd4, 3'd7};  9'h024: kb_pos = {3'd4, 3'd6};  // d e
+  9'h01E: kb_pos = {3'd4, 3'd5};  9'h026: kb_pos = {3'd4, 3'd4};  // 2 3
+  9'h01D: kb_pos = {3'd4, 3'd3};  9'h01B: kb_pos = {3'd4, 3'd2};  // w s
+  9'h01A: kb_pos = {3'd4, 3'd1};  9'h022: kb_pos = {3'd4, 3'd0};  // z x
+  9'h034: kb_pos = {3'd3, 3'd7};  9'h02C: kb_pos = {3'd3, 3'd6};  // g t
+  9'h025: kb_pos = {3'd3, 3'd5};  9'h02E: kb_pos = {3'd3, 3'd4};  // 4 5
+  9'h02D: kb_pos = {3'd3, 3'd3};  9'h02B: kb_pos = {3'd3, 3'd2};  // r f
+  9'h021: kb_pos = {3'd3, 3'd1};  9'h02A: kb_pos = {3'd3, 3'd0};  // c v
+  9'h03B: kb_pos = {3'd2, 3'd7};  9'h03C: kb_pos = {3'd2, 3'd6};  // j u
+  9'h036: kb_pos = {3'd2, 3'd5};  9'h03D: kb_pos = {3'd2, 3'd4};  // 6 7
+  9'h035: kb_pos = {3'd2, 3'd3};  9'h033: kb_pos = {3'd2, 3'd2};  // y h
+  9'h032: kb_pos = {3'd2, 3'd1};  9'h031: kb_pos = {3'd2, 3'd0};  // b n
+  9'h04B: kb_pos = {3'd1, 3'd7};  9'h044: kb_pos = {3'd1, 3'd6};  // l o
+  9'h03E: kb_pos = {3'd1, 3'd5};  9'h046: kb_pos = {3'd1, 3'd4};  // 8 9
+  9'h043: kb_pos = {3'd1, 3'd3};  9'h042: kb_pos = {3'd1, 3'd2};  // i k
+  9'h03A: kb_pos = {3'd1, 3'd1};  9'h041: kb_pos = {3'd1, 3'd0};  // m ,
+  9'h05A: kb_pos = {3'd0, 3'd6};  9'h045: kb_pos = {3'd0, 3'd5};  // enter 0
+  9'h076: kb_pos = {3'd0, 3'd4};  9'h04D: kb_pos = {3'd0, 3'd3};  // esc p
+  9'h04C: kb_pos = {3'd0, 3'd2};  9'h049: kb_pos = {3'd0, 3'd1};  // ; .
+  9'h16B: kb_pos = {3'd0, 3'd0};                                  // left
+  default: begin kb_pos = 0; kb_hit = 0; end
+  endcase
+end
+
+always @(posedge clk25) begin
+  if (kb_stb) begin
+    if (kb_byte == 8'hF0)
+      kb_rel <= 1;
+    else if (kb_byte == 8'hE0)
+      kb_ext <= 1;
+    else begin
+      if (kb_hit)
+        ecs_keys[kb_pos] <= !kb_rel;
+      kb_rel <= 0;
+      kb_ext <= 0;
+    end
+  end
+end
+
+// To clk_g (slow key presses; a torn read only misses one scan).
+reg [63:0] ecs_keys_m, ecs_keys_g = 0;
+always @(posedge clk_g) begin
+  ecs_keys_m <= ecs_keys;
+  ecs_keys_g <= ecs_keys_m;
+end
+
+wire [7:0] pa2_o;
+wire       pa2_en;
+reg  [7:0] kb_cols;
+integer    r;
+always @* begin
+  kb_cols = 8'h00;
+  for (r = 0; r < 8; r = r + 1)
+    if (!pa2_o[r])
+      kb_cols = kb_cols | ecs_keys_g[r * 8 +: 8];
+end
+// Both ECS ports read the columns while port A drives the rows; the ECS
+// hand controllers (3 and 4) are not connected.
+wire [7:0] pa2_in = pa2_en ? ~kb_cols : 8'hff;
+wire [7:0] pb2_in = pa2_en ? ~kb_cols : 8'hff;
+
 
 // ---------------------------------------------------------------------------
 // The Intellivision
@@ -288,7 +403,7 @@ wire  [7:0] cart_wdata;
 wire        pix_we;
 wire  [3:0] pix_col;
 wire  [8:0] pix_x, pix_y;
-wire [11:0] sound;
+wire [15:0] core_audio;
 reg  [15:0] paged_mask = 0;
 
 reg   [7:0] mem_rdata;
@@ -300,8 +415,14 @@ reg         mem_ack;
 intv_core intv
   ( .clk        (clk_g)
   , .reset_n    (!intv_reset)
+  , .ecs        (ecs_g)
+  , .jlp        (jlp_g)
   , .pa_i       (pa)
   , .pb_i       (pb)
+  , .pa2_o      (pa2_o)
+  , .pa2_en     (pa2_en)
+  , .pa2_i      (pa2_in)
+  , .pb2_i      (pb2_in)
   , .paged_mask (paged_mask)
   , .mem_req    (cart_req)
   , .mem_we     (cart_we)
@@ -314,7 +435,7 @@ intv_core intv
   , .pix_col    (pix_col)
   , .pix_x      (pix_x)
   , .pix_y      (pix_y)
-  , .sound      (sound)
+  , .audio      (core_audio)
   , .dbg_ad     (dbg_ad)
   , .dbg_bdic   (dbg_bdic)
   , .dbg_phi    (dbg_phi)
@@ -322,10 +443,11 @@ intv_core intv
 
 
 `ifdef INTV_SIM_TRACE
-// CPU bus: each address put on the bus (BAR = 1)
+// CPU bus: each address put on the bus (BAR = 1: fetches and indirect
+// operands, ADAR = 4: direct operands)
 always @(posedge clk_g)
-  if (!boot_mode && dbg_phi && dbg_bdic == 3'b001)
-    $display("BAR %04x", dbg_ad);
+  if (!boot_mode && dbg_phi && (dbg_bdic == 3'b001 || dbg_bdic == 3'b100))
+    $display("%s %04x", dbg_bdic == 3'b001 ? "BAR" : "ADR", dbg_ad);
 `endif
 
 // ---------------------------------------------------------------------------
@@ -499,6 +621,7 @@ always @(posedge clk_g) begin
     8'h0B: mask_lo    <= cpu_do;
     8'h0C: paged_mask <= {cpu_do, mask_lo};
     8'h0D: swap       <= cpu_do[0];
+    8'h0E: begin ecs_g <= cpu_do[0]; jlp_g <= cpu_do[1]; end
     default: ;
     endcase
   end
@@ -551,6 +674,7 @@ always @(posedge clk_g) begin
   8'h12:   io_q <= crc_out[15:8];
   8'h13:   io_q <= crc_out[23:16];
   8'h14:   io_q <= crc_out[31:24];
+  8'h15:   io_q <= mkey_g;
   default: io_q <= 8'hff;
   endcase
   vblank_s <= {vblank_s[1:0], vc >= 10'd480};
@@ -713,17 +837,17 @@ always @(posedge clk25) begin
 end
 
 // ---------------------------------------------------------------------------
-// Audio: as the MiSTer core, to clk25 once stable for two clocks.
+// Audio (mixed in intv_core.vhd), to clk25 once stable for two clocks.
 
-reg [11:0] snd_g = 0;
-reg [11:0] snd_m, snd_s;
+reg [15:0] snd_g = 0;
+reg [15:0] snd_m, snd_s;
 always @(posedge clk_g)
-  snd_g <= boot_mode ? 12'd0 : sound;
+  snd_g <= boot_mode ? 16'd0 : core_audio;
 always @(posedge clk25) begin
   snd_m <= snd_g;
   snd_s <= snd_m;
   if (snd_s == snd_m)
-    audio <= {1'b0, snd_s, 3'b000};
+    audio <= snd_s;
 end
 
 endmodule

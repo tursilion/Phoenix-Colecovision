@@ -106,6 +106,8 @@ architecture rtl of intv_phoenix_top is
       ; snes          : in  std_logic_vector(11 downto 0)
       ; kb_keys       : in  std_logic_vector(15 downto 0)
       ; kb_joy        : in  std_logic_vector(4 downto 0)
+      ; kb_byte       : in  std_logic_vector(7 downto 0)
+      ; kb_stb        : in  std_logic
       ; sram_addr     : out std_logic_vector(18 downto 0)
       ; sram_dout     : out std_logic_vector(7 downto 0)
       ; sram_din      : in  std_logic_vector(7 downto 0)
@@ -174,6 +176,8 @@ architecture rtl of intv_phoenix_top is
    signal ps2_keys_s       : std_logic_vector(15 downto 0);
    signal ps2_joy_s        : std_logic_vector(15 downto 0);
    signal kb_joy_s         : std_logic_vector(4 downto 0);
+   signal kb_byte_s        : std_logic_vector(7 downto 0);
+   signal kb_stb_s         : std_logic;
    signal cv1_pins_s       : std_logic_vector(4 downto 0);
    signal cv2_pins_s       : std_logic_vector(4 downto 0);
    signal cv1_s            : std_logic_vector(9 downto 0);
@@ -298,6 +302,8 @@ begin
    , snes          => snes_s
    , kb_keys       => ps2_keys_s
    , kb_joy        => kb_joy_s
+   , kb_byte       => kb_byte_s
+   , kb_stb        => kb_stb_s
    , sram_addr     => sram_addr_o
    , sram_dout     => sram_dout_s
    , sram_din      => sram_data_io
@@ -374,6 +380,8 @@ begin
    , joy             => ps2_joy_s
    , core_reload_o   => open
    , home_o          => open
+   , rx_byte_o       => kb_byte_s
+   , rx_stb_o        => kb_stb_s
    );
 
    kb_joy_s <= ps2_joy_s(4 downto 0);

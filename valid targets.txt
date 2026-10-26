@@ -12,7 +12,7 @@ Otherwise the cut off is mostly RAM size.
 
 Future work depends on free time and community response.
 
-Intellivision - probably
+Intellivision - in progress - base console working. Need to add expansion modules
 Gameboy - most games
 Lynx - probably
 TurboGraphics - maybe

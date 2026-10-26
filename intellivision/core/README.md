@@ -3,15 +3,17 @@
 Mattel's Intellivision for the CollectorVision Phoenix. The CPU (CP1610),
 the video chip (STIC) and the sound chip (AY-3-8914) come from the
 [MiSTer Intellivision core](https://github.com/MiSTer-devel/Intv_MiSTer)
-by Grabulosaure (release 20261001). The menu and SD card loader
-come from the Phoenix NES core.
+by Grabulosaure (release 20261001), with the ECS, the Intellivoice and the
+JLP extensions. The menu and SD card loader come from the Phoenix NES core.
 
 Status:
 
 - **Simulation:** the menu lists the card and loads a game. DKINTY.BIN
   (Donkey Kong Arcade, .BIN + .CFG) runs its title screen.
-- **ISE:** about 40% of the LUTs and 16 of 32 block RAMs, with timing met.
-- **Hardware:** the menu works.
+- **ISE:** 66% of the LUTs, 24 of 32 block RAMs, 8 RAMB8s and 14 DSPs,
+  with timing met.
+- **Hardware:** the base console works (DKINTY). The ECS, Intellivoice and
+  JLP are not tested on hardware yet.
 
 ## Using it
 
@@ -30,8 +32,27 @@ Status:
 
 Menu: the stick moves, left and right page through the list, the left fire
 button (or #) opens a folder or starts a game, and the right fire button
-(or *) goes up a folder. Keypad 0 swaps the controller ports. On a SNES
-pad, A or Start opens, B goes back and Select swaps.
+(or *) goes up a folder. Keypad 0 swaps the controller ports. Keypad 1
+and 2 set the ECS and the JLP to AUTO, ON or OFF. On a SNES pad, A or Start
+opens, B goes back, Select swaps, and L and R set the ECS and the JLP.
+
+## Extensions
+
+- **Intellivoice** (speech, for example B-17 Bomber, Space Spartans): always
+  on. It sits at $0080-$0081, where other games never look.
+- **ECS** (Entertainment Computer System): it adds a ROM, 2K of RAM, a second
+  sound chip and the computer keyboard. It conflicts with games that use
+  $2000, $4000-$47FF, $7000 or $E000 for themselves. So it is only on for a
+  game whose `.CFG` file has `ecs = 1` (or `ecs_compat` 2 or 3) in `[vars]`,
+  or when the menu has it set to ON. The PS/2 keyboard is the ECS keyboard.
+  The keyboard's digits then no longer work as the hand controller keypad,
+  and ESC still resets the game. The ECS's extra hand controller ports are
+  not connected.
+- **JLP**: homebrew cartridge hardware. It has 8K words of RAM at
+  $8040-$9F7F, a multiply/divide unit, a CRC unit and a random number
+  generator at $9F80-$9FFF. It is on for `jlp = 1` (or more, or
+  `jlp_compat` 2 or 3) in `[vars]`, or when the menu has it set to ON. It
+  has no flash: games see no save rows, so saving does nothing.
 
 In a game:
 
@@ -53,8 +74,8 @@ back to the menu. Power cycle to change cores.
 
 ## Limits
 
-- No ECS, Intellivoice or JLP. The hardware has room for them, but they
-  are not added yet.
+- No JLP save games (flash), no ECS hand controllers 3 and 4, no
+  Keyboard Component.
 - Images up to about 250K words (with any cartridge RAM). Intellicart
   bank switching is not supported. Page switching with jzintv
   `PAGE n` mappings is supported.
@@ -69,8 +90,10 @@ back to the menu. Power cycle to change cores.
   Intellivision frame per HDMI frame, and an 8-line buffer shows each
   Intellivision line on two HDMI lines. The picture is 190 x 240 STIC
   pixels (with the border), each 3 x 2 HDMI pixels: 570 x 480, centered.
-- **Memory.** The system RAMs, GRAM, GROM and EXEC are block RAM. The
-  EXEC and GROM are built in from `exec.bin` and `grom.bin`.
+- **Memory.** The system RAMs, GRAM, GROM, EXEC, ECS ROM and RAM, and the
+  Intellivoice ROM are block RAM. The ROMs are built in from `exec.bin`,
+  `grom.bin`, `ecs.bin` and `sp0256-012.bin`. The JLP RAM is in the SRAM,
+  mapped by the loader.
   The cartridge is in the SRAM, with a page table at SRAM 7E000 that the
   loader writes (`rtl/intv_cart.vhd`).
 - **Loader.** A 6502 (Arlet Ottens' core) runs from a 16K block RAM ROM
@@ -88,12 +111,15 @@ back to the menu. Power cycle to change cores.
   cartridge.
 - `rtl/intv/`: the MiSTer core's files.
   - `cp1610.vhd` is the original without its trace code.
-  - `stic.vhd` has no ECS, Intellivoice, JLP or CFG parser, uses built-in
-    ROMs, and has a pixel output.
+  - `stic.vhd` has no Intellicart registers or CFG parser, uses built-in
+    ROMs, sends only the JLP registers to `jlp.vhd`, and has a pixel output.
+  - `ivoice.vhd` has the SP0256 ROM built in and is rewritten in a few
+    places for XST.
+  - `jlp.vhd` has no RAM or flash.
   - `snd.vhd`, `cp1610_pack.vhd` and `base_pack.vhd` are unchanged.
 - `rtl/cpu6502/`: Arlet Ottens' 6502.
 - `rtl/cv_pads.vhd`: the ColecoVision controllers (same as Galaga's).
-- `tools/mkroms.py`: makes the EXEC/GROM VHDL package and the menu font
+- `tools/mkroms.py`: makes the ROM VHDL package (EXEC, GROM, ECS, SP0256) and the menu font
   from the BIOS files at build time. The BIOS is not kept in the repository.
 - `loader/`: the menu and loader (cc65).
 - `sim/`: the Verilator testbench. The VHDL is turned into Verilog with
@@ -102,8 +128,12 @@ back to the menu. Power cycle to change cores.
 
 ## Building
 
-The Intellivision BIOS (`exec.bin`, 8K, and `grom.bin`, 2K) must be in
-`intellivision/` (or pass `BIOS=dir`).
+The Intellivision BIOS must be in `intellivision/` (or pass `BIOS=dir`):
+
+- `exec.bin` (8K);
+- `grom.bin` (2K);
+- `ecs.bin` (24K);
+- `sp0256-012.bin` (2K, the Intellivoice).
 
 - **Core.** Run `make` in `build/`. Without ISE installed, it runs each
   ISE tool in the docked-ise-147 Docker image.

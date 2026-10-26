@@ -9,9 +9,10 @@
 --
 -- Phoenix version (intellivision/core): from the MiSTer Intv core
 -- (github.com/MiSTer-devel/Intv_MiSTer, release 20261001).  Changes:
---   - no ECS, Intellivoice, JLP, Intellicart registers or CFG parser;
---   - the EXEC and GROM are ROMs from intv_roms_pack (made by the build from
---     exec.bin and grom.bin) instead of being downloaded;
+--   - no Intellicart registers or CFG parser; the JLP RAM is in the
+--     cartridge (the SRAM), only its registers come here;
+--   - the EXEC, GROM and ECS ROM are ROMs from intv_roms_pack (made by the
+--     build from exec.bin, grom.bin and ecs.bin) instead of being downloaded;
 --   - pix_* outputs: each pixel's colour index and position, for the
 --     Phoenix line buffer; frame_top marks the start of a frame;
 --   - cart_pwr: CPU write strobe, for the cartridge's page registers.
@@ -66,6 +67,9 @@ ENTITY stic IS
     
     pal    : IN  std_logic;
     pause  : IN  std_logic;
+    ecs    : IN  std_logic;
+    ivoice : IN  std_logic;
+    jlp    : IN  std_logic;
 
     ------------------------------------
     ad     : OUT uv16;
@@ -74,6 +78,21 @@ ENTITY stic IS
     snd_dr : IN  uv8;
     snd_dw : OUT uv8;
     snd_wr : OUT std_logic;
+
+    -- Audio chip ECS
+    snd2_dr : IN  uv8;
+    snd2_dw : OUT uv8;
+    snd2_wr : OUT std_logic;
+
+    -- IVoice
+    ivoice_dr : IN  uv16;
+    ivoice_dw : OUT uv16;
+    ivoice_wr : OUT std_logic;
+
+    -- JLP registers ($8000-$803F, $9F80-$9FFF)
+    jlp_dr    : IN  uv16;
+    jlp_dw    : OUT uv16;
+    jlp_wr    : OUT std_logic;
 
     -- Cartridge
     cart_dr  : IN  uv16;
@@ -419,7 +438,10 @@ ARCHITECTURE rtl OF stic IS
 
   ---------------------------------------------------------
   SIGNAL pwr_x,pwr_y,pwr_a,pwr_c : std_logic;
-  SIGNAL pwr_sysram,pwr_gram,pwr_scram : std_logic;
+  SIGNAL pwr_sysram,pwr_gram,pwr_scram,pwr_ecsram : std_logic;
+  SIGNAL pr_ecsram : uv8;
+  SIGNAL pr_ecsrom : uv10;
+  SIGNAL ecspage_l : arr_uv4(0 TO 15);
   SIGNAL pr_x,pr_y,pr_a,pr_c : uv14;
   SIGNAL pr_sysram : uv16;
   SIGNAL pr_gram,pr_grom,pr_scram : uv8;
@@ -460,6 +482,12 @@ ARCHITECTURE rtl OF stic IS
   SIGNAL scram  : arr_uv8(0 TO 255) :=(OTHERS =>x"00"); -- 256 * 8bits
 
   SIGNAL EXECROM : arr_uv10(0 TO 4095) := EXEC_INIT; -- Executive ROM, 10 bits
+
+  SIGNAL ecsram : arr_uv8(0 TO 2047) := (OTHERS =>x"00"); -- 2k * 8bits
+  SIGNAL ECSROM0 : arr_uv10(0 TO 4095) := ECS0_INIT; -- ECS ROM, 3 x 4K * 10 bits
+  SIGNAL ECSROM1 : arr_uv10(0 TO 4095) := ECS1_INIT;
+  SIGNAL ECSROM2 : arr_uv10(0 TO 4095) := ECS2_INIT;
+  SIGNAL pr_ecsrom0, pr_ecsrom1, pr_ecsrom2 : uv10;
 
 BEGIN
 
@@ -503,7 +531,15 @@ BEGIN
       cart_rd   <='0';
       cart_wr   <='0';
 
+      pwr_ecsram<='0';
+      snd2_wr   <='0';
+      ivoice_wr <='0';
+      jlp_wr    <='0';
+
       snd_dw   <=dw(7 DOWNTO 0);
+      snd2_dw  <=dw(7 DOWNTO 0);
+      ivoice_dw<=dw;
+      jlp_dw   <=dw;
       cart_dw  <=dw;
 
       ----------------------------------
@@ -652,6 +688,37 @@ BEGIN
         dr<=x"00" & snd_dr;
         snd_wr<=pwr;
 
+      -- IntelliVoice ------------------
+      ELSIF padrs>=16#0080# AND padrs<=16#0081# AND ivoice='1' THEN
+        dr<=ivoice_dr;
+        ivoice_wr<=pwr;
+        
+      -- Sound chip ECS ----------------
+      ELSIF padrs>=16#00F0# AND padrs<=16#00FF# AND ecs='1' THEN
+        dr<=x"00" & snd2_dr;
+        snd2_wr<=pwr;
+        
+      -- RAM ECS -----------------------
+      ELSIF padrs>=16#4000# AND padrs<=16#47FF# AND ecs='1' THEN
+        dr<=x"00" & pr_ecsram;
+        pwr_ecsram<=pwr;
+        
+      -- ROM ECS -----------------------
+      ELSIF padrs  >=16#2000# AND padrs<=16#2FFF# AND ecs='1' AND ecspage_l(2)=x"1" THEN
+        dr<="000000" & pr_ecsrom;
+        
+      ELSIF padrs>=16#7000# AND padrs<=16#7FFF# AND ecs='1' AND ecspage_l(7)=x"0" THEN
+        dr<="000000" & pr_ecsrom;
+        
+      ELSIF padrs>=16#E000# AND padrs<=16#EFFF# AND ecs='1' AND ecspage_l(14)=x"1" THEN
+        dr<="000000" & pr_ecsrom;
+      
+      -- JLP registers (the JLP RAM is in the cartridge) --
+      ELSIF jlp='1' AND ((padrs >= 16#8000# AND padrs < 16#8040#) OR
+                         (padrs >= 16#9F80# AND padrs < 16#A000#)) THEN
+        dr     <= jlp_dr;
+        jlp_wr <= pwr;
+
       -- Cartridges --------------------
       ELSE
         dr      <= cart_dr;
@@ -666,6 +733,19 @@ BEGIN
          pwr_gram<=pwr AND vblank2;
       END IF;
 
+      -- BANK SWITCH REG ---------------
+      -- ECS : Bankswitching is performed by writing $xA5y to location $xFFF
+      --         to switch the ROM that covers the range $x000 - $xFFF.
+      --       The value of y selects which 4K page to switch in out
+      --         of a possible set of 16 pages. (From JZINTV)
+      --       The 12K of ROM in the ECS resides in $2000 Page 1, $7000 Page 0, and $E000 Page 1.
+      --       The ECS comes out of reset with page 0 selected on all ROMs,
+      --                 meaning that only the $7000 ROM is visible at RESET time. 
+      IF padrs MOD 4096 = 16#FFF# AND
+        dw(11 DOWNTO 4)=x"A5" AND dw(15 DOWNTO 12) = padrs / 4096 AND pwr='1' THEN
+        ecspage_l(padrs/4096) <= dw(3 DOWNTO 0);
+      END IF;
+      
       ----------------------------------
       IF bdic=B_IAB THEN -- Interrupt to Address Bus
         IF intrm_l='1' THEN
@@ -683,6 +763,7 @@ BEGIN
         bext_t<='0';
         bext_l<='0';
         csmode<='0';
+        ecspage_l<=(OTHERS =>x"0");
         de<='0';
 
       END IF;
@@ -743,6 +824,28 @@ BEGIN
       pr_execrom <= EXECROM(padrs MOD 4096);
     END IF;
   END PROCESS MemExec;
+
+  MemEcsram:PROCESS (clk) IS
+  BEGIN
+    IF rising_edge(clk) THEN
+      IF pwr_ecsram='1' THEN ecsram(padrs MOD 2048) <= dw(7 DOWNTO 0); END IF;
+      pr_ecsram <= ecsram(padrs MOD 2048);
+    END IF;
+  END PROCESS MemEcsram;
+
+  -- ECS ROM: $2000, $7000 and $E000
+  MemEcsrom:PROCESS (clk) IS
+  BEGIN
+    IF rising_edge(clk) THEN
+      pr_ecsrom0 <= ECSROM0(padrs MOD 4096);
+      pr_ecsrom1 <= ECSROM1(padrs MOD 4096);
+      pr_ecsrom2 <= ECSROM2(padrs MOD 4096);
+    END IF;
+  END PROCESS MemEcsrom;
+
+  pr_ecsrom <= pr_ecsrom1 WHEN padrs>=16#7000# AND padrs<=16#7FFF# ELSE
+               pr_ecsrom2 WHEN padrs>=16#E000# AND padrs<=16#EFFF# ELSE
+               pr_ecsrom0;
 
   ------------------------------------------------------------------------------
   Mobs:PROCESS (clk,cpureset_n) IS

@@ -8,13 +8,19 @@
  *
  *   - .ROM: the Intellicart header (segments, access and fine tables);
  *   - .BIN/.INT/.ITV with a .CFG file of the same name: its [mapping]
- *     (with PAGE n) and [memattr] RAM sections, as jzintv reads them;
+ *     (with PAGE n) and [memattr] RAM sections, as jzintv reads them, and
+ *     ecs/jlp in [vars];
  *   - .BIN/.INT/.ITV alone: the MiSTer core's table of known CRCs, or
  *     else the usual $5000/$D000/$F000 map.
  *
  * Controls (ColecoVision controller): stick up/down move, left/right page,
  * left fire (or #) opens, right fire (or *) goes up a folder, keypad 0
- * swaps the controller ports.  SNES pad: A/Start open, B back, Select swap.
+ * swaps the controller ports, 1 and 2 switch the ECS and the JLP between
+ * AUTO (from the .CFG file), ON and OFF.  SNES pad: A/Start open, B back,
+ * Select swap, L ECS, R JLP.
+ *
+ * The Intellivoice is always there.  JLP RAM ($8040-$9F7F) goes in the
+ * page table as 16-bit RAM; its registers are in the core.
  *
  * Memory: RAM $0000-$07FF and $6000-$7FFF, text screen $4000.
  */
@@ -50,7 +56,8 @@ static WORD count;
 /* Screen layout (32x30 characters) */
 
 #define LIST_ROW    3
-#define LIST_ROWS   23
+#define LIST_ROWS   22
+#define OPTS_ROW    26
 #define NAME_COL    3
 #define SWAP_ROW    27
 #define STATUS_ROW  28
@@ -75,6 +82,13 @@ static const char *const errors[] = {
 };
 
 static const char help[] = "L FIRE:OPEN R FIRE:BACK 0:SWAP";
+
+#define MODE_AUTO 0
+#define MODE_ON   1
+#define MODE_OFF  2
+static const char *const modes[] = { "AUTO", "ON  ", "OFF " };
+static BYTE ecs_mode, jlp_mode;
+static BYTE cfg_ecs, cfg_jlp;   /* from the .CFG file */
 
 static FATFS fs;
 static DIR dir;
@@ -116,6 +130,16 @@ static void show_swap(void)
     text(1, SWAP_ROW, swap ? "PLAYER 1: COLECO PORT 2" : "PLAYER 1: COLECO PORT 1", 31);
 }
 
+static void show_opts(void)
+{
+    char line[32];
+    strcpy(line, "1:ECS ");
+    strcat(line, modes[ecs_mode]);
+    strcat(line, "  2:JLP ");
+    strcat(line, modes[jlp_mode]);
+    text(1, OPTS_ROW, line, 31);
+}
+
 static void cls(void)
 {
     memset(TEXT, ' ', 960);
@@ -126,6 +150,16 @@ static void cls(void)
 
 static BYTE pad_last;
 static BYTE pad_timer;
+static BYTE key_last = 0xFF;
+
+/* Newly pressed keypad key, or $FF */
+static BYTE key_pressed(void)
+{
+    BYTE k = PH_KEY;
+    BYTE n = (k != key_last) ? k : 0xFF;
+    key_last = k;
+    return n;
+}
 
 /* Newly pressed buttons, with auto-repeat for the directions.  Call once
  * per frame. */
@@ -311,6 +345,7 @@ static void draw_page(void)
         draw_cursor('>');
     else
         text(NAME_COL, LIST_ROW, "NO CARTRIDGE IMAGES HERE", 31);
+    show_opts();
     show_swap();
     status(help);
 }
@@ -636,6 +671,23 @@ static void next_line(void)
 #define SEC_NONE    0
 #define SEC_MAPPING 1
 #define SEC_MEMATTR 2
+#define SEC_VARS    3
+
+/* "name = value" in [vars] */
+static void parse_var(void)
+{
+    WORD v;
+    BYTE *flag = 0;
+    BYTE compat = 0;
+
+    if (get_word("ECS_COMPAT")) { flag = &cfg_ecs; compat = 1; }
+    else if (get_word("JLP_COMPAT")) { flag = &cfg_jlp; compat = 1; }
+    else if (get_word("ECS")) flag = &cfg_ecs;
+    else if (get_word("JLP")) flag = &cfg_jlp;
+    if (!flag || !get_char('=') || !get_num(&v))
+        return;
+    *flag = compat ? (v >= 2) : (v != 0);
+}
 
 /* Parse the .CFG text in CFGBUF.  Returns 0 on a line it cannot use. */
 static BYTE parse_cfg(void)
@@ -652,8 +704,12 @@ static BYTE parse_cfg(void)
                 section = SEC_MAPPING;
             else if (get_word("MEMATTR"))
                 section = SEC_MEMATTR;
+            else if (get_word("VARS"))
+                section = SEC_VARS;
             else
                 section = SEC_NONE;
+        } else if (section == SEC_VARS) {
+            parse_var();
         } else if (*cp == '$' && section != SEC_NONE) {
             if (!get_num(&a) || !get_char('-') || !get_num(&b) || !get_char('='))
                 return 0;
@@ -706,6 +762,8 @@ static BYTE read_cfg(const char *file)
 
 static void map_reset(void)
 {
+    cfg_ecs = 0;
+    cfg_jlp = 0;
     nranges = 0;
     paged = 0;
     pages_used = 1;
@@ -817,7 +875,7 @@ static BYTE load_icart(const char *file)
 
 static BYTE load_game(const char *file)
 {
-    BYTE err;
+    BYTE err, ecs, jlp;
     const char *base = strrchr(file, '/');
 
     if (strcmp(ext_of(base ? base : file), ".ROM") == 0)
@@ -826,6 +884,17 @@ static BYTE load_game(const char *file)
         err = load_raw(file);
     if (err)
         return err;
+
+    ecs = ecs_mode == MODE_ON || (ecs_mode == MODE_AUTO && cfg_ecs);
+    jlp = jlp_mode == MODE_ON || (jlp_mode == MODE_AUTO && cfg_jlp);
+    if (jlp) {
+        /* JLP RAM: 8K words at $8000-$9FFF (the registers at $8000-$803F
+         * and $9F80-$9FFF are in the core) */
+        if (!map_ram(0x8000, 0x9FFF, 0))
+            return ERR_TOO_BIG;
+        write_table();
+    }
+    PH_EXT = (ecs ? 1 : 0) | (jlp ? 2 : 0);
 
     wait_idle();
     PH_OPTIONS = swap;
@@ -920,6 +989,21 @@ void main(void)
         } else if (b & PAD_SELECT) {
             swap ^= 1;
             show_swap();
+        }
+
+        switch (key_pressed()) {
+        case 0:
+            swap ^= 1;
+            show_swap();
+            break;
+        case 1:
+            ecs_mode = ecs_mode == MODE_OFF ? MODE_AUTO : ecs_mode + 1;
+            show_opts();
+            break;
+        case 2:
+            jlp_mode = jlp_mode == MODE_OFF ? MODE_AUTO : jlp_mode + 1;
+            show_opts();
+            break;
         }
     }
 }
