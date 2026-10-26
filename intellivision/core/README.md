@@ -10,14 +10,32 @@ Status:
 
 - **Simulation:** the menu lists the card and loads a game. DKINTY.BIN
   (Donkey Kong Arcade, .BIN + .CFG) runs its title screen.
-- **ISE:** 66% of the LUTs, 24 of 32 block RAMs, 8 RAMB8s and 14 DSPs,
+- **ISE:** 76% of the LUTs, 28 of 32 block RAMs, 4 RAMB8s and 14 DSPs,
   with timing met.
+- The BIOS comes from the SD card. In simulation the core loads it and
+  runs DKINTY (with and without the ECS) and B-17 Bomber with speech.
 - **Hardware:** the base console works (DKINTY). The ECS, Intellivoice and
   JLP are not tested on hardware yet.
 
 ## Using it
 
-1. Put cartridge images on a FAT16 or FAT32 SD card, in any folders:
+1. Put the Intellivision BIOS in a folder `INTV` on a FAT16 or FAT32 SD
+   card (or in its root):
+
+   | ROM | size | CRC-32 | needed |
+   |---|---|---|---|
+   | EXEC | 8K | CBCE86F7 | yes |
+   | GROM | 2K | 683A4158 | yes |
+   | ECS | 24K | EA790A06 | for ECS games |
+   | Intellivoice (SP0256-012) | 2K | 0DE7579D | for speech |
+
+   The core finds them by size and CRC, so any file names work, for example
+   `exec.bin`, `grom.bin`, `ecs.bin` and `sp0256-012.bin`. A file whose
+   CRC differs (another EXEC or GROM version) is used if it is named
+   `EXEC.BIN`, `GROM.BIN`, `ECS.BIN` or `IVOICE.BIN`. The menu's
+   `BIOS:` line shows what it found. Without the ECS ROM the ECS stays
+   off; without the Intellivoice ROM there is no Intellivoice.
+2. Put cartridge images on a FAT16 or FAT32 SD card, in any folders:
    - `.BIN`, `.INT` or `.ITV` raw images. A `.CFG` file with the same name
      gives the memory map, as in jzintv.
    - `.ROM` Intellicart images.
@@ -27,8 +45,8 @@ Status:
    usual map: $5000-$6FFF, then $D000 and $F000. The menu shows 8.3 names,
    so give the `.BIN` and `.CFG` files short names. Long names can get
    different `~1` endings.
-2. Install `build/CORE09.PHX` with the Phoenix boot loader.
-3. Power up with the card inserted and pick a game.
+3. Install `build/CORE09.PHX` with the Phoenix boot loader.
+4. Power up with the card inserted and pick a game.
 
 Menu: the stick moves, left and right page through the list, the left fire
 button (or #) opens a folder or starts a game, and the right fire button
@@ -91,8 +109,10 @@ back to the menu. Power cycle to change cores.
   Intellivision line on two HDMI lines. The picture is 190 x 240 STIC
   pixels (with the border), each 3 x 2 HDMI pixels: 570 x 480, centered.
 - **Memory.** The system RAMs, GRAM, GROM, EXEC, ECS ROM and RAM, and the
-  Intellivoice ROM are block RAM. The ROMs are built in from `exec.bin`,
-  `grom.bin`, `ecs.bin` and `sp0256-012.bin`. The JLP RAM is in the SRAM,
+  Intellivoice ROM are block RAM. The loader writes the ROMs from the SD
+  card at power-on: the forward engine has a load target (`$500F`), and
+  the ROMs' CPU ports are their load ports while the CPU is in reset. The
+  JLP RAM is in the SRAM,
   mapped by the loader.
   The cartridge is in the SRAM, with a page table at SRAM 7E000 that the
   loader writes (`rtl/intv_cart.vhd`).
@@ -113,14 +133,14 @@ back to the menu. Power cycle to change cores.
   - `cp1610.vhd` is the original without its trace code.
   - `stic.vhd` has no Intellicart registers or CFG parser, uses built-in
     ROMs, sends only the JLP registers to `jlp.vhd`, and has a pixel output.
-  - `ivoice.vhd` has the SP0256 ROM built in and is rewritten in a few
+  - `ivoice.vhd` has a load port for the SP0256 ROM and is rewritten in a few
     places for XST.
   - `jlp.vhd` has no RAM or flash.
   - `snd.vhd`, `cp1610_pack.vhd` and `base_pack.vhd` are unchanged.
 - `rtl/cpu6502/`: Arlet Ottens' 6502.
 - `rtl/cv_pads.vhd`: the ColecoVision controllers (same as Galaga's).
-- `tools/mkroms.py`: makes the ROM VHDL package (EXEC, GROM, ECS, SP0256) and the menu font
-  from the BIOS files at build time. The BIOS is not kept in the repository.
+- `rtl/font.hex`: the menu font, the Intellivision's characters (the first
+  768 bytes of the GROM, ASCII 32-127).
 - `loader/`: the menu and loader (cc65).
 - `sim/`: the Verilator testbench. The VHDL is turned into Verilog with
   Yosys + GHDL.
@@ -128,12 +148,9 @@ back to the menu. Power cycle to change cores.
 
 ## Building
 
-The Intellivision BIOS must be in `intellivision/` (or pass `BIOS=dir`):
-
-- `exec.bin` (8K);
-- `grom.bin` (2K);
-- `ecs.bin` (24K);
-- `sp0256-012.bin` (2K, the Intellivoice).
+The core contains no Intellivision BIOS. The simulation's SD card images
+take it from `intellivision/` (or `BIOS=dir`): `exec.bin`, `grom.bin`, and
+optionally `ecs.bin` and `sp0256-012.bin`.
 
 - **Core.** Run `make` in `build/`. Without ISE installed, it runs each
   ISE tool in the docked-ise-147 Docker image.
@@ -142,8 +159,9 @@ The Intellivision BIOS must be in `intellivision/` (or pass `BIOS=dir`):
   1. Run `make` in `sim/`. Verilator and Yosys run in the Docker image.
   2. Make a card with
      `make sd.img ROMS="GAME.BIN=path GAME.CFG=path"`.
-  3. Run it with `obj_dir/Vintv_phoenix --sd sd.img --frames 300 --pad 25:01,27:00 --ppm out/f --ppm-every 30`.
-     The `--pad` script presses SNES A at frame 25 to start the first file.
+  3. Run it with `obj_dir/Vintv_phoenix --sd sd.img --frames 330 --pad 55:20,57:00,60:01,62:00 --ppm out/f --ppm-every 30`.
+     The `--pad` script presses SNES Down at frame 55 (past `INTV/`) and A at
+     frame 60 to start the first file.
 
   Build with `make VFLAGS=+define+INTV_SIM_TRACE` to print the CPU's bus
   addresses.

@@ -22,6 +22,12 @@
  * The Intellivoice is always there.  JLP RAM ($8040-$9F7F) goes in the
  * page table as 16-bit RAM; its registers are in the core.
  *
+ * At power-on it loads the Intellivision BIOS from the card into the core:
+ * from /INTV, then the root, the files with the right size and CRC-32 (any
+ * name), or else EXEC.BIN, GROM.BIN, ECS.BIN and IVOICE.BIN.  The EXEC and
+ * GROM are needed; without the ECS ROM the ECS stays off, and without the
+ * SP0256 ROM the Intellivoice.
+ *
  * Memory: RAM $0000-$07FF and $6000-$7FFF, text screen $4000.
  */
 
@@ -57,6 +63,7 @@ static WORD count;
 
 #define LIST_ROW    3
 #define LIST_ROWS   22
+#define BIOS_ROW    25
 #define OPTS_ROW    26
 #define NAME_COL    3
 #define SWAP_ROW    27
@@ -69,6 +76,7 @@ static WORD count;
 #define ERR_BAD_ROM     5
 #define ERR_TOO_BIG     6
 #define ERR_CFG         7
+#define ERR_NO_BIOS     8
 
 static const char *const errors[] = {
     "",
@@ -79,6 +87,7 @@ static const char *const errors[] = {
     "NOT AN INTELLICART .ROM FILE",
     "TOO BIG FOR THE SRAM",
     "CANNOT USE THE .CFG FILE",
+    "NO EXEC/GROM IN /INTV",
 };
 
 static const char help[] = "L FIRE:OPEN R FIRE:BACK 0:SWAP";
@@ -129,6 +138,8 @@ static void show_swap(void)
 {
     text(1, SWAP_ROW, swap ? "PLAYER 1: COLECO PORT 2" : "PLAYER 1: COLECO PORT 1", 31);
 }
+
+static void show_bios(void);
 
 static void show_opts(void)
 {
@@ -339,12 +350,14 @@ static void draw_page(void)
     text(1, 1, title, 31);
     for (r = 0; r < LIST_ROWS; ++r) {
         TEXT[(WORD)(LIST_ROW + r) * 32 + 1] = ' ';
+        TEXT[(WORD)(LIST_ROW + r) * 32 + 2] = ' ';
         draw_row(r);
     }
     if (count)
         draw_cursor('>');
     else
         text(NAME_COL, LIST_ROW, "NO CARTRIDGE IMAGES HERE", 31);
+    show_bios();
     show_opts();
     show_swap();
     status(help);
@@ -758,6 +771,124 @@ static BYTE read_cfg(const char *file)
 }
 
 /* ------------------------------------------------------------------------ */
+/* BIOS */
+
+struct bios {
+    DWORD crc;
+    WORD size;
+    BYTE target;
+    const char *name;       /* name used if no file has the CRC */
+};
+
+static const struct bios bios_files[4] = {
+    { 0xCBCE86F7UL,  8192, TARGET_EXEC,  "EXEC.BIN" },
+    { 0x683A4158UL,  2048, TARGET_GROM,  "GROM.BIN" },
+    { 0xEA790A06UL, 24576, TARGET_ECS,   "ECS.BIN" },
+    { 0x0DE7579DUL,  2048, TARGET_VOICE, "IVOICE.BIN" },
+};
+static const char *const bios_short[4] = { "EXEC", "GROM", "ECS", "VOICE" };
+
+/* The candidates' names, in the .CFG buffer (free at power-on) */
+#define MAX_CAND 24
+#define cand_name ((char (*)[18])CFGBUF)    /* "INTV/NNNNNNNN.EEE" */
+static WORD cand_size[MAX_CAND];
+static BYTE ncand;
+static BYTE bios_have;      /* bit n: bios_files[n] loaded */
+static BYTE bios_by_crc;    /* bit n: ... with the right CRC */
+
+/* Forward a whole file (of a BIOS size) to the load target. */
+static BYTE send_file(const char *name, WORD size, BYTE target)
+{
+    UINT br;
+    if (pf_open(name) != FR_OK)
+        return 0;
+    sram_at(0);
+    PH_TARGET = target;
+    PH_CRC_RESET = 0;
+    if (pf_read(0, size, &br) != FR_OK || br != size) {
+        wait_idle();
+        PH_TARGET = TARGET_SRAM;
+        return 0;
+    }
+    wait_idle();
+    PH_TARGET = TARGET_SRAM;
+    return 1;
+}
+
+static void find_candidates(const char *dirname)
+{
+    BYTE l;
+    if (pf_opendir(&dir, dirname) != FR_OK)
+        return;
+    while (ncand < MAX_CAND && pf_readdir(&dir, &fno) == FR_OK && fno.fname[0]) {
+        if (fno.fattrib & (AM_DIR | AM_HID | AM_SYS))
+            continue;
+        if (fno.fsize != 2048 && fno.fsize != 8192 && fno.fsize != 24576)
+            continue;
+        l = 0;
+        if (dirname[0]) {
+            strcpy(cand_name[ncand], dirname);
+            l = strlen(dirname);
+            cand_name[ncand][l++] = '/';
+        }
+        strcpy(cand_name[ncand] + l, fno.fname);
+        cand_size[ncand] = (WORD)fno.fsize;
+        ++ncand;
+    }
+}
+
+static void show_bios(void)
+{
+    char line[32];
+    BYTE i;
+    strcpy(line, "BIOS:");
+    for (i = 0; i < 4; ++i)
+        if (bios_have & (1 << i)) {
+            strcat(line, " ");
+            strcat(line, bios_short[i]);
+        }
+    if (!(bios_have & 3))
+        strcpy(line, "NO EXEC/GROM IN /INTV");
+    text(1, BIOS_ROW, line, 31);
+}
+
+static void load_bios(void)
+{
+    BYTE c, i;
+    DWORD crc;
+    const char *base;
+
+    ncand = 0;
+    find_candidates("INTV");
+    find_candidates("");
+
+    /* By CRC */
+    for (c = 0; c < ncand; ++c) {
+        if (!send_file(cand_name[c], cand_size[c], TARGET_NONE))
+            continue;
+        memcpy(&crc, (const void *)PH_CRC, 4);
+        for (i = 0; i < 4; ++i)
+            if (!(bios_have & (1 << i)) && bios_files[i].crc == crc &&
+                bios_files[i].size == cand_size[c] &&
+                send_file(cand_name[c], cand_size[c], bios_files[i].target)) {
+                bios_have |= 1 << i;
+                bios_by_crc |= 1 << i;
+            }
+    }
+
+    /* By name, for the ones still missing (other EXEC/GROM versions) */
+    for (c = 0; c < ncand; ++c) {
+        base = strrchr(cand_name[c], '/');
+        base = base ? base + 1 : (const char *)cand_name[c];
+        for (i = 0; i < 4; ++i)
+            if (!(bios_have & (1 << i)) && bios_files[i].size == cand_size[c] &&
+                strcmp(base, bios_files[i].name) == 0 &&
+                send_file(cand_name[c], cand_size[c], bios_files[i].target))
+                bios_have |= 1 << i;
+    }
+}
+
+/* ------------------------------------------------------------------------ */
 /* Loading */
 
 static void map_reset(void)
@@ -878,6 +1009,9 @@ static BYTE load_game(const char *file)
     BYTE err, ecs, jlp;
     const char *base = strrchr(file, '/');
 
+    if ((bios_have & 3) != 3)
+        return ERR_NO_BIOS;
+
     if (strcmp(ext_of(base ? base : file), ".ROM") == 0)
         err = load_icart(file);
     else
@@ -885,7 +1019,7 @@ static BYTE load_game(const char *file)
     if (err)
         return err;
 
-    ecs = ecs_mode == MODE_ON || (ecs_mode == MODE_AUTO && cfg_ecs);
+    ecs = (ecs_mode == MODE_ON || (ecs_mode == MODE_AUTO && cfg_ecs)) && (bios_have & 4);
     jlp = jlp_mode == MODE_ON || (jlp_mode == MODE_AUTO && cfg_jlp);
     if (jlp) {
         /* JLP RAM: 8K words at $8000-$9FFF (the registers at $8000-$803F
@@ -894,7 +1028,7 @@ static BYTE load_game(const char *file)
             return ERR_TOO_BIG;
         write_table();
     }
-    PH_EXT = (ecs ? 1 : 0) | (jlp ? 2 : 0);
+    PH_EXT = (ecs ? 1 : 0) | (jlp ? 2 : 0) | ((bios_have & 8) ? 4 : 0);
 
     wait_idle();
     PH_OPTIONS = swap;
@@ -966,6 +1100,11 @@ void main(void)
         }
         break;
     }
+
+    text(1, 1, "INTELLIVISION", 31);
+    text(1, 3, "LOADING THE BIOS...", 31);
+    load_bios();
+    cls();
 
     path[0] = 0;
     show_folder();

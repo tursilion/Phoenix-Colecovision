@@ -11,8 +11,8 @@
 -- (github.com/MiSTer-devel/Intv_MiSTer, release 20261001).  Changes:
 --   - no Intellicart registers or CFG parser; the JLP RAM is in the
 --     cartridge (the SRAM), only its registers come here;
---   - the EXEC, GROM and ECS ROM are ROMs from intv_roms_pack (made by the
---     build from exec.bin, grom.bin and ecs.bin) instead of being downloaded;
+--   - the EXEC, GROM and ECS ROM are written through rom_* while boot is
+--     high (the Phoenix loader reads them from the SD card);
 --   - pix_* outputs: each pixel's colour index and position, for the
 --     Phoenix line buffer; frame_top marks the start of a frame;
 --   - cart_pwr: CPU write strobe, for the cartridge's page registers.
@@ -50,7 +50,6 @@ USE std.textio.ALL;
 LIBRARY work;
 USE work.base_pack.ALL;
 USE work.cp1610_pack.ALL;
-USE work.intv_roms_pack.ALL;
 
 ENTITY stic IS
   PORT (
@@ -100,6 +99,15 @@ ENTITY stic IS
     cart_rd  : OUT std_logic;
     cart_wr  : OUT std_logic;
     cart_pwr : OUT std_logic;
+
+    ------------------------------------
+    -- ROM loading, while boot='1' (the CPU is in reset):
+    -- rom_sel 0 EXEC, 1 GROM, 2-4 ECS ROM at $2000, $7000, $E000
+    boot     : IN  std_logic;
+    rom_we   : IN  std_logic;
+    rom_sel  : IN  uv3;
+    rom_a    : IN  uv12;
+    rom_d    : IN  uv10;
 
     ------------------------------------
     hvsync : OUT std_logic;
@@ -475,18 +483,21 @@ ARCHITECTURE rtl OF stic IS
   SIGNAL r_gram,r_grom : uv8;
   SIGNAL r_sysram : uv16;
 
-  SIGNAL GROM : arr_uv8(0 TO 2047) := GROM_INIT; -- Character ROM
+  TYPE arr_uv10 IS ARRAY(natural RANGE <>) OF uv10;
+  SIGNAL ma : uint12; -- CPU address, or the ROM load address in boot mode
+
+  SIGNAL GROM : arr_uv8(0 TO 2047); -- Character ROM
 
   SIGNAL   gram : arr_uv8(0 TO 511) :=(OTHERS =>x"00"); -- 512 * 8bits
   SIGNAL sysram : arr_uv16(0 TO 511) :=(OTHERS =>x"0000"); -- 160h = 352 * 16bits real
   SIGNAL scram  : arr_uv8(0 TO 255) :=(OTHERS =>x"00"); -- 256 * 8bits
 
-  SIGNAL EXECROM : arr_uv10(0 TO 4095) := EXEC_INIT; -- Executive ROM, 10 bits
+  SIGNAL EXECROM : arr_uv10(0 TO 4095); -- Executive ROM, 10 bits
 
   SIGNAL ecsram : arr_uv8(0 TO 2047) := (OTHERS =>x"00"); -- 2k * 8bits
-  SIGNAL ECSROM0 : arr_uv10(0 TO 4095) := ECS0_INIT; -- ECS ROM, 3 x 4K * 10 bits
-  SIGNAL ECSROM1 : arr_uv10(0 TO 4095) := ECS1_INIT;
-  SIGNAL ECSROM2 : arr_uv10(0 TO 4095) := ECS2_INIT;
+  SIGNAL ECSROM0 : arr_uv10(0 TO 4095); -- ECS ROM, 3 x 4K * 10 bits
+  SIGNAL ECSROM1 : arr_uv10(0 TO 4095);
+  SIGNAL ECSROM2 : arr_uv10(0 TO 4095);
   SIGNAL pr_ecsrom0, pr_ecsrom1, pr_ecsrom2 : uv10;
 
 BEGIN
@@ -810,18 +821,33 @@ BEGIN
     END IF;
   END PROCESS MemScram;
 
+  -- The ROMs' CPU port is also their load port.
+  ma <= to_integer(rom_a) WHEN boot='1' ELSE padrs MOD 4096;
+
   MemGrom:PROCESS (clk) IS
   BEGIN
     IF rising_edge(clk) THEN
-      pr_grom <= GROM(padrs MOD 2048);
-      r_grom  <= GROM(a_gmem MOD 2048);
+      IF rom_we='1' AND rom_sel="001" THEN
+        GROM(ma MOD 2048) <= rom_d(7 DOWNTO 0);
+      END IF;
+      pr_grom <= GROM(ma MOD 2048);
     END IF;
   END PROCESS MemGrom;
+
+  MemGrom2:PROCESS (clk) IS
+  BEGIN
+    IF rising_edge(clk) THEN
+      r_grom  <= GROM(a_gmem MOD 2048);
+    END IF;
+  END PROCESS MemGrom2;
 
   MemExec:PROCESS (clk) IS
   BEGIN
     IF rising_edge(clk) THEN
-      pr_execrom <= EXECROM(padrs MOD 4096);
+      IF rom_we='1' AND rom_sel="000" THEN
+        EXECROM(ma) <= rom_d;
+      END IF;
+      pr_execrom <= EXECROM(ma);
     END IF;
   END PROCESS MemExec;
 
@@ -834,14 +860,35 @@ BEGIN
   END PROCESS MemEcsram;
 
   -- ECS ROM: $2000, $7000 and $E000
-  MemEcsrom:PROCESS (clk) IS
+  MemEcsrom0:PROCESS (clk) IS
   BEGIN
     IF rising_edge(clk) THEN
-      pr_ecsrom0 <= ECSROM0(padrs MOD 4096);
-      pr_ecsrom1 <= ECSROM1(padrs MOD 4096);
-      pr_ecsrom2 <= ECSROM2(padrs MOD 4096);
+      IF rom_we='1' AND rom_sel="010" THEN
+        ECSROM0(ma) <= rom_d;
+      END IF;
+      pr_ecsrom0 <= ECSROM0(ma);
     END IF;
-  END PROCESS MemEcsrom;
+  END PROCESS MemEcsrom0;
+
+  MemEcsrom1:PROCESS (clk) IS
+  BEGIN
+    IF rising_edge(clk) THEN
+      IF rom_we='1' AND rom_sel="011" THEN
+        ECSROM1(ma) <= rom_d;
+      END IF;
+      pr_ecsrom1 <= ECSROM1(ma);
+    END IF;
+  END PROCESS MemEcsrom1;
+
+  MemEcsrom2:PROCESS (clk) IS
+  BEGIN
+    IF rising_edge(clk) THEN
+      IF rom_we='1' AND rom_sel="100" THEN
+        ECSROM2(ma) <= rom_d;
+      END IF;
+      pr_ecsrom2 <= ECSROM2(ma);
+    END IF;
+  END PROCESS MemEcsrom2;
 
   pr_ecsrom <= pr_ecsrom1 WHEN padrs>=16#7000# AND padrs<=16#7FFF# ELSE
                pr_ecsrom2 WHEN padrs>=16#E000# AND padrs<=16#EFFF# ELSE

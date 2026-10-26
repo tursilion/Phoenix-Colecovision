@@ -8,8 +8,7 @@
 # runs in the docked-ise-147 Docker image.  The core file goes to
 # $(CORE_FILE); its slot number is in the name.
 #
-# The BIOS ROMs are built into the bitstream from ../../exec.bin, grom.bin,
-# ecs.bin and sp0256-012.bin (BIOS=dir to use others).
+# The Intellivision BIOS is not built in: the core loads it from the SD card.
 #
 # Outputs (in this directory):
 #   intv_phoenix_top.bit    for JTAG (iMPACT)
@@ -22,7 +21,6 @@ TOP          := intv_phoenix_top
 CORE_FILE    ?= CORE09.PHX
 CORE_NAME    := INTELLIVISION
 CORE_ISSUE   ?= 257          # 0x0101 (bin2phx takes decimal)
-BIOS         ?= ../..
 
 REPO := ../../..
 RTL  := $(REPO)/rtl
@@ -45,7 +43,6 @@ VHDL := \
   $(RTL)/peripheral/snespad/snespad.vhd \
   $(NRTL)/cv_pads.vhd \
   $(NRTL)/intv/base_pack.vhd \
-  intv_roms_pack.vhd \
   $(NRTL)/intv/cp1610_pack.vhd \
   $(NRTL)/intv/cp1610.vhd \
   $(NRTL)/intv/snd.vhd \
@@ -63,7 +60,7 @@ VERILOG := \
   $(NRTL)/cpu6502/ALU.v
 
 # Loaded with $readmemh by bare name, so they must be in the XST directory.
-MEMFILES := intv_boot.hex grom.hex
+MEMFILES := intv_boot.hex font.hex
 
 # Bitstream options for the Phoenix multiboot loader.  These reproduce the
 # configuration words of the shipped ColecoVision core (CORE01.PHX), which
@@ -96,8 +93,8 @@ all: $(CORE_FILE)
 intv_boot.hex: $(NRTL)/intv_boot.hex
 	cp $< $@
 
-intv_roms_pack.vhd grom.hex: $(BIOS)/exec.bin $(BIOS)/grom.bin $(BIOS)/ecs.bin $(BIOS)/sp0256-012.bin ../tools/mkroms.py
-	python3 ../tools/mkroms.py $(BIOS) .
+font.hex: $(NRTL)/font.hex
+	cp $< $@
 
 $(TOP).prj: Makefile
 	rm -f $@
@@ -151,7 +148,7 @@ clean:
 	rm -rf xst_tmp xst_hdp _xmsgs xlnx_auto_0_xdb *.prj *.xst *.syr *.ngc *.ngr *.lso \
 	  *.ngd *.bld *.ncd *.pcf *.map *.mrp *.ngm *.par *.pad *.unroutes *.xpi *.ptwx \
 	  *.twr *.twx *.bgn *.drc *.bit *.bin *.xml *.xrpt *.html *.csv *.txt \
-	  *_pad.* *.PHX bin2phx $(MEMFILES) intv_roms_pack.vhd $(TOP).ucf \
+	  *_pad.* *.PHX bin2phx $(MEMFILES) $(TOP).ucf \
 	  webtalk.log usage_statistics_webtalk.html
 
 .PHONY: all loader clean

@@ -10,7 +10,8 @@
 -- Developed with the help of the JZINTV emulator
 --
 -- Phoenix version (intellivision/core): from the MiSTer Intv core, release
--- 20261001.  The SP0256 ROM comes from intv_roms_pack, the debug strings
+-- 20261001.  The SP0256 ROM is written through rom_* while boot is high
+-- (the Phoenix loader reads it from the SD card), the debug strings
 -- are gone, and the variable bit slices and "WHEN rising_edge" assignments
 -- are written in a form XST takes.  The logic is unchanged.
 --------------------------------------------------------------------------------
@@ -29,7 +30,6 @@ USE ieee.numeric_std.ALL;
 
 LIBRARY work;
 USE work.base_pack.ALL;
-USE work.intv_roms_pack.ALL;
 
 ENTITY ivoice IS
   PORT (
@@ -46,6 +46,13 @@ ENTITY ivoice IS
     
     sound    : OUT sv16;
     gain     : IN  uv2; -- 00=*1 01=*2 10=*4 11=*8
+
+    --------------------------
+    -- SP0256 ROM loading, while boot='1'
+    boot     : IN  std_logic;
+    rom_we   : IN  std_logic;
+    rom_a    : IN  unsigned(10 DOWNTO 0);
+    rom_d    : IN  uv8;
     
     --------------------------    
     clksys    : IN  std_logic; --- 43MHz ... 48MHz
@@ -708,7 +715,8 @@ ARCHITECTURE rtl OF ivoice IS
     347 ,363 ,379 ,395 ,411 ,421 ,431 ,441 ,
     451 ,451 ,451 ,451 ,455 ,455 ,455 ,455 );
   
-  SIGNAL ROMVOICE : arr_uv8(0 TO 2047) := VOICE_INIT;
+  SIGNAL ROMVOICE : arr_uv8(0 TO 2047);
+  SIGNAL rom_ma : uint11;
   
   TYPE arr_uv10 IS ARRAY(natural RANGE <>) OF uv10;
   SIGNAL fifo : arr_uv10(0 TO 63);
@@ -821,7 +829,7 @@ ARCHITECTURE rtl OF ivoice IS
   SIGNAL fifoptr : uint5;
   SIGNAL romd : uv16;
   SIGNAL fifod : uv20;
-  SIGNAL rom_a : uint16;
+  SIGNAL rom_v : uint16;
   SIGNAL rom_dr : uv8;
   SIGNAL fifomode : boolean;
   
@@ -912,14 +920,18 @@ BEGIN
   fifo_rd<=fifo(fifo_lev);
   fifod<=fifo_rd & fifo_rd2;
   
-  -- Mem access
-  rom_a<=to_integer(pc(18 DOWNTO 3)) WHEN phi2='1' ELSE
+  -- Mem access (rom_a is the load address; the speech address is rom_v)
+  rom_ma<=to_integer(rom_a) WHEN boot='1' ELSE rom_v MOD 2048;
+  rom_v<=to_integer(pc(18 DOWNTO 3)) WHEN phi2='1' ELSE
          to_integer(pc(18 DOWNTO 3))+1;
   
   PROCESS(clksys) IS
   BEGIN
     IF rising_edge(clksys) THEN
-      rom_dr<=ROMVOICE(rom_a MOD 2048);
+      IF rom_we='1' THEN
+        ROMVOICE(rom_ma) <= rom_d;
+      END IF;
+      rom_dr<=ROMVOICE(rom_ma);
       istart<=CODE_INDEX(index_a);
       micro<=MICROCODE(index);
       reg_dr<=regs(reg_a);

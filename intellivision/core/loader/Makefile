@@ -1,5 +1,5 @@
 # Phoenix Intellivision boot loader.  Needs cc65 (cl65) on the PATH, or CC65_HOME set.
-# Output: intv_boot.bin (16K ROM image) and ../rtl/intv_boot.hex (for the HDL).
+# Output: intv_boot.bin (24K ROM image) and ../rtl/intv_boot.hex (for the HDL).
 
 ifdef CC65_HOME
 CL65 := $(CC65_HOME)/bin/cl65
@@ -7,7 +7,7 @@ else
 CL65 := cl65
 endif
 
-CFLAGS := -t none -Ors --cpu 6502
+CFLAGS := -t none -Oirs --cpu 6502
 SRCS   := crt0.s main.c diskio.c spi.s pff/pff.c
 
 all: ../rtl/intv_boot.hex

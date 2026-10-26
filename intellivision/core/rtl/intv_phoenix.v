@@ -18,7 +18,7 @@
 // pixel 3 HDMI pixels wide and each line 2 HDMI lines high: 570 x 480,
 // centered.
 //
-// Boot mode: at power-on a 6502 runs the menu and loader from a 16K block
+// Boot mode: at power-on a 6502 runs the menu and loader from a 24K block
 // RAM ROM, with this I/O window at $5000 (like the NES core's):
 //
 //  $5000 R  SPI received byte
@@ -27,17 +27,21 @@
 //           bit5 HDMI vertical blank
 //        W  bit0 SD select (1 = CS asserted), bit1 slow SPI clock,
 //           bit2 forward engine discards the bytes
-//  $5002 W  byte to the SRAM at the load address, which then increments
+//  $5002 W  byte to the load target at the load address, which then
+//           increments
 //  $5003 W  reset the CRC
 //  $5004 W  start the game
 //  $5005 W  bit0 error LED
 //  $5006 W  forward count, low byte
 //  $5007 W  forward count, high byte, and start: clock in that many SPI bytes
-//           (sending $FF), write each to the SRAM and add it to the CRC
+//           (sending $FF), write each to the load target and add it to the CRC
 //  $5008-$500A W  load address, bits 7:0, 15:8, 18:16
 //  $500B-$500C W  paged zone mask (intv_cart.vhd), bits 7:0, 15:8
 //  $500D W  bit0 swap the hand controllers (port 1 = right controller)
-//  $500E W  bit0 ECS, bit1 JLP for the game
+//  $500E W  bit0 ECS, bit1 JLP for the game, bit2 Intellivoice
+//  $500F W  load target: 0 SRAM, 1 EXEC, 2 GROM, 3 ECS ROM, 4 SP0256 ROM,
+//           7 nowhere (CRC only).  The ROMs take big-endian 16-bit words
+//           (EXEC, ECS) or bytes (GROM, SP0256) from load address 0.
 //  $5010 R  menu buttons: bit0 A, 1 B, 2 select, 3 start, 4 up, 5 down,
 //           6 left, 7 right
 //  $5011-$5014 R  CRC-32 (zlib) of the bytes since $5003, bits 7:0 first
@@ -45,14 +49,16 @@
 //           11 #, $FF none; also the keyboard's digits, SNES L = 1, R = 2
 //
 // Boot memory: RAM $0000-$07FF and $6000-$7FFF, text screen $4000-$43FF
-// (32 x 30 characters, 16 x 16 pixels each), ROM $C000-$FFFF (mirrored at
-// $8000).
+// (32 x 30 characters, 16 x 16 pixels each), ROM $A000-$FFFF (24K).
+//
+// The Intellivision BIOS (EXEC, GROM, ECS ROM, SP0256 ROM) is not built in:
+// the loader reads it from the SD card into the core's ROMs at power-on.
 
 `timescale 1ns / 1ps
 
 module intv_phoenix
   #( parameter BOOTROM_FILE = "intv_boot.hex"
-   , parameter FONT_FILE    = "grom.hex"
+   , parameter FONT_FILE    = "font.hex"
    )
    ( input             clk25
    , input             clk_i       // 42.857MHz
@@ -254,7 +260,7 @@ wire [7:0] kb_pad = disc(kb_joy[0], kb_joy[1], kb_joy[2], kb_joy[3]) |
 reg [7:0] ctl1 = 0, ctl2 = 0, menu_pad = 0;
 reg [7:0] menu_key = 8'hff;
 reg       ecs_on = 0;          // from clk_g, slow
-reg       ecs_g = 0, jlp_g = 0; // clk_g: the game's extensions ($500E)
+reg       ecs_g = 0, jlp_g = 0, voice_g = 0; // clk_g: the game's extensions ($500E)
 
 // ColecoVision key code (pins 4..1) to the key number for the menu
 function [7:0] cv_num(input [3:0] k);
@@ -407,6 +413,10 @@ wire [15:0] core_audio;
 reg  [15:0] paged_mask = 0;
 
 reg   [7:0] mem_rdata;
+reg         rom_we = 0;
+reg   [2:0] rom_sel;
+reg  [11:0] rom_a;
+reg   [9:0] rom_d;
 wire [15:0] dbg_ad;
 wire  [2:0] dbg_bdic;
 wire        dbg_phi;
@@ -417,6 +427,11 @@ intv_core intv
   , .reset_n    (!intv_reset)
   , .ecs        (ecs_g)
   , .jlp        (jlp_g)
+  , .ivoice     (voice_g)
+  , .rom_we     (rom_we)
+  , .rom_sel    (rom_sel)
+  , .rom_a      (rom_a)
+  , .rom_d      (rom_d)
   , .pa_i       (pa)
   , .pb_i       (pb)
   , .pa2_o      (pa2_o)
@@ -474,11 +489,11 @@ wire sel_ram0 = (cpu_a[15:11] == 5'b00000);
 wire sel_text = (cpu_a[15:10] == 6'b010000);
 wire sel_io   = (cpu_a[15:8]  == 8'h50);
 wire sel_ram6 = (cpu_a[15:13] == 3'b011);
-wire sel_rom  = cpu_a[15];
+wire sel_rom  = (cpu_a[15:13] >= 3'b101);
 
 reg [7:0] ram0 [0:2047];
 reg [7:0] ram6 [0:8191];
-reg [7:0] bootrom [0:16383];
+reg [7:0] bootrom [0:24575];
 reg [7:0] ram0_q, ram6_q, rom_q, io_q;
 reg [2:0] sel_q;
 
@@ -494,8 +509,10 @@ always @(posedge clk_g) begin
   ram6_q <= ram6[cpu_a[12:0]];
 end
 
+// $A000-$FFFF: three 8K parts
+wire [1:0] rom_part = cpu_a[14:13] - 2'd1;
 always @(posedge clk_g)
-  rom_q <= bootrom[cpu_a[13:0]];
+  rom_q <= bootrom[{rom_part, cpu_a[12:0]}];
 
 always @(posedge clk_g)
   sel_q <= sel_ram0 ? 3'd0 : sel_ram6 ? 3'd1 : sel_io ? 3'd2 : sel_rom ? 3'd3 : 3'd4;
@@ -537,6 +554,10 @@ reg        fwd_feed_wait = 0;
 reg [18:0] ld_addr = 0;
 reg  [7:0] ld_data;
 reg        ld_pend = 0;      // a byte waits for the SRAM
+reg        ld_byte = 0;      // a byte for the load target
+reg        ld_byte_d = 0;    // ... went to a ROM
+reg  [2:0] ld_target = 0;
+reg  [7:0] ld_hi;            // high byte of a ROM word
 reg        ld_done = 0;      // SRAM write finished (from the controller)
 reg [31:0] crc = 32'hffffffff;
 reg  [7:0] mask_lo;
@@ -609,7 +630,7 @@ always @(posedge clk_g) begin
     case (cpu_a[7:0])
     8'h00: begin spi_txd <= cpu_do; spi_start <= 1; end
     8'h01: begin spi_sel <= cpu_do[0]; spi_slow <= cpu_do[1]; fwd_discard <= cpu_do[2]; end
-    8'h02: begin ld_data <= cpu_do; ld_pend <= 1; end
+    8'h02: begin ld_data <= cpu_do; ld_byte <= 1; end
     8'h03: crc        <= 32'hffffffff;
     8'h04: start_game <= 1;
     8'h05: led_err    <= cpu_do[0];
@@ -621,14 +642,15 @@ always @(posedge clk_g) begin
     8'h0B: mask_lo    <= cpu_do;
     8'h0C: paged_mask <= {cpu_do, mask_lo};
     8'h0D: swap       <= cpu_do[0];
-    8'h0E: begin ecs_g <= cpu_do[0]; jlp_g <= cpu_do[1]; end
+    8'h0E: begin ecs_g <= cpu_do[0]; jlp_g <= cpu_do[1]; voice_g <= cpu_do[2]; end
+    8'h0F: ld_target <= cpu_do[2:0];
     default: ;
     endcase
   end
 
   // Forward engine: one byte at a time, each to the SRAM and the CRC.  The
   // next transfer starts once the SRAM has taken the previous byte.
-  if (fwd_active && !spi_busy && !spi_start && !fwd_feed && !fwd_feed_wait && !ld_pend) begin
+  if (fwd_active && !spi_busy && !spi_start && !fwd_feed && !fwd_feed_wait && !ld_pend && !ld_byte) begin
     if (fwd_count == 0) begin
       fwd_active <= 0;
     end else begin
@@ -641,11 +663,33 @@ always @(posedge clk_g) begin
 
   if (fwd_byte_ready && !fwd_discard) begin
     ld_data <= spi_rx;
-    ld_pend <= 1;
+    ld_byte <= 1;
     crc     <= crc32_byte(crc, spi_rx);
   end
 
-  if (ld_done)
+  // A byte for the load target: the SRAM takes it through the SRAM
+  // controller, the ROMs right away.
+  rom_we  <= 0;
+  ld_byte_d <= 0;
+  if (ld_byte) begin
+    ld_byte <= 0;
+    if (ld_target == 3'd0)
+      ld_pend <= 1;
+    else begin
+      ld_byte_d <= 1;
+      case (ld_target)
+      3'd1: begin rom_sel <= 3'd0; rom_a <= ld_addr[12:1]; rom_we <= ld_addr[0]; end
+      3'd2: begin rom_sel <= 3'd1; rom_a <= {1'b0, ld_addr[10:0]}; rom_we <= 1; end
+      3'd3: begin rom_sel <= 3'd2 + ld_addr[14:13]; rom_a <= ld_addr[12:1]; rom_we <= ld_addr[0]; end
+      3'd4: begin rom_sel <= 3'd5; rom_a <= {1'b0, ld_addr[10:0]}; rom_we <= 1; end
+      default: ;
+      endcase
+      rom_d   <= ld_addr[0] ? {ld_hi[1:0], ld_data} : {2'b00, ld_data};
+      ld_hi   <= ld_data;
+    end
+  end
+
+  if (ld_done || ld_byte_d)
     ld_addr <= ld_addr + 1;
 
   if (g_reset) begin
@@ -655,6 +699,8 @@ always @(posedge clk_g) begin
     fwd_active    <= 0;
     fwd_feed_wait <= 0;
     ld_pend       <= 0;
+    ld_byte       <= 0;
+    ld_target     <= 0;
     led_err       <= 0;
     paged_mask    <= 0;
   end
@@ -667,7 +713,7 @@ wire [31:0] crc_out = ~crc;
 always @(posedge clk_g) begin
   case (cpu_a[7:0])
   8'h00:   io_q <= spi_rx;
-  8'h01:   io_q <= {spi_busy || spi_start || fwd_active || fwd_feed || fwd_feed_wait || ld_pend,
+  8'h01:   io_q <= {spi_busy || spi_start || fwd_active || fwd_feed || fwd_feed_wait || ld_pend || ld_byte,
                     !sd_cd_n, vblank_s[2], 5'd0};
   8'h10:   io_q <= menu_g;
   8'h11:   io_q <= crc_out[7:0];
@@ -775,8 +821,8 @@ always @(posedge clk25)
   lb_q <= linebuf[{gline[2:0], gx}];
 
 // Menu text: 32 x 30 characters of 16 x 16 pixels, x 64..575.  The font
-// is the GROM's (character n is ASCII n + 32), doubled.
-reg  [7:0] font [0:2047];
+// is the Intellivision's (GROM cards 0-95, ASCII 32-127), doubled.
+reg  [7:0] font [0:1023];
 initial $readmemh(FONT_FILE, font);
 
 wire [9:0] tx = hc - 10'd64;

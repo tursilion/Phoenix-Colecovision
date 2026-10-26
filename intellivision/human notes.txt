@@ -1,0 +1,21 @@
+SD card setup: put the BIOS files in an INTV folder (the root also works). The core picks each one out by size and
+CRC, so the names don't matter. Your exec.bin, grom.bin, ecs.bin and sp0256-012.bin can go in as they are, and the
+long voice-ROM name still works.
+
++----------------------------------------------------------+
+¦            ROM            ¦ Size ¦  CRC-32  ¦ Needed for ¦
++---------------------------+------+----------+------------¦
+¦ EXEC                      ¦ 8K   ¦ CBCE86F7 ¦ everything ¦
++---------------------------+------+----------+------------¦
+¦ GROM                      ¦ 2K   ¦ 683A4158 ¦ everything ¦
++---------------------------+------+----------+------------¦
+¦ ECS                       ¦ 24K  ¦ EA790A06 ¦ ECS games  ¦
++---------------------------+------+----------+------------¦
+¦ Intellivoice (SP0256-012) ¦ 2K   ¦ 0DE7579D ¦ speech     ¦
++----------------------------------------------------------+
+
+- Other versions: a different EXEC or GROM version is still used if it's named EXEC.BIN or GROM.BIN.
+- Missing files:
+- No EXEC or GROM: starting a game shows "NO EXEC/GROM IN /INTV".
+- No ECS ROM: the ECS stays off.
+- No voice ROM: the Intellivoice is switched off.  

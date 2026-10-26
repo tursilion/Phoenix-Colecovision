@@ -17,7 +17,15 @@
 #define PH_PAGED_LO   (*(volatile unsigned char *)0x500B) /* W: paged zone mask 7:0 */
 #define PH_PAGED_HI   (*(volatile unsigned char *)0x500C) /* W: 15:8, takes effect */
 #define PH_OPTIONS    (*(volatile unsigned char *)0x500D) /* W: bit 0 swap controllers */
-#define PH_EXT        (*(volatile unsigned char *)0x500E) /* W: bit 0 ECS, bit 1 JLP */
+#define PH_EXT        (*(volatile unsigned char *)0x500E) /* W: bit 0 ECS, bit 1 JLP, bit 2 Intellivoice */
+#define PH_TARGET     (*(volatile unsigned char *)0x500F) /* W: load target, TARGET_* */
+
+#define TARGET_SRAM   0
+#define TARGET_EXEC   1
+#define TARGET_GROM   2
+#define TARGET_ECS    3
+#define TARGET_VOICE  4
+#define TARGET_NONE   7  /* CRC only */
 #define PH_BUTTONS    (*(volatile unsigned char *)0x5010) /* R: menu buttons */
 #define PH_CRC        ((volatile unsigned char *)0x5011)  /* R: CRC-32, 4 bytes, low first */
 #define PH_KEY        (*(volatile unsigned char *)0x5015) /* R: keypad key, 0-9, 10 *, 11 #, $FF */

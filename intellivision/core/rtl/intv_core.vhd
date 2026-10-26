@@ -21,6 +21,15 @@ ENTITY intv_core IS
 
     ecs        : IN  std_logic;  -- ECS (ROM, RAM, second AY-3-8914) present
     jlp        : IN  std_logic;  -- JLP registers present
+    ivoice     : IN  std_logic;  -- Intellivoice present
+
+    -- BIOS loading, while reset_n is low: rom_sel 0 EXEC, 1 GROM,
+    -- 2-4 ECS ROM ($2000, $7000, $E000), 5 SP0256; rom_a is the word
+    -- (byte for GROM and SP0256) address in that ROM.
+    rom_we     : IN  std_logic;
+    rom_sel    : IN  std_logic_vector(2 DOWNTO 0);
+    rom_a      : IN  std_logic_vector(11 DOWNTO 0);
+    rom_d      : IN  std_logic_vector(9 DOWNTO 0);
 
     -- Hand controllers as the AY-3-8914 ports read them (active low):
     -- pa = $1FE (right controller), pb = $1FF (left controller)
@@ -77,6 +86,12 @@ ARCHITECTURE struct OF intv_core IS
   SIGNAL sound_iv : sv16;
   SIGNAL jlp_dr, jlp_dw : uv16;
   SIGNAL jlp_wr : std_logic;
+  SIGNAL boot, voice_we : std_logic;
+  SIGNAL rom_sel_u : uv3;
+  SIGNAL rom_a_u : uv12;
+  SIGNAL rom_d_u : uv10;
+  SIGNAL voice_a : unsigned(10 DOWNTO 0);
+  SIGNAL voice_d : uv8;
 
   SIGNAL dr, dw, ad, cart_dr, cart_dw : uv16;
   SIGNAL snd_dr, snd_dw : uv8;
@@ -163,7 +178,7 @@ BEGIN
       pal        => '0',
       pause      => '0',
       ecs        => ecs,
-      ivoice     => '1',
+      ivoice     => ivoice,
       jlp        => jlp,
       ad         => ad,
       snd_dr     => snd_dr,
@@ -183,6 +198,11 @@ BEGIN
       cart_rd    => cart_rd,
       cart_wr    => cart_wr,
       cart_pwr   => cart_pwr,
+      boot       => boot,
+      rom_we     => rom_we,
+      rom_sel    => rom_sel_u,
+      rom_a      => rom_a_u,
+      rom_d      => rom_d_u,
       hvsync     => hvsync,
       pix_we     => pix_we,
       pix_col    => pix_col_u,
@@ -258,6 +278,10 @@ BEGIN
       divi     => 358,
       sound    => sound_iv,
       gain     => "01",
+      boot     => boot,
+      rom_we   => voice_we,
+      rom_a    => voice_a,
+      rom_d    => voice_d,
       clksys   => clk,
       reset_na => reset_n);
 
@@ -286,6 +310,14 @@ BEGIN
       audio <= std_logic_vector(shift_left(ay16_v, 3) + shift_left(iv16_v, 3));
     END IF;
   END PROCESS Mix;
+
+  boot      <= NOT reset_n;
+  rom_sel_u <= unsigned(rom_sel);
+  rom_a_u   <= unsigned(rom_a);
+  rom_d_u   <= unsigned(rom_d);
+  voice_we  <= rom_we WHEN rom_sel="101" ELSE '0';
+  voice_a   <= unsigned(rom_a(10 DOWNTO 0));
+  voice_d   <= unsigned(rom_d(7 DOWNTO 0));
 
   pa2_o <= std_logic_vector(pa2_o_u);
   pa2_u <= unsigned(pa2_i);
