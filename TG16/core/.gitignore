@@ -1,0 +1,25 @@
+# loader build
+loader/*.o
+loader/*.bin
+loader/*.map
+loader/pff/*.o
+
+# simulation
+sim/obj_dir/
+sim/gen/
+sim/out/
+sim/*.img
+sim/*.hex
+
+# trial synthesis
+xst_trial/
+
+# ISE build (everything but the Makefile and the extra constraints)
+build/*
+!build/Makefile
+!build/tg16.ucf
+
+# gate-level simulation (keep the primitive models)
+sim/obj_xst/
+sim/xstnet/*
+!sim/xstnet/cells.v

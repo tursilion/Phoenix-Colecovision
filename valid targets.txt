@@ -13,14 +13,17 @@ Otherwise the cut off is mostly RAM size.
 09 - Intellivision - working - needs ROMs
 10 - Gameboy - working for GB up to 512k and GBC up to 256k
 
+TurboGraphics - maybe - up to 446k (Splatterhouse is 512!)
+
 Future work depends on free time and community response.
 
 Lynx - probably
-TurboGraphics - maybe
 Master System - probably
 Game Gear - just a variant of Master System
 Vectrex - probably - remember to add modern banking
 Robotron and Joust Arcade - maybe
 Bubble Bobble - maybe
 
-Gauntlet 2 - no
+Gauntlet 2 - no - way too much memory, logic doesn't fit (by about 50%)
+Genesis - no - logic doesn't fit (by about 30-50% again)
+

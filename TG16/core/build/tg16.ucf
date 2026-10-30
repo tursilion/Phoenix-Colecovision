@@ -1,0 +1,13 @@
+# PC Engine core: the 25MHz and 42.78MHz domains only meet in synchronizers
+# and dual-clock block RAMs (see rtl/tg16_phoenix.v).
+NET "clk_25m0_s" TNM_NET = "GRP_25";
+NET "clk_i_s"    TNM_NET = "GRP_PCE";
+NET "clk_g_s"    TNM_NET = "GRP_PCE";
+TIMESPEC "TS_25_to_pce_ignore" = FROM "GRP_25" TO "GRP_PCE" TIG;
+TIMESPEC "TS_pce_to_25_ignore" = FROM "GRP_PCE" TO "GRP_25" TIG;
+
+# SRAM: fast edges.  One read per 23.4ns clock leaves little room.
+NET "sram_addr_o<*>" SLEW = FAST;
+NET "sram_data_io<*>" SLEW = FAST;
+NET "sram_oe_n_o"     SLEW = FAST;
+NET "sram_we_n_o"     SLEW = FAST;
