@@ -55,8 +55,9 @@
 // SD card (16 sectors, at the argument the loader gave for the
 // page) into an SRAM page that was not used lately (clock algorithm), then
 // maps it.  The loader checks that each page is in consecutive sectors.
-// The page is read as 16 single-sector reads (CMD17), each sector's CRC16
-// checked; a page with a bad sector is read again (and the LED blinks).
+// The page is read with one multi-sector read (CMD18, then CMD12), each
+// sector's CRC16 checked; a page with a bad sector is read again (and the
+// LED blinks).
 
 `timescale 1ns / 1ps
 
@@ -447,7 +448,8 @@ wire fwd_byte_ready = fwd_feed_wait && !spi_busy;
 localparam F_IDLE = 5'd0,  F_VICT = 5'd1,  F_EVICT = 5'd2, F_CMD = 5'd3,
            F_R1 = 5'd4,    F_R1C = 5'd5,   F_TOK = 5'd6,   F_TOKC = 5'd7,
            F_DATA = 5'd8,  F_DATAC = 5'd9, F_CRC = 5'd10,  F_STOP = 5'd11,
-           F_STUFF = 5'd12, F_END = 5'd17, F_MAP = 5'd18,  F_WAIT = 5'd19,
+           F_STUFF = 5'd12, F_SR1 = 5'd13, F_SR1C = 5'd14, F_BUSY = 5'd15,
+           F_BUSYC = 5'd16, F_END = 5'd17, F_MAP = 5'd18,  F_WAIT = 5'd19,
            F_ERR = 5'd20,  F_MAPW = 5'd21, F_CRCC = 5'd22;
 reg  [4:0] f_state = F_IDLE, f_next;
 reg  [8:0] f_page;
@@ -458,11 +460,12 @@ reg  [8:0] f_byte;
 reg  [2:0] f_ci;              // command byte
 reg        f_stop;            // sending CMD12 (else CMD18)
 reg [31:0] f_arg;             // the page's first sector
-reg [31:0] f_sarg;            // the sector being read
+reg [31:0] f_sarg;            // its read argument
 reg        f_bytes = 0;       // SD v1: arguments are byte offsets ($1E)
 reg [23:0] led_time = 0;      // the LED blinks for an SD error
 reg [15:0] f_crc;             // CRC16 (CCITT, 0 start) of a block's data
 reg        f_bad;             // a block of the page had a bad CRC
+reg        f_retry = 0;       // an error's CMD12 has been sent
 
 function [15:0] crc16_byte(input [15:0] c, input [7:0] d);
   integer i;
@@ -495,7 +498,8 @@ reg [23:0] lba_lo;
 always @(posedge clk_g)
   f_arg <= c_lba[f_page];
 
-wire [7:0] f_cmd_byte = f_ci == 3'd0 ? 8'h51 :              // CMD17
+wire [7:0] f_cmd_byte = f_ci == 3'd0 ? (f_stop ? 8'h4C : 8'h52) :   // CMD12, CMD18
+                        f_ci == 3'd5 ? 8'hFF : f_stop ? 8'h00 :
                         f_ci == 3'd1 ? f_sarg[31:24] : f_ci == 3'd2 ? f_sarg[23:16] :
                         f_ci == 3'd3 ? f_sarg[15:8]  : f_ci == 3'd4 ? f_sarg[7:0] : 8'hFF;
 
@@ -574,10 +578,10 @@ always @(posedge clk_g) begin
         spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_CMD;
       end
     end
-  F_CMD: begin                       // CMD17, 6 bytes
+  F_CMD: begin                       // CMD18 or CMD12, 6 bytes
       spi_txd <= f_cmd_byte; spi_start <= 1; f_state <= F_WAIT;
       f_ci <= f_ci + 1;
-      f_next <= (f_ci != 3'd5) ? F_CMD : F_R1;
+      f_next <= (f_ci != 3'd5) ? F_CMD : f_stop ? F_STUFF : F_R1;
       f_cnt <= 0;
     end
   F_R1: begin
@@ -623,21 +627,39 @@ always @(posedge clk_g) begin
       if (f_cnt == 2) begin
         f_blk   <= f_blk + 1;
         f_cnt   <= 0;
-        f_state <= F_STOP;
+        f_state <= (f_blk == 4'd15) ? F_STOP : F_TOK;
       end else
         f_state <= F_CRC;
     end
-  F_STOP: begin                      // deselect between sectors
-      f_cs <= 0;
-      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT;
-      f_next <= (f_blk == 4'd0) ? F_END : F_STUFF;   // 16 done: f_blk wrapped
+  F_STOP: begin                      // 16 sectors: CMD12
+      f_ci    <= 0;
+      f_stop  <= 1;
+      f_state <= F_CMD;
     end
-  F_STUFF: begin                     // the next sector
-      f_cs   <= 1;
-      f_ci   <= 0;
-      f_sarg <= f_sarg + (f_bytes ? 32'd512 : 32'd1);
-      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_CMD;
+  F_STUFF: begin                     // the byte after CMD12 (discarded)
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_SR1;
+      f_cnt <= 0;
     end
+  F_SR1: begin                       // CMD12's response
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_SR1C;
+      f_cnt <= f_cnt + 1;
+    end
+  F_SR1C:
+    if (spi_rx == 8'hFF && f_cnt != 16)
+      f_state <= F_SR1;
+    else begin
+      f_cnt   <= 0;
+      f_state <= F_BUSY;
+    end
+  F_BUSY: begin                      // the card is busy while it sends 0
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_BUSYC;
+      f_cnt <= f_cnt + 1;
+    end
+  F_BUSYC:
+    if (spi_rx == 8'hFF)
+      f_state <= F_END;
+    else
+      f_state <= (f_cnt == 16'hFFFF) ? F_ERR : F_BUSY;
   F_END:
     if (!ld_pend) begin
       f_cs <= 0;
@@ -656,11 +678,16 @@ always @(posedge clk_g) begin
   F_WAIT:                            // an SPI byte
     if (!spi_start && !spi_busy)
       f_state <= f_next;
-  F_ERR: begin                       // start the page again
+  F_ERR: begin                       // stop the read (CMD12), then start the page again
       led_err  <= 1;
       led_time <= 24'hFFFFFF;
-      f_cs    <= 0;
-      if (!ld_pend) begin
+      if (!f_retry) begin
+        f_retry <= 1;
+        f_bad   <= 1;
+        f_state <= F_STOP;
+      end else if (!ld_pend) begin
+        f_retry <= 0;
+        f_cs    <= 0;
         ld_addr <= {f_line, 13'd0};
         f_cnt <= 0; f_blk <= 0; f_ci <= 0; f_stop <= 0;
         spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_EVICT;
