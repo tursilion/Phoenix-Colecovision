@@ -1,0 +1,5 @@
+# Game Boy boot ROMs and game images: not distributed
+*.bin
+*.gb
+*.gbc
+*.sav

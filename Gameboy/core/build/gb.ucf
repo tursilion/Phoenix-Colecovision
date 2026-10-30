@@ -1,0 +1,7 @@
+# Game Boy core: the 25MHz and 33.75MHz domains only meet in synchronizers
+# and dual-clock block RAMs (see rtl/gb_phoenix.v).
+NET "clk_25m0_s" TNM_NET = "GRP_25";
+NET "clk_i_s"    TNM_NET = "GRP_GB";
+NET "clk_g_s"    TNM_NET = "GRP_GB";
+TIMESPEC "TS_25_to_gb_ignore" = FROM "GRP_25" TO "GRP_GB" TIG;
+TIMESPEC "TS_gb_to_25_ignore" = FROM "GRP_GB" TO "GRP_25" TIG;

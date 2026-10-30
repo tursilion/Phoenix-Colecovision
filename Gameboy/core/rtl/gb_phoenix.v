@@ -1,0 +1,849 @@
+// Phoenix glue for the Game Boy / Game Boy Color core.
+//
+// Clocks:
+//
+//  - clk25: the 640x480 HDMI pixel clock.
+//  - clk_i: 33.75MHz (25MHz x 27/20), a little faster than the Game Boy's
+//    8 x 4.194304MHz = 33.554MHz, so one Game Boy frame (154 lines of 456
+//    dots, 561792 clocks) takes a bit less than one HDMI frame.
+//  - clk_g: clk_i through a BUFGCE whose enable is run.  Everything of the
+//    Game Boy and the SRAM runs from clk_g.  At the top of each Game Boy
+//    frame the frame lock stops clk_g until the HDMI frame reaches
+//    RELEASE_LINE (59.52 instead of 59.73 frames per second).
+//
+// Picture: 160 x 144, each Game Boy pixel 10/3 HDMI pixels wide and high
+// (3, 3 or 4): 533 x 480, centered.  The HDMI side shows a line 3.33 HDMI
+// lines after the Game Boy drew it, so an 8-line buffer is enough.
+//
+// Loader mode: at power-on the Game Boy's own CPU runs the menu and loader
+// (loader/, SDCC) in CGB mode without a boot ROM.  The cartridge bus then
+// reads the loader ROM (16K block RAM) at $0000-$7FFF, and $A000-$BFFF is
+// this I/O window (address bits 7:0):
+//
+//  $00 R  SPI received byte
+//      W  SPI transfer byte
+//  $01 R  bit7 busy (SPI, forward engine or SRAM write), bit6 card present
+//      W  bit0 SD select (1 = CS asserted), bit1 slow SPI clock,
+//         bit2 forward engine discards the bytes
+//  $02 W  byte to the SRAM at the load address, which then increments
+//  $03 W  reset the CRC
+//  $04 W  start the game
+//  $05 W  bit0 error LED
+//  $06 W  forward count, low byte
+//  $07 W  forward count, high byte, and start: clock in that many SPI bytes
+//         (sending $FF), write each to the SRAM and add it to the CRC
+//  $08-$0A W  load address, bits 7:0, 15:8, 18:16; $0A bit 3 loads the
+//         cartridge RAM block RAM instead of the SRAM (bits 12:0)
+//  $0B W  mapper: 0 none, 1 MBC1, 2 MBC2, 3 MBC3, 4 MBC5
+//  $0C W  ROM bank mask, bits 7:0 (16K banks - 1)
+//  $0D W  bit0 ROM bank mask bit 8
+//  $0E W  bits 3:0 RAM bank mask (8K banks - 1), bit6 the cartridge RAM
+//         is the 8K block RAM, bit7 the cartridge has RAM
+//  $0F W  bit0 GBC hardware for the game, bit1 fast boot, bits 3:2 DMG
+//         palette (0 grey, 1 green, 2 pocket, 3 light)
+//  $10 R  keypad key held on either ColecoVision controller: 0-9, 10 *,
+//         11 #, $FF none; also the keyboard's digits, SNES L = 1, R = 2
+//  $11-$14 R  CRC-32 (zlib) of the bytes since $03 (forwarded to the SRAM,
+//         not discarded, or read from $16), bits 7:0 first
+//  $15 R  SPI received byte, and start the next transfer (sending $FF)
+//  $16 R  byte at the load address (the SRAM, or the cartridge RAM block
+//         RAM with $0A bit 3), which then increments; added to the CRC
+//  $80-$FF R/W  128 bytes that resets keep (only power-on clears them):
+//         the loader's note of the game's save file
+//
+// Memory: ROM in the SRAM from 00000, up to 512K.  Work RAM banks 0 and 1
+// (all of the original Game Boy's) in block RAM, the GBC's banks 2-7 in the
+// SRAM at 42000-47FFF.  Cartridge RAM up to 8K in block RAM, more in the
+// SRAM at 60000-7FFFF.  So a 512K ROM fills the SRAM and leaves room for
+// neither the GBC's banks 2-7 nor more than 8K of cartridge RAM: the loader
+// runs such games on original Game Boy hardware.
+
+`timescale 1ns / 1ps
+
+module gb_phoenix
+  #( parameter LOADER_FILE = "gb_loader.hex"
+   )
+   ( input             clk25
+   , input             clk_i       // 33.75MHz
+   , input             clk_g       // clk_i, stopped while run is low
+   , output reg        run         // enable of clk_g (clk_i domain)
+
+   , input             reset       // power-on or hold-reset (clk25): back to the menu
+   , input             game_reset  // reset the game (clk25)
+
+   // Controllers (clk25), 1 = pressed
+   , input       [9:0] cv1         // ColecoVision port 1 (cv_pads_ga format)
+   , input       [9:0] cv2         // ColecoVision port 2
+   , input      [11:0] snes        // 0 A 1 B 2 X 3 Y 4 start 5 select 6 L 7 R 8 up 9 down 10 left 11 right
+   , input      [15:0] kb_keys     // colecoKeyboard keys
+   , input       [4:0] kb_joy      // colecoKeyboard arrows + Z
+
+   // External SRAM.  The data bus tri-state is done at the top level.
+   , output reg [18:0] sram_addr
+   , output reg  [7:0] sram_dout
+   , input       [7:0] sram_din
+   , output reg        sram_doe
+   , output reg        sram_we_n
+   , output reg        sram_oe_n
+
+   // SD card SPI
+   , output            sd_cs_n
+   , output            sd_sclk
+   , output            sd_mosi
+   , input             sd_miso
+   , input             sd_cd_n
+
+   // 640x480 video (clk25)
+   , output reg  [7:0] vid_r
+   , output reg  [7:0] vid_g
+   , output reg  [7:0] vid_b
+   , output reg        vid_hsync_n
+   , output reg        vid_vsync_n
+   , output reg        vid_blank
+
+   // Audio (clk25), signed
+   , output reg [15:0] audio_l
+   , output reg [15:0] audio_r
+
+   , output reg        boot_mode
+   , output reg        led_err
+   );
+
+// HDMI line on which a waiting Game Boy starts its next frame: twelve
+// lines before HDMI line 0.  A Game Boy line takes 3.38 HDMI lines and is
+// shown for 3.33, so the Game Boy loses 6.5 HDMI lines over a frame; it
+// still finishes each line before the HDMI side shows it.
+localparam RELEASE_LINE = 10'd513;
+
+// ---------------------------------------------------------------------------
+// HDMI timing (clk25)
+
+reg [9:0] hc = 0, vc = 0;
+
+always @(posedge clk25) begin
+  if (hc == 10'd799) begin
+    hc <= 0;
+    vc <= (vc == 10'd524) ? 10'd0 : vc + 1;
+  end else
+    hc <= hc + 1;
+end
+
+reg release_tog = 0;
+always @(posedge clk25)
+  if (vc == RELEASE_LINE && hc == 0)
+    release_tog <= !release_tog;
+
+// ---------------------------------------------------------------------------
+// Frame lock (clk_i)
+
+reg        frame_top = 0;    // clk_g: the Game Boy is at the top of a frame
+reg  [2:0] rel_sync = 0;
+reg        waiting = 0;
+wire       rel_event = rel_sync[2] ^ rel_sync[1];
+
+initial run = 1;
+
+always @(posedge clk_i) begin
+  rel_sync <= {rel_sync[1:0], release_tog};
+  if (!waiting) begin
+    if (frame_top) begin
+      waiting <= 1;
+      run     <= 0;
+    end
+  end else if (rel_event) begin
+    waiting <= 0;
+    run     <= 1;
+  end
+end
+
+// ---------------------------------------------------------------------------
+// Resets (clk_g)
+
+reg [2:0] reset_s = 3'b111, game_reset_s = 0;
+always @(posedge clk_g) begin
+  reset_s      <= {reset_s[1:0], reset};
+  game_reset_s <= {game_reset_s[1:0], game_reset};
+end
+wire g_reset = reset_s[2];
+
+reg       start_game = 0;
+reg [7:0] gb_rst_cnt = 8'hff;
+wire      gb_reset = (gb_rst_cnt != 0);
+
+initial boot_mode = 1;
+
+always @(posedge clk_g) begin
+  if (g_reset)
+    boot_mode <= 1;
+  else if (start_game)
+    boot_mode <= 0;
+
+  if (g_reset || start_game || (game_reset_s[2] && !boot_mode))
+    gb_rst_cnt <= 8'hff;
+  else if (gb_rst_cnt != 0)
+    gb_rst_cnt <= gb_rst_cnt - 1;
+end
+
+// Clock enables (the MiSTer core's speedcontrol): ce at 4MHz, ce_n half a
+// period later, ce_2x at 8MHz for the GBC's double speed.
+reg [2:0] clkdiv = 0;
+reg       ce = 0, ce_n = 0, ce_2x = 0;
+always @(posedge clk_g) begin
+  clkdiv <= clkdiv + 1;
+  ce     <= (clkdiv == 3'd0);
+  ce_n   <= (clkdiv == 3'd4);
+  ce_2x  <= (clkdiv[1:0] == 2'd0);
+end
+
+// ---------------------------------------------------------------------------
+// Controllers
+
+// ColecoVision key codes (pins 4..1, active low)
+localparam [3:0] CV_STAR = 4'b0101, CV_HASH = 4'b1010;
+
+function [7:0] cv_pad(input [9:0] p);
+  // {start, select, B, A, down, up, left, right}: left fire A, right fire
+  // B, # start, * select
+  cv_pad = { p[9:6] == CV_HASH, p[9:6] == CV_STAR, p[5], p[4], p[1], p[0], p[2], p[3] };
+endfunction
+
+reg [7:0] joy = 0;
+reg [7:0] menu_key = 8'hff;
+
+// ColecoVision key code (pins 4..1) to the key number for the menu
+function [7:0] cv_num(input [3:0] k);
+  case (k)
+  4'b1100: cv_num = 0;  4'b0111: cv_num = 1;  4'b1011: cv_num = 2;
+  4'b0110: cv_num = 3;  4'b1000: cv_num = 4;  4'b1001: cv_num = 5;
+  4'b1110: cv_num = 6;  4'b0011: cv_num = 7;  4'b0001: cv_num = 8;
+  4'b1101: cv_num = 9;  4'b0101: cv_num = 10; 4'b1010: cv_num = 11;
+  default: cv_num = 8'hff;
+  endcase
+endfunction
+
+always @(posedge clk25) begin
+  // SNES: A A, B B, X A, Y B; keyboard: arrows, X A, Z B, Q start, W select
+  joy <= cv_pad(cv1) | cv_pad(cv2) |
+         { snes[4], snes[5], snes[1] | snes[3], snes[0] | snes[2],
+           snes[9], snes[8], snes[10], snes[11] } |
+         { kb_keys[6], kb_keys[9], kb_joy[4], kb_keys[0],
+           kb_joy[1], kb_joy[0], kb_joy[2], kb_joy[3] };
+  menu_key <= (cv1[9:6] != 4'b1111) ? cv_num(cv1[9:6]) :
+              (cv2[9:6] != 4'b1111) ? cv_num(cv2[9:6]) :
+              snes[6] ? 8'd1 : snes[7] ? 8'd2 :
+              kb_keys[10] ? 8'd0 : kb_keys[13] ? 8'd1 : kb_keys[7] ? 8'd2 :
+              kb_keys[12] ? 8'd3 : 8'hff;
+end
+
+// To clk_g: take a value once it has been the same for two clocks.
+reg [7:0] joy_m, joy_s, joy_g = 0;
+reg [7:0] mkey_m, mkey_s, mkey_g = 8'hff;
+always @(posedge clk_g) begin
+  joy_m  <= joy;      joy_s  <= joy_m;  if (joy_s == joy_m) joy_g <= joy_s;
+  mkey_m <= menu_key; mkey_s <= mkey_m; if (mkey_s == mkey_m) mkey_g <= mkey_s;
+end
+
+wire [1:0] joy_p54;
+wire [3:0] joy_dir     = ~joy_g[3:0] | {4{joy_p54[0]}};      // down, up, left, right
+wire [3:0] joy_buttons = ~joy_g[7:4] | {4{joy_p54[1]}};      // start, select, B, A
+wire [3:0] joy_din     = joy_dir & joy_buttons;
+
+// ---------------------------------------------------------------------------
+// The Game Boy
+
+reg         game_gbc = 0;      // the game's settings ($0B-$0F)
+reg         fast_boot = 0;
+reg   [1:0] dmg_pal = 0;
+reg   [2:0] mapper = 0;
+reg   [8:0] rom_mask = 0;
+reg   [3:0] ram_mask = 0;
+reg         has_ram = 0;
+reg         cram_bram = 0;     // the cartridge RAM is the 8K block RAM
+
+wire        is_gbc = boot_mode | game_gbc;
+
+wire [14:0] ext_bus_addr;
+wire        ext_bus_a15;
+wire        cart_rd, cart_wr;
+wire  [7:0] cart_di;
+reg   [7:0] cart_do;
+wire        cart_oe;
+wire        nCS;
+wire [14:0] wram_addr;
+wire        wram_we;
+wire  [7:0] wram_wdata;
+reg   [7:0] wram_q = 8'hff, cart_q = 8'hff;
+wire  [7:0] wram_data;
+wire [15:0] gb_audio_l, gb_audio_r;
+wire        lcd_clkena, lcd_on, lcd_vsync;
+wire [14:0] lcd_data;
+wire  [1:0] lcd_data_gb, lcd_mode;
+wire        speed, dma_on;
+
+gb gb
+  ( .reset        (gb_reset)
+  , .clk_sys      (clk_g)
+  , .ce           (ce)
+  , .ce_n         (ce_n)
+  , .ce_2x        (ce_2x)
+  , .isGBC        (is_gbc)
+  , .boot_rom_off (boot_mode)
+  , .fast_boot_en (fast_boot)
+  , .ext_bus_addr (ext_bus_addr)
+  , .ext_bus_a15  (ext_bus_a15)
+  , .cart_rd      (cart_rd)
+  , .cart_wr      (cart_wr)
+  , .cart_do      (cart_do)
+  , .cart_di      (cart_di)
+  , .cart_oe      (cart_oe)
+  , .nCS          (nCS)
+  , .wram_addr    (wram_addr)
+  , .wram_we      (wram_we)
+  , .wram_wdata   (wram_wdata)
+  , .wram_rdata   (wram_data)
+  , .audio_l      (gb_audio_l)
+  , .audio_r      (gb_audio_r)
+  , .lcd_clkena   (lcd_clkena)
+  , .lcd_data     (lcd_data)
+  , .lcd_data_gb  (lcd_data_gb)
+  , .lcd_mode     (lcd_mode)
+  , .lcd_on       (lcd_on)
+  , .lcd_vsync    (lcd_vsync)
+  , .joy_p54      (joy_p54)
+  , .joy_din      (joy_din)
+  , .speed        (speed)
+  , .DMA_on       (dma_on)
+  );
+
+wire ce_cpu = speed ? ce_2x : ce;
+
+// The game's cartridge
+wire [18:0] cart_sram_addr;
+wire        game_oe, cram_wr, rtc_sel, mbc2_ram, is_ram;
+
+gb_cart cart
+  ( .clk       (clk_g)
+  , .ce_cpu    (ce_cpu)
+  , .reset     (gb_reset || boot_mode)
+  , .mapper    (mapper)
+  , .rom_mask  (rom_mask)
+  , .ram_mask  (ram_mask)
+  , .has_ram   (has_ram)
+  , .addr      (ext_bus_addr)
+  , .a15       (ext_bus_a15)
+  , .cart_rd   (cart_rd)
+  , .cart_wr   (cart_wr)
+  , .cart_di   (cart_di)
+  , .nCS       (nCS)
+  , .sram_addr (cart_sram_addr)
+  , .is_ram    (is_ram)
+  , .cart_oe   (game_oe)
+  , .ram_wr    (cram_wr)
+  , .rtc_sel   (rtc_sel)
+  , .mbc2_ram  (mbc2_ram)
+  );
+
+// Loader ROM, 16K at $0000-$3FFF (mirrored at $4000)
+reg [7:0] loader_rom [0:16383];
+reg [7:0] loader_q;
+initial $readmemh(LOADER_FILE, loader_rom);
+always @(posedge clk_g)
+  loader_q <= loader_rom[ext_bus_addr[13:0]];
+
+reg [7:0] io_q;
+wire      io_sel = ext_bus_a15 && !nCS && !ext_bus_addr[14];   // $A000-$BFFF
+
+// Cartridge RAM up to 8K: written by the game, or by the loader (.SAV)
+reg  [7:0] cram_m [0:8191];
+reg  [7:0] cram_q;
+reg        cram_wr_d = 0;
+reg        ld_bram = 0;      // the loader's bytes go here ($0A bit 3)
+reg        ld_pend = 0;      // a byte waits for the SRAM
+reg  [7:0] ld_data;
+reg [18:0] ld_addr = 0;
+reg        ld_bram_done = 0;
+wire       cram_bram_we = !boot_mode && cram_bram && cram_wr && !cram_wr_d;
+wire       ld_bram_we = boot_mode && ld_bram && ld_pend && !ld_bram_done;
+wire [12:0] cram_a = boot_mode ? ld_addr[12:0] : cart_sram_addr[12:0];
+
+always @(posedge clk_g) begin
+  cram_wr_d    <= cram_wr;
+  ld_bram_done <= ld_bram_we;
+  if (cram_bram_we || ld_bram_we)
+    cram_m[cram_a] <= boot_mode ? ld_data : cart_di;
+  cram_q <= cram_m[cram_a];
+end
+
+wire [7:0] cart_data = (is_ram && cram_bram) ? cram_q : cart_q;
+
+always @* begin
+  if (boot_mode)
+    cart_do = ext_bus_a15 ? io_q : loader_q;
+  else if (rtc_sel && ext_bus_a15)
+    cart_do = 8'h00;
+  else if (mbc2_ram && ext_bus_a15)
+    cart_do = {4'hF, cart_data[3:0]};
+  else
+    cart_do = cart_data;
+end
+
+assign cart_oe = boot_mode ? (cart_rd && (!ext_bus_a15 || io_sel)) : game_oe;
+
+// ---------------------------------------------------------------------------
+// Loader I/O: SD card SPI, forward engine, SRAM loader
+
+reg        spi_sel = 0;
+reg        spi_slow = 1;
+reg        spi_busy = 0;
+reg  [7:0] spi_tx = 8'hff, spi_rx = 8'hff;
+reg  [7:0] spi_txd;
+reg  [2:0] spi_bit;
+reg  [6:0] spi_div = 0;
+reg        spi_sclk_r = 0;
+reg        spi_start = 0;
+reg [15:0] fwd_count = 0;
+reg  [7:0] fwd_lo;
+reg        fwd_active = 0;
+reg        fwd_discard = 0;
+reg        fwd_feed = 0;
+reg        fwd_feed_wait = 0;
+
+reg        ld_done = 0;      // SRAM write finished (from the controller)
+reg [31:0] crc = 32'hffffffff;
+
+assign sd_cs_n = !spi_sel;
+assign sd_sclk = spi_sclk_r;
+assign sd_mosi = spi_tx[7];
+
+// SPI half period: 2 clocks fast (8.4MHz SCLK), 64 clocks slow (264kHz).
+wire spi_tick = spi_slow ? (spi_div == 7'd63) : (spi_div[0] == 1'b1);
+
+always @(posedge clk_g) begin
+  spi_div <= spi_tick ? 7'd0 : spi_div + 1;
+
+  if (spi_start) begin
+    spi_tx     <= spi_txd;
+    spi_busy   <= 1;
+    spi_bit    <= 0;
+    spi_sclk_r <= 0;
+    spi_div    <= 0;
+  end else if (spi_busy && spi_tick) begin
+    if (!spi_sclk_r) begin                // rising edge: sample MISO
+      spi_sclk_r <= 1;
+      spi_rx     <= {spi_rx[6:0], sd_miso};
+    end else begin                        // falling edge: shift MOSI
+      spi_sclk_r <= 0;
+      spi_tx     <= {spi_tx[6:0], 1'b1};
+      spi_bit    <= spi_bit + 1;
+      if (spi_bit == 3'd7)
+        spi_busy <= 0;
+    end
+  end
+
+  if (g_reset) begin
+    spi_busy   <= 0;
+    spi_sclk_r <= 0;
+    spi_tx     <= 8'hff;
+  end
+end
+
+// CRC-32, reflected, polynomial EDB88320 (zlib)
+function [31:0] crc32_byte(input [31:0] c, input [7:0] d);
+  integer i;
+  reg [31:0] r;
+  begin
+    r = c ^ {24'd0, d};
+    for (i = 0; i < 8; i = i + 1)
+      r = r[0] ? (r >> 1) ^ 32'hEDB88320 : (r >> 1);
+    crc32_byte = r;
+  end
+endfunction
+
+// I/O accesses: one per CPU access, at its end (cart_rd or cart_wr
+// falling), with the address and data of the clock before.
+reg  cart_rd_d = 0, cart_wr_d = 0;
+reg  [7:0] io_a, io_d;
+reg        io_s;
+always @(posedge clk_g) begin
+  cart_rd_d <= cart_rd;
+  cart_wr_d <= cart_wr;
+  if (cart_rd || cart_wr) begin
+    io_a <= ext_bus_addr[7:0];
+    io_d <= cart_di;
+    io_s <= io_sel;
+  end
+end
+wire io_wr     = boot_mode && io_s && cart_wr_d && !cart_wr;
+wire io_rd     = boot_mode && io_s && cart_rd_d && !cart_rd;
+wire io_rd_end = io_rd && (io_a == 8'h15);
+wire mem_rd    = io_rd && (io_a == 8'h16);
+wire [7:0] mem_q = ld_bram ? cram_q : cart_q;   // byte at ld_addr
+
+// Kept across resets: the loader's note of the game's save file
+reg  [7:0] keep [0:127];
+integer ki;
+initial for (ki = 0; ki < 128; ki = ki + 1) keep[ki] = 8'd0;
+always @(posedge clk_g)
+  if (io_wr && io_a[7])
+    keep[io_a[6:0]] <= io_d;
+
+wire fwd_byte_ready = fwd_feed_wait && !spi_busy;
+
+always @(posedge clk_g) begin
+  spi_start  <= 0;
+  start_game <= 0;
+  fwd_feed   <= 0;
+
+  if (fwd_feed)
+    fwd_feed_wait <= 1;
+  else if (fwd_byte_ready)
+    fwd_feed_wait <= 0;
+
+  if (ld_done || ld_bram_done) begin
+    ld_pend <= 0;
+    ld_addr <= ld_addr + 1;
+  end
+  if (mem_rd) begin
+    ld_addr <= ld_addr + 1;
+    crc     <= crc32_byte(crc, mem_q);
+  end
+
+  if (io_wr) begin
+    case (io_a)
+    8'h00: begin spi_txd <= io_d; spi_start <= 1; end
+    8'h01: begin spi_sel <= io_d[0]; spi_slow <= io_d[1]; fwd_discard <= io_d[2]; end
+    8'h02: begin ld_data <= io_d; ld_pend <= 1; end
+    8'h03: crc        <= 32'hffffffff;
+    8'h04: start_game <= 1;
+    8'h05: led_err    <= io_d[0];
+    8'h06: fwd_lo     <= io_d;
+    8'h07: begin fwd_count <= {io_d, fwd_lo}; fwd_active <= 1; end
+    8'h08: ld_addr[7:0]   <= io_d;
+    8'h09: ld_addr[15:8]  <= io_d;
+    8'h0A: begin ld_addr[18:16] <= io_d[2:0]; ld_bram <= io_d[3]; end
+    8'h0B: mapper        <= io_d[2:0];
+    8'h0C: rom_mask[7:0] <= io_d;
+    8'h0D: rom_mask[8]   <= io_d[0];
+    8'h0E: begin ram_mask <= io_d[3:0]; cram_bram <= io_d[6]; has_ram <= io_d[7]; end
+    8'h0F: begin game_gbc <= io_d[0]; fast_boot <= io_d[1]; dmg_pal <= io_d[3:2]; end
+    default: ;
+    endcase
+  end
+
+  if (io_rd_end) begin
+    spi_txd   <= 8'hff;
+    spi_start <= 1;
+  end
+
+  // Forward engine: one byte at a time, each to the SRAM and the CRC.  The
+  // next transfer starts once the SRAM has taken the previous byte.
+  if (fwd_active && !spi_busy && !spi_start && !fwd_feed && !fwd_feed_wait && !ld_pend) begin
+    if (fwd_count == 0) begin
+      fwd_active <= 0;
+    end else begin
+      spi_txd   <= 8'hff;
+      spi_start <= 1;
+      fwd_feed  <= 1;
+      fwd_count <= fwd_count - 1;
+    end
+  end
+
+  if (fwd_byte_ready) begin
+    if (!fwd_discard) begin
+      crc     <= crc32_byte(crc, spi_rx);
+      ld_data <= spi_rx;
+      ld_pend <= 1;
+    end
+  end
+
+  if (g_reset) begin
+    spi_sel       <= 0;
+    spi_slow      <= 1;
+    fwd_discard   <= 0;
+    fwd_active    <= 0;
+    fwd_feed_wait <= 0;
+    ld_pend       <= 0;
+    led_err       <= 0;
+    game_gbc      <= 0;
+    fast_boot     <= 0;
+    mapper        <= 0;
+    ld_bram       <= 0;
+  end
+end
+
+wire [31:0] crc_out = ~crc;
+
+always @(posedge clk_g) begin
+  case (ext_bus_addr[7:0])
+  8'h00,
+  8'h15:   io_q <= spi_rx;
+  8'h01:   io_q <= {spi_busy || spi_start || fwd_active || fwd_feed || fwd_feed_wait || ld_pend,
+                    !sd_cd_n, 6'd0};
+  8'h10:   io_q <= mkey_g;
+  8'h11:   io_q <= crc_out[7:0];
+  8'h12:   io_q <= crc_out[15:8];
+  8'h13:   io_q <= crc_out[23:16];
+  8'h14:   io_q <= crc_out[31:24];
+  8'h16:   io_q <= mem_q;
+  default: io_q <= ext_bus_addr[7] ? keep[ext_bus_addr[6:0]] : 8'hff;
+  endcase
+end
+
+// ---------------------------------------------------------------------------
+// SRAM controller (clk_g, 29.6ns).  Reads take one clock each and alternate
+// between the cartridge and the work RAM, so each port's data follows its
+// address within a few clocks.  A write takes four clocks (address and data,
+// WE low, WE high, release the bus); the work RAM goes first, then the
+// cartridge RAM, then the loader.
+
+localparam [18:0] WRAM_BASE = 19'h40000;
+
+reg  [2:0] ws = 0;           // 0 reads, 1-3 write
+reg        rp = 0;           // port of the read being issued: 0 cartridge, 1 work RAM
+reg        rd_valid = 0, rd_port = 0;
+reg        wram_pend = 0, cram_pend = 0;
+reg [14:0] wram_wa;
+reg  [7:0] wram_wd;
+reg [18:0] cram_wa;
+reg  [7:0] cram_wd;
+reg  [1:0] w_src;            // 0 work RAM, 1 cartridge RAM, 2 loader
+
+wire [18:0] cart_rd_addr = boot_mode ? ld_addr : cart_sram_addr;   // loader: $16
+
+initial begin
+  sram_we_n = 1;
+  sram_oe_n = 0;
+  sram_doe  = 0;
+end
+
+// Work RAM banks 0 and 1: block RAM
+reg  [7:0] wram_lo [0:8191];
+reg  [7:0] wram_lo_q;
+reg        wram_lo_sel = 0;
+wire       wram_is_lo = (wram_addr[14:13] == 2'd0);
+
+always @(posedge clk_g) begin
+  if (wram_we && wram_is_lo)
+    wram_lo[wram_addr[12:0]] <= wram_wdata;
+  wram_lo_q   <= wram_lo[wram_addr[12:0]];
+  wram_lo_sel <= wram_is_lo;
+end
+
+assign wram_data = wram_lo_sel ? wram_lo_q : wram_q;
+
+always @(posedge clk_g) begin
+  ld_done   <= 0;
+
+  if (wram_we && !wram_is_lo) begin
+    wram_pend <= 1;
+    wram_wa   <= wram_addr;
+    wram_wd   <= wram_wdata;
+  end
+  if (cram_wr && !cram_wr_d && !boot_mode && !cram_bram) begin
+    cram_pend <= 1;
+    cram_wa   <= cart_sram_addr;
+    cram_wd   <= cart_di;
+  end
+
+  // Read data of the previous clock
+  if (rd_valid) begin
+    if (rd_port) wram_q <= sram_din;
+    else         cart_q <= sram_din;
+  end
+  rd_valid <= 0;
+
+  case (ws)
+  3'd0:
+    if (wram_pend || cram_pend || (ld_pend && !ld_done && !ld_bram)) begin
+      sram_doe  <= 1;
+      sram_oe_n <= 1;
+      if (wram_pend) begin
+        sram_addr <= WRAM_BASE | wram_wa;
+        sram_dout <= wram_wd;
+        w_src     <= 2'd0;
+        wram_pend <= wram_we && !wram_is_lo;   // a new write in this clock stays pending
+      end else if (cram_pend) begin
+        sram_addr <= cram_wa;
+        sram_dout <= cram_wd;
+        w_src     <= 2'd1;
+        cram_pend <= 0;
+      end else begin
+        sram_addr <= ld_addr;
+        sram_dout <= ld_data;
+        w_src     <= 2'd2;
+      end
+      ws <= 3'd1;
+    end else begin
+      sram_addr <= rp ? (WRAM_BASE | wram_addr) : cart_rd_addr;
+      rd_valid  <= 1;
+      rd_port   <= rp;
+      rp        <= !rp;
+    end
+  3'd1: begin sram_we_n <= 0; ws <= 3'd2; end
+  3'd2: begin sram_we_n <= 1; ws <= 3'd3; end
+  3'd3: begin
+      sram_doe  <= 0;
+      sram_oe_n <= 0;
+      ld_done   <= (w_src == 2'd2);
+      ws <= 3'd0;
+    end
+  default: ws <= 3'd0;
+  endcase
+
+  if (g_reset) begin
+    wram_pend <= 0;
+    cram_pend <= 0;
+  end
+end
+
+// ---------------------------------------------------------------------------
+// Line buffer: 8 lines of 256 pixels (160 used), written at clk_g, read at
+// clk25.  GBC hardware stores the 15-bit colour, DMG hardware the 2-bit
+// shade.
+
+reg  [7:0] px = 0;
+reg  [7:0] py = 0;
+reg        lcd_off_d = 1;
+wire       lcd_off = !lcd_on || (lcd_mode == 2'd1);
+wire       pix_wr = ce && lcd_clkena;
+
+reg [14:0] linebuf [0:2047];
+
+always @(posedge clk_g) begin
+  lcd_off_d <= lcd_off;
+  if (lcd_off != lcd_off_d) begin
+    px <= 0;
+    py <= 0;
+  end else if (pix_wr) begin
+    if (px == 8'd159) begin
+      px <= 0;
+      py <= py + 1;
+    end else
+      px <= px + 1;
+  end
+end
+
+always @(posedge clk_g)
+  if (pix_wr && py < 8'd144)
+    linebuf[{py[2:0], px}] <= is_gbc ? lcd_data : {13'd0, lcd_data_gb};
+
+// Frame top: the LCD's vertical sync, or with the LCD off a frame time
+// (70224 dots) and a line after the last one.
+reg [16:0] fcnt = 0;
+reg        vsync_d = 0;
+
+always @(posedge clk_g) begin
+  frame_top <= 0;
+  vsync_d   <= lcd_vsync;
+  if ((lcd_on && lcd_vsync && !vsync_d) || fcnt == 17'd70680) begin
+    frame_top <= 1;
+    fcnt      <= 0;
+  end else if (ce)
+    fcnt <= fcnt + 1;
+end
+
+// ---------------------------------------------------------------------------
+// Video (clk25)
+
+reg [2:0] gbc_s = 0, on_s = 0;
+reg [3:0] pal_s0, pal_s1;
+always @(posedge clk25) begin
+  gbc_s  <= {gbc_s[1:0], is_gbc};
+  on_s   <= {on_s[1:0], lcd_on};
+  pal_s0 <= {dmg_pal, dmg_pal};
+  pal_s1 <= pal_s0;
+end
+wire show_gbc = gbc_s[2];
+wire show_on  = on_s[2];
+
+// Game picture: x 53..585.  gx/gy step 3/10 of a Game Boy pixel per HDMI
+// pixel / line.
+reg [7:0] gx = 0, gy = 0;
+reg [3:0] hacc = 0, vacc = 0;
+wire      g_in = (hc >= 10'd53) && (hc < 10'd586) && (vc < 10'd480);
+
+always @(posedge clk25) begin
+  if (hc == 10'd52) begin
+    gx   <= 0;
+    hacc <= 0;
+  end else if (hacc >= 4'd7) begin
+    hacc <= hacc - 4'd7;
+    gx   <= gx + 1;
+  end else
+    hacc <= hacc + 4'd3;
+
+  if (hc == 10'd799) begin
+    if (vc == 10'd524) begin
+      gy   <= 0;
+      vacc <= 0;
+    end else if (vacc >= 4'd7) begin
+      vacc <= vacc - 4'd7;
+      gy   <= gy + 1;
+    end else
+      vacc <= vacc + 4'd3;
+  end
+end
+
+reg [14:0] lb_q;
+always @(posedge clk25)
+  lb_q <= linebuf[{gy[2:0], gx}];
+
+function [23:0] dmg_rgb(input [1:0] pal, input [1:0] shade);
+  case ({pal, shade})
+  // grey
+  4'b0000: dmg_rgb = 24'hFFFFFF;  4'b0001: dmg_rgb = 24'hAAAAAA;
+  4'b0010: dmg_rgb = 24'h555555;  4'b0011: dmg_rgb = 24'h000000;
+  // green (DMG)
+  4'b0100: dmg_rgb = 24'h9BBC0F;  4'b0101: dmg_rgb = 24'h8BAC0F;
+  4'b0110: dmg_rgb = 24'h306230;  4'b0111: dmg_rgb = 24'h0F380F;
+  // pocket
+  4'b1000: dmg_rgb = 24'hC4CFA1;  4'b1001: dmg_rgb = 24'h8B956D;
+  4'b1010: dmg_rgb = 24'h4D533C;  4'b1011: dmg_rgb = 24'h1F1F1F;
+  // light
+  4'b1100: dmg_rgb = 24'h00B2A0;  4'b1101: dmg_rgb = 24'h00968A;
+  4'b1110: dmg_rgb = 24'h006B60;  default: dmg_rgb = 24'h004A40;
+  endcase
+endfunction
+
+reg [2:0] g_in_d, blank_d, hs_d, vs_d;
+reg [23:0] g_rgb;
+
+always @(posedge clk25) begin
+  // stage 2: colour
+  if (!show_on)
+    g_rgb <= show_gbc ? 24'hFFFFFF : dmg_rgb(pal_s1[1:0], 2'd0);
+  else if (show_gbc)
+    g_rgb <= { lb_q[4:0], lb_q[4:2], lb_q[9:5], lb_q[9:7], lb_q[14:10], lb_q[14:12] };
+  else
+    g_rgb <= dmg_rgb(pal_s1[1:0], lb_q[1:0]);
+
+  g_in_d  <= {g_in_d[1:0], g_in};
+  blank_d <= {blank_d[1:0], !(hc < 10'd640 && vc < 10'd480)};
+  hs_d    <= {hs_d[1:0], !(hc >= 10'd656 && hc < 10'd752)};
+  vs_d    <= {vs_d[1:0], !(vc >= 10'd490 && vc < 10'd492)};
+
+  // stage 3: output
+  if (g_in_d[1])
+    {vid_r, vid_g, vid_b} <= g_rgb;
+  else
+    {vid_r, vid_g, vid_b} <= 24'h000000;
+  vid_blank   <= blank_d[1];
+  vid_hsync_n <= hs_d[1];
+  vid_vsync_n <= vs_d[1];
+end
+
+// ---------------------------------------------------------------------------
+// Audio, to clk25 once stable for two clocks.
+
+reg [31:0] snd_g = 0;
+reg [31:0] snd_m, snd_s;
+always @(posedge clk_g)
+  snd_g <= boot_mode ? 32'd0 : {gb_audio_l, gb_audio_r};
+always @(posedge clk25) begin
+  snd_m <= snd_g;
+  snd_s <= snd_m;
+  if (snd_s == snd_m)
+    {audio_l, audio_r} <= snd_s;
+end
+
+endmodule

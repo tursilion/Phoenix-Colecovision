@@ -1,0 +1,38 @@
+# loader build
+loader/*.rel
+loader/*.lst
+loader/*.sym
+loader/*.asm
+loader/*.ihx
+loader/*.map
+loader/*.noi
+loader/*.lk
+loader/*.bin
+loader/pff/*.rel
+loader/pff/*.lst
+loader/pff/*.sym
+loader/pff/*.asm
+
+# simulation
+sim/obj_dir/
+sim/gen/
+sim/out/
+sim/*.img
+sim/*.hex
+
+# ISE build (everything but the Makefile and the extra constraints)
+build/*
+!build/Makefile
+!build/gb.ucf
+
+# simulation test cartridges
+sim/tests/*.rel
+sim/tests/*.lst
+sim/tests/*.sym
+sim/tests/*.asm
+sim/tests/*.ihx
+sim/tests/*.map
+sim/tests/*.noi
+sim/tests/*.lk
+sim/tests/*.bin
+sim/tests/*.GB
