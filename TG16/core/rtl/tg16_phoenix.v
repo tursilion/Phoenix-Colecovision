@@ -38,9 +38,25 @@
 //  $10 R  keypad key held on either ColecoVision controller: 0-9, 10 *,
 //         11 #, $FF none; also the keyboard's digits, SNES L = 1, R = 2
 //  $15 R  SPI received byte, and start the next transfer (sending $FF)
+//  $18 W  ROM page (8K) for $1A-$1D, bits 7:0
+//  $19 W  bit0: its bit 8
+//  $1A-$1D W  the SD read argument of that page's first sector (block
+//         number, or byte offset on an SD v1 card), bits 7:0 first; $1D
+//         writes it to the page table
+//  $1E W  bit0: the card takes byte offsets (SD v1), not block numbers
 //
-// SRAM: the ROM from 00000, up to 448K; the VDC's 64K of video RAM at
-// 70000-7FFFF (word w at 70000 + 2w, low byte first).
+// SRAM: 56 8K pages of ROM from 00000 (448K); the VDC's 64K of video RAM
+// at 70000-7FFFF (word w at 70000 + 2w, low byte first).
+//
+// ROM cache: the ROM can be up to 4M.  A table maps each 8K ROM page to
+// its SRAM page, if it has one.  The game starts with ROM pages 0-55 in
+// SRAM pages 0-55 (a ROM up to 448K is all there).  When the CPU reads a
+// page that is not there, it waits while the cache reads the page from the
+// SD card (16 sectors, at the argument the loader gave for the
+// page) into an SRAM page that was not used lately (clock algorithm), then
+// maps it.  The loader checks that each page is in consecutive sectors.
+// The page is read as 16 single-sector reads (CMD17), each sector's CRC16
+// checked; a page with a bad sector is read again (and the LED blinks).
 
 `timescale 1ns / 1ps
 
@@ -91,6 +107,7 @@ module tg16_phoenix
 
    , output reg        boot_mode
    , output reg        led_err
+   , output     [31:0] dbg         // simulation: the ROM cache's state
    );
 
 // HDMI line on which a waiting PC Engine starts its next frame.  Its line
@@ -153,7 +170,8 @@ wire g_reset = reset_s[2];
 
 reg       start_game = 0;
 reg [7:0] pce_rst_cnt = 8'hff;
-wire      pce_reset = (pce_rst_cnt != 0);
+reg       c_init = 0;           // the cache table is being set up
+wire      pce_reset = (pce_rst_cnt != 0) || c_init;
 
 initial boot_mode = 1;
 
@@ -330,10 +348,21 @@ always @(posedge clk_g)
 
 // The game's ROM byte, from the SRAM controller
 reg  [7:0] rom_q = 8'hff;
-reg [18:0] rom_q_a = 0;
+reg [21:0] rom_q_a = 0;
 reg        rom_q_ok = 0;
 reg        rom_want;
-wire       rom_hit = rom_q_ok && (rom_q_a == rom_a[18:0]);
+wire       rom_hit = rom_q_ok && (rom_q_a == rom_a);
+
+// ROM cache tables (see the top).  c_map: ROM page -> {in SRAM, SRAM page}.
+reg  [6:0] c_map [0:511];
+reg  [8:0] c_rev [0:63];        // SRAM page -> ROM page (56 used)
+reg [55:0] c_ref = 0;           // SRAM page used since the clock hand passed
+reg [31:0] c_lba [0:511];       // ROM page -> SD argument
+wire [8:0] c_page  = rom_a[21:13];
+wire [6:0] c_map_q = c_map[c_page];
+wire       c_hit   = c_map_q[6];
+wire [5:0] c_line  = c_map_q[5:0];
+wire [9:0] c_pages = (rom_size + 12'd7) >> 3;
 
 function [7:0] bitrev(input [7:0] b);
   bitrev = {b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]};
@@ -366,12 +395,17 @@ reg  [7:0] ld_data;
 reg [18:0] ld_addr = 0;
 reg        ld_done = 0;      // SRAM write finished (from the controller)
 
-assign sd_cs_n = !spi_sel;
+reg        f_cs = 0;         // the cache's SD select
+
+assign sd_cs_n = !(boot_mode ? spi_sel : f_cs);
 assign sd_sclk = spi_sclk_r;
 assign sd_mosi = spi_tx[7];
 
 // SPI half period: 2 clocks fast (10.7MHz SCLK), 80 clocks slow (267kHz).
-wire spi_tick = spi_slow ? (spi_div == 7'd79) : (spi_div[0] == 1'b1);
+// (21.4MHz read wrong sectors on the Phoenix: commands have no CRC.)
+// MISO is taken at the end of SCLK's high half: the card changes it only
+// after SCLK falls, so it has had the low half and the high half to settle.
+wire spi_tick = (spi_slow && boot_mode) ? (spi_div == 7'd79) : (spi_div[0] == 1'b1);
 
 always @(posedge clk_g) begin
   spi_div <= spi_tick ? 7'd0 : spi_div + 1;
@@ -383,11 +417,11 @@ always @(posedge clk_g) begin
     spi_sclk_r <= 0;
     spi_div    <= 0;
   end else if (spi_busy && spi_tick) begin
-    if (!spi_sclk_r) begin                // rising edge: sample MISO
+    if (!spi_sclk_r) begin                // rising edge
       spi_sclk_r <= 1;
-      spi_rx     <= {spi_rx[6:0], sd_miso};
-    end else begin                        // falling edge: shift MOSI
+    end else begin                        // falling edge: sample MISO, shift MOSI
       spi_sclk_r <= 0;
+      spi_rx     <= {spi_rx[6:0], sd_miso};
       spi_tx     <= {spi_tx[6:0], 1'b1};
       spi_bit    <= spi_bit + 1;
       if (spi_bit == 3'd7)
@@ -409,10 +443,231 @@ wire io_rd_next = io_rd && (ext_a[7:0] == 8'h15);
 
 wire fwd_byte_ready = fwd_feed_wait && !spi_busy;
 
+// The cache's page reader
+localparam F_IDLE = 5'd0,  F_VICT = 5'd1,  F_EVICT = 5'd2, F_CMD = 5'd3,
+           F_R1 = 5'd4,    F_R1C = 5'd5,   F_TOK = 5'd6,   F_TOKC = 5'd7,
+           F_DATA = 5'd8,  F_DATAC = 5'd9, F_CRC = 5'd10,  F_STOP = 5'd11,
+           F_STUFF = 5'd12, F_END = 5'd17, F_MAP = 5'd18,  F_WAIT = 5'd19,
+           F_ERR = 5'd20,  F_MAPW = 5'd21, F_CRCC = 5'd22;
+reg  [4:0] f_state = F_IDLE, f_next;
+reg  [8:0] f_page;
+reg  [5:0] f_line, f_hand = 0;
+reg [15:0] f_cnt;
+reg  [3:0] f_blk;
+reg  [8:0] f_byte;
+reg  [2:0] f_ci;              // command byte
+reg        f_stop;            // sending CMD12 (else CMD18)
+reg [31:0] f_arg;             // the page's first sector
+reg [31:0] f_sarg;            // the sector being read
+reg        f_bytes = 0;       // SD v1: arguments are byte offsets ($1E)
+reg [23:0] led_time = 0;      // the LED blinks for an SD error
+reg [15:0] f_crc;             // CRC16 (CCITT, 0 start) of a block's data
+reg        f_bad;             // a block of the page had a bad CRC
+
+function [15:0] crc16_byte(input [15:0] c, input [7:0] d);
+  integer i;
+  reg [15:0] r;
+  begin
+    r = c ^ {d, 8'd0};
+    for (i = 0; i < 8; i = i + 1)
+      r = r[15] ? (r << 1) ^ 16'h1021 : (r << 1);
+    crc16_byte = r;
+  end
+endfunction
+reg  [9:0] c_init_i;
+reg        cm_we = 0;         // the one write port of c_map (LUT RAM)
+reg  [8:0] cm_a;
+reg  [6:0] cm_d;
+reg        cr_we = 0;         // and of c_rev (XST drops one of two)
+reg  [5:0] cr_a;
+reg  [8:0] cr_d;
+
+always @(posedge clk_g) begin
+  if (cm_we)
+    c_map[cm_a] <= cm_d;
+  if (cr_we)
+    c_rev[cr_a] <= cr_d;
+end
+reg  [7:0] lba_page_lo;
+reg        lba_page_hi;
+reg [23:0] lba_lo;
+
+always @(posedge clk_g)
+  f_arg <= c_lba[f_page];
+
+wire [7:0] f_cmd_byte = f_ci == 3'd0 ? 8'h51 :              // CMD17
+                        f_ci == 3'd1 ? f_sarg[31:24] : f_ci == 3'd2 ? f_sarg[23:16] :
+                        f_ci == 3'd3 ? f_sarg[15:8]  : f_ci == 3'd4 ? f_sarg[7:0] : 8'hFF;
+
 always @(posedge clk_g) begin
   spi_start  <= 0;
   start_game <= 0;
   fwd_feed   <= 0;
+
+  // The cache's error blink (0.4s)
+  if (!boot_mode && led_time != 0) begin
+    led_time <= led_time - 1;
+    if (led_time == 1)
+      led_err <= 0;
+  end
+
+  // Cache table writes: set-up at the start of a game, and the reader's
+  cm_we <= 0;
+  cr_we <= 0;
+  if (start_game) begin
+    c_init   <= 1;
+    c_init_i <= 0;
+  end else if (c_init) begin
+    cm_we <= 1;
+    cm_a  <= c_init_i[8:0];
+    cm_d  <= (c_init_i < 10'd56) ? {1'b1, c_init_i[5:0]} : 7'd0;
+    cr_we <= (c_init_i < 10'd56);
+    cr_a  <= c_init_i[5:0];
+    cr_d  <= c_init_i[8:0];
+    c_ref    <= 0;
+    f_hand   <= 0;
+    c_init_i <= c_init_i + 1;
+    if (c_init_i == 10'd511)
+      c_init <= 0;
+  end
+
+  // The CPU's ROM reads mark their SRAM page used
+  if (!boot_mode && rom_rd && c_hit && !c_init)
+    c_ref[c_line] <= 1;
+
+  if (boot_mode || c_init) begin
+    f_state <= F_IDLE;
+    f_cs    <= 0;
+  end else case (f_state)
+  F_IDLE:
+    if (rom_rd && !c_hit) begin
+      f_page  <= c_page;
+      f_state <= F_VICT;
+    end
+  F_VICT:                            // clock hand: the first page not used lately
+    if (c_ref[f_hand]) begin
+      c_ref[f_hand] <= 0;
+      f_hand <= (f_hand == 6'd55) ? 6'd0 : f_hand + 1;
+    end else begin
+      f_line  <= f_hand;
+      f_hand  <= (f_hand == 6'd55) ? 6'd0 : f_hand + 1;
+      f_state <= F_EVICT;
+    end
+  F_EVICT: begin
+      cm_we <= 1;                    // unmap the page it had
+      cm_a  <= c_rev[f_line];
+      cm_d  <= 7'd0;
+      cr_we <= 1;
+      cr_a  <= f_line;
+      cr_d  <= f_page;
+      ld_addr <= {f_line, 13'd0};
+      f_cnt   <= 0;
+      f_blk   <= 0;
+      f_ci    <= 0;
+      f_stop  <= 0;
+      f_bad   <= 0;
+      f_sarg  <= f_arg;
+      if (f_page >= c_pages[8:0] && c_pages < 10'd512)
+        f_state <= F_MAP;              // past the end of the ROM: nothing to read
+      else begin
+        f_cs    <= 1;
+        spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_CMD;
+      end
+    end
+  F_CMD: begin                       // CMD17, 6 bytes
+      spi_txd <= f_cmd_byte; spi_start <= 1; f_state <= F_WAIT;
+      f_ci <= f_ci + 1;
+      f_next <= (f_ci != 3'd5) ? F_CMD : F_R1;
+      f_cnt <= 0;
+    end
+  F_R1: begin
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_R1C;
+      f_cnt <= f_cnt + 1;
+    end
+  F_R1C:
+    if (spi_rx == 8'hFF)
+      f_state <= (f_cnt == 16) ? F_ERR : F_R1;
+    else
+      f_state <= (spi_rx == 8'h00) ? F_TOK : F_ERR;
+  F_TOK: begin
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_TOKC;
+      f_cnt <= f_cnt + 1;
+    end
+  F_TOKC:
+    if (spi_rx == 8'hFE) begin
+      f_byte  <= 0;
+      f_crc   <= 0;
+      f_state <= F_DATA;
+    end else
+      f_state <= (spi_rx != 8'hFF || f_cnt == 16'hFFFF) ? F_ERR : F_TOK;
+  F_DATA:
+    if (!ld_pend) begin
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_DATAC;
+    end
+  F_DATAC: if (!ld_pend) begin       // (the SRAM has the last byte)
+      ld_data <= spi_rx;
+      ld_pend <= 1;
+      f_crc   <= crc16_byte(f_crc, spi_rx);
+      f_byte  <= f_byte + 1;
+      f_cnt   <= 0;
+      f_state <= (f_byte == 9'd511) ? F_CRC : F_DATA;
+    end
+  F_CRC: begin                       // two CRC bytes (checked in F_CRCC)
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT;
+      f_cnt <= f_cnt + 1;
+      f_next <= F_CRCC;
+    end
+  F_CRCC: begin                      // the CRC byte just read
+      if (spi_rx != (f_cnt == 1 ? f_crc[15:8] : f_crc[7:0]))
+        f_bad <= 1;
+      if (f_cnt == 2) begin
+        f_blk   <= f_blk + 1;
+        f_cnt   <= 0;
+        f_state <= F_STOP;
+      end else
+        f_state <= F_CRC;
+    end
+  F_STOP: begin                      // deselect between sectors
+      f_cs <= 0;
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT;
+      f_next <= (f_blk == 4'd0) ? F_END : F_STUFF;   // 16 done: f_blk wrapped
+    end
+  F_STUFF: begin                     // the next sector
+      f_cs   <= 1;
+      f_ci   <= 0;
+      f_sarg <= f_sarg + (f_bytes ? 32'd512 : 32'd1);
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_CMD;
+    end
+  F_END:
+    if (!ld_pend) begin
+      f_cs <= 0;
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT;
+      f_next  <= f_bad ? F_ERR : F_MAP;    // a bad block: read the page again
+    end
+  F_MAP: begin
+      cm_we <= 1;
+      cm_a  <= f_page;
+      cm_d  <= {1'b1, f_line};
+      c_ref[f_line] <= 1;
+      f_state <= F_MAPW;
+    end
+  F_MAPW:                            // the table write lands
+    f_state <= F_IDLE;
+  F_WAIT:                            // an SPI byte
+    if (!spi_start && !spi_busy)
+      f_state <= f_next;
+  F_ERR: begin                       // start the page again
+      led_err  <= 1;
+      led_time <= 24'hFFFFFF;
+      f_cs    <= 0;
+      if (!ld_pend) begin
+        ld_addr <= {f_line, 13'd0};
+        f_cnt <= 0; f_blk <= 0; f_ci <= 0; f_stop <= 0;
+        spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_EVICT;
+      end
+    end
+  default: f_state <= F_IDLE;
+  endcase
 
   if (fwd_feed)
     fwd_feed_wait <= 1;
@@ -439,6 +694,13 @@ always @(posedge clk_g) begin
     8'h0B: rom_size[7:0]  <= ext_do;
     8'h0C: rom_size[11:8] <= ext_do[3:0];
     8'h0D: rom_swap       <= ext_do[0];
+    8'h18: lba_page_lo    <= ext_do;
+    8'h19: lba_page_hi    <= ext_do[0];
+    8'h1A: lba_lo[7:0]    <= ext_do;
+    8'h1B: lba_lo[15:8]   <= ext_do;
+    8'h1C: lba_lo[23:16]  <= ext_do;
+    8'h1D: c_lba[{lba_page_hi, lba_page_lo}] <= {ext_do, lba_lo};
+    8'h1E: f_bytes        <= ext_do[0];
     default: ;
     endcase
   end
@@ -542,16 +804,16 @@ reg        wr2 = 0;              // the current clock is a write's second
 reg        wr_ld = 0;            // the write is the loader's
 reg  [7:0] vlo;
 reg [14:0] vr_a;                 // the VDC word being read
-reg [18:0] rom_iss_a;            // the ROM byte being read
+reg [21:0] rom_iss_a;            // the ROM byte being read (CPU address)
 reg        rom_pend = 0;
 
 wire       vdc_wr_now = vram_we && !vram_a[15];
 
 // A VDC write still has a byte to write after this clock (not when this
-// clock ends its high byte), and the loader has a byte to write (only in
-// loader mode, and not again in the clock its last write ends).
+// clock ends its high byte), and the loader or the cache has a byte to
+// write (not again in the clock its last write ends).
 wire       vx_next = vx_act && !(wr2 && !wr_ld && vx_hi);
-wire       ld_ok   = boot_mode && ld_pend && !ld_done && !wr2;
+wire       ld_ok   = ld_pend && !ld_done && !wr2;
 
 // The VDC's word: in the clock after its high byte's, else kept.  A word
 // being written, or waiting to be, gives its new data.
@@ -567,9 +829,11 @@ always @* begin
     vram_di = vram_q;
 end
 
-// The CPU wants a ROM byte that it has not got
+assign dbg = {f_state, f_blk, f_byte, ld_pend, c_hit, rom_rd, f_cs, c_page};   // 5+4+9+4+9
+
+// The CPU wants a ROM byte that it has not got, from a page in the SRAM
 always @*
-  rom_want = !boot_mode && rom_rd && !rom_hit && !rom_pend;
+  rom_want = !boot_mode && !c_init && rom_rd && !rom_hit && !rom_pend && c_hit;
 
 always @(posedge clk_g) begin
   ph      <= ph_n;
@@ -637,8 +901,8 @@ always @(posedge clk_g) begin
         wr_ld     <= 1;
       end
     end else if (rom_want && !wr2) begin   // not right after a write: bus turnaround
-      sa_r      <= rom_a[18:0];
-      rom_iss_a <= rom_a[18:0];
+      sa_r      <= {c_line, rom_a[12:0]};
+      rom_iss_a <= rom_a;
       rom_q_ok  <= 0;
       rom_pend  <= 1;
       bus       <= BUS_ROM;
@@ -646,6 +910,9 @@ always @(posedge clk_g) begin
   end else begin
     wr2 <= 1;                    // keep address and data for the second clock
   end
+
+  if (c_init)
+    rom_q_ok <= 0;              // a new game: nothing read yet
 
   if (g_reset) begin
     vw_pend  <= 0;

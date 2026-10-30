@@ -23,3 +23,7 @@ build/*
 sim/obj_xst/
 sim/xstnet/*
 !sim/xstnet/cells.v
+sim/tests/cachetest/*.o
+sim/tests/cachetest/bank0.bin
+sim/tests/cachetest/cache.map
+sim/tests/cachetest/CACHETST.PCE

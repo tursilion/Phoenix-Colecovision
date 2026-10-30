@@ -45,7 +45,10 @@ struct SdCard {
     bool idle = true, app = false;
     int acmd41_count = 0;
     int miso = 1;
-    long reads = 0, writes = 0;
+    long reads = 0, writes = 0, multi = 0;
+    // CMD18: streaming sectors from mblk until CMD12
+    bool streaming = false;
+    size_t mblk = 0;
     // CMD24: 0 none, 1 waiting for the data token, 2 receiving
     int wstate = 0;
     size_t wbase = 0;
@@ -91,12 +94,32 @@ struct SdCard {
             out.push_back(0xFF);
             out.push_back(0xFE);
             size_t base = (size_t)arg * 512;
-            for (int i = 0; i < 512; ++i)
-                out.push_back(base + i < img.size() ? img[base + i] : 0);
-            out.push_back(0x12);
-            out.push_back(0x34);
+            uint16_t crc = 0;
+            for (int i = 0; i < 512; ++i) {
+                uint8_t d = base + i < img.size() ? img[base + i] : 0;
+                out.push_back(d);
+                crc ^= d << 8;
+                for (int k = 0; k < 8; ++k)
+                    crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
+            }
+            out.push_back(crc >> 8);
+            out.push_back(crc & 0xFF);
             break;
         }
+        case 18:
+            ++multi;
+            out.push_back(0x00);
+            streaming = true;
+            mblk = arg;
+            break;
+        case 12:
+            streaming = false;
+            out.clear();
+            out.push_back(0xFF);                    // stuff byte
+            out.push_back(0x00);                    // R1
+            out.push_back(0x00);                    // busy
+            out.push_back(0x00);
+            break;
         case 24:
             out.push_back(0x00);
             wstate = 1;
@@ -135,10 +158,31 @@ struct SdCard {
         }
     }
 
+    // The next sector of a CMD18, when the card has sent the last.
+    void stream() {
+        if (!streaming || out.size() > 2) return;
+        out.push_back(0xFF);
+        out.push_back(0xFE);
+        size_t base = mblk * 512;
+        uint16_t crc = 0;
+        for (int i = 0; i < 512; ++i) {
+            uint8_t b = base + i < img.size() ? img[base + i] : 0;
+            out.push_back(b);
+            crc ^= b << 8;
+            for (int k = 0; k < 8; ++k)
+                crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
+        }
+        out.push_back(crc >> 8);
+        out.push_back(crc & 0xFF);
+        ++mblk;
+        ++reads;
+    }
+
     // Called once per clock with the current pins.
     void step(bool cs_n, bool sclk, bool mosi) {
+        stream();
         if (cs_n) {
-            if (!last_cs_n) { bit = 0; cmd.clear(); wstate = 0; }
+            if (!last_cs_n) { bit = 0; cmd.clear(); wstate = 0; streaming = false; }
             miso = 1;
         } else {
             if (last_cs_n) {                        // selected: load first byte
@@ -290,12 +334,14 @@ int main(int argc, char **argv)
         // SRAM: asynchronous
         if (!top->sram_we_n && top->sram_doe) {
             sram[top->sram_addr] = top->sram_dout;
-            // A game writes only the video RAM (70000-7FFFF)
-            static long stray = 0;
+            // In a game only the ROM cache writes below the video RAM, a page
+            // (8K) at a time from its start
+            static long below = 0;
             static int last_a = -1;
             if (!top->boot_mode && top->sram_addr < 0x70000 && (int)top->sram_addr != last_a) {
-                if (++stray <= 5 || stray % 10000 == 0)
-                    printf("stray SRAM write %ld: %05x = %02x at frame %d\n", stray, top->sram_addr, top->sram_dout, frame);
+                ++below;
+                if ((top->sram_addr & 0x1FFF) == 0)
+                    printf("cache fill: SRAM page %d at frame %d\n", top->sram_addr >> 13, frame);
             }
             last_a = top->sram_addr;
         }
@@ -364,6 +410,11 @@ int main(int argc, char **argv)
                        r->tg16_phoenix__DOT__vcnt, r->tg16_phoenix__DOT__hcnt, top->run, sd.reads,
                        r->tg16_phoenix__DOT__video_r, r->tg16_phoenix__DOT__video_g, r->tg16_phoenix__DOT__video_b,
                        r->tg16_phoenix__DOT__ph, r->tg16_phoenix__DOT__vram_a, r->tg16_phoenix__DOT__vram_q);
+                printf("   cache: f_state=%d f_page=%d f_line=%d f_blk=%d f_byte=%d f_cnt=%d ld_pend=%d c_init=%d rom_rd=%d rom_a=%06x led=%d\n",
+                       r->tg16_phoenix__DOT__f_state, r->tg16_phoenix__DOT__f_page, r->tg16_phoenix__DOT__f_line,
+                       r->tg16_phoenix__DOT__f_blk, r->tg16_phoenix__DOT__f_byte, r->tg16_phoenix__DOT__f_cnt,
+                       r->tg16_phoenix__DOT__ld_pend, r->tg16_phoenix__DOT__c_init, r->tg16_phoenix__DOT__rom_rd,
+                       r->tg16_phoenix__DOT__rom_a, top->led_err);
                 auto &R = r->tg16_phoenix__DOT__pce__DOT__vdc0__DOT__regs;
                 printf("   pc=%04x vdc:", r->tg16_phoenix__DOT__pce__DOT__cpu__DOT__core__DOT__pc);
                 for (int k = 0; k < 20; ++k) printf(" %04x", (R[k / 2] >> ((k & 1) * 16)) & 0xFFFF);
@@ -371,6 +422,12 @@ int main(int argc, char **argv)
                        r->tg16_phoenix__DOT__pce__DOT__vdc0__DOT__vdisp, r->tg16_phoenix__DOT__pce__DOT__vce__DOT__cr);
             }
 #endif
+            if (getenv("TB_CACHE") && frame >= atoi(getenv("TB_CACHE"))) {
+                uint32_t d = top->dbg;
+                printf("f%d cache: state=%d blk=%d byte=%d ld_pend=%d hit=%d rom_rd=%d cs=%d page=%d\n", frame,
+                       d >> 27, (d >> 23) & 15, (d >> 14) & 511, (d >> 13) & 1, (d >> 12) & 1, (d >> 11) & 1,
+                       (d >> 10) & 1, d & 511);
+            }
             int pad = 0;
             for (auto &p : pad_script)
                 if (frame >= p.first) pad = p.second;
@@ -386,7 +443,7 @@ int main(int argc, char **argv)
         last_vsync_n = top->vid_vsync_n;
     }
 
-    printf("%d frames, %ld clocks, boot_mode=%d, %ld SD writes\n", frame, clocks, top->boot_mode, sd.writes);
+    printf("%d frames, %ld clocks, boot_mode=%d, %ld SD writes, %ld multi-block reads\n", frame, clocks, top->boot_mode, sd.writes, sd.multi);
     if (sd_out) {
         FILE *f = fopen(sd_out, "wb");
         fwrite(sd.img.data(), 1, sd.img.size(), f);

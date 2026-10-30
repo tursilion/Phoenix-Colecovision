@@ -23,6 +23,10 @@
 #define PH_SWAP       IO(0x0D)  /* W: bit 0 the ROM's bits are reversed */
 #define PH_KEY        IO(0x10)  /* R: keypad key, 0-9, 10 *, 11 #, $FF */
 #define PH_SPI_NEXT   IO(0x15)  /* R: received byte, starts the next transfer */
+#define PH_PAGE_LO    IO(0x18)  /* W: ROM page (8K) for PH_ARG, 7:0 */
+#define PH_PAGE_HI    IO(0x19)  /* W: bit 0: bit 8 */
+#define PH_ARG        ((volatile unsigned char *)0x181A)  /* W: its SD read argument, low first; the 4th byte sets it */
+#define PH_BYTES      IO(0x1E)  /* W: bit 0: the card takes byte offsets (SD v1) */
 
 /* PH_CTRL write bits */
 #define PH_CTRL_SELECT   0x01  /* SD card selected */
@@ -33,7 +37,9 @@
 #define PH_STAT_BUSY     0x80  /* SPI, forward transfer or SRAM write in progress */
 #define PH_STAT_CARD     0x40  /* card present */
 
-#define ROM_MAX   0x70000UL    /* 448K: the video RAM is above */
+#define ROM_SRAM  0x70000UL    /* 448K in the SRAM: the video RAM is above */
+#define ROM_MAX   0x400000UL   /* 4M, through the ROM cache */
+#define PAGE      0x2000UL     /* cache page */
 
 /* PC Engine registers */
 #define REG(a) (*(volatile unsigned char *)(a))

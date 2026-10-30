@@ -5,8 +5,11 @@
  * sorted by name.  The selected image goes to the SRAM and the game
  * starts.
  *
- * Images: up to 448K (the video RAM has the rest of the SRAM), with or
- * without a 512-byte copier header.  Images whose bits are reversed (some
+ * Images: up to 4M, with or without a 512-byte copier header.  The first
+ * 448K go to the SRAM (the video RAM has the rest); bigger images run
+ * through the core's ROM cache, which reads 8K pages from the card when
+ * the game needs them, so the loader gives it each page's first sector
+ * and checks that each page's sectors follow each other on the card.  Images whose bits are reversed (some
  * US TurboGrafx-16 dumps) are found by their reset vector and played
  * reversed back.
  *
@@ -57,6 +60,7 @@ static WORD count;
 #define ERR_READ        4
 #define ERR_TOO_BIG     5
 #define ERR_EMPTY       6
+#define ERR_FRAGMENTED  7
 
 static const char *const errors[] = {
     "",
@@ -64,8 +68,9 @@ static const char *const errors[] = {
     "CANNOT READ THE SD CARD",
     "CANNOT READ THE FOLDER",
     "READ ERROR",
-    "TOO BIG (MAX 448K)",
+    "TOO BIG (MAX 4M)",
     "EMPTY FILE",
+    "FILE FRAGMENTED: COPY IT AGAIN",
 };
 
 static const char help[] = "I:OPEN  II:BACK";
@@ -439,13 +444,66 @@ static BYTE bitrev(BYTE b)
     return r;
 }
 
+BYTE disk_block_addr(void);
+
+/* Sector of the file at offset ofs (a sector start), or 0 */
+static DWORD sector_at(DWORD ofs)
+{
+    if (pf_lseek(ofs + 1) != FR_OK)    /* + 1: at a cluster start lseek stays in the last */
+        return 0;
+    return fs.dsect;
+}
+
+/* Give the ROM cache the first sector of each 8K page (all of them: the
+ * first 448K can leave the SRAM too), checking that each page's sectors
+ * are consecutive. */
+static BYTE map_pages(DWORD hdr, DWORD size)
+{
+    WORD page, pages = (WORD)((size + PAGE - 1) / PAGE);
+    DWORD ofs, s0, s, arg;
+    BYTE k;
+    char line[24];
+
+    PH_BYTES = !disk_block_addr();
+    for (page = 0; page < pages; ++page) {
+        if ((page & 7) == 0) {
+            strcpy(line, "MAPPING ");
+            line[8] = '0' + (BYTE)(page * 10 / pages);
+            line[9] = '0';
+            line[10] = '%';
+            line[11] = 0;
+            status(line);
+        }
+        ofs = hdr + (DWORD)page * PAGE;
+        s0 = sector_at(ofs);
+        if (!s0)
+            return ERR_READ;
+        /* each cluster start in the page must follow on */
+        for (k = 1; k < 16 && ofs + (DWORD)k * 512 < hdr + size; ++k) {
+            if (((ofs >> 9) + k) % fs.csize)
+                continue;
+            s = sector_at(ofs + (DWORD)k * 512);
+            if (s != s0 + k)
+                return ERR_FRAGMENTED;
+        }
+        arg = disk_block_addr() ? s0 : s0 << 9;
+        PH_PAGE_LO = (BYTE)page;
+        PH_PAGE_HI = (BYTE)(page >> 8);
+        PH_ARG[0] = (BYTE)arg;
+        PH_ARG[1] = (BYTE)(arg >> 8);
+        PH_ARG[2] = (BYTE)(arg >> 16);
+        PH_ARG[3] = (BYTE)(arg >> 24);
+    }
+    return 0;
+}
+
 /* Load and start the game in fname. */
 static BYTE load_game(void)
 {
     UINT br, n, i;
-    DWORD size, left;
+    DWORD size, left, hdr = 0;
     WORD kb;
-    BYTE vec_hi = 0, swap;
+    BYTE vec_hi = 0, swap, r;
 
     if (pf_open(fname) != FR_OK)
         return ERR_READ;
@@ -454,6 +512,7 @@ static BYTE load_game(void)
         if (pf_read(0, 512, &br) != FR_OK || br != 512)
             return ERR_READ;
         size -= 512;
+        hdr = 512;
     }
     if (size == 0)
         return ERR_EMPTY;
@@ -468,7 +527,7 @@ static BYTE load_game(void)
     PH_ADDR2 = 0;
 
     /* Bank 0 through the CPU, for its reset vector at $1FFE */
-    left = size;
+    left = size > ROM_SRAM ? ROM_SRAM : size;
     for (i = 0; i < 16 && left; ++i) {
         n = left > 512 ? 512 : (UINT)left;
         if (pf_read(buf, n, &br) != FR_OK || br != n)
@@ -490,6 +549,12 @@ static BYTE load_game(void)
         left -= n;
     }
     wait_idle();
+
+    if (size > ROM_SRAM) {
+        r = map_pages(hdr, size);
+        if (r)
+            return r;
+    }
 
     /* The reset vector points into $E000-$FFFF; reversed bits if only the
      * reversed byte does. */
