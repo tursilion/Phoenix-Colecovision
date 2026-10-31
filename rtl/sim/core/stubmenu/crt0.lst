@@ -1,0 +1,20 @@
+                                      1 ; Stub menu start-up (the loader ROM at $0000, RAM at $7000-$7FFF).
+                                      2         .module crt0
+                                      3         .globl  _main
+                                      4         .area   _HEADER (ABS)
+      000000                          5         .org    0x0000
+      000000 F3               [ 4]    6         di
+      000001 31 00 7F         [10]    7         ld      sp, #0x7F00
+      000004 C3r00r00         [10]    8         jp      _main
+      000066                          9         .org    0x0066
+      000066 ED 45            [14]   10         retn                    ; NMI
+                                     11         .area   _HOME
+                                     12         .area   _CODE
+                                     13         .area   _INITIALIZER
+                                     14         .area   _GSINIT
+                                     15         .area   _GSFINAL
+                                     16         .area   _DATA
+                                     17         .area   _INITIALIZED
+                                     18         .area   _BSEG
+                                     19         .area   _BSS
+                                     20         .area   _HEAP

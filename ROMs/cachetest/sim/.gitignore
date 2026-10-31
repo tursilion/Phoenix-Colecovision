@@ -1,0 +1,5 @@
+*.o
+cart_tb
+work-obj08.cf
+*.txt
+bad1m.rom

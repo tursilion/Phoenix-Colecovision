@@ -1,0 +1,11 @@
+*.rel
+*.lst
+*.sym
+*.asm
+*.ihx
+*.map
+*.noi
+*.lk
+*.bin
+CACHE1M.ROM
+CACHE2M.SGM
