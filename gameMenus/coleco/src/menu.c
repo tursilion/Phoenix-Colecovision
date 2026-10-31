@@ -36,7 +36,6 @@ extern void startTitle();       // start with no init
 
 // sprite layer updates (yes, text mode sprites!)
 extern void textout(unsigned int vdp, const char *p);
-extern void textouthalf(unsigned int vdp, const char *p);
 extern void centerString(unsigned char line, char *p);
 
 // Reference to the font for copying out of
@@ -650,7 +649,7 @@ void copyPage(unsigned char a, unsigned char b) {
 // lets us decide whether to reload the directory
 unsigned char loadMegacartRom(unsigned char fsize, unsigned char isSGM) {
     unsigned char *p;
-    unsigned char page;
+    unsigned char page, n;
     UINT br;
     FSIZE_t ofs;
 
@@ -661,21 +660,23 @@ unsigned char loadMegacartRom(unsigned char fsize, unsigned char isSGM) {
         centerString(0, "reading sgm...");
     }
     
-    // seek offset. In the case of a 512k image,
-    // we have to skip the first 32k and hope for the best.
+    // seek offset. 480k fits in the SRAM (the rest is the SGM's): a bigger
+    // image loads its last 480k, and the core's ROM cache reads the rest
+    // from the SD card as the game needs it.
     ofs = 0;
-    if (fsize == 32) {
-        ofs = (unsigned int)32*1024;
-        fsize-=2;
+    n = fsize;
+    if (n > 30) {
+        ofs = (FSIZE_t)(n - 30) << 14;
+        n = 30;
     }
 
     // calculate the first page - pages are 32k each so divide by 2
-    page = CART_LAST_PAGE - ((fsize-1)>>1);
+    page = CART_LAST_PAGE - ((n-1)>>1);
     phRAMBankSelect = page;
 
     // calculate the starting address, it's just the MOD of above
     // although for any valid image it's going to always be 0x8000+0.
-    p = (unsigned char*)0x8000 + ((fsize&1)?0x4000:0);
+    p = (unsigned char*)0x8000 + ((n&1)?0x4000:0);
 
     // seek back as requested (usually to 0)
     if (FR_OK != f_lseek(&fil, ofs)) {
@@ -704,16 +705,8 @@ unsigned char loadMegacartRom(unsigned char fsize, unsigned char isSGM) {
             // time for the next page!
             ++page;
             if (page > CART_LAST_PAGE) {
-                // if it's exactly 512k, we get here.
-                if (f_eof(&fil)) {
-                    // end of file
-                    break;
-                } else {
-                    // we ran out of space
-                    f_close(&fil);
-                    displayErrorString("Cart ROM too large", 0);
-                    return page;
-                }
+                // the SRAM is full
+                break;
             }
             // else, reset the pointer and keep reading
             p = (unsigned char*)0x8000;
@@ -721,38 +714,34 @@ unsigned char loadMegacartRom(unsigned char fsize, unsigned char isSGM) {
         }
     }
 
+    // The ROM cache: for each 8K page, seek to it and read a byte; the core
+    // takes the sector from the SD read, and checks the page's last one.
+    if (fsize > 30) {
+        n = 0;          // the page (256 pages wrap to 0)
+        ofs = 0;
+        // (the port first: f_lseek reads the sector itself when it stops
+        // inside one)
+        do {
+            phCachePage = n;
+            f_lseek(&fil, ofs);
+            f_read(&fil, path2, 1, &br);
+            ofs += 8191;
+            phCacheCheck = n;
+            f_lseek(&fil, ofs);
+            f_read(&fil, path2, 1, &br);
+            ++ofs;
+        } while (++n != (unsigned char)(fsize * 2));
+        phCacheStatus = 0;
+    }
     f_close(&fil);
 
-    // instead of the fixed size approach, we just set a register mask
-    // Valid sizes then are 32k, 64k, 128k, 256k, 512k, so fsize is:
-    //                       2    4    8    16    32 
-    // masks are doubled for SGM's 8k pages
-    switch (fsize) {
-        case 2: 
-            phCartMask = isSGM ? 0x03 : 0x01;  // 2 pages
-            break;
-
-        case 4: 
-            phCartMask = isSGM ? 0x07 : 0x3;   // 4 pages
-            break;
-
-        case 8: 
-            phCartMask = isSGM ? 0x0f : 0x07;  // 8 pages
-            break;
-        
-        case 16:
-            phCartMask = isSGM ? 0x1f : 0x0f;  // 16 pages
-            break;
-
-        case 30:    // should be 32, but we hacked it up
-            phCartMask = isSGM ? 0x3f : 0x1f;  // 32 pages
-            break;
-
-        default:
-            f_close(&fil);
-            displayErrorString("Banked images must be padded", fsize);
-            return page;
+    // a register mask, from the size: 16k pages (8k for SGM), a power of
+    // two; and the file must not be fragmented
+    if ((fsize & (fsize - 1)) || (phCacheStatus & 1)) {
+        displayErrorString("Unpadded or fragmented", fsize);
+        return page;
     }
+    phCartMask = isSGM ? fsize * 2 - 1 : fsize - 1;
 
     // - set the mappers appropriately
     if (isSGM) {
@@ -943,7 +932,7 @@ nocard:
 dirLoop:
     // - put up 'reading SD card' on status line
     cleartextout();
-	textouthalf(GSPRITEPAT+(0*8)+(12*16), "READING");
+	textout(GSPRITEPAT+(0*8)+(12*16), "READING");
 	
     // activate RAM at the cartridge space so we have somewhere to store data
     phBankingScheme = PH_BANK_MEGACART | PH_UPPER_INTRAM;

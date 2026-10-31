@@ -61,3 +61,5 @@ dist/nes/nes_for_phoenix/
 dist/gyruss/gyruss_for_phoenix/
 dist/gyruss/tp84_for_phoenix/
 dist/gyruss/galaga_for_phoenix/
+*.rom
+*.sgm

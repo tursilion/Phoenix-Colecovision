@@ -1,7 +1,7 @@
 Computers have different issues to solve than game systems... not wanting to go that way today.
 Otherwise the cut off is mostly RAM size.
 
-01 - ColecoVision - updated
+
 02 - A2600 - preexisting
 03 - Pencil - preexisting alpha (keyboard update?)
 
@@ -10,14 +10,16 @@ Otherwise the cut off is mostly RAM size.
 07 - Time Pilot 84 - working - needs ROMs
 08 - Galaga Arcade - working - needs ROMs
 
-04 - NES - working up to 512k native, 1MB cached (max 256k CHR)
-09 - Intellivision - working - needs ROMs
-10 - Gameboy - working for GB up to 512k and GBC up to 256k native, up to 8MB caching
-11 - TurboGraphics - working - up to 448k native, up to 4MB caching
+--
+
+01 - 0102 - ColecoVision - working up to 480k native, --in progress-- 1MB Megacart cached and 2MB SGM cached
+04 - 0103 - NES - working up to 512k native, 1MB cached (max 256k CHR)
+09 - 0101 - Intellivision - working - needs ROMs
+10 - 0101 - Gameboy - working for GB up to 512k and GBC up to 256k native, up to 8MB caching
+11 - 0101 - TurboGraphics - working - up to 448k native, up to 4MB caching
 
 Future work depends on free time and community response.
 
-Pico-8 - maybe
 Lynx - probably
 Master System - probably
 Game Gear - just a variant of Master System

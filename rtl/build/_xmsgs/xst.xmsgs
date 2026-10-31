@@ -14,6 +14,48 @@
 <msg type="warning" file="HDLCompiler" num="1127" delta="old" >"/workspace/rtl/f18a/f18a_gpu.vhd" Line 1732: Assignment to <arg fmt="%s" index="1">cpu_state_hold</arg> ignored, since the identifier is never used
 </msg>
 
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"/workspace/rtl/cv_cache.v" Line 196: Result of <arg fmt="%d" index="1">4</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">3</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"/workspace/rtl/cv_cache.v" Line 306: Result of <arg fmt="%d" index="1">32</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">3</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"/workspace/rtl/cv_cache.v" Line 311: Result of <arg fmt="%d" index="1">32</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">3</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"/workspace/rtl/cv_cache.v" Line 314: Result of <arg fmt="%d" index="1">32</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">23</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"/workspace/rtl/cv_cache.v" Line 321: Result of <arg fmt="%d" index="1">20</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">19</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"/workspace/rtl/cv_cache.v" Line 336: Result of <arg fmt="%d" index="1">10</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">9</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"/workspace/rtl/cv_cache.v" Line 383: Result of <arg fmt="%d" index="1">4</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">3</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"/workspace/rtl/cv_cache.v" Line 389: Result of <arg fmt="%d" index="1">17</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">16</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"/workspace/rtl/cv_cache.v" Line 398: Result of <arg fmt="%d" index="1">17</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">16</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"/workspace/rtl/cv_cache.v" Line 415: Result of <arg fmt="%d" index="1">10</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">9</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"/workspace/rtl/cv_cache.v" Line 421: Result of <arg fmt="%d" index="1">17</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">16</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"/workspace/rtl/cv_cache.v" Line 428: Result of <arg fmt="%d" index="1">5</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">4</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"/workspace/rtl/cv_cache.v" Line 445: Result of <arg fmt="%d" index="1">17</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">16</arg>-bit target.
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="413" delta="old" >"/workspace/rtl/cv_cache.v" Line 456: Result of <arg fmt="%d" index="1">17</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">16</arg>-bit target.
+</msg>
+
 <msg type="warning" file="HDLCompiler" num="413" delta="old" >"/workspace/rtl/HDMI/hdmidataencoder.v" Line 218: Result of <arg fmt="%d" index="1">32</arg>-bit expression is truncated to fit in <arg fmt="%d" index="2">17</arg>-bit target.
 </msg>
 
@@ -41,61 +83,64 @@
 <msg type="warning" file="HDLCompiler" num="1127" delta="old" >"/workspace/rtl/HDMI/hdmidataencoder.v" Line 260: Assignment to <arg fmt="%s" index="1">audioLAvgSum</arg> ignored, since the identifier is never used
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/phoenix_top.vhd</arg>&quot; line <arg fmt="%s" index="2">475</arg>: Output port &lt;<arg fmt="%s" index="3">core_reload_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">ps2if_inst</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/phoenix_top.vhd</arg>&quot; line <arg fmt="%s" index="2">475</arg>: Output port &lt;<arg fmt="%s" index="3">core_reload_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">ps2if_inst</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/phoenix_top.vhd</arg>&quot; line <arg fmt="%s" index="2">475</arg>: Output port &lt;<arg fmt="%s" index="3">home_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">ps2if_inst</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/phoenix_top.vhd</arg>&quot; line <arg fmt="%s" index="2">475</arg>: Output port &lt;<arg fmt="%s" index="3">home_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">ps2if_inst</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/phoenix_top.vhd</arg>&quot; line <arg fmt="%s" index="2">500</arg>: Output port &lt;<arg fmt="%s" index="3">but_clear_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">snespads_b</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/phoenix_top.vhd</arg>&quot; line <arg fmt="%s" index="2">500</arg>: Output port &lt;<arg fmt="%s" index="3">but_clear_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">snespads_b</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/phoenix_top.vhd</arg>&quot; line <arg fmt="%s" index="2">500</arg>: Output port &lt;<arg fmt="%s" index="3">but_equal_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">snespads_b</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/phoenix_top.vhd</arg>&quot; line <arg fmt="%s" index="2">500</arg>: Output port &lt;<arg fmt="%s" index="3">but_equal_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">snespads_b</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
 <msg type="warning" file="Xst" num="647" delta="old" >Input &lt;<arg fmt="%s" index="1">por_n_i</arg>&gt; is never used. This port will be preserved and left unconnected if it belongs to a top-level block or it belongs to a sub-block and the hierarchy of this sub-block is preserved.
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">332</arg>: Output port &lt;<arg fmt="%s" index="3">HALT_n</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">inst_t80</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">385</arg>: Output port &lt;<arg fmt="%s" index="3">HALT_n</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">inst_t80</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">332</arg>: Output port &lt;<arg fmt="%s" index="3">BUSAK_n</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">inst_t80</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">385</arg>: Output port &lt;<arg fmt="%s" index="3">BUSAK_n</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">inst_t80</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">362</arg>: Output port &lt;<arg fmt="%s" index="3">spi_clk_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">inst_f18a</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">415</arg>: Output port &lt;<arg fmt="%s" index="3">spi_clk_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">inst_f18a</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">362</arg>: Output port &lt;<arg fmt="%s" index="3">spi_cs_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">inst_f18a</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">415</arg>: Output port &lt;<arg fmt="%s" index="3">spi_cs_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">inst_f18a</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">362</arg>: Output port &lt;<arg fmt="%s" index="3">spi_mosi_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">inst_f18a</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">415</arg>: Output port &lt;<arg fmt="%s" index="3">spi_mosi_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">inst_f18a</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">395</arg>: Output port &lt;<arg fmt="%s" index="3">ch_a_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">sn76489_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">448</arg>: Output port &lt;<arg fmt="%s" index="3">ch_a_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">sn76489_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">395</arg>: Output port &lt;<arg fmt="%s" index="3">ch_b_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">sn76489_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">448</arg>: Output port &lt;<arg fmt="%s" index="3">ch_b_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">sn76489_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">395</arg>: Output port &lt;<arg fmt="%s" index="3">ch_c_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">sn76489_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">448</arg>: Output port &lt;<arg fmt="%s" index="3">ch_c_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">sn76489_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">395</arg>: Output port &lt;<arg fmt="%s" index="3">noise_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">sn76489_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">448</arg>: Output port &lt;<arg fmt="%s" index="3">noise_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">sn76489_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">395</arg>: Output port &lt;<arg fmt="%s" index="3">mix_audio_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">sn76489_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">448</arg>: Output port &lt;<arg fmt="%s" index="3">mix_audio_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">sn76489_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">418</arg>: Output port &lt;<arg fmt="%s" index="3">ch_a_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">ym2149_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">471</arg>: Output port &lt;<arg fmt="%s" index="3">ch_a_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">ym2149_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">418</arg>: Output port &lt;<arg fmt="%s" index="3">ch_b_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">ym2149_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">471</arg>: Output port &lt;<arg fmt="%s" index="3">ch_b_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">ym2149_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">418</arg>: Output port &lt;<arg fmt="%s" index="3">ch_c_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">ym2149_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">471</arg>: Output port &lt;<arg fmt="%s" index="3">ch_c_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">ym2149_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
-<msg type="info" file="Xst" num="3210" delta="new" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">418</arg>: Output port &lt;<arg fmt="%s" index="3">mix_audio_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">ym2149_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">471</arg>: Output port &lt;<arg fmt="%s" index="3">mix_audio_o</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">ym2149_audio_inst</arg>&gt; is unconnected or connected to loadless signal.
+</msg>
+
+<msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/colecovision.vhd</arg>&quot; line <arg fmt="%s" index="2">676</arg>: Output port &lt;<arg fmt="%s" index="3">c_hit</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">cache</arg>&gt; is unconnected or connected to loadless signal.
 </msg>
 
 <msg type="info" file="Xst" num="3210" delta="old" >&quot;<arg fmt="%s" index="1">/workspace/rtl/t80/T80se.vhd</arg>&quot; line <arg fmt="%s" index="2">116</arg>: Output port &lt;<arg fmt="%s" index="3">IntE</arg>&gt; of the instance &lt;<arg fmt="%s" index="4">u0</arg>&gt; is unconnected or connected to loadless signal.
@@ -167,15 +212,23 @@
 <msg type="info" file="Xst" num="3218" delta="old" >HDL ADVISOR - The RAM &lt;<arg fmt="%s" index="1">Mram_RegsL</arg>&gt; will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
 </msg>
 
-<msg type="info" file="Xst" num="3231" delta="new" >The small RAM &lt;<arg fmt="%s" index="1">Mram_kbd_fifo_r</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
+<msg type="info" file="Xst" num="3226" delta="old" >The RAM &lt;<arg fmt="%s" index="1">cache/Mram_c_lba</arg>&gt; will be implemented as a BLOCK RAM, absorbing the following register(s):</msg>
+
+<msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">cache/Mram_c_rev</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
+</msg>
+
+<msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">Mram_kbd_fifo_r</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
 </msg>
 
 <msg type="info" file="Xst" num="3226" delta="old" >The RAM &lt;<arg fmt="%s" index="1">Mram_cv_ram1k_r</arg>&gt; will be implemented as a BLOCK RAM, absorbing the following register(s):</msg>
 
-<msg type="info" file="Xst" num="3218" delta="new" >HDL ADVISOR - The RAM &lt;<arg fmt="%s" index="1">Mram__n1023</arg>&gt; will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
+<msg type="info" file="Xst" num="3218" delta="new" >HDL ADVISOR - The RAM &lt;<arg fmt="%s" index="1">Mram__n1034</arg>&gt; will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
 </msg>
 
-<msg type="info" file="Xst" num="3218" delta="new" >HDL ADVISOR - The RAM &lt;<arg fmt="%s" index="1">Mram__n1036</arg>&gt; will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
+<msg type="info" file="Xst" num="3218" delta="new" >HDL ADVISOR - The RAM &lt;<arg fmt="%s" index="1">Mram__n1055</arg>&gt; will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
+</msg>
+
+<msg type="info" file="Xst" num="3218" delta="old" >HDL ADVISOR - The RAM &lt;<arg fmt="%s" index="1">cache/Mram_c_map</arg>&gt; will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
 </msg>
 
 <msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">Mram_colram</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
@@ -187,7 +240,7 @@
 <msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">Mram_vwe_next</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
 </msg>
 
-<msg type="info" file="Xst" num="3231" delta="new" >The small RAM &lt;<arg fmt="%s" index="1">Mram__n3050</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
+<msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">Mram__n3216</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
 </msg>
 
 <msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">Mram_n1034</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
@@ -232,7 +285,7 @@
 <msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">Mram_n1028</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
 </msg>
 
-<msg type="info" file="Xst" num="3231" delta="new" >The small RAM &lt;<arg fmt="%s" index="1">Mram__n3369</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
+<msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">Mram__n3272</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
 </msg>
 
 <msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">Mram_n1037</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
@@ -249,10 +302,10 @@
 <msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">Mram_shift_dir</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
 </msg>
 
-<msg type="info" file="Xst" num="3231" delta="new" >The small RAM &lt;<arg fmt="%s" index="1">Mram__n3115</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
+<msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">Mram__n3095</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
 </msg>
 
-<msg type="info" file="Xst" num="3231" delta="new" >The small RAM &lt;<arg fmt="%s" index="1">Mram__n3163</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
+<msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">Mram__n3142</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
 </msg>
 
 <msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">Mram_ir[6]_GND_25_o_wide_mux_210_OUT</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
@@ -270,7 +323,7 @@
 <msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">Mram_n1026</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
 </msg>
 
-<msg type="info" file="Xst" num="3231" delta="new" >The small RAM &lt;<arg fmt="%s" index="1">Mram__n3374</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
+<msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">Mram__n3277</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
 </msg>
 
 <msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">Mram_mar[12]_GND_25_o_Mux_45_o</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
@@ -305,7 +358,7 @@
 
 <msg type="info" file="Xst" num="3226" delta="old" >The RAM &lt;<arg fmt="%s" index="1">Mram_verrom</arg>&gt; will be implemented as a BLOCK RAM, absorbing the following register(s):</msg>
 
-<msg type="info" file="Xst" num="3218" delta="old" >HDL ADVISOR - The RAM &lt;<arg fmt="%s" index="1">Mram_channelStatusIdx[7]_X_68_o_Mux_18_o</arg>&gt; will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
+<msg type="info" file="Xst" num="3218" delta="old" >HDL ADVISOR - The RAM &lt;<arg fmt="%s" index="1">Mram_channelStatusIdx[7]_X_69_o_Mux_18_o</arg>&gt; will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
 </msg>
 
 <msg type="info" file="Xst" num="3226" delta="old" >The RAM &lt;<arg fmt="%s" index="1">Mram_ram_q</arg>&gt; will be implemented as a BLOCK RAM, absorbing the following register(s):</msg>
@@ -337,13 +390,37 @@
 <msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">Mram_dacrom_ar</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
 </msg>
 
-<msg type="info" file="Xst" num="3231" delta="new" >The small RAM &lt;<arg fmt="%s" index="1">Mram__n0974</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
+<msg type="info" file="Xst" num="3231" delta="old" >The small RAM &lt;<arg fmt="%s" index="1">Mram__n0974</arg>&gt; will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
 </msg>
 
 <msg type="info" file="Xst" num="3218" delta="old" >HDL ADVISOR - The RAM &lt;<arg fmt="%s" index="1">Mram_dacrom_ar</arg>&gt; will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
 </msg>
 
 <msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">upmem_mode_r_1</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">colecovision</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">cache/sn_arg_24</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">colecovision</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">cache/sn_arg_25</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">colecovision</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">cache/sn_arg_26</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">colecovision</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">cache/sn_arg_27</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">colecovision</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">cache/sn_arg_28</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">colecovision</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">cache/sn_arg_29</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">colecovision</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">cache/sn_arg_30</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">colecovision</arg>&gt;.
+</msg>
+
+<msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">cache/sn_arg_31</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">colecovision</arg>&gt;.
 </msg>
 
 <msg type="warning" file="Xst" num="2677" delta="old" >Node &lt;<arg fmt="%s" index="1">ws_dst_save_7</arg>&gt; of sequential type is unconnected in block &lt;<arg fmt="%s" index="2">f18a_gpu</arg>&gt;.
@@ -591,37 +668,19 @@ You should achieve better results by setting this init to <arg fmt="%i" index="3
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">ce_n_r</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">sn76489_audio</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;wr_n_r&gt; </arg>
 </msg>
 
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_10</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_10&gt; </arg>
-</msg>
-
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_0</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_0&gt; </arg>
-</msg>
-
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_11</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_11&gt; </arg>
 </msg>
 
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_1</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_1&gt; </arg>
 </msg>
 
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_12</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_12&gt; </arg>
-</msg>
-
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_2</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_2&gt; </arg>
-</msg>
-
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_13</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_13&gt; </arg>
 </msg>
 
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_3</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_3&gt; </arg>
 </msg>
 
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_14</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_14&gt; </arg>
-</msg>
-
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_4</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_4&gt; </arg>
-</msg>
-
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_15</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_15&gt; </arg>
 </msg>
 
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_5</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_5&gt; </arg>
@@ -637,6 +696,24 @@ You should achieve better results by setting this init to <arg fmt="%i" index="3
 </msg>
 
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_9</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_9&gt; </arg>
+</msg>
+
+<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_10</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_10&gt; </arg>
+</msg>
+
+<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_11</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_11&gt; </arg>
+</msg>
+
+<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_12</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_12&gt; </arg>
+</msg>
+
+<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_13</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_13&gt; </arg>
+</msg>
+
+<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_14</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_14&gt; </arg>
+</msg>
+
+<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">audioLAvg_15</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmidataencoder</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;audioRAvg_15&gt; </arg>
 </msg>
 
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">q_pipe_0_16</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">hdmi_delay_line</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;q_pipe_0_20&gt; </arg>
@@ -1493,6 +1570,21 @@ You should achieve better results by setting this init to <arg fmt="%i" index="3
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/prevBlank</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/prevBlank&gt; </arg>
 </msg>
 
+<msg type="info" file="Xst" num="2261" delta="new" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_113</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_57&gt; </arg>
+</msg>
+
+<msg type="info" file="Xst" num="2261" delta="new" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_115</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_59&gt; </arg>
+</msg>
+
+<msg type="info" file="Xst" num="2261" delta="new" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_121</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_65&gt; </arg>
+</msg>
+
+<msg type="info" file="Xst" num="2261" delta="new" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_117</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_61&gt; </arg>
+</msg>
+
+<msg type="info" file="Xst" num="2261" delta="new" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_119</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_63&gt; </arg>
+</msg>
+
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/inst_f18a/inst_cpu/blank_edge_r</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/inst_f18a/inst_cpu/inst_gpu/blank_reg&gt; </arg>
 </msg>
 
@@ -1511,9 +1603,6 @@ You should achieve better results by setting this init to <arg fmt="%i" index="3
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_170</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_114&gt; &lt;tmds/dataenc/subpacket_0_58&gt; </arg>
 </msg>
 
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_171</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_115&gt; &lt;tmds/dataenc/subpacket_0_59&gt; </arg>
-</msg>
-
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/prevData</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/delay_line/q_pipe_0_12&gt; </arg>
 </msg>
 
@@ -1523,22 +1612,13 @@ You should achieve better results by setting this init to <arg fmt="%i" index="3
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/prevHSync</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/delay_line/q_pipe_0_15&gt; </arg>
 </msg>
 
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_173</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_117&gt; &lt;tmds/dataenc/subpacket_0_61&gt; </arg>
-</msg>
-
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_168</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_112&gt; &lt;tmds/dataenc/subpacket_0_56&gt; </arg>
 </msg>
 
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_174</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_118&gt; &lt;tmds/dataenc/subpacket_0_62&gt; </arg>
 </msg>
 
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_169</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_113&gt; &lt;tmds/dataenc/subpacket_0_57&gt; </arg>
-</msg>
-
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_180</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_124&gt; &lt;tmds/dataenc/subpacket_0_68&gt; </arg>
-</msg>
-
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_175</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_119&gt; &lt;tmds/dataenc/subpacket_0_63&gt; </arg>
 </msg>
 
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_181</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_125&gt; &lt;tmds/dataenc/subpacket_0_69&gt; </arg>
@@ -1548,9 +1628,6 @@ You should achieve better results by setting this init to <arg fmt="%i" index="3
 </msg>
 
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_182</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_126&gt; &lt;tmds/dataenc/subpacket_0_70&gt; </arg>
-</msg>
-
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_177</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_121&gt; &lt;tmds/dataenc/subpacket_0_65&gt; </arg>
 </msg>
 
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_183</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_127&gt; &lt;tmds/dataenc/subpacket_0_71&gt; </arg>
@@ -1583,34 +1660,52 @@ You should achieve better results by setting this init to <arg fmt="%i" index="3
 <msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/inst_f18a/inst_cpu/reg48inc_0</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/inst_f18a/inst_cpu/reg48sign_5&gt; </arg>
 </msg>
 
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/ext512/d_to_ext_r_0</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/sn76489_audio_inst/din_r_0&gt; &lt;coleco/ym2149_audio_inst/data_i_r_0&gt; </arg>
+<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/sn76489_audio_inst/din_r_0</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/ym2149_audio_inst/data_i_r_0&gt; </arg>
 </msg>
 
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/ext512/d_to_ext_r_1</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/sn76489_audio_inst/din_r_1&gt; &lt;coleco/ym2149_audio_inst/data_i_r_1&gt; </arg>
+<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/sn76489_audio_inst/din_r_1</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/ym2149_audio_inst/data_i_r_1&gt; </arg>
 </msg>
 
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/ext512/d_to_ext_r_2</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/sn76489_audio_inst/din_r_2&gt; &lt;coleco/ym2149_audio_inst/data_i_r_2&gt; </arg>
+<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/sn76489_audio_inst/din_r_2</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/ym2149_audio_inst/data_i_r_2&gt; </arg>
 </msg>
 
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/ext512/d_to_ext_r_3</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/sn76489_audio_inst/din_r_3&gt; &lt;coleco/ym2149_audio_inst/data_i_r_3&gt; </arg>
+<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/sn76489_audio_inst/din_r_3</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/ym2149_audio_inst/data_i_r_3&gt; </arg>
 </msg>
 
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/ext512/d_to_ext_r_4</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/sn76489_audio_inst/din_r_4&gt; &lt;coleco/ym2149_audio_inst/data_i_r_4&gt; </arg>
+<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/sn76489_audio_inst/din_r_4</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/ym2149_audio_inst/data_i_r_4&gt; </arg>
 </msg>
 
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/ext512/d_to_ext_r_5</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/sn76489_audio_inst/din_r_5&gt; &lt;coleco/ym2149_audio_inst/data_i_r_5&gt; </arg>
+<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/sn76489_audio_inst/din_r_5</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/ym2149_audio_inst/data_i_r_5&gt; </arg>
 </msg>
 
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/ext512/d_to_ext_r_6</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/sn76489_audio_inst/din_r_6&gt; &lt;coleco/ym2149_audio_inst/data_i_r_6&gt; </arg>
+<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/sn76489_audio_inst/din_r_6</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/ym2149_audio_inst/data_i_r_6&gt; </arg>
 </msg>
 
-<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/ext512/d_to_ext_r_7</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">2 FFs/Latches</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/sn76489_audio_inst/din_r_7&gt; &lt;coleco/ym2149_audio_inst/data_i_r_7&gt; </arg>
+<msg type="info" file="Xst" num="2261" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/sn76489_audio_inst/din_r_7</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/ym2149_audio_inst/data_i_r_7&gt; </arg>
 </msg>
 
 <msg type="info" file="Xst" num="3203" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/ext512/ram_st_r</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is the opposite to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/ext512/ce_n_r&gt; </arg>
 </msg>
 
 <msg type="info" file="Xst" num="3203" delta="old" >The FF/Latch &lt;<arg fmt="%s" index="1">coleco/sn76489_audio_inst/clk_div16_r_0</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is the opposite to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;coleco/ym2149_audio_inst/sel_ff_r&gt; </arg>
+</msg>
+
+<msg type="info" file="Xst" num="2261" delta="new" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_177</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_121&gt; </arg>
+</msg>
+
+<msg type="info" file="Xst" num="2261" delta="new" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_175</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_119&gt; </arg>
+</msg>
+
+<msg type="info" file="Xst" num="2261" delta="new" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_173</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_117&gt; </arg>
+</msg>
+
+<msg type="info" file="Xst" num="2261" delta="new" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_171</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_115&gt; </arg>
+</msg>
+
+<msg type="info" file="Xst" num="2261" delta="new" >The FF/Latch &lt;<arg fmt="%s" index="1">tmds/dataenc/subpacket_0_169</arg>&gt; in Unit &lt;<arg fmt="%s" index="2">phoenix_top</arg>&gt; is equivalent to the following <arg fmt="%s" index="3">FF/Latch</arg>, which will be removed : <arg fmt="%s" index="4">&lt;tmds/dataenc/subpacket_0_113&gt; </arg>
+</msg>
+
+<msg type="warning" file="Xst" num="2254" delta="new" >Area constraint could not be met for block &lt;<arg fmt="%s" index="1">phoenix_top</arg>&gt;, final ratio is <arg fmt="%i" index="2">116</arg>.
 </msg>
 
 <msg type="info" file="Xst" num="741" delta="old" >HDL ADVISOR - A <arg fmt="%d" index="1">4</arg>-bit shift register was found for signal &lt;<arg fmt="%s" index="2">snespads_b/pads[0].pad_b/shift_buttons_q_3</arg>&gt; and currently occupies <arg fmt="%d" index="3">4</arg> logic cells (<arg fmt="%d" index="4">2</arg> slices). Removing the set/reset logic would take advantage of SRL<arg fmt="%d" index="5">32</arg> (and derived) primitives and reduce this to 1 logic cells (1 slices). Evaluate if the set/reset can be removed for this simple shift register. The majority of simple pipeline structures do not need to be set/reset operationally.

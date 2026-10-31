@@ -312,43 +312,6 @@ void textout(unsigned int vdp, const char *p) {
 	}
 }
 
-// same as textout, but shifts the text half a character to the right
-// this would have been much easier with the bitmap layer...
-void textouthalf(unsigned int vdp, const char *p) {
-    unsigned char first = 1;
-	while (*p) {
-        unsigned char i;
-        VDP_SET_ADDRESS_WRITE(vdp);
-        for (i=0; i<8; ++i) {
-            unsigned char c1,c2,out;
-            unsigned int off1,off2;
-
-            if (first) {
-                c1 = 3;     // space is 3
-                c2 = (*p)-' '+3;
-            } else {
-                c1 = (*p)-' '+3;
-                if (*(p+1) == 0) {
-                    c2 = 3;
-                } else {
-                    c2 = (*(p+1))-' '+3;
-                }
-            }
-            off1 = c1*8+i;
-            off2 = c2*8+i;
-
-            out = (FATFONT[off1]<<4) | (FATFONT[off2]>>4);
-            VDPWD = out;
-        }
-        vdp+=16;
-        if (first) {
-            first = 0;
-        } else {
-            ++p;
-        }
-	}
-}
-
 // skip the boot animation - save some ROM space. Nobody cared about it
 // and most people's HDMI didn't sync before it was done anyway.
 void displayLogo() {
@@ -402,13 +365,8 @@ void centerString(unsigned char line, char *p) {
     len = pp-p;
     vdp += (16-(len/2))*16;
 
-    if (len&1) {
-        // odd offset
-        textouthalf(vdp-16, p);
-    } else {
-        // even offset
-        textout(vdp, p);
-    }
+    // even offset
+    textout(vdp, p);
 }
 
 // start whatever is configured at 0x8000

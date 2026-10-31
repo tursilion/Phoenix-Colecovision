@@ -4,7 +4,7 @@
 #   make clean
 #
 # The core revision shown to users is the .PHX header "issue" (16-bit LE at
-# offset 0x10, after the name).  Set it with: make CORE_ISSUE=10
+# offset 0x10, after the name).  Set it with: make CORE_ISSUE=259
 #
 # The game menu ROM is taken pre-built from $(BOOTROM) and merged into the
 # loader block RAM with data2mem (see ../romloader.bmm), so the menu can be
@@ -22,7 +22,7 @@ PART         := xc6slx16-2-csg324
 TOP          := phoenix_top
 CORE_FILE    ?= CORE01.PHX
 CORE_NAME    := COLECOVISION
-CORE_ISSUE   ?= 9
+CORE_ISSUE   ?= 258
 
 REPO    := ../..
 RTL     := ..
@@ -76,7 +76,8 @@ VHDL := \
   $(RTL)/phoenix_top.vhd
 
 VERILOG := \
-  $(RTL)/HDMI/hdmidataencoder.v
+  $(RTL)/HDMI/hdmidataencoder.v \
+  $(RTL)/cv_cache.v
 
 # Bitstream options for the Phoenix multiboot loader, matching the shipped
 # CORE01.PHX (ConfigRate 26, unused pins floating).

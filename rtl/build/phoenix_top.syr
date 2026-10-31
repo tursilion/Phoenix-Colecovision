@@ -5,14 +5,14 @@ Parameter TMPDIR set to xst_tmp
 
 
 Total REAL time to Xst completion: 0.00 secs
-Total CPU time to Xst completion: 0.03 secs
+Total CPU time to Xst completion: 0.02 secs
  
 --> 
 Parameter xsthdpdir set to xst_hdp
 
 
 Total REAL time to Xst completion: 0.00 secs
-Total CPU time to Xst completion: 0.03 secs
+Total CPU time to Xst completion: 0.02 secs
  
 --> 
 
@@ -64,6 +64,8 @@ Optimization Effort                : 1
 =========================================================================
 Analyzing Verilog file "/workspace/rtl/HDMI/hdmidataencoder.v" into library work
 Parsing module <hdmidataencoder>.
+Analyzing Verilog file "/workspace/rtl/cv_cache.v" into library work
+Parsing module <cv_cache>.
 Parsing VHDL file "/workspace/rtl/dcm_pll/clk_sys_pll.vhd" into library work
 Parsing entity <clk_sys_pll>.
 Parsing architecture <xilinx> of entity <clk_sys_pll>.
@@ -275,7 +277,25 @@ Elaborating entity <romloader> (architecture <rtl>) from library <work>.
 Elaborating entity <rombios> (architecture <rtl>) from library <work>.
 
 Elaborating entity <ext512x8sram> (architecture <rtl>) from library <work>.
-INFO:HDLCompiler:679 - "/workspace/rtl/colecovision.vhd" Line 938. Case statement is complete. others clause is never selected
+Going to verilog side to elaborate module cv_cache
+
+Elaborating module <cv_cache>.
+WARNING:HDLCompiler:413 - "/workspace/rtl/cv_cache.v" Line 196: Result of 4-bit expression is truncated to fit in 3-bit target.
+WARNING:HDLCompiler:413 - "/workspace/rtl/cv_cache.v" Line 306: Result of 32-bit expression is truncated to fit in 3-bit target.
+WARNING:HDLCompiler:413 - "/workspace/rtl/cv_cache.v" Line 311: Result of 32-bit expression is truncated to fit in 3-bit target.
+WARNING:HDLCompiler:413 - "/workspace/rtl/cv_cache.v" Line 314: Result of 32-bit expression is truncated to fit in 23-bit target.
+WARNING:HDLCompiler:413 - "/workspace/rtl/cv_cache.v" Line 321: Result of 20-bit expression is truncated to fit in 19-bit target.
+WARNING:HDLCompiler:413 - "/workspace/rtl/cv_cache.v" Line 336: Result of 10-bit expression is truncated to fit in 9-bit target.
+WARNING:HDLCompiler:413 - "/workspace/rtl/cv_cache.v" Line 383: Result of 4-bit expression is truncated to fit in 3-bit target.
+WARNING:HDLCompiler:413 - "/workspace/rtl/cv_cache.v" Line 389: Result of 17-bit expression is truncated to fit in 16-bit target.
+WARNING:HDLCompiler:413 - "/workspace/rtl/cv_cache.v" Line 398: Result of 17-bit expression is truncated to fit in 16-bit target.
+WARNING:HDLCompiler:413 - "/workspace/rtl/cv_cache.v" Line 415: Result of 10-bit expression is truncated to fit in 9-bit target.
+WARNING:HDLCompiler:413 - "/workspace/rtl/cv_cache.v" Line 421: Result of 17-bit expression is truncated to fit in 16-bit target.
+WARNING:HDLCompiler:413 - "/workspace/rtl/cv_cache.v" Line 428: Result of 5-bit expression is truncated to fit in 4-bit target.
+WARNING:HDLCompiler:413 - "/workspace/rtl/cv_cache.v" Line 445: Result of 17-bit expression is truncated to fit in 16-bit target.
+WARNING:HDLCompiler:413 - "/workspace/rtl/cv_cache.v" Line 456: Result of 17-bit expression is truncated to fit in 16-bit target.
+Back to vhdl to continue elaboration
+INFO:HDLCompiler:679 - "/workspace/rtl/colecovision.vhd" Line 1050. Case statement is complete. others clause is never selected
 
 Elaborating entity <colecoKeyboard> (architecture <SYN>) from library <work>.
 
@@ -350,25 +370,29 @@ Synthesizing Unit <colecovision>.
     Related source file is "/workspace/rtl/colecovision.vhd".
         mach_id_g = 8
 WARNING:Xst:647 - Input <por_n_i> is never used. This port will be preserved and left unconnected if it belongs to a top-level block or it belongs to a sub-block and the hierarchy of this sub-block is preserved.
-INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 332: Output port <HALT_n> of the instance <inst_t80> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 332: Output port <BUSAK_n> of the instance <inst_t80> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 362: Output port <spi_clk_o> of the instance <inst_f18a> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 362: Output port <spi_cs_o> of the instance <inst_f18a> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 362: Output port <spi_mosi_o> of the instance <inst_f18a> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 395: Output port <ch_a_o> of the instance <sn76489_audio_inst> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 395: Output port <ch_b_o> of the instance <sn76489_audio_inst> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 395: Output port <ch_c_o> of the instance <sn76489_audio_inst> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 395: Output port <noise_o> of the instance <sn76489_audio_inst> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 395: Output port <mix_audio_o> of the instance <sn76489_audio_inst> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 418: Output port <ch_a_o> of the instance <ym2149_audio_inst> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 418: Output port <ch_b_o> of the instance <ym2149_audio_inst> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 418: Output port <ch_c_o> of the instance <ym2149_audio_inst> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 418: Output port <mix_audio_o> of the instance <ym2149_audio_inst> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 385: Output port <HALT_n> of the instance <inst_t80> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 385: Output port <BUSAK_n> of the instance <inst_t80> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 415: Output port <spi_clk_o> of the instance <inst_f18a> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 415: Output port <spi_cs_o> of the instance <inst_f18a> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 415: Output port <spi_mosi_o> of the instance <inst_f18a> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 448: Output port <ch_a_o> of the instance <sn76489_audio_inst> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 448: Output port <ch_b_o> of the instance <sn76489_audio_inst> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 448: Output port <ch_c_o> of the instance <sn76489_audio_inst> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 448: Output port <noise_o> of the instance <sn76489_audio_inst> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 448: Output port <mix_audio_o> of the instance <sn76489_audio_inst> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 471: Output port <ch_a_o> of the instance <ym2149_audio_inst> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 471: Output port <ch_b_o> of the instance <ym2149_audio_inst> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 471: Output port <ch_c_o> of the instance <ym2149_audio_inst> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 471: Output port <mix_audio_o> of the instance <ym2149_audio_inst> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 676: Output port <c_hit> of the instance <cache> is unconnected or connected to loadless signal.
     Found 1024x8-bit single-port RAM <Mram_cv_ram1k_r> for signal <cv_ram1k_r>.
     Found 8x8-bit dual-port RAM <Mram_kbd_fifo_r> for signal <kbd_fifo_r>.
     Found 1-bit register for signal <m1_wait_n_r>.
     Found 16-bit register for signal <pcm16_r>.
     Found 8-bit register for signal <d_from_cv_ram1k_r>.
+    Found 1-bit register for signal <io_wr_d_r>.
+    Found 1-bit register for signal <loader_en_d_r>.
+    Found 1-bit register for signal <cache_start_r>.
     Found 1-bit register for signal <sgm_en_r>.
     Found 1-bit register for signal <sgm_8k_en_r>.
     Found 1-bit register for signal <kbd_mode_r>.
@@ -379,41 +403,43 @@ INFO:Xst:3210 - "/workspace/rtl/colecovision.vhd" line 418: Output port <mix_aud
     Found 1-bit register for signal <sd_spi_ss_n_r>.
     Found 1-bit register for signal <real_cart_r>.
     Found 2-bit register for signal <upmem_mode_r>.
-    Found 6-bit register for signal <mc_mem_size_r>.
-    Found 5-bit register for signal <mc_bank_r>.
-    Found 5-bit register for signal <mc_addr_r>.
+    Found 8-bit register for signal <mc_mem_size_r>.
+    Found 6-bit register for signal <mc_bank_r>.
     Found 1-bit register for signal <mc_en_r>.
     Found 1-bit register for signal <sgmbk_en_r>.
-    Found 6-bit register for signal <sgmbk_a_r>.
-    Found 6-bit register for signal <sgmbk_c_r>.
-    Found 6-bit register for signal <sgmbk_e_r>.
+    Found 8-bit register for signal <sgmbk_a_r>.
+    Found 8-bit register for signal <sgmbk_c_r>.
+    Found 8-bit register for signal <sgmbk_e_r>.
     Found 3-bit register for signal <kbd_wr_ptr_r>.
     Found 3-bit register for signal <kbd_rd_ptr_r>.
     Found 4-bit register for signal <kbd_count_r>.
     Found 8-bit register for signal <kbd_data_r>.
     Found 1-bit register for signal <kbd_rd_r>.
     Found 1-bit register for signal <m1_n_r>.
-    Found 15-bit adder for signal <pcm16_x<15:1>> created at line 438.
-    Found 3-bit adder for signal <kbd_wr_ptr_r[2]_GND_12_o_add_173_OUT> created at line 1241.
-    Found 3-bit adder for signal <kbd_rd_ptr_r[2]_GND_12_o_add_175_OUT> created at line 1241.
-    Found 4-bit adder for signal <kbd_count_r[3]_GND_12_o_add_177_OUT> created at line 1241.
-    Found 4-bit subtractor for signal <GND_12_o_GND_12_o_sub_179_OUT<3:0>> created at line 1308.
-    Found 8x4-bit Read Only RAM for signal <_n1023>
-    Found 8x5-bit Read Only RAM for signal <_n1036>
-    Found 6-bit 4-to-1 multiplexer for signal <sgm_banking.page_v> created at line 967.
-    Found 1-bit tristate buffer for signal <cart_data_io<7>> created at line 607
-    Found 1-bit tristate buffer for signal <cart_data_io<6>> created at line 607
-    Found 1-bit tristate buffer for signal <cart_data_io<5>> created at line 607
-    Found 1-bit tristate buffer for signal <cart_data_io<4>> created at line 607
-    Found 1-bit tristate buffer for signal <cart_data_io<3>> created at line 607
-    Found 1-bit tristate buffer for signal <cart_data_io<2>> created at line 607
-    Found 1-bit tristate buffer for signal <cart_data_io<1>> created at line 607
-    Found 1-bit tristate buffer for signal <cart_data_io<0>> created at line 607
+    Found 15-bit adder for signal <pcm16_x<15:1>> created at line 491.
+    Found 9-bit adder for signal <GND_12_o_GND_12_o_add_11_OUT> created at line 1241.
+    Found 9-bit adder for signal <GND_12_o_GND_12_o_add_12_OUT> created at line 1241.
+    Found 3-bit adder for signal <kbd_wr_ptr_r[2]_GND_12_o_add_177_OUT> created at line 1241.
+    Found 3-bit adder for signal <kbd_rd_ptr_r[2]_GND_12_o_add_179_OUT> created at line 1241.
+    Found 4-bit adder for signal <kbd_count_r[3]_GND_12_o_add_181_OUT> created at line 1241.
+    Found 4-bit subtractor for signal <GND_12_o_GND_12_o_sub_183_OUT<3:0>> created at line 1308.
+    Found 8x4-bit Read Only RAM for signal <_n1034>
+    Found 8x5-bit Read Only RAM for signal <_n1055>
+    Found 8-bit 4-to-1 multiplexer for signal <cpu_addr_s[14]_sgmbk_e_r[7]_wide_mux_60_OUT> created at line 1075.
+    Found 8-bit 14-to-1 multiplexer for signal <cpu_addr_s[3]_GND_12_o_wide_mux_98_OUT> created at line 1244.
+    Found 1-bit tristate buffer for signal <cart_data_io<7>> created at line 730
+    Found 1-bit tristate buffer for signal <cart_data_io<6>> created at line 730
+    Found 1-bit tristate buffer for signal <cart_data_io<5>> created at line 730
+    Found 1-bit tristate buffer for signal <cart_data_io<4>> created at line 730
+    Found 1-bit tristate buffer for signal <cart_data_io<3>> created at line 730
+    Found 1-bit tristate buffer for signal <cart_data_io<2>> created at line 730
+    Found 1-bit tristate buffer for signal <cart_data_io<1>> created at line 730
+    Found 1-bit tristate buffer for signal <cart_data_io<0>> created at line 730
     Summary:
 	inferred   4 RAM(s).
-	inferred   4 Adder/Subtractor(s).
-	inferred  95 D-type flip-flop(s).
-	inferred 121 Multiplexer(s).
+	inferred   5 Adder/Subtractor(s).
+	inferred 102 D-type flip-flop(s).
+	inferred 107 Multiplexer(s).
 	inferred   8 Tristate(s).
 Unit <colecovision> synthesized.
 
@@ -957,11 +983,11 @@ INFO:Xst:3210 - "/workspace/rtl/f18a/f18a_gpu.vhd" line 1527: Output port <ready
     Found 16x6-bit Read Only RAM for signal <n1028>
     Found 16x6-bit Read Only RAM for signal <n1038>
     Found 16x6-bit Read Only RAM for signal <n1037>
-    Found 16x5-bit Read Only RAM for signal <_n3050>
-    Found 64x2-bit Read Only RAM for signal <_n3115>
-    Found 32x2-bit Read Only RAM for signal <_n3163>
-    Found 16x10-bit Read Only RAM for signal <_n3369>
-    Found 4x11-bit Read Only RAM for signal <_n3374>
+    Found 64x2-bit Read Only RAM for signal <_n3095>
+    Found 32x2-bit Read Only RAM for signal <_n3142>
+    Found 16x5-bit Read Only RAM for signal <_n3216>
+    Found 16x10-bit Read Only RAM for signal <_n3272>
+    Found 4x11-bit Read Only RAM for signal <_n3277>
     Found 2-bit 4-to-1 multiplexer for signal <pix_in> created at line 497.
     Found 8-bit 4-to-1 multiplexer for signal <pix_out> created at line 497.
     Found 1-bit 4-to-1 multiplexer for signal <pix_eq> created at line 497.
@@ -1721,6 +1747,121 @@ Synthesizing Unit <ext512x8sram>.
 	inferred   8 Tristate(s).
 Unit <ext512x8sram> synthesized.
 
+Synthesizing Unit <cv_cache>.
+    Related source file is "/workspace/rtl/cv_cache.v".
+    Found 256x7-bit dual-port RAM <Mram_c_map> for signal <c_map>.
+    Found 64x9-bit dual-port RAM <Mram_c_rev> for signal <c_rev>.
+    Found 256x32-bit dual-port RAM <Mram_c_lba> for signal <c_lba>.
+    Found 1-bit register for signal <cl_we>.
+    Found 3-bit register for signal <sn_st>.
+    Found 32-bit register for signal <sn_arg>.
+    Found 1-bit register for signal <cap_seen>.
+    Found 8-bit register for signal <cl_a>.
+    Found 32-bit register for signal <cl_d>.
+    Found 32-bit register for signal <chk_last>.
+    Found 1-bit register for signal <chk_seen>.
+    Found 1-bit register for signal <frag>.
+    Found 1-bit register for signal <cap_on>.
+    Found 1-bit register for signal <chk_on>.
+    Found 8-bit register for signal <cap_page>.
+    Found 8-bit register for signal <chk_page>.
+    Found 1-bit register for signal <lba_rd_chk>.
+    Found 8-bit register for signal <spi_tx>.
+    Found 1-bit register for signal <spi_busy>.
+    Found 3-bit register for signal <spi_bit>.
+    Found 1-bit register for signal <spi_sclk_r>.
+    Found 8-bit register for signal <spi_rx>.
+    Found 1-bit register for signal <ld_done>.
+    Found 2-bit register for signal <ws>.
+    Found 1-bit register for signal <ov_we_n>.
+    Found 1-bit register for signal <ov_en>.
+    Found 19-bit register for signal <ov_addr>.
+    Found 8-bit register for signal <ov_data>.
+    Found 1-bit register for signal <spi_start>.
+    Found 1-bit register for signal <cm_we>.
+    Found 1-bit register for signal <cr_we>.
+    Found 1-bit register for signal <cpu_wait_n>.
+    Found 3-bit register for signal <c_settle>.
+    Found 1-bit register for signal <fill_on_d>.
+    Found 3-bit register for signal <ov_settle>.
+    Found 23-bit register for signal <led_time>.
+    Found 1-bit register for signal <led>.
+    Found 1-bit register for signal <ld_pend>.
+    Found 19-bit register for signal <ld_addr>.
+    Found 1-bit register for signal <c_init>.
+    Found 9-bit register for signal <c_init_i>.
+    Found 8-bit register for signal <cm_a>.
+    Found 7-bit register for signal <cm_d>.
+    Found 6-bit register for signal <cr_a>.
+    Found 9-bit register for signal <cr_d>.
+    Found 64-bit register for signal <c_ref>.
+    Found 6-bit register for signal <f_hand>.
+    Found 5-bit register for signal <f_state>.
+    Found 1-bit register for signal <f_cs>.
+    Found 1-bit register for signal <fill_on>.
+    Found 1-bit register for signal <f_bad>.
+    Found 4-bit register for signal <f_blk>.
+    Found 16-bit register for signal <f_cnt>.
+    Found 1-bit register for signal <f_retry>.
+    Found 8-bit register for signal <spi_txd>.
+    Found 5-bit register for signal <f_next>.
+    Found 3-bit register for signal <f_ci>.
+    Found 1-bit register for signal <f_stop>.
+    Found 8-bit register for signal <ld_data>.
+    Found 16-bit register for signal <f_crc>.
+    Found 9-bit register for signal <f_byte>.
+    Found 6-bit register for signal <f_line>.
+    Found 8-bit register for signal <f_page>.
+    Found 32-bit register for signal <f_arg>.
+    Found finite state machine <FSM_11> for signal <ws>.
+    -----------------------------------------------------------------------
+    | States             | 4                                              |
+    | Transitions        | 6                                              |
+    | Inputs             | 2                                              |
+    | Outputs            | 5                                              |
+    | Clock              | clk (rising_edge)                              |
+    | Power Up State     | 00                                             |
+    | Encoding           | auto                                           |
+    | Implementation     | LUT                                            |
+    -----------------------------------------------------------------------
+    Found 9-bit subtractor for signal <n1294> created at line 285.
+    Found 3-bit adder for signal <sn_st[2]_GND_69_o_add_15_OUT> created at line 120.
+    Found 32-bit adder for signal <f_arg[31]_GND_69_o_add_34_OUT> created at line 141.
+    Found 32-bit adder for signal <f_arg[31]_GND_69_o_add_36_OUT> created at line 141.
+    Found 3-bit adder for signal <spi_bit[2]_GND_69_o_add_49_OUT> created at line 196.
+    Found 9-bit adder for signal <ci_sram> created at line 285.
+    Found 9-bit adder for signal <c_init_i[8]_n_pages[8]_add_97_OUT> created at line 288.
+    Found 19-bit adder for signal <ld_addr[18]_GND_69_o_add_113_OUT> created at line 321.
+    Found 9-bit adder for signal <c_init_i[8]_GND_69_o_add_117_OUT> created at line 336.
+    Found 6-bit adder for signal <f_hand[5]_GND_69_o_add_271_OUT> created at line 361.
+    Found 3-bit adder for signal <f_ci[2]_GND_69_o_add_279_OUT> created at line 383.
+    Found 9-bit adder for signal <f_byte[8]_GND_69_o_add_318_OUT> created at line 415.
+    Found 4-bit adder for signal <f_blk[3]_GND_69_o_add_331_OUT> created at line 428.
+    Found 16-bit adder for signal <f_cnt[15]_GND_69_o_add_342_OUT> created at line 456.
+    Found 8-bit subtractor for signal <ci_page<7:0>> created at line 286.
+    Found 3-bit subtractor for signal <GND_69_o_GND_69_o_sub_104_OUT<2:0>> created at line 306.
+    Found 3-bit subtractor for signal <GND_69_o_GND_69_o_sub_107_OUT<2:0>> created at line 311.
+    Found 23-bit subtractor for signal <GND_69_o_GND_69_o_sub_111_OUT<22:0>> created at line 314.
+    Found 1-bit 64-to-1 multiplexer for signal <f_hand[5]_c_ref[63]_Mux_201_o> created at line 356.
+    Found 8-bit 4-to-1 multiplexer for signal <_n1436> created at line 280.
+    Found 32-bit comparator not equal for signal <n0054> created at line 141
+    Found 32-bit comparator not equal for signal <n0057> created at line 141
+    Found 9-bit comparator greater for signal <c_init_i[8]_n_pages[8]_LessThan_94_o> created at line 287
+    Found 9-bit comparator lessequal for signal <n0159> created at line 287
+    Found 9-bit comparator greater for signal <ci_sram[8]_GND_69_o_LessThan_96_o> created at line 287
+    Found 9-bit comparator lessequal for signal <n0164> created at line 288
+    Found 9-bit comparator lessequal for signal <n0167> created at line 288
+    Found 9-bit comparator greater for signal <c_init_i[8]_GND_69_o_LessThan_117_o> created at line 331
+    Found 8-bit comparator equal for signal <n0416> created at line 425
+    Summary:
+	inferred   3 RAM(s).
+	inferred  18 Adder/Subtractor(s).
+	inferred 471 D-type flip-flop(s).
+	inferred   9 Comparator(s).
+	inferred 312 Multiplexer(s).
+	inferred   1 Finite State Machine(s).
+Unit <cv_cache> synthesized.
+
 Synthesizing Unit <colecoKeyboard>.
     Related source file is "/workspace/rtl/peripheral/keyboard.vhd".
     Found 5-bit register for signal <count>.
@@ -1731,7 +1872,7 @@ Synthesizing Unit <colecoKeyboard>.
     Found 1-bit register for signal <tick1us>.
     Found 1-bit register for signal <ctrl_s>.
     Found 1-bit register for signal <alt_s>.
-    Found 5-bit adder for signal <count[4]_GND_77_o_add_1_OUT> created at line 121.
+    Found 5-bit adder for signal <count[4]_GND_79_o_add_1_OUT> created at line 121.
     Summary:
 	inferred   1 Adder/Subtractor(s).
 	inferred  42 D-type flip-flop(s).
@@ -1753,8 +1894,8 @@ Synthesizing Unit <ps2kbd>.
     Found 8-bit register for signal <RX_ShiftReg>.
     Found 1-bit register for signal <RX_Received>.
     Found 7-bit register for signal <Cnt>.
-    Found 4-bit adder for signal <RX_Bit_Cnt[3]_GND_78_o_add_15_OUT> created at line 1241.
-    Found 7-bit adder for signal <Cnt[6]_GND_78_o_add_25_OUT> created at line 164.
+    Found 4-bit adder for signal <RX_Bit_Cnt[3]_GND_80_o_add_15_OUT> created at line 1241.
+    Found 7-bit adder for signal <Cnt[6]_GND_80_o_add_25_OUT> created at line 164.
     Summary:
 	inferred   2 Adder/Subtractor(s).
 	inferred  31 D-type flip-flop(s).
@@ -1780,22 +1921,22 @@ Synthesizing Unit <snespad_ctrl>.
     Found 8-bit register for signal <clocks_per_6us_q>.
     Found 2-bit register for signal <state_q>.
     Found 1-bit register for signal <pad_latch_q>.
-    Found finite state machine <FSM_11> for signal <state_q>.
+    Found finite state machine <FSM_12> for signal <state_q>.
     -----------------------------------------------------------------------
     | States             | 4                                              |
     | Transitions        | 9                                              |
     | Inputs             | 2                                              |
     | Outputs            | 4                                              |
     | Clock              | clk_i (rising_edge)                            |
-    | Reset              | GND_81_o_reset_i_equal_1_o (positive)          |
+    | Reset              | GND_83_o_reset_i_equal_1_o (positive)          |
     | Reset type         | synchronous                                    |
     | Reset State        | idle                                           |
     | Power Up State     | idle                                           |
     | Encoding           | auto                                           |
     | Implementation     | LUT                                            |
     -----------------------------------------------------------------------
-    Found 8-bit adder for signal <clocks_per_6us_q[7]_GND_81_o_add_2_OUT> created at line 140.
-    Found 5-bit subtractor for signal <GND_81_o_GND_81_o_sub_6_OUT<4:0>> created at line 147.
+    Found 8-bit adder for signal <clocks_per_6us_q[7]_GND_83_o_add_2_OUT> created at line 140.
+    Found 5-bit subtractor for signal <GND_83_o_GND_83_o_sub_6_OUT<4:0>> created at line 147.
     Summary:
 	inferred   2 Adder/Subtractor(s).
 	inferred  15 D-type flip-flop(s).
@@ -1828,21 +1969,21 @@ Synthesizing Unit <hdmi>.
     Found 1-bit register for signal <prevBlank>.
     Found 1-bit register for signal <prevData>.
     Found 3-bit register for signal <state>.
-    Found finite state machine <FSM_12> for signal <state>.
+    Found finite state machine <FSM_13> for signal <state>.
     -----------------------------------------------------------------------
     | States             | 8                                              |
     | Transitions        | 23                                             |
     | Inputs             | 7                                              |
     | Outputs            | 7                                              |
     | Clock              | I_CLK_PIXEL (rising_edge)                      |
-    | Reset              | prevBlank_I_BLANK_AND_1003_o (positive)        |
+    | Reset              | prevBlank_I_BLANK_AND_1163_o (positive)        |
     | Reset type         | synchronous                                    |
     | Reset State        | controldata                                    |
     | Power Up State     | videodata                                      |
     | Encoding           | auto                                           |
     | Implementation     | LUT                                            |
     -----------------------------------------------------------------------
-    Found 11-bit adder for signal <clockCounter[10]_GND_84_o_add_28_OUT> created at line 229.
+    Found 11-bit adder for signal <clockCounter[10]_GND_86_o_add_28_OUT> created at line 229.
     Found 11-bit 7-to-1 multiplexer for signal <state[2]_clockCounter[10]_wide_mux_56_OUT> created at line 182.
     Summary:
 	inferred   1 Adder/Subtractor(s).
@@ -1899,24 +2040,24 @@ Synthesizing Unit <hdmidataencoder>.
     Found 1-bit register for signal <prevBlank>.
     Found 1-bit register for signal <prevHSync>.
     Found 17-bit register for signal <audioTimer>.
-    Found 18-bit subtractor for signal <GND_87_o_GND_87_o_sub_5_OUT> created at line 218.
-    Found 18-bit subtractor for signal <GND_87_o_GND_87_o_sub_138_OUT> created at line 170.
+    Found 18-bit subtractor for signal <GND_88_o_GND_88_o_sub_5_OUT> created at line 218.
+    Found 18-bit subtractor for signal <GND_88_o_GND_88_o_sub_138_OUT> created at line 170.
     Found 32-bit adder for signal <n0269> created at line 218.
-    Found 8-bit adder for signal <channelStatusIdx[7]_GND_87_o_add_27_OUT> created at line 225.
-    Found 2-bit adder for signal <samplesHead[1]_GND_87_o_add_29_OUT> created at line 228.
-    Found 17-bit adder for signal <audioTimer[16]_GND_87_o_add_40_OUT> created at line 237.
-    Found 5-bit adder for signal <dataOffset[4]_GND_87_o_add_101_OUT> created at line 157.
-    Found 17-bit adder for signal <ctsTimer[16]_GND_87_o_add_130_OUT> created at line 272.
+    Found 8-bit adder for signal <channelStatusIdx[7]_GND_88_o_add_27_OUT> created at line 225.
+    Found 2-bit adder for signal <samplesHead[1]_GND_88_o_add_29_OUT> created at line 228.
+    Found 17-bit adder for signal <audioTimer[16]_GND_88_o_add_40_OUT> created at line 237.
+    Found 5-bit adder for signal <dataOffset[4]_GND_88_o_add_101_OUT> created at line 157.
+    Found 17-bit adder for signal <ctsTimer[16]_GND_88_o_add_130_OUT> created at line 272.
     Found 32-bit adder for signal <n0371> created at line 170.
-    Found 16-bit adder for signal <counterX[15]_GND_87_o_add_148_OUT> created at line 291.
-    Found 24-bit shifter logical left for signal <GND_87_o_samplesHead[1]_shift_left_9_OUT> created at line 219
-    Found 256x1-bit Read Only RAM for signal <channelStatusIdx[7]_X_68_o_Mux_18_o>
+    Found 16-bit adder for signal <counterX[15]_GND_88_o_add_148_OUT> created at line 291.
+    Found 24-bit shifter logical left for signal <GND_88_o_samplesHead[1]_shift_left_9_OUT> created at line 219
+    Found 256x1-bit Read Only RAM for signal <channelStatusIdx[7]_X_69_o_Mux_18_o>
     Found 16-bit comparator greater for signal <n0000> created at line 216
-    Found 16-bit comparator greater for signal <counterX[15]_GND_87_o_LessThan_77_o> created at line 216
+    Found 16-bit comparator greater for signal <counterX[15]_GND_88_o_LessThan_77_o> created at line 216
     Found 17-bit comparator greater for signal <n0006> created at line 217
-    Found 8-bit comparator lessequal for signal <channelStatusIdx[7]_PWR_67_o_LessThan_27_o> created at line 224
-    Found 5-bit comparator greater for signal <dataOffset[4]_PWR_67_o_LessThan_79_o> created at line 147
-    Found 5-bit comparator greater for signal <dataOffset[4]_PWR_67_o_LessThan_97_o> created at line 151
+    Found 8-bit comparator lessequal for signal <channelStatusIdx[7]_PWR_70_o_LessThan_27_o> created at line 224
+    Found 5-bit comparator greater for signal <dataOffset[4]_PWR_70_o_LessThan_79_o> created at line 147
+    Found 5-bit comparator greater for signal <dataOffset[4]_PWR_70_o_LessThan_97_o> created at line 151
     Found 1-bit comparator equal for signal <n0193> created at line 280
     Found 17-bit comparator greater for signal <n0195> created at line 164
     Summary:
@@ -1948,12 +2089,12 @@ Synthesizing Unit <encoder>.
     Found 4-bit adder for signal <n0201> created at line 69.
     Found 4-bit adder for signal <data_word_disparity> created at line 69.
     Found 4-bit adder for signal <dc_bias[3]_data_word_disparity[3]_add_24_OUT> created at line 81.
-    Found 4-bit adder for signal <dc_bias[3]_GND_88_o_add_28_OUT> created at line 89.
-    Found 4-bit adder for signal <GND_88_o_data_word_disparity[3]_add_31_OUT> created at line 92.
-    Found 4-bit subtractor for signal <GND_88_o_GND_88_o_sub_26_OUT<3:0>> created at line 84.
-    Found 4-bit subtractor for signal <GND_88_o_GND_88_o_sub_30_OUT<3:0>> created at line 89.
+    Found 4-bit adder for signal <dc_bias[3]_GND_89_o_add_28_OUT> created at line 89.
+    Found 4-bit adder for signal <GND_89_o_data_word_disparity[3]_add_31_OUT> created at line 92.
+    Found 4-bit subtractor for signal <GND_89_o_GND_89_o_sub_26_OUT<3:0>> created at line 84.
+    Found 4-bit subtractor for signal <GND_89_o_GND_89_o_sub_30_OUT<3:0>> created at line 89.
     Found 4-bit subtractor for signal <n0210> created at line 0.
-    Found 4-bit comparator greater for signal <GND_88_o_ones[3]_LessThan_9_o> created at line 59
+    Found 4-bit comparator greater for signal <GND_89_o_ones[3]_LessThan_9_o> created at line 59
     Summary:
 	inferred  20 Adder/Subtractor(s).
 	inferred  14 D-type flip-flop(s).
@@ -1969,7 +2110,7 @@ WARNING:Xst:647 - Input <clock_pixel_i> is never used. This port will be preserv
     Found 10-bit register for signal <shift_b>.
     Found 10-bit register for signal <shift_clk>.
     Found 3-bit register for signal <mod5>.
-    Found 3-bit adder for signal <mod5[2]_GND_89_o_add_0_OUT> created at line 78.
+    Found 3-bit adder for signal <mod5[2]_GND_90_o_add_0_OUT> created at line 78.
     Summary:
 	inferred   1 Adder/Subtractor(s).
 	inferred  43 D-type flip-flop(s).
@@ -1980,7 +2121,7 @@ Unit <hdmi_out_xilinx> synthesized.
 HDL Synthesis Report
 
 Macro Statistics
-# RAMs                                                 : 64
+# RAMs                                                 : 67
  1024x1-bit single-port Read Only RAM                  : 1
  1024x8-bit single-port RAM                            : 1
  16384x8-bit dual-port RAM                             : 1
@@ -1993,6 +2134,8 @@ Macro Statistics
  16x6-bit single-port Read Only RAM                    : 7
  2048x8-bit single-port RAM                            : 13
  256x1-bit single-port Read Only RAM                   : 1
+ 256x32-bit dual-port RAM                              : 1
+ 256x7-bit dual-port RAM                               : 1
  32x12-bit dual-port Read Only RAM                     : 1
  32x2-bit single-port Read Only RAM                    : 1
  4x1-bit single-port Read Only RAM                     : 4
@@ -2002,6 +2145,7 @@ Macro Statistics
  512x9-bit dual-port RAM                               : 2
  64x12-bit dual-port RAM                               : 1
  64x2-bit single-port Read Only RAM                    : 1
+ 64x9-bit dual-port RAM                                : 1
  8192x8-bit single-port RAM                            : 1
  8x3-bit single-port Read Only RAM                     : 2
  8x4-bit single-port Read Only RAM                     : 1
@@ -2014,7 +2158,7 @@ Macro Statistics
  8x8-bit multiplier                                    : 2
  9x8-bit multiplier                                    : 1
  9x9-bit multiplier                                    : 1
-# Adders/Subtractors                                   : 214
+# Adders/Subtractors                                   : 233
  10-bit adder                                          : 5
  10-bit subtractor                                     : 3
  11-bit adder                                          : 1
@@ -2023,52 +2167,56 @@ Macro Statistics
  12-bit addsub                                         : 6
  14-bit adder                                          : 20
  15-bit adder                                          : 1
- 16-bit adder                                          : 13
+ 16-bit adder                                          : 14
  16-bit addsub                                         : 3
  16-bit subtractor                                     : 1
  17-bit adder                                          : 10
  17-bit subtractor                                     : 1
  18-bit subtractor                                     : 2
+ 19-bit adder                                          : 1
  2-bit adder                                           : 3
- 3-bit adder                                           : 12
- 3-bit subtractor                                      : 2
- 32-bit adder                                          : 2
- 4-bit adder                                           : 55
+ 23-bit subtractor                                     : 1
+ 3-bit adder                                           : 15
+ 3-bit subtractor                                      : 4
+ 32-bit adder                                          : 4
+ 4-bit adder                                           : 56
  4-bit addsub                                          : 4
  4-bit subtractor                                      : 7
  5-bit adder                                           : 8
  5-bit subtractor                                      : 5
- 6-bit adder                                           : 6
+ 6-bit adder                                           : 7
  7-bit adder                                           : 4
  7-bit subtractor                                      : 1
  8-bit adder                                           : 3
- 8-bit subtractor                                      : 9
- 9-bit adder                                           : 13
- 9-bit subtractor                                      : 6
-# Registers                                            : 653
- 1-bit register                                        : 263
+ 8-bit subtractor                                      : 10
+ 9-bit adder                                           : 18
+ 9-bit subtractor                                      : 7
+# Registers                                            : 715
+ 1-bit register                                        : 291
  10-bit register                                       : 22
  11-bit register                                       : 5
  12-bit register                                       : 27
  14-bit register                                       : 12
  15-bit register                                       : 1
- 16-bit register                                       : 35
+ 16-bit register                                       : 37
  17-bit register                                       : 3
  18-bit register                                       : 1
- 19-bit register                                       : 1
+ 19-bit register                                       : 3
  2-bit register                                        : 22
  224-bit register                                      : 2
+ 23-bit register                                       : 1
  24-bit register                                       : 2
- 3-bit register                                        : 25
- 32-bit register                                       : 4
- 4-bit register                                        : 51
+ 3-bit register                                        : 30
+ 32-bit register                                       : 8
+ 4-bit register                                        : 52
  40-bit register                                       : 11
  5-bit register                                        : 17
  6-bit register                                        : 15
- 7-bit register                                        : 7
- 8-bit register                                        : 111
- 9-bit register                                        : 16
-# Comparators                                          : 73
+ 64-bit register                                       : 1
+ 7-bit register                                        : 8
+ 8-bit register                                        : 125
+ 9-bit register                                        : 19
+# Comparators                                          : 82
  1-bit comparator equal                                : 1
  10-bit comparator greater                             : 16
  10-bit comparator lessequal                           : 2
@@ -2080,6 +2228,7 @@ Macro Statistics
  17-bit comparator greater                             : 2
  2-bit comparator equal                                : 5
  3-bit comparator equal                                : 3
+ 32-bit comparator not equal                           : 2
  4-bit comparator equal                                : 1
  4-bit comparator greater                              : 10
  5-bit comparator equal                                : 2
@@ -2087,18 +2236,19 @@ Macro Statistics
  5-bit comparator lessequal                            : 1
  6-bit comparator greater                              : 2
  7-bit comparator equal                                : 1
- 8-bit comparator equal                                : 1
+ 8-bit comparator equal                                : 2
  8-bit comparator greater                              : 4
  8-bit comparator lessequal                            : 1
- 9-bit comparator greater                              : 3
- 9-bit comparator lessequal                            : 1
+ 9-bit comparator greater                              : 6
+ 9-bit comparator lessequal                            : 4
  9-bit comparator not equal                            : 1
-# Multiplexers                                         : 1793
+# Multiplexers                                         : 2091
  1-bit 13-to-1 multiplexer                             : 1
  1-bit 16-to-1 multiplexer                             : 3
- 1-bit 2-to-1 multiplexer                              : 795
+ 1-bit 2-to-1 multiplexer                              : 802
  1-bit 3-to-1 multiplexer                              : 18
  1-bit 4-to-1 multiplexer                              : 6
+ 1-bit 64-to-1 multiplexer                             : 1
  1-bit 8-to-1 multiplexer                              : 1
  10-bit 2-to-1 multiplexer                             : 31
  11-bit 2-to-1 multiplexer                             : 13
@@ -2106,49 +2256,51 @@ Macro Statistics
  12-bit 2-to-1 multiplexer                             : 37
  14-bit 2-to-1 multiplexer                             : 31
  15-bit 2-to-1 multiplexer                             : 1
- 16-bit 2-to-1 multiplexer                             : 105
+ 16-bit 2-to-1 multiplexer                             : 122
  16-bit 3-to-1 multiplexer                             : 1
  16-bit 7-to-1 multiplexer                             : 1
  17-bit 2-to-1 multiplexer                             : 6
  17-bit 21-to-1 multiplexer                            : 1
+ 19-bit 2-to-1 multiplexer                             : 3
  2-bit 2-to-1 multiplexer                              : 27
  2-bit 4-to-1 multiplexer                              : 1
  24-bit 2-to-1 multiplexer                             : 6
- 3-bit 2-to-1 multiplexer                              : 141
+ 3-bit 2-to-1 multiplexer                              : 145
  3-bit 3-to-1 multiplexer                              : 3
- 32-bit 2-to-1 multiplexer                             : 1
- 4-bit 2-to-1 multiplexer                              : 264
+ 32-bit 2-to-1 multiplexer                             : 193
+ 4-bit 2-to-1 multiplexer                              : 265
  4-bit 3-to-1 multiplexer                              : 4
  4-bit 4-to-1 multiplexer                              : 1
- 5-bit 2-to-1 multiplexer                              : 16
+ 5-bit 2-to-1 multiplexer                              : 57
  5-bit 7-to-1 multiplexer                              : 1
  56-bit 2-to-1 multiplexer                             : 4
- 6-bit 2-to-1 multiplexer                              : 24
- 6-bit 4-to-1 multiplexer                              : 1
+ 6-bit 2-to-1 multiplexer                              : 30
  6-bit 6-to-1 multiplexer                              : 2
  6-bit 7-to-1 multiplexer                              : 1
- 7-bit 2-to-1 multiplexer                              : 7
+ 64-bit 2-to-1 multiplexer                             : 7
+ 7-bit 2-to-1 multiplexer                              : 13
  8-bit 11-to-1 multiplexer                             : 1
  8-bit 13-to-1 multiplexer                             : 1
+ 8-bit 14-to-1 multiplexer                             : 1
  8-bit 15-to-1 multiplexer                             : 1
  8-bit 16-to-1 multiplexer                             : 1
- 8-bit 2-to-1 multiplexer                              : 194
+ 8-bit 2-to-1 multiplexer                              : 201
  8-bit 3-to-1 multiplexer                              : 2
- 8-bit 4-to-1 multiplexer                              : 1
+ 8-bit 4-to-1 multiplexer                              : 3
  8-bit 8-to-1 multiplexer                              : 1
  8-bit 9-to-1 multiplexer                              : 1
- 9-bit 2-to-1 multiplexer                              : 33
+ 9-bit 2-to-1 multiplexer                              : 37
  9-bit 3-to-1 multiplexer                              : 1
 # Logic shifters                                       : 1
  24-bit shifter logical left                           : 1
 # Tristates                                            : 18
  1-bit tristate buffer                                 : 18
-# FSMs                                                 : 13
-# Xors                                                 : 111
+# FSMs                                                 : 14
+# Xors                                                 : 120
  1-bit xor16                                           : 2
  1-bit xor2                                            : 81
  1-bit xor8                                            : 7
- 16-bit xor2                                           : 1
+ 16-bit xor2                                           : 10
  32-bit xor2                                           : 18
  56-bit xor2                                           : 1
  8-bit xor2                                            : 1
@@ -2244,6 +2396,45 @@ Synthesizing (advanced) Unit <colecovision>.
 The following registers are absorbed into counter <kbd_wr_ptr_r>: 1 register on signal <kbd_wr_ptr_r>.
 The following registers are absorbed into counter <kbd_count_r>: 1 register on signal <kbd_count_r>.
 The following registers are absorbed into counter <kbd_rd_ptr_r>: 1 register on signal <kbd_rd_ptr_r>.
+INFO:Xst:3226 - The RAM <cache/Mram_c_lba> will be implemented as a BLOCK RAM, absorbing the following register(s): <cache/f_arg>
+    -----------------------------------------------------------------------
+    | ram_type           | Block                               |          |
+    -----------------------------------------------------------------------
+    | Port A                                                              |
+    |     aspect ratio   | 256-word x 32-bit                   |          |
+    |     mode           | read-first                          |          |
+    |     clkA           | connected to signal <clk_25m0_i>    | rise     |
+    |     weA            | connected to signal <cache/cl_we>   | high     |
+    |     addrA          | connected to signal <cache/cl_a>    |          |
+    |     diA            | connected to signal <cache/cl_d>    |          |
+    -----------------------------------------------------------------------
+    | optimization       | speed                               |          |
+    -----------------------------------------------------------------------
+    | Port B                                                              |
+    |     aspect ratio   | 256-word x 32-bit                   |          |
+    |     mode           | read-first                          |          |
+    |     clkB           | connected to signal <clk_25m0_i>    | rise     |
+    |     addrB          | connected to signal <cache/f_page[7]_chk_page[7]_mux_7_OUT> |          |
+    |     doB            | connected to signal <cache/f_arg>   |          |
+    -----------------------------------------------------------------------
+    | optimization       | speed                               |          |
+    -----------------------------------------------------------------------
+INFO:Xst:3231 - The small RAM <cache/Mram_c_rev> will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
+    -----------------------------------------------------------------------
+    | ram_type           | Distributed                         |          |
+    -----------------------------------------------------------------------
+    | Port A                                                              |
+    |     aspect ratio   | 64-word x 9-bit                     |          |
+    |     clkA           | connected to signal <clk_25m0_i>    | rise     |
+    |     weA            | connected to signal <cache/cr_we>   | high     |
+    |     addrA          | connected to signal <cache/cr_a>    |          |
+    |     diA            | connected to signal <cache/cr_d>    |          |
+    -----------------------------------------------------------------------
+    | Port B                                                              |
+    |     aspect ratio   | 64-word x 9-bit                     |          |
+    |     addrB          | connected to signal <cache/f_line>  |          |
+    |     doB            | connected to internal node          |          |
+    -----------------------------------------------------------------------
 INFO:Xst:3231 - The small RAM <Mram_kbd_fifo_r> will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
     -----------------------------------------------------------------------
     | ram_type           | Distributed                         |          |
@@ -2268,7 +2459,7 @@ INFO:Xst:3226 - The RAM <Mram_cv_ram1k_r> will be implemented as a BLOCK RAM, ab
     |     aspect ratio   | 1024-word x 8-bit                   |          |
     |     mode           | read-first                          |          |
     |     clkA           | connected to signal <clk_25m0_i>    | rise     |
-    |     enA            | connected to signal <cpu_addr_s[15]_GND_12_o_Mux_37_o_0> | high     |
+    |     enA            | connected to signal <cpu_addr_s[15]_GND_12_o_Mux_46_o_0> | high     |
     |     weA            | connected to signal <wr_n_s>        | low      |
     |     addrA          | connected to signal <cpu_addr_s<9:0>> |          |
     |     diA            | connected to signal <d_from_cpu_s>  |          |
@@ -2276,7 +2467,7 @@ INFO:Xst:3226 - The RAM <Mram_cv_ram1k_r> will be implemented as a BLOCK RAM, ab
     -----------------------------------------------------------------------
     | optimization       | speed                               |          |
     -----------------------------------------------------------------------
-INFO:Xst:3218 - HDL ADVISOR - The RAM <Mram__n1023> will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
+INFO:Xst:3218 - HDL ADVISOR - The RAM <Mram__n1034> will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
     -----------------------------------------------------------------------
     | ram_type           | Distributed                         |          |
     -----------------------------------------------------------------------
@@ -2287,7 +2478,7 @@ INFO:Xst:3218 - HDL ADVISOR - The RAM <Mram__n1023> will be implemented on LUTs 
     |     diA            | connected to signal <GND>           |          |
     |     doA            | connected to internal node          |          |
     -----------------------------------------------------------------------
-INFO:Xst:3218 - HDL ADVISOR - The RAM <Mram__n1036> will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
+INFO:Xst:3218 - HDL ADVISOR - The RAM <Mram__n1055> will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
     -----------------------------------------------------------------------
     | ram_type           | Distributed                         |          |
     -----------------------------------------------------------------------
@@ -2298,7 +2489,33 @@ INFO:Xst:3218 - HDL ADVISOR - The RAM <Mram__n1036> will be implemented on LUTs 
     |     diA            | connected to signal <GND>           |          |
     |     doA            | connected to internal node          |          |
     -----------------------------------------------------------------------
+INFO:Xst:3218 - HDL ADVISOR - The RAM <cache/Mram_c_map> will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
+    -----------------------------------------------------------------------
+    | ram_type           | Distributed                         |          |
+    -----------------------------------------------------------------------
+    | Port A                                                              |
+    |     aspect ratio   | 256-word x 7-bit                    |          |
+    |     clkA           | connected to signal <clk_25m0_i>    | rise     |
+    |     weA            | connected to signal <cache/cm_we>   | high     |
+    |     addrA          | connected to signal <cache/cm_a>    |          |
+    |     diA            | connected to signal <cache/cm_d>    |          |
+    -----------------------------------------------------------------------
+    | Port B                                                              |
+    |     aspect ratio   | 256-word x 7-bit                    |          |
+    |     addrB          | connected to signal <rom_page_s>    |          |
+    |     doB            | connected to signal <c_line_s>      |          |
+    -----------------------------------------------------------------------
 Unit <colecovision> synthesized (advanced).
+
+Synthesizing (advanced) Unit <cv_cache>.
+The following registers are absorbed into counter <f_blk>: 1 register on signal <f_blk>.
+The following registers are absorbed into counter <f_byte>: 1 register on signal <f_byte>.
+The following registers are absorbed into counter <spi_bit>: 1 register on signal <spi_bit>.
+The following registers are absorbed into counter <c_init_i>: 1 register on signal <c_init_i>.
+The following registers are absorbed into counter <c_settle>: 1 register on signal <c_settle>.
+The following registers are absorbed into counter <ov_settle>: 1 register on signal <ov_settle>.
+The following registers are absorbed into counter <led_time>: 1 register on signal <led_time>.
+Unit <cv_cache> synthesized (advanced).
 
 Synthesizing (advanced) Unit <cv_ctrl>.
 The following registers are absorbed into counter <intcnt_r>: 1 register on signal <intcnt_r>.
@@ -2395,7 +2612,7 @@ INFO:Xst:3231 - The small RAM <Mram_vwe_next> will be implemented on LUTs in ord
     |     diA            | connected to signal <GND>           |          |
     |     doA            | connected to signal <vwe_next>      |          |
     -----------------------------------------------------------------------
-INFO:Xst:3231 - The small RAM <Mram__n3050> will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
+INFO:Xst:3231 - The small RAM <Mram__n3216> will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
     -----------------------------------------------------------------------
     | ram_type           | Distributed                         |          |
     -----------------------------------------------------------------------
@@ -2560,7 +2777,7 @@ INFO:Xst:3231 - The small RAM <Mram_n1028> will be implemented on LUTs in order 
     |     diA            | connected to signal <GND>           |          |
     |     doA            | connected to internal node          |          |
     -----------------------------------------------------------------------
-INFO:Xst:3231 - The small RAM <Mram__n3369> will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
+INFO:Xst:3231 - The small RAM <Mram__n3272> will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
     -----------------------------------------------------------------------
     | ram_type           | Distributed                         |          |
     -----------------------------------------------------------------------
@@ -2631,7 +2848,7 @@ INFO:Xst:3231 - The small RAM <Mram_shift_dir> will be implemented on LUTs in or
     |     diA            | connected to signal <GND>           |          |
     |     doA            | connected to signal <shift_dir>     |          |
     -----------------------------------------------------------------------
-INFO:Xst:3231 - The small RAM <Mram__n3115> will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
+INFO:Xst:3231 - The small RAM <Mram__n3095> will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
     -----------------------------------------------------------------------
     | ram_type           | Distributed                         |          |
     -----------------------------------------------------------------------
@@ -2642,7 +2859,7 @@ INFO:Xst:3231 - The small RAM <Mram__n3115> will be implemented on LUTs in order
     |     diA            | connected to signal <GND>           |          |
     |     doA            | connected to internal node          |          |
     -----------------------------------------------------------------------
-INFO:Xst:3231 - The small RAM <Mram__n3163> will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
+INFO:Xst:3231 - The small RAM <Mram__n3142> will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
     -----------------------------------------------------------------------
     | ram_type           | Distributed                         |          |
     -----------------------------------------------------------------------
@@ -2708,7 +2925,7 @@ INFO:Xst:3231 - The small RAM <Mram_n1026> will be implemented on LUTs in order 
     |     diA            | connected to signal <GND>           |          |
     |     doA            | connected to internal node          |          |
     -----------------------------------------------------------------------
-INFO:Xst:3231 - The small RAM <Mram__n3374> will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
+INFO:Xst:3231 - The small RAM <Mram__n3277> will be implemented on LUTs in order to maximize performance and save block RAM resources. If you want to force its implementation on block, use option/constraint ram_style.
     -----------------------------------------------------------------------
     | ram_type           | Distributed                         |          |
     -----------------------------------------------------------------------
@@ -2897,7 +3114,7 @@ The following registers are absorbed into counter <counterX>: 1 register on sign
 The following registers are absorbed into counter <dataOffset>: 1 register on signal <dataOffset>.
 The following registers are absorbed into counter <channelStatusIdx>: 1 register on signal <channelStatusIdx>.
 The following registers are absorbed into counter <samplesHead>: 1 register on signal <samplesHead>.
-INFO:Xst:3218 - HDL ADVISOR - The RAM <Mram_channelStatusIdx[7]_X_68_o_Mux_18_o> will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
+INFO:Xst:3218 - HDL ADVISOR - The RAM <Mram_channelStatusIdx[7]_X_69_o_Mux_18_o> will be implemented on LUTs either because you have described an asynchronous read or because of currently unsupported block RAM features. If you have described an asynchronous read, making it synchronous would allow you to take advantage of available block RAM resources, for optimized device usage and improved timings. Please refer to your documentation for coding guidelines.
     -----------------------------------------------------------------------
     | ram_type           | Distributed                         |          |
     -----------------------------------------------------------------------
@@ -3189,6 +3406,14 @@ INFO:Xst:3218 - HDL ADVISOR - The RAM <Mram_dacrom_ar> will be implemented on LU
     -----------------------------------------------------------------------
 Unit <ym2149_audio> synthesized (advanced).
 WARNING:Xst:2677 - Node <upmem_mode_r_1> of sequential type is unconnected in block <colecovision>.
+WARNING:Xst:2677 - Node <cache/sn_arg_24> of sequential type is unconnected in block <colecovision>.
+WARNING:Xst:2677 - Node <cache/sn_arg_25> of sequential type is unconnected in block <colecovision>.
+WARNING:Xst:2677 - Node <cache/sn_arg_26> of sequential type is unconnected in block <colecovision>.
+WARNING:Xst:2677 - Node <cache/sn_arg_27> of sequential type is unconnected in block <colecovision>.
+WARNING:Xst:2677 - Node <cache/sn_arg_28> of sequential type is unconnected in block <colecovision>.
+WARNING:Xst:2677 - Node <cache/sn_arg_29> of sequential type is unconnected in block <colecovision>.
+WARNING:Xst:2677 - Node <cache/sn_arg_30> of sequential type is unconnected in block <colecovision>.
+WARNING:Xst:2677 - Node <cache/sn_arg_31> of sequential type is unconnected in block <colecovision>.
 WARNING:Xst:2677 - Node <ws_dst_save_7> of sequential type is unconnected in block <f18a_gpu>.
 WARNING:Xst:2677 - Node <ws_dst_save_6> of sequential type is unconnected in block <f18a_gpu>.
 WARNING:Xst:2677 - Node <ws_dst_save_5> of sequential type is unconnected in block <f18a_gpu>.
@@ -3207,7 +3432,7 @@ WARNING:Xst:2677 - Node <buttons_q_19> of sequential type is unconnected in bloc
 Advanced HDL Synthesis Report
 
 Macro Statistics
-# RAMs                                                 : 64
+# RAMs                                                 : 67
  1024x1-bit single-port block Read Only RAM            : 1
  1024x8-bit single-port block RAM                      : 1
  16384x8-bit dual-port block RAM                       : 1
@@ -3220,6 +3445,8 @@ Macro Statistics
  16x6-bit single-port distributed Read Only RAM        : 7
  2048x8-bit single-port block RAM                      : 13
  256x1-bit single-port distributed Read Only RAM       : 1
+ 256x32-bit dual-port block RAM                        : 1
+ 256x7-bit dual-port distributed RAM                   : 1
  32x12-bit dual-port distributed Read Only RAM         : 1
  32x2-bit single-port distributed Read Only RAM        : 1
  4x1-bit single-port distributed Read Only RAM         : 4
@@ -3229,6 +3456,7 @@ Macro Statistics
  512x9-bit dual-port block RAM                         : 2
  64x12-bit dual-port distributed RAM                   : 1
  64x2-bit single-port distributed Read Only RAM        : 1
+ 64x9-bit dual-port distributed RAM                    : 1
  8192x8-bit single-port block RAM                      : 1
  8x3-bit single-port distributed Read Only RAM         : 2
  8x4-bit single-port distributed Read Only RAM         : 1
@@ -3241,42 +3469,45 @@ Macro Statistics
  8x8-bit registered multiplier                         : 2
  9x8-bit multiplier                                    : 1
  9x9-bit registered multiplier                         : 1
-# Adders/Subtractors                                   : 95
+# Adders/Subtractors                                   : 107
  11-bit adder                                          : 1
  12-bit adder                                          : 1
  12-bit addsub                                         : 6
  14-bit adder                                          : 13
  15-bit adder                                          : 1
- 16-bit adder                                          : 8
+ 16-bit adder                                          : 9
  16-bit addsub                                         : 3
  16-bit subtractor                                     : 1
  17-bit adder                                          : 10
  17-bit adder carry in                                 : 1
  17-bit subtractor                                     : 1
- 3-bit adder                                           : 2
+ 19-bit adder                                          : 1
+ 3-bit adder                                           : 4
+ 32-bit adder                                          : 2
  4-bit adder                                           : 11
  4-bit subtractor                                      : 6
  5-bit adder                                           : 3
  5-bit subtractor                                      : 1
- 6-bit adder                                           : 4
+ 6-bit adder                                           : 5
  7-bit adder                                           : 3
- 8-bit subtractor                                      : 7
- 9-bit adder                                           : 8
- 9-bit subtractor                                      : 4
+ 8-bit subtractor                                      : 8
+ 9-bit adder                                           : 11
+ 9-bit subtractor                                      : 5
 # Adder Trees                                          : 8
  14-bit / 4-inputs adder tree                          : 2
  4-bit / 4-inputs adder tree                           : 6
-# Counters                                             : 61
+# Counters                                             : 68
  10-bit down counter                                   : 3
  10-bit up counter                                     : 4
  11-bit down counter                                   : 4
  12-bit up counter                                     : 3
  16-bit up counter                                     : 3
  2-bit up counter                                      : 3
- 3-bit down counter                                    : 2
- 3-bit up counter                                      : 10
+ 23-bit down counter                                   : 1
+ 3-bit down counter                                    : 4
+ 3-bit up counter                                      : 11
  4-bit down counter                                    : 1
- 4-bit up counter                                      : 2
+ 4-bit up counter                                      : 3
  4-bit updown counter                                  : 1
  5-bit down counter                                    : 4
  5-bit up counter                                      : 6
@@ -3286,15 +3517,15 @@ Macro Statistics
  8-bit down counter                                    : 2
  8-bit up counter                                      : 3
  9-bit down counter                                    : 2
- 9-bit up counter                                      : 5
+ 9-bit up counter                                      : 7
 # Accumulators                                         : 7
  10-bit up accumulator                                 : 1
  14-bit up loadable accumulator                        : 1
  16-bit up loadable accumulator                        : 2
  4-bit updown loadable accumulator                     : 3
-# Registers                                            : 3549
- Flip-Flops                                            : 3549
-# Comparators                                          : 73
+# Registers                                            : 3933
+ Flip-Flops                                            : 3933
+# Comparators                                          : 82
  1-bit comparator equal                                : 1
  10-bit comparator greater                             : 16
  10-bit comparator lessequal                           : 2
@@ -3306,6 +3537,7 @@ Macro Statistics
  17-bit comparator greater                             : 2
  2-bit comparator equal                                : 5
  3-bit comparator equal                                : 3
+ 32-bit comparator not equal                           : 2
  4-bit comparator equal                                : 1
  4-bit comparator greater                              : 10
  5-bit comparator equal                                : 2
@@ -3313,19 +3545,20 @@ Macro Statistics
  5-bit comparator lessequal                            : 1
  6-bit comparator greater                              : 2
  7-bit comparator equal                                : 1
- 8-bit comparator equal                                : 1
+ 8-bit comparator equal                                : 2
  8-bit comparator greater                              : 4
  8-bit comparator lessequal                            : 1
- 9-bit comparator greater                              : 3
- 9-bit comparator lessequal                            : 1
+ 9-bit comparator greater                              : 6
+ 9-bit comparator lessequal                            : 4
  9-bit comparator not equal                            : 1
-# Multiplexers                                         : 2350
+# Multiplexers                                         : 2655
  1-bit 13-to-1 multiplexer                             : 1
  1-bit 15-to-1 multiplexer                             : 8
  1-bit 16-to-1 multiplexer                             : 11
- 1-bit 2-to-1 multiplexer                              : 1415
+ 1-bit 2-to-1 multiplexer                              : 1430
  1-bit 3-to-1 multiplexer                              : 18
- 1-bit 4-to-1 multiplexer                              : 16
+ 1-bit 4-to-1 multiplexer                              : 18
+ 1-bit 64-to-1 multiplexer                             : 1
  1-bit 8-to-1 multiplexer                              : 1
  10-bit 2-to-1 multiplexer                             : 28
  11-bit 2-to-1 multiplexer                             : 9
@@ -3333,42 +3566,45 @@ Macro Statistics
  12-bit 2-to-1 multiplexer                             : 30
  14-bit 2-to-1 multiplexer                             : 23
  15-bit 2-to-1 multiplexer                             : 1
- 16-bit 2-to-1 multiplexer                             : 102
+ 16-bit 2-to-1 multiplexer                             : 119
  16-bit 3-to-1 multiplexer                             : 1
  16-bit 7-to-1 multiplexer                             : 1
  17-bit 2-to-1 multiplexer                             : 6
  17-bit 21-to-1 multiplexer                            : 1
+ 19-bit 2-to-1 multiplexer                             : 3
  2-bit 2-to-1 multiplexer                              : 27
  2-bit 4-to-1 multiplexer                              : 1
  24-bit 2-to-1 multiplexer                             : 3
- 3-bit 2-to-1 multiplexer                              : 135
+ 3-bit 2-to-1 multiplexer                              : 139
  3-bit 3-to-1 multiplexer                              : 3
- 32-bit 2-to-1 multiplexer                             : 1
+ 32-bit 2-to-1 multiplexer                             : 193
  4-bit 2-to-1 multiplexer                              : 255
  4-bit 3-to-1 multiplexer                              : 4
- 5-bit 2-to-1 multiplexer                              : 9
+ 5-bit 2-to-1 multiplexer                              : 50
  5-bit 7-to-1 multiplexer                              : 1
- 6-bit 2-to-1 multiplexer                              : 22
+ 6-bit 2-to-1 multiplexer                              : 28
  6-bit 6-to-1 multiplexer                              : 2
  6-bit 7-to-1 multiplexer                              : 1
- 7-bit 2-to-1 multiplexer                              : 6
+ 64-bit 2-to-1 multiplexer                             : 7
+ 7-bit 2-to-1 multiplexer                              : 12
  8-bit 11-to-1 multiplexer                             : 1
  8-bit 13-to-1 multiplexer                             : 1
- 8-bit 2-to-1 multiplexer                              : 171
+ 8-bit 14-to-1 multiplexer                             : 1
+ 8-bit 2-to-1 multiplexer                              : 177
  8-bit 3-to-1 multiplexer                              : 2
- 8-bit 4-to-1 multiplexer                              : 1
+ 8-bit 4-to-1 multiplexer                              : 2
  8-bit 8-to-1 multiplexer                              : 1
  8-bit 9-to-1 multiplexer                              : 1
- 9-bit 2-to-1 multiplexer                              : 28
+ 9-bit 2-to-1 multiplexer                              : 31
  9-bit 3-to-1 multiplexer                              : 1
 # Logic shifters                                       : 1
  24-bit shifter logical left                           : 1
-# FSMs                                                 : 13
-# Xors                                                 : 111
+# FSMs                                                 : 14
+# Xors                                                 : 120
  1-bit xor16                                           : 2
  1-bit xor2                                            : 81
  1-bit xor8                                            : 7
- 16-bit xor2                                           : 1
+ 16-bit xor2                                           : 10
  32-bit xor2                                           : 18
  56-bit xor2                                           : 1
  8-bit xor2                                            : 1
@@ -3448,22 +3684,22 @@ INFO:Xst:2261 - The FF/Latch <y_max_rows_r_3> in Unit <f18a_tiles> is equivalent
 INFO:Xst:2261 - The FF/Latch <y_pos_r_8> in Unit <f18a_tiles> is equivalent to the following FF/Latch, which will be removed : <y_next_r> 
 INFO:Xst:2261 - The FF/Latch <subpacket_0_43> in Unit <hdmidataencoder> is equivalent to the following 7 FFs/Latches, which will be removed : <subpacket_0_44> <subpacket_0_99> <subpacket_0_100> <subpacket_0_155> <subpacket_0_156> <subpacket_0_211> <subpacket_0_212> 
 INFO:Xst:2261 - The FF/Latch <ce_n_r> in Unit <sn76489_audio> is equivalent to the following FF/Latch, which will be removed : <wr_n_r> 
-INFO:Xst:2261 - The FF/Latch <audioLAvg_10> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_10> 
 INFO:Xst:2261 - The FF/Latch <audioLAvg_0> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_0> 
-INFO:Xst:2261 - The FF/Latch <audioLAvg_11> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_11> 
 INFO:Xst:2261 - The FF/Latch <audioLAvg_1> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_1> 
-INFO:Xst:2261 - The FF/Latch <audioLAvg_12> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_12> 
 INFO:Xst:2261 - The FF/Latch <audioLAvg_2> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_2> 
-INFO:Xst:2261 - The FF/Latch <audioLAvg_13> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_13> 
 INFO:Xst:2261 - The FF/Latch <audioLAvg_3> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_3> 
-INFO:Xst:2261 - The FF/Latch <audioLAvg_14> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_14> 
 INFO:Xst:2261 - The FF/Latch <audioLAvg_4> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_4> 
-INFO:Xst:2261 - The FF/Latch <audioLAvg_15> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_15> 
 INFO:Xst:2261 - The FF/Latch <audioLAvg_5> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_5> 
 INFO:Xst:2261 - The FF/Latch <audioLAvg_6> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_6> 
 INFO:Xst:2261 - The FF/Latch <audioLAvg_7> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_7> 
 INFO:Xst:2261 - The FF/Latch <audioLAvg_8> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_8> 
 INFO:Xst:2261 - The FF/Latch <audioLAvg_9> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_9> 
+INFO:Xst:2261 - The FF/Latch <audioLAvg_10> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_10> 
+INFO:Xst:2261 - The FF/Latch <audioLAvg_11> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_11> 
+INFO:Xst:2261 - The FF/Latch <audioLAvg_12> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_12> 
+INFO:Xst:2261 - The FF/Latch <audioLAvg_13> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_13> 
+INFO:Xst:2261 - The FF/Latch <audioLAvg_14> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_14> 
+INFO:Xst:2261 - The FF/Latch <audioLAvg_15> in Unit <hdmidataencoder> is equivalent to the following FF/Latch, which will be removed : <audioRAvg_15> 
 INFO:Xst:2261 - The FF/Latch <q_pipe_0_16> in Unit <hdmi_delay_line> is equivalent to the following FF/Latch, which will be removed : <q_pipe_0_20> 
 INFO:Xst:2261 - The FF/Latch <q_pipe_0_17> in Unit <hdmi_delay_line> is equivalent to the following FF/Latch, which will be removed : <q_pipe_0_21> 
 INFO:Xst:2261 - The FF/Latch <q_pipe_0_18> in Unit <hdmi_delay_line> is equivalent to the following FF/Latch, which will be removed : <q_pipe_0_22> 
@@ -3598,6 +3834,16 @@ INFO:Xst:2261 - The FF/Latch <q_pipe_10_32> in Unit <hdmi_delay_line> is equival
 INFO:Xst:2261 - The FF/Latch <q_pipe_10_33> in Unit <hdmi_delay_line> is equivalent to the following FF/Latch, which will be removed : <q_pipe_10_37> 
 INFO:Xst:2261 - The FF/Latch <q_pipe_10_34> in Unit <hdmi_delay_line> is equivalent to the following FF/Latch, which will be removed : <q_pipe_10_38> 
 INFO:Xst:2261 - The FF/Latch <q_pipe_10_35> in Unit <hdmi_delay_line> is equivalent to the following FF/Latch, which will be removed : <q_pipe_10_39> 
+Analyzing FSM <MFsm> for best encoding.
+Optimizing FSM <coleco/FSM_11> on signal <ws[1:2]> with user encoding.
+-------------------
+ State | Encoding
+-------------------
+ 00    | 00
+ 01    | 01
+ 10    | 10
+ 11    | 11
+-------------------
 Analyzing FSM <MFsm> for best encoding.
 Optimizing FSM <coleco/inst_f18a/inst_cpu/FSM_0> on signal <io_state[1:4]> with user encoding.
 ------------------------------
@@ -3735,7 +3981,7 @@ Optimizing FSM <coleco/sdcard/FSM_10> on signal <state_r[1:2]> with user encodin
  st_wait_eoc | 11
 -------------------------
 Analyzing FSM <MFsm> for best encoding.
-Optimizing FSM <snespads_b/ctrl_b/FSM_11> on signal <state_q[1:2]> with user encoding.
+Optimizing FSM <snespads_b/ctrl_b/FSM_12> on signal <state_q[1:2]> with user encoding.
 ----------------------
  State    | Encoding
 ----------------------
@@ -3745,7 +3991,7 @@ Optimizing FSM <snespads_b/ctrl_b/FSM_11> on signal <state_q[1:2]> with user enc
  read_pad | 11
 ----------------------
 Analyzing FSM <MFsm> for best encoding.
-Optimizing FSM <tmds/FSM_12> on signal <state[1:3]> with user encoding.
+Optimizing FSM <tmds/FSM_13> on signal <state[1:3]> with user encoding.
 ---------------------------------
  State               | Encoding
 ---------------------------------
@@ -3971,26 +4217,26 @@ WARNING:Xst:2677 - Node <coleco/ym2149_audio_inst/sum_audio_r_0> of sequential t
 WARNING:Xst:2677 - Node <snespads_b/pads[0].pad_b/buttons_q_2> of sequential type is unconnected in block <phoenix_top>.
 WARNING:Xst:2677 - Node <snespads_b/pads[0].pad_b/buttons_q_0> of sequential type is unconnected in block <phoenix_top>.
 INFO:Xst:2261 - The FF/Latch <tmds/prevBlank> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <tmds/dataenc/prevBlank> 
+INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_113> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <tmds/dataenc/subpacket_0_57> 
+INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_115> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <tmds/dataenc/subpacket_0_59> 
+INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_121> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <tmds/dataenc/subpacket_0_65> 
+INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_117> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <tmds/dataenc/subpacket_0_61> 
+INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_119> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <tmds/dataenc/subpacket_0_63> 
 INFO:Xst:2261 - The FF/Latch <coleco/inst_f18a/inst_cpu/blank_edge_r> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <coleco/inst_f18a/inst_cpu/inst_gpu/blank_reg> 
 INFO:Xst:2261 - The FF/Latch <coleco/inst_f18a/inst_tiles/textpos_r_10> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <coleco/inst_f18a/inst_tiles/textattr_r_10> 
 INFO:Xst:2261 - The FF/Latch <coleco/inst_f18a/inst_tiles/textpos_r_11> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <coleco/inst_f18a/inst_tiles/textattr_r_11> 
 INFO:Xst:2261 - The FF/Latch <coleco/inst_f18a/inst_tiles/textpos_r_12> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <coleco/inst_f18a/inst_tiles/textattr_r_12> 
 INFO:Xst:2261 - The FF/Latch <coleco/inst_f18a/inst_tiles/textpos_r_13> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <coleco/inst_f18a/inst_tiles/textattr_r_13> 
 INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_170> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <tmds/dataenc/subpacket_0_114> <tmds/dataenc/subpacket_0_58> 
-INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_171> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <tmds/dataenc/subpacket_0_115> <tmds/dataenc/subpacket_0_59> 
 INFO:Xst:2261 - The FF/Latch <tmds/prevData> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <tmds/delay_line/q_pipe_0_12> 
 INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_172> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <tmds/dataenc/subpacket_0_116> <tmds/dataenc/subpacket_0_60> 
 INFO:Xst:2261 - The FF/Latch <tmds/dataenc/prevHSync> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <tmds/delay_line/q_pipe_0_15> 
-INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_173> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <tmds/dataenc/subpacket_0_117> <tmds/dataenc/subpacket_0_61> 
 INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_168> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <tmds/dataenc/subpacket_0_112> <tmds/dataenc/subpacket_0_56> 
 INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_174> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <tmds/dataenc/subpacket_0_118> <tmds/dataenc/subpacket_0_62> 
-INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_169> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <tmds/dataenc/subpacket_0_113> <tmds/dataenc/subpacket_0_57> 
 INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_180> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <tmds/dataenc/subpacket_0_124> <tmds/dataenc/subpacket_0_68> 
-INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_175> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <tmds/dataenc/subpacket_0_119> <tmds/dataenc/subpacket_0_63> 
 INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_181> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <tmds/dataenc/subpacket_0_125> <tmds/dataenc/subpacket_0_69> 
 INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_176> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <tmds/dataenc/subpacket_0_120> <tmds/dataenc/subpacket_0_64> 
 INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_182> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <tmds/dataenc/subpacket_0_126> <tmds/dataenc/subpacket_0_70> 
-INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_177> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <tmds/dataenc/subpacket_0_121> <tmds/dataenc/subpacket_0_65> 
 INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_183> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <tmds/dataenc/subpacket_0_127> <tmds/dataenc/subpacket_0_71> 
 INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_178> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <tmds/dataenc/subpacket_0_122> <tmds/dataenc/subpacket_0_66> 
 INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_184> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <tmds/dataenc/subpacket_0_128> <tmds/dataenc/subpacket_0_72> 
@@ -4001,35 +4247,43 @@ INFO:Xst:2261 - The FF/Latch <coleco/inst_f18a/inst_tiles/textpos_r_8> in Unit <
 INFO:Xst:2261 - The FF/Latch <coleco/inst_f18a/inst_tiles/textpos_r_9> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <coleco/inst_f18a/inst_tiles/textattr_r_9> 
 INFO:Xst:2261 - The FF/Latch <coleco/inst_f18a/inst_tiles/y_pos_r_8> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <coleco/inst_f18a/inst_sprites/y_next> 
 INFO:Xst:2261 - The FF/Latch <coleco/inst_f18a/inst_cpu/reg48inc_0> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <coleco/inst_f18a/inst_cpu/reg48sign_5> 
-INFO:Xst:2261 - The FF/Latch <coleco/ext512/d_to_ext_r_0> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <coleco/sn76489_audio_inst/din_r_0> <coleco/ym2149_audio_inst/data_i_r_0> 
-INFO:Xst:2261 - The FF/Latch <coleco/ext512/d_to_ext_r_1> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <coleco/sn76489_audio_inst/din_r_1> <coleco/ym2149_audio_inst/data_i_r_1> 
-INFO:Xst:2261 - The FF/Latch <coleco/ext512/d_to_ext_r_2> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <coleco/sn76489_audio_inst/din_r_2> <coleco/ym2149_audio_inst/data_i_r_2> 
-INFO:Xst:2261 - The FF/Latch <coleco/ext512/d_to_ext_r_3> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <coleco/sn76489_audio_inst/din_r_3> <coleco/ym2149_audio_inst/data_i_r_3> 
-INFO:Xst:2261 - The FF/Latch <coleco/ext512/d_to_ext_r_4> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <coleco/sn76489_audio_inst/din_r_4> <coleco/ym2149_audio_inst/data_i_r_4> 
-INFO:Xst:2261 - The FF/Latch <coleco/ext512/d_to_ext_r_5> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <coleco/sn76489_audio_inst/din_r_5> <coleco/ym2149_audio_inst/data_i_r_5> 
-INFO:Xst:2261 - The FF/Latch <coleco/ext512/d_to_ext_r_6> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <coleco/sn76489_audio_inst/din_r_6> <coleco/ym2149_audio_inst/data_i_r_6> 
-INFO:Xst:2261 - The FF/Latch <coleco/ext512/d_to_ext_r_7> in Unit <phoenix_top> is equivalent to the following 2 FFs/Latches, which will be removed : <coleco/sn76489_audio_inst/din_r_7> <coleco/ym2149_audio_inst/data_i_r_7> 
+INFO:Xst:2261 - The FF/Latch <coleco/sn76489_audio_inst/din_r_0> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <coleco/ym2149_audio_inst/data_i_r_0> 
+INFO:Xst:2261 - The FF/Latch <coleco/sn76489_audio_inst/din_r_1> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <coleco/ym2149_audio_inst/data_i_r_1> 
+INFO:Xst:2261 - The FF/Latch <coleco/sn76489_audio_inst/din_r_2> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <coleco/ym2149_audio_inst/data_i_r_2> 
+INFO:Xst:2261 - The FF/Latch <coleco/sn76489_audio_inst/din_r_3> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <coleco/ym2149_audio_inst/data_i_r_3> 
+INFO:Xst:2261 - The FF/Latch <coleco/sn76489_audio_inst/din_r_4> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <coleco/ym2149_audio_inst/data_i_r_4> 
+INFO:Xst:2261 - The FF/Latch <coleco/sn76489_audio_inst/din_r_5> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <coleco/ym2149_audio_inst/data_i_r_5> 
+INFO:Xst:2261 - The FF/Latch <coleco/sn76489_audio_inst/din_r_6> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <coleco/ym2149_audio_inst/data_i_r_6> 
+INFO:Xst:2261 - The FF/Latch <coleco/sn76489_audio_inst/din_r_7> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <coleco/ym2149_audio_inst/data_i_r_7> 
 INFO:Xst:3203 - The FF/Latch <coleco/ext512/ram_st_r> in Unit <phoenix_top> is the opposite to the following FF/Latch, which will be removed : <coleco/ext512/ce_n_r> 
 INFO:Xst:3203 - The FF/Latch <coleco/sn76489_audio_inst/clk_div16_r_0> in Unit <phoenix_top> is the opposite to the following FF/Latch, which will be removed : <coleco/ym2149_audio_inst/sel_ff_r> 
 
 Mapping all equations...
 Building and optimizing final netlist ...
-Found area constraint ratio of 100 (+ 0) on block phoenix_top, actual ratio is 94.
+INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_177> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <tmds/dataenc/subpacket_0_121> 
+INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_175> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <tmds/dataenc/subpacket_0_119> 
+INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_173> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <tmds/dataenc/subpacket_0_117> 
+INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_171> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <tmds/dataenc/subpacket_0_115> 
+INFO:Xst:2261 - The FF/Latch <tmds/dataenc/subpacket_0_169> in Unit <phoenix_top> is equivalent to the following FF/Latch, which will be removed : <tmds/dataenc/subpacket_0_113> 
+Found area constraint ratio of 100 (+ 0) on block phoenix_top, actual ratio is 107.
+Optimizing block <phoenix_top> to meet ratio 100 (+ 0) of 2278 slices :
+WARNING:Xst:2254 - Area constraint could not be met for block <phoenix_top>, final ratio is 116.
 FlipFlop coleco/inst_t80/u0/F_0 has been replicated 1 time(s)
-FlipFlop coleco/inst_t80/u0/IR_0 has been replicated 3 time(s)
-FlipFlop coleco/inst_t80/u0/IR_1 has been replicated 3 time(s)
-FlipFlop coleco/inst_t80/u0/IR_2 has been replicated 3 time(s)
-FlipFlop coleco/inst_t80/u0/IR_3 has been replicated 2 time(s)
-FlipFlop coleco/inst_t80/u0/IR_4 has been replicated 2 time(s)
-FlipFlop coleco/inst_t80/u0/IR_5 has been replicated 3 time(s)
+FlipFlop coleco/inst_t80/u0/IR_0 has been replicated 4 time(s)
+FlipFlop coleco/inst_t80/u0/IR_1 has been replicated 2 time(s)
+FlipFlop coleco/inst_t80/u0/IR_2 has been replicated 2 time(s)
+FlipFlop coleco/inst_t80/u0/IR_3 has been replicated 3 time(s)
+FlipFlop coleco/inst_t80/u0/IR_4 has been replicated 3 time(s)
+FlipFlop coleco/inst_t80/u0/IR_5 has been replicated 4 time(s)
 FlipFlop coleco/inst_t80/u0/IR_6 has been replicated 3 time(s)
 FlipFlop coleco/inst_t80/u0/IR_7 has been replicated 3 time(s)
 FlipFlop coleco/inst_t80/u0/ISet_0 has been replicated 1 time(s)
 FlipFlop coleco/inst_t80/u0/ISet_1 has been replicated 1 time(s)
 FlipFlop coleco/inst_t80/u0/IntCycle has been replicated 1 time(s)
 FlipFlop coleco/inst_t80/u0/MCycle_0 has been replicated 2 time(s)
-FlipFlop coleco/inst_t80/u0/MCycle_1 has been replicated 3 time(s)
+FlipFlop coleco/inst_t80/u0/MCycle_1 has been replicated 2 time(s)
 FlipFlop coleco/inst_t80/u0/MCycle_2 has been replicated 2 time(s)
+FlipFlop coleco/inst_t80/u0/TState_2 has been replicated 1 time(s)
 
 Final Macro Processing ...
 
@@ -4078,8 +4332,8 @@ Unit <phoenix_top> processed.
 Final Register Report
 
 Macro Statistics
-# Registers                                            : 3282
- Flip-Flops                                            : 3282
+# Registers                                            : 3732
+ Flip-Flops                                            : 3732
 # Shift Registers                                      : 37
  10-bit shift register                                 : 2
  11-bit shift register                                 : 26
@@ -4107,39 +4361,40 @@ Top Level Output File Name         : phoenix_top.ngc
 
 Primitive and Black Box Usage:
 ------------------------------
-# BELS                             : 8977
+# BELS                             : 10082
 #      GND                         : 1
-#      INV                         : 180
-#      LUT1                        : 227
-#      LUT2                        : 604
-#      LUT3                        : 951
-#      LUT4                        : 854
-#      LUT5                        : 1324
-#      LUT6                        : 2716
-#      MUXCY                       : 965
-#      MUXF7                       : 154
+#      INV                         : 211
+#      LUT1                        : 316
+#      LUT2                        : 611
+#      LUT3                        : 970
+#      LUT4                        : 916
+#      LUT5                        : 1501
+#      LUT6                        : 3153
+#      MUXCY                       : 1125
+#      MUXF7                       : 137
 #      MUXF8                       : 11
 #      VCC                         : 1
-#      XORCY                       : 989
-# FlipFlops/Latches                : 3323
-#      FD                          : 372
-#      FDC                         : 33
-#      FDCE                        : 161
-#      FDE                         : 1827
-#      FDP                         : 2
-#      FDPE                        : 61
-#      FDR                         : 131
-#      FDRE                        : 620
-#      FDS                         : 16
-#      FDSE                        : 96
+#      XORCY                       : 1129
+# FlipFlops/Latches                : 3773
+#      FD                          : 422
+#      FDC                         : 28
+#      FDCE                        : 168
+#      FDE                         : 2134
+#      FDP                         : 1
+#      FDPE                        : 62
+#      FDR                         : 170
+#      FDRE                        : 662
+#      FDS                         : 12
+#      FDSE                        : 110
 #      ODDR2                       : 4
-# RAMS                             : 86
+# RAMS                             : 102
 #      RAM16X1D                    : 24
 #      RAM16X1S                    : 16
 #      RAM32M                      : 4
-#      RAM64X1D                    : 12
+#      RAM64M                      : 11
+#      RAM64X1D                    : 16
 #      RAMB16BWER                  : 26
-#      RAMB8BWER                   : 4
+#      RAMB8BWER                   : 5
 # Shift Registers                  : 37
 #      SRLC16E                     : 37
 # Clock Buffers                    : 4
@@ -4163,27 +4418,27 @@ Selected Device : 6slx16csg324-2
 
 
 Slice Logic Utilization: 
- Number of Slice Registers:            3323  out of  18224    18%  
- Number of Slice LUTs:                 6997  out of   9112    76%  
-    Number used as Logic:              6856  out of   9112    75%  
-    Number used as Memory:              141  out of   2176     6%  
-       Number used as RAM:              104
+ Number of Slice Registers:            3773  out of  18224    20%  
+ Number of Slice LUTs:                 7871  out of   9112    86%  
+    Number used as Logic:              7678  out of   9112    84%  
+    Number used as Memory:              193  out of   2176     8%  
+       Number used as RAM:              156
        Number used as SRL:               37
 
 Slice Logic Distribution: 
- Number of LUT Flip Flop pairs used:   7801
-   Number with an unused Flip Flop:    4478  out of   7801    57%  
-   Number with an unused LUT:           804  out of   7801    10%  
-   Number of fully used LUT-FF pairs:  2519  out of   7801    32%  
-   Number of unique control sets:       254
+ Number of LUT Flip Flop pairs used:   8812
+   Number with an unused Flip Flop:    5039  out of   8812    57%  
+   Number with an unused LUT:           941  out of   8812    10%  
+   Number of fully used LUT-FF pairs:  2832  out of   8812    32%  
+   Number of unique control sets:       375
 
 IO Utilization: 
  Number of IOs:                          99
  Number of bonded IOBs:                  99  out of    232    42%  
 
 Specific Feature Utilization:
- Number of Block RAM/FIFO:               28  out of     32    87%  
-    Number using Block RAM only:         28
+ Number of Block RAM/FIFO:               29  out of     32    90%  
+    Number using Block RAM only:         29
  Number of BUFG/BUFGCTRLs:                4  out of     16    25%  
  Number of DSP48A1s:                      5  out of     32    15%  
  Number of PLL_ADVs:                      1  out of      2    50%  
@@ -4209,7 +4464,7 @@ Clock Information:
 -----------------------------------+------------------------+-------+
 Clock Signal                       | Clock buffer(FF name)  | Load  |
 -----------------------------------+------------------------+-------+
-clock_system/pll_base_inst/CLKOUT0 | BUFG                   | 1980  |
+clock_system/pll_base_inst/CLKOUT0 | BUFG                   | 2446  |
 clock_system/pll_base_inst/CLKOUT1 | BUFG                   | 1431  |
 clock_system/pll_base_inst/CLKOUT2 | BUFG                   | 40    |
 clock_system/pll_base_inst/CLKOUT3 | BUFG                   | 4     |
@@ -4223,9 +4478,9 @@ Timing Summary:
 ---------------
 Speed Grade: -2
 
-   Minimum period: 14.181ns (Maximum Frequency: 70.515MHz)
-   Minimum input arrival time before clock: 6.000ns
-   Maximum output required time after clock: 6.963ns
+   Minimum period: 14.179ns (Maximum Frequency: 70.525MHz)
+   Minimum input arrival time before clock: 6.104ns
+   Maximum output required time after clock: 7.077ns
    Maximum combinational path delay: No path found
 
 Timing Details:
@@ -4234,26 +4489,26 @@ All values displayed in nanoseconds (ns)
 
 =========================================================================
 Timing constraint: Default period analysis for Clock 'clock_system/pll_base_inst/CLKOUT0'
-  Clock period: 14.181ns (frequency: 70.515MHz)
-  Total number of paths / destination ports: 2825783 / 4911
+  Clock period: 14.179ns (frequency: 70.525MHz)
+  Total number of paths / destination ports: 2898748 / 5996
 -------------------------------------------------------------------------
-Delay:               14.181ns (Levels of Logic = 18)
-  Source:            coleco/inst_t80/u0/IR_0_1 (FF)
+Delay:               14.179ns (Levels of Logic = 18)
+  Source:            coleco/inst_t80/u0/IR_6_1 (FF)
   Destination:       coleco/inst_t80/u0/IncDecZ (FF)
   Source Clock:      clock_system/pll_base_inst/CLKOUT0 rising
   Destination Clock: clock_system/pll_base_inst/CLKOUT0 rising
 
-  Data Path: coleco/inst_t80/u0/IR_0_1 to coleco/inst_t80/u0/IncDecZ
+  Data Path: coleco/inst_t80/u0/IR_6_1 to coleco/inst_t80/u0/IncDecZ
                                 Gate     Net
     Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
     ----------------------------------------  ------------
-     FDCE:C->Q             4   0.525   1.032  coleco/inst_t80/u0/IR_0_1 (coleco/inst_t80/u0/IR_0_1)
-     LUT3:I0->O            6   0.235   0.876  coleco/inst_t80/u0/mcode/_n2117<12>111 (coleco/inst_t80/u0/mcode/_n7018<7>1)
-     LUT6:I5->O           18   0.254   1.235  coleco/inst_t80/u0/mcode/_n12281<7>1 (coleco/inst_t80/u0/mcode/_n12281)
-     LUT6:I5->O            5   0.254   0.949  coleco/inst_t80/u0/mcode/_n526612_SW0 (N777)
+     FDCE:C->Q             4   0.525   0.912  coleco/inst_t80/u0/IR_6_1 (coleco/inst_t80/u0/IR_6_1)
+     LUT3:I1->O           12   0.250   1.069  coleco/inst_t80/u0/mcode/_n2117<12>111 (coleco/inst_t80/u0/mcode/_n7018<7>1)
+     LUT6:I5->O           16   0.254   1.182  coleco/inst_t80/u0/mcode/_n12281<7>1 (coleco/inst_t80/u0/mcode/_n12281)
+     LUT6:I5->O            4   0.254   0.912  coleco/inst_t80/u0/mcode/_n526612_SW0 (N1487)
      LUT6:I4->O            4   0.250   0.912  coleco/inst_t80/u0/mcode/Mmux_IncDec_1644 (coleco/inst_t80/u0/IncDec_16<1>)
-     LUT6:I4->O            4   0.250   0.804  coleco/inst_t80/u0/TState[2]_PWR_14_o_AND_63_o (coleco/inst_t80/u0/TState[2]_PWR_14_o_AND_63_o)
-     LUT6:I5->O            1   0.254   0.000  coleco/inst_t80/u0/Mmux_RegAddrA21_F (N1384)
+     LUT6:I4->O            4   0.250   0.804  coleco/inst_t80/u0/TState[2]_PWR_14_o_AND_64_o (coleco/inst_t80/u0/TState[2]_PWR_14_o_AND_64_o)
+     LUT6:I5->O            1   0.254   0.000  coleco/inst_t80/u0/Mmux_RegAddrA21_F (N1851)
      MUXF7:I0->O          62   0.163   1.913  coleco/inst_t80/u0/Mmux_RegAddrA21 (coleco/inst_t80/u0/RegAddrA<1>)
      RAM16X1D:A1->SPO      4   0.235   0.804  coleco/inst_t80/u0/Regs/Mram_RegsL1 (coleco/inst_t80/u0/RegBusA<0>)
      LUT6:I5->O            1   0.254   0.000  coleco/inst_t80/u0/Maddsub_ID16_lut<0> (coleco/inst_t80/u0/Maddsub_ID16_lut<0>)
@@ -4268,39 +4523,40 @@ Delay:               14.181ns (Levels of Logic = 18)
      LUT6:I5->O            1   0.254   0.000  coleco/inst_t80/u0/Mmux_IncDecZ_ID16[15]_MUX_595_o14 (coleco/inst_t80/u0/IncDecZ_ID16[15]_MUX_595_o)
      FDE:D                     0.074          coleco/inst_t80/u0/IncDecZ
     ----------------------------------------
-    Total                     14.181ns (3.793ns logic, 10.388ns route)
-                                       (26.7% logic, 73.3% route)
+    Total                     14.179ns (3.808ns logic, 10.371ns route)
+                                       (26.9% logic, 73.1% route)
 
 =========================================================================
 Timing constraint: Default period analysis for Clock 'clock_system/pll_base_inst/CLKOUT1'
-  Clock period: 12.248ns (frequency: 81.644MHz)
-  Total number of paths / destination ports: 112326 / 3436
+  Clock period: 12.487ns (frequency: 80.080MHz)
+  Total number of paths / destination ports: 110916 / 3473
 -------------------------------------------------------------------------
-Delay:               12.248ns (Levels of Logic = 10)
+Delay:               12.487ns (Levels of Logic = 11)
   Source:            coleco/inst_f18a/inst_cpu/gpu_pause (FF)
-  Destination:       coleco/inst_f18a/inst_cpu/reg_val_6 (FF)
+  Destination:       coleco/inst_f18a/inst_cpu/reg_val_5 (FF)
   Source Clock:      clock_system/pll_base_inst/CLKOUT1 rising
   Destination Clock: clock_system/pll_base_inst/CLKOUT1 rising
 
-  Data Path: coleco/inst_f18a/inst_cpu/gpu_pause to coleco/inst_f18a/inst_cpu/reg_val_6
+  Data Path: coleco/inst_f18a/inst_cpu/gpu_pause to coleco/inst_f18a/inst_cpu/reg_val_5
                                 Gate     Net
     Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
     ----------------------------------------  ------------
-     FD:C->Q             104   0.525   2.221  coleco/inst_f18a/inst_cpu/gpu_pause (coleco/inst_f18a/inst_cpu/gpu_pause)
-     LUT5:I4->O            8   0.254   0.944  coleco/inst_f18a/inst_cpu/_n0937<0>11 (coleco/inst_f18a/inst_cpu/_n0937<0>1)
-     LUT5:I4->O            9   0.254   0.976  coleco/inst_f18a/inst_cpu/_n0996<0>2 (coleco/inst_f18a/inst_cpu/_n0996)
-     LUT6:I5->O            6   0.254   0.876  coleco/inst_f18a/inst_cpu/mux1085411111 (coleco/inst_f18a/inst_cpu/mux108541111)
-     LUT6:I5->O            1   0.254   0.682  coleco/inst_f18a/inst_cpu/mux1086511 (coleco/inst_f18a/inst_cpu/mux1086510)
-     LUT6:I5->O            1   0.254   0.682  coleco/inst_f18a/inst_cpu/mux1086513 (coleco/inst_f18a/inst_cpu/mux1086512)
-     LUT6:I5->O            1   0.254   0.682  coleco/inst_f18a/inst_cpu/mux1086514 (coleco/inst_f18a/inst_cpu/mux1086513)
-     LUT6:I5->O            1   0.254   0.682  coleco/inst_f18a/inst_cpu/mux1086515 (coleco/inst_f18a/inst_cpu/mux1086514)
-     LUT6:I5->O            1   0.254   0.682  coleco/inst_f18a/inst_cpu/mux1086516 (coleco/inst_f18a/inst_cpu/mux1086515)
-     LUT6:I5->O            1   0.254   0.682  coleco/inst_f18a/inst_cpu/mux1086517 (coleco/inst_f18a/inst_cpu/mux1086516)
-     LUT6:I5->O            2   0.254   0.000  coleco/inst_f18a/inst_cpu/mux1086518 (coleco/inst_f18a/inst_cpu/regread<6>)
-     FDE:D                     0.074          coleco/inst_f18a/inst_cpu/reg_val_6
+     FDE:C->Q             98   0.525   2.193  coleco/inst_f18a/inst_cpu/gpu_pause (coleco/inst_f18a/inst_cpu/gpu_pause)
+     LUT5:I4->O            9   0.254   0.976  coleco/inst_f18a/inst_cpu/_n0912<0>21 (coleco/inst_f18a/inst_cpu/_n0912<0>2)
+     LUT5:I4->O            8   0.254   1.052  coleco/inst_f18a/inst_cpu/_n0942<0>3 (coleco/inst_f18a/inst_cpu/_n0942)
+     LUT6:I4->O            6   0.250   0.876  coleco/inst_f18a/inst_cpu/mux1085411111 (coleco/inst_f18a/inst_cpu/mux108541111)
+     LUT5:I4->O            1   0.254   0.682  coleco/inst_f18a/inst_cpu/mux1085411 (coleco/inst_f18a/inst_cpu/mux1085410)
+     LUT6:I5->O            1   0.254   0.000  coleco/inst_f18a/inst_cpu/mux1085412_SW1_F (N1829)
+     MUXF7:I0->O           1   0.163   0.682  coleco/inst_f18a/inst_cpu/mux1085412_SW1 (N1640)
+     LUT6:I5->O            1   0.254   0.682  coleco/inst_f18a/inst_cpu/mux1085413 (coleco/inst_f18a/inst_cpu/mux1085412)
+     LUT6:I5->O            1   0.254   0.682  coleco/inst_f18a/inst_cpu/mux1085414 (coleco/inst_f18a/inst_cpu/mux1085413)
+     LUT6:I5->O            1   0.254   0.682  coleco/inst_f18a/inst_cpu/mux1085415 (coleco/inst_f18a/inst_cpu/mux1085414)
+     LUT6:I5->O            1   0.254   0.682  coleco/inst_f18a/inst_cpu/mux1085416 (coleco/inst_f18a/inst_cpu/mux1085415)
+     LUT6:I5->O            2   0.254   0.000  coleco/inst_f18a/inst_cpu/mux1085417 (coleco/inst_f18a/inst_cpu/regread<5>)
+     FDE:D                     0.074          coleco/inst_f18a/inst_cpu/reg_val_5
     ----------------------------------------
-    Total                     12.248ns (3.139ns logic, 9.109ns route)
-                                       (25.6% logic, 74.4% route)
+    Total                     12.487ns (3.298ns logic, 9.189ns route)
+                                       (26.4% logic, 73.6% route)
 
 =========================================================================
 Timing constraint: Default period analysis for Clock 'clock_system/pll_base_inst/CLKOUT2'
@@ -4318,7 +4574,7 @@ Delay:               2.912ns (Levels of Logic = 1)
     Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
     ----------------------------------------  ------------
      FDR:C->Q             37   0.525   2.059  tmds_out/mod5_2 (tmds_out/mod5_2)
-     LUT6:I0->O            1   0.254   0.000  tmds_out/Mmux_GND_89_o_blue_i[9]_mux_4_OUT1 (tmds_out/GND_89_o_blue_i[9]_mux_4_OUT<0>)
+     LUT6:I0->O            1   0.254   0.000  tmds_out/Mmux_GND_90_o_blue_i[9]_mux_4_OUT1 (tmds_out/GND_90_o_blue_i[9]_mux_4_OUT<0>)
      FD:D                      0.074          tmds_out/shift_b_0
     ----------------------------------------
     Total                      2.912ns (0.853ns logic, 2.059ns route)
@@ -4326,32 +4582,32 @@ Delay:               2.912ns (Levels of Logic = 1)
 
 =========================================================================
 Timing constraint: Default OFFSET IN BEFORE for Clock 'clock_system/pll_base_inst/CLKOUT0'
-  Total number of paths / destination ports: 78 / 73
+  Total number of paths / destination ports: 81 / 76
 -------------------------------------------------------------------------
-Offset:              6.000ns (Levels of Logic = 5)
-  Source:            cart_data_io<3> (PAD)
-  Destination:       coleco/inst_t80/u0/IR_3 (FF)
+Offset:              6.104ns (Levels of Logic = 5)
+  Source:            cart_data_io<7> (PAD)
+  Destination:       coleco/inst_t80/u0/IR_7 (FF)
   Destination Clock: clock_system/pll_base_inst/CLKOUT0 rising
 
-  Data Path: cart_data_io<3> to coleco/inst_t80/u0/IR_3
+  Data Path: cart_data_io<7> to coleco/inst_t80/u0/IR_7
                                 Gate     Net
     Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
     ----------------------------------------  ------------
-     IOBUF:IO->O           1   1.328   0.958  cart_data_io_3_IOBUF (N718)
-     LUT6:I2->O            1   0.254   1.112  coleco/Mmux_d_to_cpu_s283 (coleco/Mmux_d_to_cpu_s282)
-     LUT6:I1->O            1   0.254   0.682  coleco/Mmux_d_to_cpu_s284 (coleco/Mmux_d_to_cpu_s283)
-     LUT6:I5->O            2   0.254   0.834  coleco/Mmux_d_to_cpu_s2810 (coleco/d_to_cpu_s<3>)
-     LUT6:I4->O            3   0.250   0.000  coleco/inst_t80/u0/Mmux__n102841 (coleco/inst_t80/u0/_n1028<3>)
-     FDCE:D                    0.074          coleco/inst_t80/u0/IR_3
+     IOBUF:IO->O           1   1.328   0.790  cart_data_io_7_IOBUF (N768)
+     LUT6:I4->O            1   0.250   1.112  coleco/Mmux_d_to_cpu_s408 (coleco/Mmux_d_to_cpu_s407)
+     LUT5:I0->O            1   0.254   0.958  coleco/Mmux_d_to_cpu_s409 (coleco/Mmux_d_to_cpu_s408)
+     LUT6:I2->O            2   0.254   0.834  coleco/Mmux_d_to_cpu_s4011 (coleco/d_to_cpu_s<7>)
+     LUT6:I4->O            4   0.250   0.000  coleco/inst_t80/u0/Mmux__n102881 (coleco/inst_t80/u0/_n1028<7>)
+     FDCE:D                    0.074          coleco/inst_t80/u0/IR_7
     ----------------------------------------
-    Total                      6.000ns (2.414ns logic, 3.586ns route)
-                                       (40.2% logic, 59.8% route)
+    Total                      6.104ns (2.410ns logic, 3.694ns route)
+                                       (39.5% logic, 60.5% route)
 
 =========================================================================
 Timing constraint: Default OFFSET OUT AFTER for Clock 'clock_system/pll_base_inst/CLKOUT0'
-  Total number of paths / destination ports: 98 / 65
+  Total number of paths / destination ports: 111 / 65
 -------------------------------------------------------------------------
-Offset:              6.963ns (Levels of Logic = 2)
+Offset:              7.077ns (Levels of Logic = 2)
   Source:            reset_r (FF)
   Destination:       led_o (PAD)
   Source Clock:      clock_system/pll_base_inst/CLKOUT0 rising
@@ -4360,12 +4616,12 @@ Offset:              6.963ns (Levels of Logic = 2)
                                 Gate     Net
     Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
     ----------------------------------------  ------------
-     FD:C->Q             609   0.525   2.595  reset_r (reset_r)
-     LUT2:I0->O            1   0.250   0.681  reset_r_cv_led_s_OR_12_o1 (reset_r_cv_led_s_OR_12_o)
+     FD:C->Q             640   0.525   2.724  reset_r (reset_r)
+     LUT3:I0->O            1   0.235   0.681  reset_r_cv_led_s_OR_12_o1 (reset_r_cv_led_s_OR_12_o)
      OBUFT:T->O                2.912          led_o_OBUFT (led_o)
     ----------------------------------------
-    Total                      6.963ns (3.687ns logic, 3.276ns route)
-                                       (53.0% logic, 47.0% route)
+    Total                      7.077ns (3.672ns logic, 3.405ns route)
+                                       (51.9% logic, 48.1% route)
 
 =========================================================================
 
@@ -4377,7 +4633,7 @@ Clock to Setup on destination clock clock_system/pll_base_inst/CLKOUT0
                                   | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
 Source Clock                      |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
 ----------------------------------+---------+---------+---------+---------+
-clock_system/pll_base_inst/CLKOUT0|   14.181|         |         |         |
+clock_system/pll_base_inst/CLKOUT0|   14.179|         |         |         |
 clock_system/pll_base_inst/CLKOUT1|    7.185|         |         |         |
 ----------------------------------+---------+---------+---------+---------+
 
@@ -4387,7 +4643,7 @@ Clock to Setup on destination clock clock_system/pll_base_inst/CLKOUT1
 Source Clock                      |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
 ----------------------------------+---------+---------+---------+---------+
 clock_system/pll_base_inst/CLKOUT0|    8.287|         |         |         |
-clock_system/pll_base_inst/CLKOUT1|   12.248|         |         |         |
+clock_system/pll_base_inst/CLKOUT1|   12.487|         |         |         |
 ----------------------------------+---------+---------+---------+---------+
 
 Clock to Setup on destination clock clock_system/pll_base_inst/CLKOUT2
@@ -4410,15 +4666,15 @@ clock_system/pll_base_inst/CLKOUT2|    1.250|         |         |         |
 =========================================================================
 
 
-Total REAL time to Xst completion: 31.00 secs
-Total CPU time to Xst completion: 28.66 secs
+Total REAL time to Xst completion: 41.00 secs
+Total CPU time to Xst completion: 37.94 secs
  
 --> 
 
 
-Total memory usage is 526032 kilobytes
+Total memory usage is 524484 kilobytes
 
 Number of errors   :    0 (   0 filtered)
-Number of warnings :  227 (   0 filtered)
-Number of infos    :  316 (   0 filtered)
+Number of warnings :  250 (   0 filtered)
+Number of infos    :  325 (   0 filtered)
 

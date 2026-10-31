@@ -1,24 +1,46 @@
 Release 14.7 Drc P.20131013 (lin64)
 Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
 
-Wed Oct 14 06:50:40 2026
+Sat Oct 31 10:15:42 2026
 
 drc -z phoenix_top.ncd phoenix_top.pcf
 
-WARNING:PhysDesignRules:367 - The signal
-   <coleco/inst_t80/u0/Regs/Mram_RegsL11_RAMD_D1_O> is incomplete. The signal
-   does not drive any load pins in the design.
-WARNING:PhysDesignRules:367 - The signal
-   <coleco/inst_f18a/inst_tiles/Mram_fifo1_RAMD_D1_O> is incomplete. The signal
-   does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal <coleco/cache/Mram_c_rev1_RAMD_O> is
+   incomplete. The signal does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal <coleco/cache/Mram_c_rev3_RAMD_O> is
+   incomplete. The signal does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal <coleco/cache/Mram_c_rev2_RAMD_O> is
+   incomplete. The signal does not drive any load pins in the design.
 WARNING:PhysDesignRules:367 - The signal
    <coleco/inst_t80/u0/Regs/Mram_RegsH11_RAMD_D1_O> is incomplete. The signal
    does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal
+   <coleco/inst_t80/u0/Regs/Mram_RegsL11_RAMD_D1_O> is incomplete. The signal
+   does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal <coleco/cache/Mram_c_map8_RAMD_O> is
+   incomplete. The signal does not drive any load pins in the design.
 WARNING:PhysDesignRules:367 - The signal <coleco/Mram_kbd_fifo_r1_RAMD_D1_O> is
+   incomplete. The signal does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal <coleco/cache/Mram_c_map6_RAMD_O> is
+   incomplete. The signal does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal <coleco/cache/Mram_c_map5_RAMD_O> is
+   incomplete. The signal does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal
+   <coleco/inst_f18a/inst_tiles/Mram_fifo1_RAMD_D1_O> is incomplete. The signal
+   does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal <coleco/cache/Mram_c_map1_RAMD_O> is
+   incomplete. The signal does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal <coleco/cache/Mram_c_map2_RAMD_O> is
+   incomplete. The signal does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal <coleco/cache/Mram_c_map4_RAMD_O> is
+   incomplete. The signal does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal <coleco/cache/Mram_c_map3_RAMD_O> is
+   incomplete. The signal does not drive any load pins in the design.
+WARNING:PhysDesignRules:367 - The signal <coleco/cache/Mram_c_map7_RAMD_O> is
    incomplete. The signal does not drive any load pins in the design.
 WARNING:PhysDesignRules:2410 - This design is using one or more 9K Block RAMs
    (RAMB8BWER).  9K Block RAM initialization data, both user defined and
    default, may be incorrect and should not be used.  For more information,
    please reference Xilinx Answer Record 39999.
-DRC detected 0 errors and 5 warnings.  Please see the previously displayed
+DRC detected 0 errors and 16 warnings.  Please see the previously displayed
 individual error or warning messages for more details.

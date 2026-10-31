@@ -1,5 +1,5 @@
 //! **************************************************************************
-// Written by: Map P.20131013 on Wed Oct 14 06:50:08 2026
+// Written by: Map P.20131013 on Sat Oct 31 10:14:59 2026
 //! **************************************************************************
 
 SCHEMATIC START;
@@ -110,6 +110,10 @@ PIN coleco/bios/Mram_ram_q2_pins<13> = BEL "coleco/bios/Mram_ram_q2" PINNAME
         CLKA;
 PIN coleco/bios/Mram_ram_q1_pins<13> = BEL "coleco/bios/Mram_ram_q1" PINNAME
         CLKA;
+PIN coleco/cache/Mram_c_lba_pins<16> = BEL "coleco/cache/Mram_c_lba" PINNAME
+        CLKAWRCLK;
+PIN coleco/cache/Mram_c_lba_pins<17> = BEL "coleco/cache/Mram_c_lba" PINNAME
+        CLKBRDCLK;
 PIN coleco/Mram_cv_ram1k_r_pins<10> = BEL "coleco/Mram_cv_ram1k_r" PINNAME
         CLKAWRCLK;
 PIN coleco/loader/Mram_ram_C_pins<11> = BEL "coleco/loader/Mram_ram_C" PINNAME
@@ -138,73 +142,273 @@ PIN coleco/loader/Mram_ram_3_pins<11> = BEL "coleco/loader/Mram_ram_3" PINNAME
         CLKA;
 PIN coleco/inst_f18a/inst_version_Mram_verrom_pins<13> = BEL
         "coleco/inst_f18a/inst_version_Mram_verrom" PINNAME CLKAWRCLK;
-TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
-        "rst_cnt_r_0" BEL "rst_cnt_r_1" BEL "rst_cnt_r_2" BEL "rst_cnt_r_3"
-        BEL "rst_cnt_r_4" BEL "rst_cnt_r_5" BEL "rst_cnt_r_6" BEL
-        "rst_cnt_r_7" BEL "cnt3m58_r_0" BEL "cnt3m58_r_1" BEL "cnt3m58_r_2"
-        BEL "clock_system/clkout1_buf" BEL "coleco/kbd_rd_ptr_r_2" BEL
+TIMEGRP clock_system_clkout0 = BEL "por_n_r" BEL "clk_3m58_en_r" BEL "reset_r"
+        BEL "rst_cnt_r_0" BEL "rst_cnt_r_1" BEL "rst_cnt_r_2" BEL
+        "rst_cnt_r_3" BEL "rst_cnt_r_4" BEL "rst_cnt_r_5" BEL "rst_cnt_r_6"
+        BEL "rst_cnt_r_7" BEL "cnt3m58_r_0" BEL "cnt3m58_r_1" BEL
+        "cnt3m58_r_2" BEL "clock_system/clkout1_buf" BEL
+        "coleco/cache/c_init_i_8" BEL "coleco/cache/c_init_i_7" BEL
+        "coleco/cache/c_init_i_6" BEL "coleco/cache/c_init_i_5" BEL
+        "coleco/cache/c_init_i_4" BEL "coleco/cache/c_init_i_3" BEL
+        "coleco/cache/c_init_i_2" BEL "coleco/cache/c_init_i_1" BEL
+        "coleco/cache/c_init_i_0" BEL "coleco/cache/ws_FSM_FFd1" BEL
+        "coleco/cache/ws_FSM_FFd2" BEL "coleco/cache/f_byte_8" BEL
+        "coleco/cache/f_byte_7" BEL "coleco/cache/f_byte_6" BEL
+        "coleco/cache/f_byte_5" BEL "coleco/cache/f_byte_4" BEL
+        "coleco/cache/f_byte_3" BEL "coleco/cache/f_byte_2" BEL
+        "coleco/cache/f_byte_1" BEL "coleco/cache/f_byte_0" BEL
+        "coleco/cache/spi_bit_2" BEL "coleco/cache/spi_bit_1" BEL
+        "coleco/cache/spi_bit_0" BEL "coleco/cache/f_blk_3" BEL
+        "coleco/cache/f_blk_2" BEL "coleco/cache/f_blk_1" BEL
+        "coleco/cache/f_blk_0" BEL "coleco/kbd_rd_ptr_r_2" BEL
         "coleco/kbd_rd_ptr_r_1" BEL "coleco/kbd_rd_ptr_r_0" BEL
         "coleco/kbd_count_r_3" BEL "coleco/kbd_count_r_2" BEL
         "coleco/kbd_count_r_1" BEL "coleco/kbd_count_r_0" BEL
         "coleco/kbd_wr_ptr_r_2" BEL "coleco/kbd_wr_ptr_r_1" BEL
-        "coleco/kbd_wr_ptr_r_0" BEL "coleco/pcm16_r_15" BEL
+        "coleco/kbd_wr_ptr_r_0" BEL "coleco/cache/spi_tx_7" BEL
+        "coleco/cache/spi_tx_6" BEL "coleco/cache/spi_tx_5" BEL
+        "coleco/cache/spi_tx_4" BEL "coleco/cache/spi_tx_3" BEL
+        "coleco/cache/spi_tx_2" BEL "coleco/cache/spi_tx_1" BEL
+        "coleco/cache/spi_tx_0" BEL "coleco/cache/spi_txd_7" BEL
+        "coleco/cache/spi_txd_6" BEL "coleco/cache/spi_txd_5" BEL
+        "coleco/cache/spi_txd_4" BEL "coleco/cache/spi_txd_3" BEL
+        "coleco/cache/spi_txd_2" BEL "coleco/cache/spi_txd_1" BEL
+        "coleco/cache/spi_txd_0" BEL "coleco/pcm16_r_15" BEL
         "coleco/pcm16_r_14" BEL "coleco/pcm16_r_13" BEL "coleco/pcm16_r_12"
         BEL "coleco/pcm16_r_11" BEL "coleco/pcm16_r_10" BEL "coleco/pcm16_r_9"
         BEL "coleco/pcm16_r_8" BEL "coleco/pcm16_r_7" BEL "coleco/pcm16_r_6"
         BEL "coleco/pcm16_r_5" BEL "coleco/pcm16_r_4" BEL "coleco/pcm16_r_3"
         BEL "coleco/pcm16_r_2" BEL "coleco/pcm16_r_1" BEL
-        "coleco/mc_mem_size_r_5" BEL "coleco/mc_mem_size_r_4" BEL
-        "coleco/mc_mem_size_r_3" BEL "coleco/mc_mem_size_r_2" BEL
-        "coleco/mc_mem_size_r_1" BEL "coleco/mc_mem_size_r_0" BEL
-        "coleco/upmem_mode_r_0" BEL "coleco/m1_n_r" BEL "coleco/kbd_data_r_7"
-        BEL "coleco/kbd_data_r_6" BEL "coleco/kbd_data_r_5" BEL
-        "coleco/kbd_data_r_4" BEL "coleco/kbd_data_r_3" BEL
-        "coleco/kbd_data_r_2" BEL "coleco/kbd_data_r_1" BEL
-        "coleco/kbd_data_r_0" BEL "coleco/mc_addr_r_4" BEL
-        "coleco/mc_addr_r_3" BEL "coleco/mc_addr_r_2" BEL "coleco/mc_addr_r_1"
-        BEL "coleco/mc_addr_r_0" BEL "coleco/sgmbk_e_r_5" BEL
-        "coleco/sgmbk_e_r_4" BEL "coleco/sgmbk_e_r_3" BEL "coleco/sgmbk_e_r_2"
-        BEL "coleco/sgmbk_e_r_1" BEL "coleco/sgmbk_e_r_0" BEL
+        "coleco/cache/cl_a_7" BEL "coleco/cache/cl_a_6" BEL
+        "coleco/cache/cl_a_5" BEL "coleco/cache/cl_a_4" BEL
+        "coleco/cache/cl_a_3" BEL "coleco/cache/cl_a_2" BEL
+        "coleco/cache/cl_a_1" BEL "coleco/cache/cl_a_0" BEL
+        "coleco/cache/cl_d_31" BEL "coleco/cache/cl_d_30" BEL
+        "coleco/cache/cl_d_29" BEL "coleco/cache/cl_d_28" BEL
+        "coleco/cache/cl_d_27" BEL "coleco/cache/cl_d_26" BEL
+        "coleco/cache/cl_d_25" BEL "coleco/cache/cl_d_24" BEL
+        "coleco/cache/cl_d_23" BEL "coleco/cache/cl_d_22" BEL
+        "coleco/cache/cl_d_21" BEL "coleco/cache/cl_d_20" BEL
+        "coleco/cache/cl_d_19" BEL "coleco/cache/cl_d_18" BEL
+        "coleco/cache/cl_d_17" BEL "coleco/cache/cl_d_16" BEL
+        "coleco/cache/cl_d_15" BEL "coleco/cache/cl_d_14" BEL
+        "coleco/cache/cl_d_13" BEL "coleco/cache/cl_d_12" BEL
+        "coleco/cache/cl_d_11" BEL "coleco/cache/cl_d_10" BEL
+        "coleco/cache/cl_d_9" BEL "coleco/cache/cl_d_8" BEL
+        "coleco/cache/cl_d_7" BEL "coleco/cache/cl_d_6" BEL
+        "coleco/cache/cl_d_5" BEL "coleco/cache/cl_d_4" BEL
+        "coleco/cache/cl_d_3" BEL "coleco/cache/cl_d_2" BEL
+        "coleco/cache/cl_d_1" BEL "coleco/cache/cl_d_0" BEL
+        "coleco/cache/chk_last_31" BEL "coleco/cache/chk_last_30" BEL
+        "coleco/cache/chk_last_29" BEL "coleco/cache/chk_last_28" BEL
+        "coleco/cache/chk_last_27" BEL "coleco/cache/chk_last_26" BEL
+        "coleco/cache/chk_last_25" BEL "coleco/cache/chk_last_24" BEL
+        "coleco/cache/chk_last_23" BEL "coleco/cache/chk_last_22" BEL
+        "coleco/cache/chk_last_21" BEL "coleco/cache/chk_last_20" BEL
+        "coleco/cache/chk_last_19" BEL "coleco/cache/chk_last_18" BEL
+        "coleco/cache/chk_last_17" BEL "coleco/cache/chk_last_16" BEL
+        "coleco/cache/chk_last_15" BEL "coleco/cache/chk_last_14" BEL
+        "coleco/cache/chk_last_13" BEL "coleco/cache/chk_last_12" BEL
+        "coleco/cache/chk_last_11" BEL "coleco/cache/chk_last_10" BEL
+        "coleco/cache/chk_last_9" BEL "coleco/cache/chk_last_8" BEL
+        "coleco/cache/chk_last_7" BEL "coleco/cache/chk_last_6" BEL
+        "coleco/cache/chk_last_5" BEL "coleco/cache/chk_last_4" BEL
+        "coleco/cache/chk_last_3" BEL "coleco/cache/chk_last_2" BEL
+        "coleco/cache/chk_last_1" BEL "coleco/cache/chk_last_0" BEL
+        "coleco/cache/cap_page_7" BEL "coleco/cache/cap_page_6" BEL
+        "coleco/cache/cap_page_5" BEL "coleco/cache/cap_page_4" BEL
+        "coleco/cache/cap_page_3" BEL "coleco/cache/cap_page_2" BEL
+        "coleco/cache/cap_page_1" BEL "coleco/cache/cap_page_0" BEL
+        "coleco/cache/chk_page_7" BEL "coleco/cache/chk_page_6" BEL
+        "coleco/cache/chk_page_5" BEL "coleco/cache/chk_page_4" BEL
+        "coleco/cache/chk_page_3" BEL "coleco/cache/chk_page_2" BEL
+        "coleco/cache/chk_page_1" BEL "coleco/cache/chk_page_0" BEL
+        "coleco/cache/sn_arg_23" BEL "coleco/cache/sn_arg_22" BEL
+        "coleco/cache/sn_arg_21" BEL "coleco/cache/sn_arg_20" BEL
+        "coleco/cache/sn_arg_19" BEL "coleco/cache/sn_arg_18" BEL
+        "coleco/cache/sn_arg_17" BEL "coleco/cache/sn_arg_16" BEL
+        "coleco/cache/sn_arg_15" BEL "coleco/cache/sn_arg_14" BEL
+        "coleco/cache/sn_arg_13" BEL "coleco/cache/sn_arg_12" BEL
+        "coleco/cache/sn_arg_11" BEL "coleco/cache/sn_arg_10" BEL
+        "coleco/cache/sn_arg_9" BEL "coleco/cache/sn_arg_8" BEL
+        "coleco/cache/sn_arg_7" BEL "coleco/cache/sn_arg_6" BEL
+        "coleco/cache/sn_arg_5" BEL "coleco/cache/sn_arg_4" BEL
+        "coleco/cache/sn_arg_3" BEL "coleco/cache/sn_arg_2" BEL
+        "coleco/cache/sn_arg_1" BEL "coleco/cache/sn_arg_0" BEL
+        "coleco/mc_bank_r_5" BEL "coleco/mc_bank_r_4" BEL "coleco/mc_bank_r_3"
+        BEL "coleco/mc_bank_r_2" BEL "coleco/mc_bank_r_1" BEL
+        "coleco/mc_bank_r_0" BEL "coleco/upmem_mode_r_0" BEL "coleco/m1_n_r"
+        BEL "coleco/cache/f_cnt_15" BEL "coleco/cache/f_cnt_14" BEL
+        "coleco/cache/f_cnt_13" BEL "coleco/cache/f_cnt_12" BEL
+        "coleco/cache/f_cnt_11" BEL "coleco/cache/f_cnt_10" BEL
+        "coleco/cache/f_cnt_9" BEL "coleco/cache/f_cnt_8" BEL
+        "coleco/cache/f_cnt_7" BEL "coleco/cache/f_cnt_6" BEL
+        "coleco/cache/f_cnt_5" BEL "coleco/cache/f_cnt_4" BEL
+        "coleco/cache/f_cnt_3" BEL "coleco/cache/f_cnt_2" BEL
+        "coleco/cache/f_cnt_1" BEL "coleco/cache/f_cnt_0" BEL
+        "coleco/cache/f_cs" BEL "coleco/cache/f_ci_2" BEL
+        "coleco/cache/f_ci_1" BEL "coleco/cache/f_ci_0" BEL
+        "coleco/cache/f_crc_15" BEL "coleco/cache/f_crc_14" BEL
+        "coleco/cache/f_crc_13" BEL "coleco/cache/f_crc_12" BEL
+        "coleco/cache/f_crc_11" BEL "coleco/cache/f_crc_10" BEL
+        "coleco/cache/f_crc_9" BEL "coleco/cache/f_crc_8" BEL
+        "coleco/cache/f_crc_7" BEL "coleco/cache/f_crc_6" BEL
+        "coleco/cache/f_crc_5" BEL "coleco/cache/f_crc_4" BEL
+        "coleco/cache/f_crc_3" BEL "coleco/cache/f_crc_2" BEL
+        "coleco/cache/f_crc_1" BEL "coleco/cache/f_crc_0" BEL
+        "coleco/cache/f_stop" BEL "coleco/cache/f_state_4" BEL
+        "coleco/cache/f_state_3" BEL "coleco/cache/f_state_2" BEL
+        "coleco/cache/f_state_1" BEL "coleco/cache/f_state_0" BEL
+        "coleco/cache/cm_a_7" BEL "coleco/cache/cm_a_6" BEL
+        "coleco/cache/cm_a_5" BEL "coleco/cache/cm_a_4" BEL
+        "coleco/cache/cm_a_3" BEL "coleco/cache/cm_a_2" BEL
+        "coleco/cache/cm_a_1" BEL "coleco/cache/cm_a_0" BEL
+        "coleco/cache/cm_we" BEL "coleco/cache/c_ref_63" BEL
+        "coleco/cache/c_ref_62" BEL "coleco/cache/c_ref_61" BEL
+        "coleco/cache/c_ref_60" BEL "coleco/cache/c_ref_59" BEL
+        "coleco/cache/c_ref_58" BEL "coleco/cache/c_ref_57" BEL
+        "coleco/cache/c_ref_56" BEL "coleco/cache/c_ref_55" BEL
+        "coleco/cache/c_ref_54" BEL "coleco/cache/c_ref_53" BEL
+        "coleco/cache/c_ref_52" BEL "coleco/cache/c_ref_51" BEL
+        "coleco/cache/c_ref_50" BEL "coleco/cache/c_ref_49" BEL
+        "coleco/cache/c_ref_48" BEL "coleco/cache/c_ref_47" BEL
+        "coleco/cache/c_ref_46" BEL "coleco/cache/c_ref_45" BEL
+        "coleco/cache/c_ref_44" BEL "coleco/cache/c_ref_43" BEL
+        "coleco/cache/c_ref_42" BEL "coleco/cache/c_ref_41" BEL
+        "coleco/cache/c_ref_40" BEL "coleco/cache/c_ref_39" BEL
+        "coleco/cache/c_ref_38" BEL "coleco/cache/c_ref_37" BEL
+        "coleco/cache/c_ref_36" BEL "coleco/cache/c_ref_35" BEL
+        "coleco/cache/c_ref_34" BEL "coleco/cache/c_ref_33" BEL
+        "coleco/cache/c_ref_32" BEL "coleco/cache/c_ref_31" BEL
+        "coleco/cache/c_ref_30" BEL "coleco/cache/c_ref_29" BEL
+        "coleco/cache/c_ref_28" BEL "coleco/cache/c_ref_27" BEL
+        "coleco/cache/c_ref_26" BEL "coleco/cache/c_ref_25" BEL
+        "coleco/cache/c_ref_24" BEL "coleco/cache/c_ref_23" BEL
+        "coleco/cache/c_ref_22" BEL "coleco/cache/c_ref_21" BEL
+        "coleco/cache/c_ref_20" BEL "coleco/cache/c_ref_19" BEL
+        "coleco/cache/c_ref_18" BEL "coleco/cache/c_ref_17" BEL
+        "coleco/cache/c_ref_16" BEL "coleco/cache/c_ref_15" BEL
+        "coleco/cache/c_ref_14" BEL "coleco/cache/c_ref_13" BEL
+        "coleco/cache/c_ref_12" BEL "coleco/cache/c_ref_11" BEL
+        "coleco/cache/c_ref_10" BEL "coleco/cache/c_ref_9" BEL
+        "coleco/cache/c_ref_8" BEL "coleco/cache/c_ref_7" BEL
+        "coleco/cache/c_ref_6" BEL "coleco/cache/c_ref_5" BEL
+        "coleco/cache/c_ref_4" BEL "coleco/cache/c_ref_3" BEL
+        "coleco/cache/c_ref_2" BEL "coleco/cache/c_ref_1" BEL
+        "coleco/cache/c_ref_0" BEL "coleco/cache/cm_d_6" BEL
+        "coleco/cache/cm_d_5" BEL "coleco/cache/cm_d_4" BEL
+        "coleco/cache/cm_d_3" BEL "coleco/cache/cm_d_2" BEL
+        "coleco/cache/cm_d_1" BEL "coleco/cache/cm_d_0" BEL
+        "coleco/cache/ov_addr_18" BEL "coleco/cache/ov_addr_17" BEL
+        "coleco/cache/ov_addr_16" BEL "coleco/cache/ov_addr_15" BEL
+        "coleco/cache/ov_addr_14" BEL "coleco/cache/ov_addr_13" BEL
+        "coleco/cache/ov_addr_12" BEL "coleco/cache/ov_addr_11" BEL
+        "coleco/cache/ov_addr_10" BEL "coleco/cache/ov_addr_9" BEL
+        "coleco/cache/ov_addr_8" BEL "coleco/cache/ov_addr_7" BEL
+        "coleco/cache/ov_addr_6" BEL "coleco/cache/ov_addr_5" BEL
+        "coleco/cache/ov_addr_4" BEL "coleco/cache/ov_addr_3" BEL
+        "coleco/cache/ov_addr_2" BEL "coleco/cache/ov_addr_1" BEL
+        "coleco/cache/ov_addr_0" BEL "coleco/cache/ld_addr_18" BEL
+        "coleco/cache/ld_addr_17" BEL "coleco/cache/ld_addr_16" BEL
+        "coleco/cache/ld_addr_15" BEL "coleco/cache/ld_addr_14" BEL
+        "coleco/cache/ld_addr_13" BEL "coleco/cache/ld_addr_12" BEL
+        "coleco/cache/ld_addr_11" BEL "coleco/cache/ld_addr_10" BEL
+        "coleco/cache/ld_addr_9" BEL "coleco/cache/ld_addr_8" BEL
+        "coleco/cache/ld_addr_7" BEL "coleco/cache/ld_addr_6" BEL
+        "coleco/cache/ld_addr_5" BEL "coleco/cache/ld_addr_4" BEL
+        "coleco/cache/ld_addr_3" BEL "coleco/cache/ld_addr_2" BEL
+        "coleco/cache/ld_addr_1" BEL "coleco/cache/ld_addr_0" BEL
+        "coleco/cache/cr_a_5" BEL "coleco/cache/cr_a_4" BEL
+        "coleco/cache/cr_a_3" BEL "coleco/cache/cr_a_2" BEL
+        "coleco/cache/cr_a_1" BEL "coleco/cache/cr_a_0" BEL
+        "coleco/cache/cr_d_8" BEL "coleco/cache/cr_d_7" BEL
+        "coleco/cache/cr_d_6" BEL "coleco/cache/cr_d_5" BEL
+        "coleco/cache/cr_d_4" BEL "coleco/cache/cr_d_3" BEL
+        "coleco/cache/cr_d_2" BEL "coleco/cache/cr_d_1" BEL
+        "coleco/cache/cr_d_0" BEL "coleco/cache/spi_sclk_r" BEL
+        "coleco/cache/f_next_4" BEL "coleco/cache/f_next_3" BEL
+        "coleco/cache/f_next_2" BEL "coleco/cache/f_next_1" BEL
+        "coleco/cache/f_next_0" BEL "coleco/cache/f_line_5" BEL
+        "coleco/cache/f_line_4" BEL "coleco/cache/f_line_3" BEL
+        "coleco/cache/f_line_2" BEL "coleco/cache/f_line_1" BEL
+        "coleco/cache/f_line_0" BEL "coleco/cache/spi_start" BEL
+        "coleco/cache/f_hand_5" BEL "coleco/cache/f_hand_4" BEL
+        "coleco/cache/f_hand_3" BEL "coleco/cache/f_hand_2" BEL
+        "coleco/cache/f_hand_1" BEL "coleco/cache/f_hand_0" BEL
+        "coleco/kbd_rd_r" BEL "coleco/cache/f_page_7" BEL
+        "coleco/cache/f_page_6" BEL "coleco/cache/f_page_5" BEL
+        "coleco/cache/f_page_4" BEL "coleco/cache/f_page_3" BEL
+        "coleco/cache/f_page_2" BEL "coleco/cache/f_page_1" BEL
+        "coleco/cache/f_page_0" BEL "coleco/cache/cl_we" BEL
+        "coleco/cache/fill_on_d" BEL "coleco/cache/ov_data_7" BEL
+        "coleco/cache/ov_data_6" BEL "coleco/cache/ov_data_5" BEL
+        "coleco/cache/ov_data_4" BEL "coleco/cache/ov_data_3" BEL
+        "coleco/cache/ov_data_2" BEL "coleco/cache/ov_data_1" BEL
+        "coleco/cache/ov_data_0" BEL "coleco/cache/ov_we_n" BEL
+        "coleco/kbd_data_r_7" BEL "coleco/kbd_data_r_6" BEL
+        "coleco/kbd_data_r_5" BEL "coleco/kbd_data_r_4" BEL
+        "coleco/kbd_data_r_3" BEL "coleco/kbd_data_r_2" BEL
+        "coleco/kbd_data_r_1" BEL "coleco/kbd_data_r_0" BEL
+        "coleco/cache/ld_data_7" BEL "coleco/cache/ld_data_6" BEL
+        "coleco/cache/ld_data_5" BEL "coleco/cache/ld_data_4" BEL
+        "coleco/cache/ld_data_3" BEL "coleco/cache/ld_data_2" BEL
+        "coleco/cache/ld_data_1" BEL "coleco/cache/ld_data_0" BEL
+        "coleco/cache/fill_on" BEL "coleco/loader_en_d_r" BEL
+        "coleco/cache/ld_done" BEL "coleco/cache/cpu_wait_n" BEL
+        "coleco/cache/spi_rx_7" BEL "coleco/cache/spi_rx_6" BEL
+        "coleco/cache/spi_rx_5" BEL "coleco/cache/spi_rx_4" BEL
+        "coleco/cache/spi_rx_3" BEL "coleco/cache/spi_rx_2" BEL
+        "coleco/cache/spi_rx_1" BEL "coleco/cache/spi_rx_0" BEL
+        "coleco/cache/f_bad" BEL "coleco/cache/sn_st_2" BEL
+        "coleco/cache/sn_st_1" BEL "coleco/cache/sn_st_0" BEL
+        "coleco/sgmbk_e_r_7" BEL "coleco/sgmbk_e_r_6" BEL "coleco/sgmbk_e_r_5"
+        BEL "coleco/sgmbk_e_r_4" BEL "coleco/sgmbk_e_r_3" BEL
+        "coleco/sgmbk_e_r_2" BEL "coleco/sgmbk_e_r_1" BEL "coleco/sgmbk_e_r_0"
+        BEL "coleco/sgmbk_c_r_7" BEL "coleco/sgmbk_c_r_6" BEL
         "coleco/sgmbk_c_r_5" BEL "coleco/sgmbk_c_r_4" BEL "coleco/sgmbk_c_r_3"
         BEL "coleco/sgmbk_c_r_2" BEL "coleco/sgmbk_c_r_1" BEL
-        "coleco/sgmbk_c_r_0" BEL "coleco/sgmbk_a_r_5" BEL "coleco/sgmbk_a_r_4"
-        BEL "coleco/sgmbk_a_r_3" BEL "coleco/sgmbk_a_r_2" BEL
-        "coleco/sgmbk_a_r_1" BEL "coleco/sgmbk_a_r_0" BEL
-        "coleco/ext_ram_bank_r_3" BEL "coleco/ext_ram_bank_r_2" BEL
-        "coleco/ext_ram_bank_r_1" BEL "coleco/ext_ram_bank_r_0" BEL
-        "coleco/mc_bank_r_4" BEL "coleco/mc_bank_r_3" BEL "coleco/mc_bank_r_2"
-        BEL "coleco/mc_bank_r_1" BEL "coleco/mc_bank_r_0" BEL
+        "coleco/sgmbk_c_r_0" BEL "coleco/sgmbk_a_r_7" BEL "coleco/sgmbk_a_r_6"
+        BEL "coleco/sgmbk_a_r_5" BEL "coleco/sgmbk_a_r_4" BEL
+        "coleco/sgmbk_a_r_3" BEL "coleco/sgmbk_a_r_2" BEL "coleco/sgmbk_a_r_1"
+        BEL "coleco/sgmbk_a_r_0" BEL "coleco/mc_mem_size_r_7" BEL
+        "coleco/mc_mem_size_r_6" BEL "coleco/mc_mem_size_r_5" BEL
+        "coleco/mc_mem_size_r_4" BEL "coleco/mc_mem_size_r_3" BEL
+        "coleco/mc_mem_size_r_2" BEL "coleco/mc_mem_size_r_1" BEL
+        "coleco/mc_mem_size_r_0" BEL "coleco/ext_ram_bank_r_3" BEL
+        "coleco/ext_ram_bank_r_2" BEL "coleco/ext_ram_bank_r_1" BEL
+        "coleco/ext_ram_bank_r_0" BEL "coleco/real_cart_r" BEL
         "coleco/sd_spi_ss_n_r" BEL "coleco/sd_slow_clk_r" BEL
-        "coleco/real_cart_r" BEL "coleco/sgmbk_en_r" BEL "coleco/mc_en_r" BEL
-        "coleco/sd_detect_r" BEL "coleco/kbd_mode_r" BEL "coleco/sgm_en_r" BEL
+        "coleco/sgmbk_en_r" BEL "coleco/mc_en_r" BEL "coleco/sd_detect_r" BEL
+        "coleco/kbd_mode_r" BEL "coleco/sgm_8k_en_r" BEL "coleco/sgm_en_r" BEL
+        "coleco/cache_start_r" BEL "coleco/io_wr_d_r" BEL
         "coleco/ext512/d_from_ext_r_7" BEL "coleco/ext512/d_from_ext_r_6" BEL
         "coleco/ext512/d_from_ext_r_5" BEL "coleco/ext512/d_from_ext_r_4" BEL
         "coleco/ext512/d_from_ext_r_3" BEL "coleco/ext512/d_from_ext_r_2" BEL
         "coleco/ext512/d_from_ext_r_1" BEL "coleco/ext512/d_from_ext_r_0" BEL
-        "coleco/ext512/d_to_ext_r_7" BEL "coleco/ext512/d_to_ext_r_6" BEL
-        "coleco/ext512/d_to_ext_r_5" BEL "coleco/ext512/d_to_ext_r_4" BEL
-        "coleco/ext512/d_to_ext_r_3" BEL "coleco/ext512/d_to_ext_r_2" BEL
-        "coleco/ext512/d_to_ext_r_1" BEL "coleco/ext512/d_to_ext_r_0" BEL
-        "coleco/ext512/addr_r_18" BEL "coleco/ext512/addr_r_17" BEL
-        "coleco/ext512/addr_r_16" BEL "coleco/ext512/addr_r_15" BEL
-        "coleco/ext512/addr_r_14" BEL "coleco/ext512/addr_r_13" BEL
-        "coleco/ext512/addr_r_12" BEL "coleco/ext512/addr_r_11" BEL
-        "coleco/ext512/addr_r_10" BEL "coleco/ext512/addr_r_9" BEL
-        "coleco/ext512/addr_r_8" BEL "coleco/ext512/addr_r_7" BEL
-        "coleco/ext512/addr_r_6" BEL "coleco/ext512/addr_r_5" BEL
-        "coleco/ext512/addr_r_4" BEL "coleco/ext512/addr_r_3" BEL
-        "coleco/ext512/addr_r_2" BEL "coleco/ext512/addr_r_1" BEL
-        "coleco/ext512/addr_r_0" BEL "ps2if_inst/count_4" BEL
-        "ps2if_inst/count_3" BEL "ps2if_inst/count_2" BEL "ps2if_inst/count_1"
-        BEL "ps2if_inst/count_0" BEL "ps2if_inst/joy_4" BEL "ps2if_inst/joy_3"
-        BEL "ps2if_inst/joy_2" BEL "ps2if_inst/joy_1" BEL "ps2if_inst/joy_0"
-        BEL "ps2if_inst/keys_14" BEL "ps2if_inst/keys_13" BEL
-        "ps2if_inst/keys_12" BEL "ps2if_inst/keys_11" BEL "ps2if_inst/keys_10"
-        BEL "ps2if_inst/keys_9" BEL "ps2if_inst/keys_8" BEL
-        "ps2if_inst/keys_7" BEL "ps2if_inst/keys_6" BEL "ps2if_inst/keys_5"
-        BEL "ps2if_inst/keys_3" BEL "ps2if_inst/keys_2" BEL
-        "ps2if_inst/keys_1" BEL "ps2if_inst/keys_0" BEL "ps2if_inst/tick1us"
-        BEL "ps2if_inst/ps2kbd_inst/Release" BEL
+        "coleco/ext512/we_n_r" BEL "coleco/ext512/d_to_ext_r_7" BEL
+        "coleco/ext512/d_to_ext_r_6" BEL "coleco/ext512/d_to_ext_r_5" BEL
+        "coleco/ext512/d_to_ext_r_4" BEL "coleco/ext512/d_to_ext_r_3" BEL
+        "coleco/ext512/d_to_ext_r_2" BEL "coleco/ext512/d_to_ext_r_1" BEL
+        "coleco/ext512/d_to_ext_r_0" BEL "coleco/ext512/addr_r_18" BEL
+        "coleco/ext512/addr_r_17" BEL "coleco/ext512/addr_r_16" BEL
+        "coleco/ext512/addr_r_15" BEL "coleco/ext512/addr_r_14" BEL
+        "coleco/ext512/addr_r_13" BEL "coleco/ext512/addr_r_12" BEL
+        "coleco/ext512/addr_r_11" BEL "coleco/ext512/addr_r_10" BEL
+        "coleco/ext512/addr_r_9" BEL "coleco/ext512/addr_r_8" BEL
+        "coleco/ext512/addr_r_7" BEL "coleco/ext512/addr_r_6" BEL
+        "coleco/ext512/addr_r_5" BEL "coleco/ext512/addr_r_4" BEL
+        "coleco/ext512/addr_r_3" BEL "coleco/ext512/addr_r_2" BEL
+        "coleco/ext512/addr_r_1" BEL "coleco/ext512/addr_r_0" BEL
+        "ps2if_inst/count_4" BEL "ps2if_inst/count_3" BEL "ps2if_inst/count_2"
+        BEL "ps2if_inst/count_1" BEL "ps2if_inst/count_0" BEL
+        "ps2if_inst/joy_4" BEL "ps2if_inst/joy_3" BEL "ps2if_inst/joy_2" BEL
+        "ps2if_inst/joy_1" BEL "ps2if_inst/joy_0" BEL "ps2if_inst/keys_14" BEL
+        "ps2if_inst/keys_13" BEL "ps2if_inst/keys_12" BEL "ps2if_inst/keys_11"
+        BEL "ps2if_inst/keys_10" BEL "ps2if_inst/keys_9" BEL
+        "ps2if_inst/keys_8" BEL "ps2if_inst/keys_7" BEL "ps2if_inst/keys_6"
+        BEL "ps2if_inst/keys_5" BEL "ps2if_inst/keys_3" BEL
+        "ps2if_inst/keys_2" BEL "ps2if_inst/keys_1" BEL "ps2if_inst/keys_0"
+        BEL "ps2if_inst/tick1us" BEL "ps2if_inst/ps2kbd_inst/Release" BEL
         "ps2if_inst/ps2kbd_inst/Press" BEL "ps2if_inst/ps2kbd_inst/Reset" BEL
         "ps2if_inst/ps2kbd_inst/RX_Received" BEL
         "ps2if_inst/ps2kbd_inst/RX_Bit_Cnt_3" BEL
@@ -223,10 +427,13 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "ps2if_inst/ps2kbd_inst/RX_ShiftReg_2" BEL
         "ps2if_inst/ps2kbd_inst/RX_ShiftReg_1" BEL
         "ps2if_inst/ps2kbd_inst/RX_ShiftReg_0" BEL
+        "ps2if_inst/ps2kbd_inst/PS2_Data_s" BEL
+        "ps2if_inst/ps2kbd_inst/PS2_Clk_State" BEL
         "ps2if_inst/ps2kbd_inst/PS2_Data_r_1" BEL
         "ps2if_inst/ps2kbd_inst/PS2_Data_r_0" BEL
         "ps2if_inst/ps2kbd_inst/PS2_Clk_r_1" BEL
-        "ps2if_inst/ps2kbd_inst/PS2_Clk_r_0" BEL "coleco/ctrl_b/p1_1/sync_r_0"
+        "ps2if_inst/ps2kbd_inst/PS2_Clk_r_0" BEL
+        "ps2if_inst/ps2kbd_inst/RX_Release" BEL "coleco/ctrl_b/p1_1/sync_r_0"
         BEL "coleco/ctrl_b/p1_1/sync_r_1" BEL "coleco/ctrl_b/p1_1/sync_r_2"
         BEL "coleco/ctrl_b/p1_1/sync_r_3" BEL "coleco/ctrl_b/p1_2/sync_r_0"
         BEL "coleco/ctrl_b/p1_2/sync_r_1" BEL "coleco/ctrl_b/p1_2/sync_r_2"
@@ -295,37 +502,37 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "coleco/ctrl_b/p1_9/rc_rise_r_0" BEL "coleco/ctrl_b/p1_9/sync_r_3" BEL
         "coleco/ctrl_b/p1_9/sync_r_2" BEL "coleco/ctrl_b/p1_9/sync_r_1" BEL
         "coleco/ctrl_b/p1_9/sync_r_0" BEL "coleco/ctrl_b/p2_9cd/d_cnt_r_1" BEL
-        "coleco/ctrl_b/p2_9cd/d_cnt_r_0" BEL "coleco/ctrl_b/p2_9cd/d_last_r"
-        BEL "coleco/ctrl_b/p1_9cd/d_cnt_r_1" BEL
-        "coleco/ctrl_b/p1_9cd/d_cnt_r_0" BEL "coleco/ctrl_b/p1_9cd/d_last_r"
-        BEL "coleco/inst_t80/MREQ_n" BEL "coleco/inst_t80/IORQ_n" BEL
-        "coleco/inst_t80/RD_n" BEL "coleco/inst_t80/WR_n" BEL
-        "coleco/inst_t80/DI_Reg_7" BEL "coleco/inst_t80/DI_Reg_6" BEL
-        "coleco/inst_t80/DI_Reg_5" BEL "coleco/inst_t80/DI_Reg_4" BEL
-        "coleco/inst_t80/DI_Reg_3" BEL "coleco/inst_t80/DI_Reg_2" BEL
-        "coleco/inst_t80/DI_Reg_1" BEL "coleco/inst_t80/DI_Reg_0" BEL
-        "coleco/inst_t80/u0/TState_2" BEL "coleco/inst_t80/u0/TState_1" BEL
-        "coleco/inst_t80/u0/TState_0" BEL "coleco/inst_t80/u0/IntE_FF1" BEL
-        "coleco/inst_t80/u0/A_15" BEL "coleco/inst_t80/u0/A_14" BEL
-        "coleco/inst_t80/u0/A_13" BEL "coleco/inst_t80/u0/A_12" BEL
-        "coleco/inst_t80/u0/A_11" BEL "coleco/inst_t80/u0/A_10" BEL
-        "coleco/inst_t80/u0/A_9" BEL "coleco/inst_t80/u0/A_8" BEL
-        "coleco/inst_t80/u0/A_7" BEL "coleco/inst_t80/u0/A_6" BEL
-        "coleco/inst_t80/u0/A_5" BEL "coleco/inst_t80/u0/A_4" BEL
-        "coleco/inst_t80/u0/A_3" BEL "coleco/inst_t80/u0/A_2" BEL
-        "coleco/inst_t80/u0/A_1" BEL "coleco/inst_t80/u0/A_0" BEL
-        "coleco/inst_t80/u0/BusA_7" BEL "coleco/inst_t80/u0/BusA_6" BEL
-        "coleco/inst_t80/u0/BusA_5" BEL "coleco/inst_t80/u0/BusA_4" BEL
-        "coleco/inst_t80/u0/BusA_3" BEL "coleco/inst_t80/u0/BusA_2" BEL
-        "coleco/inst_t80/u0/BusA_1" BEL "coleco/inst_t80/u0/BusA_0" BEL
-        "coleco/inst_t80/u0/ALU_Op_r_3" BEL "coleco/inst_t80/u0/ALU_Op_r_2"
-        BEL "coleco/inst_t80/u0/ALU_Op_r_1" BEL
-        "coleco/inst_t80/u0/ALU_Op_r_0" BEL "coleco/inst_t80/u0/ALU_cpi_r" BEL
-        "coleco/inst_t80/u0/Save_ALU_r" BEL "coleco/inst_t80/u0/Halt_FF" BEL
-        "coleco/inst_t80/u0/MCycles_2" BEL "coleco/inst_t80/u0/MCycles_1" BEL
-        "coleco/inst_t80/u0/MCycles_0" BEL "coleco/inst_t80/u0/IStatus_1" BEL
-        "coleco/inst_t80/u0/IStatus_0" BEL "coleco/inst_t80/u0/Arith16_r" BEL
-        "coleco/inst_t80/u0/F_7" BEL "coleco/inst_t80/u0/F_6" BEL
+        "coleco/ctrl_b/p2_9cd/d_cnt_r_0" BEL "coleco/ctrl_b/p2_9cd/d_r" BEL
+        "coleco/ctrl_b/p2_9cd/d_last_r" BEL "coleco/ctrl_b/p1_9cd/d_cnt_r_1"
+        BEL "coleco/ctrl_b/p1_9cd/d_cnt_r_0" BEL "coleco/ctrl_b/p1_9cd/d_r"
+        BEL "coleco/ctrl_b/p1_9cd/d_last_r" BEL "coleco/inst_t80/MREQ_n" BEL
+        "coleco/inst_t80/IORQ_n" BEL "coleco/inst_t80/RD_n" BEL
+        "coleco/inst_t80/WR_n" BEL "coleco/inst_t80/DI_Reg_7" BEL
+        "coleco/inst_t80/DI_Reg_6" BEL "coleco/inst_t80/DI_Reg_5" BEL
+        "coleco/inst_t80/DI_Reg_4" BEL "coleco/inst_t80/DI_Reg_3" BEL
+        "coleco/inst_t80/DI_Reg_2" BEL "coleco/inst_t80/DI_Reg_1" BEL
+        "coleco/inst_t80/DI_Reg_0" BEL "coleco/inst_t80/u0/TState_2" BEL
+        "coleco/inst_t80/u0/TState_1" BEL "coleco/inst_t80/u0/TState_0" BEL
+        "coleco/inst_t80/u0/IntE_FF1" BEL "coleco/inst_t80/u0/A_15" BEL
+        "coleco/inst_t80/u0/A_14" BEL "coleco/inst_t80/u0/A_13" BEL
+        "coleco/inst_t80/u0/A_12" BEL "coleco/inst_t80/u0/A_11" BEL
+        "coleco/inst_t80/u0/A_10" BEL "coleco/inst_t80/u0/A_9" BEL
+        "coleco/inst_t80/u0/A_8" BEL "coleco/inst_t80/u0/A_7" BEL
+        "coleco/inst_t80/u0/A_6" BEL "coleco/inst_t80/u0/A_5" BEL
+        "coleco/inst_t80/u0/A_4" BEL "coleco/inst_t80/u0/A_3" BEL
+        "coleco/inst_t80/u0/A_2" BEL "coleco/inst_t80/u0/A_1" BEL
+        "coleco/inst_t80/u0/A_0" BEL "coleco/inst_t80/u0/BusA_7" BEL
+        "coleco/inst_t80/u0/BusA_6" BEL "coleco/inst_t80/u0/BusA_5" BEL
+        "coleco/inst_t80/u0/BusA_4" BEL "coleco/inst_t80/u0/BusA_3" BEL
+        "coleco/inst_t80/u0/BusA_2" BEL "coleco/inst_t80/u0/BusA_1" BEL
+        "coleco/inst_t80/u0/BusA_0" BEL "coleco/inst_t80/u0/ALU_Op_r_3" BEL
+        "coleco/inst_t80/u0/ALU_Op_r_2" BEL "coleco/inst_t80/u0/ALU_Op_r_1"
+        BEL "coleco/inst_t80/u0/ALU_Op_r_0" BEL "coleco/inst_t80/u0/ALU_cpi_r"
+        BEL "coleco/inst_t80/u0/Save_ALU_r" BEL "coleco/inst_t80/u0/Halt_FF"
+        BEL "coleco/inst_t80/u0/MCycles_2" BEL "coleco/inst_t80/u0/MCycles_1"
+        BEL "coleco/inst_t80/u0/MCycles_0" BEL "coleco/inst_t80/u0/IStatus_1"
+        BEL "coleco/inst_t80/u0/IStatus_0" BEL "coleco/inst_t80/u0/Arith16_r"
+        BEL "coleco/inst_t80/u0/F_7" BEL "coleco/inst_t80/u0/F_6" BEL
         "coleco/inst_t80/u0/F_5" BEL "coleco/inst_t80/u0/F_4" BEL
         "coleco/inst_t80/u0/F_3" BEL "coleco/inst_t80/u0/F_2" BEL
         "coleco/inst_t80/u0/F_1" BEL "coleco/inst_t80/u0/F_0" BEL
@@ -414,17 +621,18 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "coleco/inst_t80/u0/Ap_3" BEL "coleco/inst_t80/u0/Ap_2" BEL
         "coleco/inst_t80/u0/Ap_1" BEL "coleco/inst_t80/u0/Ap_0" BEL
         "coleco/inst_t80/u0/RFSH_n" BEL "coleco/inst_t80/u0/No_BTR" BEL
-        "coleco/inst_t80/u0/NMICycle" BEL "coleco/inst_t80/u0/INT_s" BEL
-        "coleco/inst_t80/u0/OldNMI_n" BEL "coleco/inst_t80/u0/PreserveC_r" BEL
+        "coleco/inst_t80/u0/NMICycle" BEL "coleco/inst_t80/u0/NMI_s" BEL
+        "coleco/inst_t80/u0/INT_s" BEL "coleco/inst_t80/u0/OldNMI_n" BEL
+        "coleco/inst_t80/u0/XY_Ind" BEL "coleco/inst_t80/u0/PreserveC_r" BEL
         "coleco/inst_t80/u0/Z16_r" BEL "coleco/inst_t80/u0/BTR_r" BEL
-        "coleco/inst_f18a/blu_r_0" BEL "coleco/inst_f18a/blu_r_1" BEL
-        "coleco/inst_f18a/blu_r_2" BEL "coleco/inst_f18a/blu_r_3" BEL
-        "coleco/inst_f18a/red_r_0" BEL "coleco/inst_f18a/red_r_1" BEL
-        "coleco/inst_f18a/red_r_2" BEL "coleco/inst_f18a/red_r_3" BEL
-        "coleco/inst_f18a/grn_r_0" BEL "coleco/inst_f18a/grn_r_1" BEL
-        "coleco/inst_f18a/grn_r_2" BEL "coleco/inst_f18a/grn_r_3" BEL
-        "coleco/inst_f18a/vsync_r" BEL "coleco/inst_f18a/hsync_r" BEL
-        "coleco/inst_f18a/blank_r" BEL
+        "coleco/inst_t80/u0/Alternate" BEL "coleco/inst_f18a/blu_r_0" BEL
+        "coleco/inst_f18a/blu_r_1" BEL "coleco/inst_f18a/blu_r_2" BEL
+        "coleco/inst_f18a/blu_r_3" BEL "coleco/inst_f18a/red_r_0" BEL
+        "coleco/inst_f18a/red_r_1" BEL "coleco/inst_f18a/red_r_2" BEL
+        "coleco/inst_f18a/red_r_3" BEL "coleco/inst_f18a/grn_r_0" BEL
+        "coleco/inst_f18a/grn_r_1" BEL "coleco/inst_f18a/grn_r_2" BEL
+        "coleco/inst_f18a/grn_r_3" BEL "coleco/inst_f18a/vsync_r" BEL
+        "coleco/inst_f18a/hsync_r" BEL "coleco/inst_f18a/blank_r" BEL
         "coleco/inst_f18a/inst_counters/y_count_0" BEL
         "coleco/inst_f18a/inst_counters/y_count_1" BEL
         "coleco/inst_f18a/inst_counters/y_count_2" BEL
@@ -460,6 +668,7 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "coleco/inst_f18a/inst_counters/x_sprt_pos_reg_5" BEL
         "coleco/inst_f18a/inst_counters/x_sprt_pos_reg_6" BEL
         "coleco/inst_f18a/inst_counters/x_sprt_pos_reg_7" BEL
+        "coleco/inst_f18a/inst_counters/y_margin_reg" BEL
         "coleco/inst_f18a/inst_counters/row30reg" BEL
         "coleco/inst_f18a/inst_counters/vga_clk_logic" BEL
         "coleco/inst_f18a/inst_counters/margin_reg" BEL
@@ -489,6 +698,9 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "coleco/inst_f18a/inst_vga_cont/hcounter_7" BEL
         "coleco/inst_f18a/inst_vga_cont/hcounter_8" BEL
         "coleco/inst_f18a/inst_vga_cont/hcounter_9" BEL
+        "coleco/inst_f18a/inst_vga_cont/vsync" BEL
+        "coleco/inst_f18a/inst_vga_cont/hsync" BEL
+        "coleco/inst_f18a/inst_vga_cont/blank_reg" BEL
         "coleco/sn76489_audio_inst/noise_cnt_r_6" BEL
         "coleco/sn76489_audio_inst/noise_cnt_r_5" BEL
         "coleco/sn76489_audio_inst/noise_cnt_r_4" BEL
@@ -551,6 +763,7 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "coleco/sn76489_audio_inst/pcm14s_r_2" BEL
         "coleco/sn76489_audio_inst/pcm14s_r_1" BEL
         "coleco/sn76489_audio_inst/pcm14s_r_0" BEL
+        "coleco/sn76489_audio_inst/noise_ff_r" BEL
         "coleco/sn76489_audio_inst/sign_c_r_11" BEL
         "coleco/sn76489_audio_inst/sign_c_r_10" BEL
         "coleco/sn76489_audio_inst/sign_c_r_9" BEL
@@ -614,6 +827,7 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "coleco/sn76489_audio_inst/sign_n_r_2" BEL
         "coleco/sn76489_audio_inst/sign_n_r_1" BEL
         "coleco/sn76489_audio_inst/sign_n_r_0" BEL
+        "coleco/sn76489_audio_inst/noise_rst_r" BEL
         "coleco/sn76489_audio_inst/noise_level_r_11" BEL
         "coleco/sn76489_audio_inst/noise_level_r_10" BEL
         "coleco/sn76489_audio_inst/noise_level_r_9" BEL
@@ -694,11 +908,23 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "coleco/sn76489_audio_inst/ch_a_level_r_2" BEL
         "coleco/sn76489_audio_inst/ch_a_level_r_1" BEL
         "coleco/sn76489_audio_inst/ch_a_level_r_0" BEL
+        "coleco/sn76489_audio_inst/ready_r" BEL
         "coleco/sn76489_audio_inst/noise_shift_r_1" BEL
         "coleco/sn76489_audio_inst/noise_shift_r_0" BEL
         "coleco/sn76489_audio_inst/noise_ctrl_r" BEL
+        "coleco/sn76489_audio_inst/tone_b_r" BEL
+        "coleco/sn76489_audio_inst/tone_a_r" BEL
         "coleco/sn76489_audio_inst/tone_c_r" BEL
         "coleco/sn76489_audio_inst/en_cnt_r" BEL
+        "coleco/sn76489_audio_inst/c_ff_r" BEL
+        "coleco/sn76489_audio_inst/din_r_7" BEL
+        "coleco/sn76489_audio_inst/din_r_6" BEL
+        "coleco/sn76489_audio_inst/din_r_5" BEL
+        "coleco/sn76489_audio_inst/din_r_4" BEL
+        "coleco/sn76489_audio_inst/din_r_3" BEL
+        "coleco/sn76489_audio_inst/din_r_2" BEL
+        "coleco/sn76489_audio_inst/din_r_1" BEL
+        "coleco/sn76489_audio_inst/din_r_0" BEL
         "coleco/sn76489_audio_inst/ce_n_r" BEL
         "coleco/ym2149_audio_inst/clk_div8_r_2" BEL
         "coleco/ym2149_audio_inst/clk_div8_r_1" BEL
@@ -811,6 +1037,9 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "coleco/ym2149_audio_inst/sign_a_r_1" BEL
         "coleco/ym2149_audio_inst/sign_a_r_0" BEL
         "coleco/ym2149_audio_inst/noise_ff_r" BEL
+        "coleco/ym2149_audio_inst/tone_b_r" BEL
+        "coleco/ym2149_audio_inst/tone_a_r" BEL
+        "coleco/ym2149_audio_inst/tone_c_r" BEL
         "coleco/ym2149_audio_inst/ch_b_level_r_11" BEL
         "coleco/ym2149_audio_inst/ch_b_level_r_10" BEL
         "coleco/ym2149_audio_inst/ch_b_level_r_9" BEL
@@ -847,6 +1076,7 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "coleco/ym2149_audio_inst/ch_c_level_r_2" BEL
         "coleco/ym2149_audio_inst/ch_c_level_r_1" BEL
         "coleco/ym2149_audio_inst/ch_c_level_r_0" BEL
+        "coleco/ym2149_audio_inst/hold_ff_r" BEL
         "coleco/ym2149_audio_inst/data_o_r_7" BEL
         "coleco/ym2149_audio_inst/data_o_r_6" BEL
         "coleco/ym2149_audio_inst/data_o_r_5" BEL
@@ -856,6 +1086,7 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "coleco/ym2149_audio_inst/data_o_r_1" BEL
         "coleco/ym2149_audio_inst/data_o_r_0" BEL
         "coleco/ym2149_audio_inst/env_shape_wr_r" BEL
+        "coleco/ym2149_audio_inst/continue_ff_r" BEL
         "coleco/ym2149_audio_inst/en_cnt_r" BEL
         "coleco/ym2149_audio_inst/noise_lfsr_r_16" BEL
         "coleco/ym2149_audio_inst/noise_lfsr_r_15" BEL
@@ -1006,6 +1237,7 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "coleco/ym2149_audio_inst/reg_addr_r_2" BEL
         "coleco/ym2149_audio_inst/reg_addr_r_1" BEL
         "coleco/ym2149_audio_inst/reg_addr_r_0" BEL
+        "coleco/ym2149_audio_inst/attack_ff_r" BEL
         "coleco/ym2149_audio_inst/sel_n_r" BEL
         "coleco/ym2149_audio_inst/busctl_r_1" BEL
         "coleco/ym2149_audio_inst/busctl_r_0" BEL "coleco/sdcard/count_r_2"
@@ -1013,7 +1245,8 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "coleco/sdcard/state_r_FSM_FFd1" BEL "coleco/sdcard/state_r_FSM_FFd2"
         BEL "coleco/sdcard/slow_clk_r_4" BEL "coleco/sdcard/slow_clk_r_3" BEL
         "coleco/sdcard/slow_clk_r_2" BEL "coleco/sdcard/slow_clk_r_1" BEL
-        "coleco/sdcard/slow_clk_r_0" BEL "coleco/sdcard/wait_n_r" BEL
+        "coleco/sdcard/slow_clk_r_0" BEL "coleco/sdcard/clk_r" BEL
+        "coleco/sdcard/din_r" BEL "coleco/sdcard/wait_n_r" BEL
         "coleco/sdcard/spi_ss_n_r" BEL "snespads_b/pads[0].pad_b/buttons_q_31"
         BEL "snespads_b/pads[0].pad_b/buttons_q_30" BEL
         "snespads_b/pads[0].pad_b/buttons_q_29" BEL
@@ -1176,38 +1409,38 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "tmds/dataenc/audioTimer_8" BEL "tmds/dataenc/audioTimer_7" BEL
         "tmds/dataenc/audioTimer_6" BEL "tmds/dataenc/audioTimer_5" BEL
         "tmds/dataenc/audioTimer_4" BEL "tmds/dataenc/audioTimer_3" BEL
-        "tmds/dataenc/subpacket_0_186" BEL "tmds/dataenc/subpacket_0_185" BEL
-        "tmds/dataenc/subpacket_0_184" BEL "tmds/dataenc/subpacket_0_183" BEL
-        "tmds/dataenc/subpacket_0_182" BEL "tmds/dataenc/subpacket_0_181" BEL
-        "tmds/dataenc/subpacket_0_180" BEL "tmds/dataenc/subpacket_0_179" BEL
-        "tmds/dataenc/subpacket_0_178" BEL "tmds/dataenc/subpacket_0_177" BEL
-        "tmds/dataenc/subpacket_0_176" BEL "tmds/dataenc/subpacket_0_175" BEL
-        "tmds/dataenc/subpacket_0_174" BEL "tmds/dataenc/subpacket_0_173" BEL
-        "tmds/dataenc/subpacket_0_172" BEL "tmds/dataenc/subpacket_0_171" BEL
-        "tmds/dataenc/subpacket_0_170" BEL "tmds/dataenc/subpacket_0_169" BEL
-        "tmds/dataenc/subpacket_0_168" BEL "tmds/dataenc/subpacket_0_76" BEL
-        "tmds/dataenc/subpacket_0_75" BEL "tmds/dataenc/subpacket_0_43" BEL
-        "tmds/dataenc/subpacket_0_41" BEL "tmds/dataenc/subpacket_0_39" BEL
-        "tmds/dataenc/subpacket_0_37" BEL "tmds/dataenc/subpacket_0_35" BEL
-        "tmds/dataenc/subpacket_0_33" BEL "tmds/dataenc/subpacket_0_32" BEL
-        "tmds/dataenc/subpacket_0_31" BEL "tmds/dataenc/subpacket_0_30" BEL
-        "tmds/dataenc/subpacket_0_29" BEL "tmds/dataenc/subpacket_0_28" BEL
-        "tmds/dataenc/subpacket_0_27" BEL "tmds/dataenc/subpacket_0_26" BEL
-        "tmds/dataenc/subpacket_0_25" BEL "tmds/dataenc/subpacket_0_24" BEL
-        "tmds/dataenc/subpacket_0_23" BEL "tmds/dataenc/subpacket_0_22" BEL
-        "tmds/dataenc/subpacket_0_21" BEL "tmds/dataenc/subpacket_0_20" BEL
-        "tmds/dataenc/subpacket_0_19" BEL "tmds/dataenc/subpacket_0_18" BEL
-        "tmds/dataenc/subpacket_0_17" BEL "tmds/dataenc/subpacket_0_16" BEL
-        "tmds/dataenc/subpacket_0_15" BEL "tmds/dataenc/subpacket_0_14" BEL
-        "tmds/dataenc/subpacket_0_13" BEL "tmds/dataenc/subpacket_0_12" BEL
-        "tmds/dataenc/subpacket_0_11" BEL "tmds/dataenc/subpacket_0_10" BEL
-        "tmds/dataenc/subpacket_0_9" BEL "tmds/dataenc/subpacket_0_8" BEL
-        "tmds/dataenc/subpacket_0_7" BEL "tmds/dataenc/subpacket_0_6" BEL
-        "tmds/dataenc/subpacket_0_5" BEL "tmds/dataenc/subpacket_0_4" BEL
-        "tmds/dataenc/subpacket_0_3" BEL "tmds/dataenc/subpacket_0_2" BEL
-        "tmds/dataenc/subpacket_0_1" BEL "tmds/dataenc/subpacket_0_0" BEL
-        "tmds/dataenc/audioSubPacket_0_223" BEL
-        "tmds/dataenc/audioSubPacket_0_222" BEL
+        "tmds/dataenc/oddLine" BEL "tmds/dataenc/subpacket_0_186" BEL
+        "tmds/dataenc/subpacket_0_185" BEL "tmds/dataenc/subpacket_0_184" BEL
+        "tmds/dataenc/subpacket_0_183" BEL "tmds/dataenc/subpacket_0_182" BEL
+        "tmds/dataenc/subpacket_0_181" BEL "tmds/dataenc/subpacket_0_180" BEL
+        "tmds/dataenc/subpacket_0_179" BEL "tmds/dataenc/subpacket_0_178" BEL
+        "tmds/dataenc/subpacket_0_177" BEL "tmds/dataenc/subpacket_0_176" BEL
+        "tmds/dataenc/subpacket_0_175" BEL "tmds/dataenc/subpacket_0_174" BEL
+        "tmds/dataenc/subpacket_0_173" BEL "tmds/dataenc/subpacket_0_172" BEL
+        "tmds/dataenc/subpacket_0_171" BEL "tmds/dataenc/subpacket_0_170" BEL
+        "tmds/dataenc/subpacket_0_169" BEL "tmds/dataenc/subpacket_0_168" BEL
+        "tmds/dataenc/subpacket_0_76" BEL "tmds/dataenc/subpacket_0_75" BEL
+        "tmds/dataenc/subpacket_0_43" BEL "tmds/dataenc/subpacket_0_41" BEL
+        "tmds/dataenc/subpacket_0_39" BEL "tmds/dataenc/subpacket_0_37" BEL
+        "tmds/dataenc/subpacket_0_35" BEL "tmds/dataenc/subpacket_0_33" BEL
+        "tmds/dataenc/subpacket_0_32" BEL "tmds/dataenc/subpacket_0_31" BEL
+        "tmds/dataenc/subpacket_0_30" BEL "tmds/dataenc/subpacket_0_29" BEL
+        "tmds/dataenc/subpacket_0_28" BEL "tmds/dataenc/subpacket_0_27" BEL
+        "tmds/dataenc/subpacket_0_26" BEL "tmds/dataenc/subpacket_0_25" BEL
+        "tmds/dataenc/subpacket_0_24" BEL "tmds/dataenc/subpacket_0_23" BEL
+        "tmds/dataenc/subpacket_0_22" BEL "tmds/dataenc/subpacket_0_21" BEL
+        "tmds/dataenc/subpacket_0_20" BEL "tmds/dataenc/subpacket_0_19" BEL
+        "tmds/dataenc/subpacket_0_18" BEL "tmds/dataenc/subpacket_0_17" BEL
+        "tmds/dataenc/subpacket_0_16" BEL "tmds/dataenc/subpacket_0_15" BEL
+        "tmds/dataenc/subpacket_0_14" BEL "tmds/dataenc/subpacket_0_13" BEL
+        "tmds/dataenc/subpacket_0_12" BEL "tmds/dataenc/subpacket_0_11" BEL
+        "tmds/dataenc/subpacket_0_10" BEL "tmds/dataenc/subpacket_0_9" BEL
+        "tmds/dataenc/subpacket_0_8" BEL "tmds/dataenc/subpacket_0_7" BEL
+        "tmds/dataenc/subpacket_0_6" BEL "tmds/dataenc/subpacket_0_5" BEL
+        "tmds/dataenc/subpacket_0_4" BEL "tmds/dataenc/subpacket_0_3" BEL
+        "tmds/dataenc/subpacket_0_2" BEL "tmds/dataenc/subpacket_0_1" BEL
+        "tmds/dataenc/subpacket_0_0" BEL "tmds/dataenc/audioSubPacket_0_223"
+        BEL "tmds/dataenc/audioSubPacket_0_222" BEL
         "tmds/dataenc/audioSubPacket_0_221" BEL
         "tmds/dataenc/audioSubPacket_0_220" BEL
         "tmds/dataenc/audioSubPacket_0_219" BEL
@@ -1458,11 +1691,41 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "tmds/enc0/ENCODED_6" BEL "tmds/enc0/ENCODED_5" BEL
         "tmds/enc0/ENCODED_4" BEL "tmds/enc0/ENCODED_3" BEL
         "tmds/enc0/ENCODED_2" BEL "tmds/enc0/ENCODED_1" BEL
-        "tmds/enc0/ENCODED_0" BEL "coleco/rom_loader_en_r" BEL
-        "coleco/m1_wait_n_r" BEL "coleco/ctrl_b/p1_ifc_cnt_r_10" BEL
-        "coleco/ctrl_b/p1_ifc_cnt_r_9" BEL "coleco/ctrl_b/p1_ifc_cnt_r_8" BEL
-        "coleco/ctrl_b/p2_ifc_cnt_r_10" BEL "coleco/ctrl_b/p2_ifc_cnt_r_9" BEL
-        "coleco/ctrl_b/p2_ifc_cnt_r_8" BEL "coleco/ctrl_b/keyjoy_sel_r" BEL
+        "tmds/enc0/ENCODED_0" BEL "coleco/cache/c_settle_2" BEL
+        "coleco/cache/c_settle_1" BEL "coleco/cache/c_settle_0" BEL
+        "coleco/cache/ov_settle_2" BEL "coleco/cache/ov_settle_1" BEL
+        "coleco/cache/ov_settle_0" BEL "coleco/cache/led_time_22" BEL
+        "coleco/cache/led_time_21" BEL "coleco/cache/led_time_20" BEL
+        "coleco/cache/led_time_19" BEL "coleco/cache/led_time_18" BEL
+        "coleco/cache/led_time_17" BEL "coleco/cache/led_time_16" BEL
+        "coleco/cache/led_time_15" BEL "coleco/cache/led_time_14" BEL
+        "coleco/cache/led_time_13" BEL "coleco/cache/led_time_12" BEL
+        "coleco/cache/led_time_11" BEL "coleco/cache/led_time_10" BEL
+        "coleco/cache/led_time_9" BEL "coleco/cache/led_time_8" BEL
+        "coleco/cache/led_time_7" BEL "coleco/cache/led_time_6" BEL
+        "coleco/cache/led_time_5" BEL "coleco/cache/led_time_4" BEL
+        "coleco/cache/led_time_3" BEL "coleco/cache/led_time_2" BEL
+        "coleco/cache/led_time_1" BEL "coleco/cache/led_time_0" BEL
+        "coleco/cache/cr_we" BEL "coleco/cache/spi_busy" BEL
+        "coleco/cache/ov_en" BEL "coleco/cache/lba_rd_chk" BEL
+        "coleco/cache/c_init" BEL "coleco/cache/led" BEL
+        "coleco/cache/cap_seen" BEL "coleco/cache/chk_seen" BEL
+        "coleco/cache/frag" BEL "coleco/cache/cap_on" BEL
+        "coleco/cache/chk_on" BEL "coleco/cache/ld_pend" BEL
+        "coleco/cache/f_retry" BEL "coleco/rom_loader_en_r" BEL
+        "coleco/m1_wait_n_r" BEL "coleco/ext512/ram_st_r" BEL
+        "coleco/ctrl_b/p1_1/d_r" BEL "coleco/ctrl_b/p1_2/d_r" BEL
+        "coleco/ctrl_b/p1_3/d_r" BEL "coleco/ctrl_b/p1_4/d_r" BEL
+        "coleco/ctrl_b/p1_6/d_r" BEL "coleco/ctrl_b/p1_7/d_r" BEL
+        "coleco/ctrl_b/p2_1/d_r" BEL "coleco/ctrl_b/p2_2/d_r" BEL
+        "coleco/ctrl_b/p2_3/d_r" BEL "coleco/ctrl_b/p2_4/d_r" BEL
+        "coleco/ctrl_b/p2_6/d_r" BEL "coleco/ctrl_b/p2_7/d_r" BEL
+        "coleco/ctrl_b/p1_ifc_cnt_r_10" BEL "coleco/ctrl_b/p1_ifc_cnt_r_9" BEL
+        "coleco/ctrl_b/p1_ifc_cnt_r_8" BEL "coleco/ctrl_b/p2_ifc_cnt_r_10" BEL
+        "coleco/ctrl_b/p2_ifc_cnt_r_9" BEL "coleco/ctrl_b/p2_ifc_cnt_r_8" BEL
+        "coleco/ctrl_b/keyjoy_sel_r" BEL "coleco/ctrl_b/p2_9/d_r" BEL
+        "coleco/ctrl_b/p1_9/d_r" BEL
+        "coleco/inst_f18a/inst_counters/y_count_en" BEL
         "coleco/ym2149_audio_inst/shape_cnt_r_4" BEL
         "coleco/ym2149_audio_inst/shape_cnt_r_3" BEL
         "coleco/ym2149_audio_inst/shape_cnt_r_2" BEL
@@ -1473,56 +1736,26 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "coleco/sdcard/shift_r_2" BEL "coleco/sdcard/shift_r_1" BEL
         "coleco/sdcard/shift_r_0" BEL "tmds/state_FSM_FFd2" BEL
         "tmds/state_FSM_FFd3" BEL "tmds/state_FSM_FFd1" BEL
-        "tmds/dataenc/firstHSyncChange" BEL "tmds/dataenc/allowGeneration" BEL
-        "coleco/inst_t80/u0/M1_n" BEL "coleco/inst_t80/u0/IR_5_1" BEL
-        "coleco/inst_t80/u0/IR_1_1" BEL "coleco/inst_t80/u0/MCycle_1_1" BEL
-        "coleco/inst_t80/u0/MCycle_0_1" BEL "coleco/inst_t80/u0/IR_0_1" BEL
+        "tmds/dataenc/tercData" BEL "tmds/dataenc/firstHSyncChange" BEL
+        "tmds/dataenc/allowGeneration" BEL "coleco/inst_t80/u0/M1_n" BEL
+        "coleco/inst_t80/u0/IR_0_1" BEL "coleco/inst_t80/u0/IR_5_1" BEL
+        "coleco/inst_t80/u0/IR_6_1" BEL "coleco/inst_t80/u0/IR_7_1" BEL
+        "coleco/inst_t80/u0/IR_2_1" BEL "coleco/inst_t80/u0/ISet_1_1" BEL
+        "coleco/inst_t80/u0/MCycle_0_1" BEL "coleco/inst_t80/u0/ISet_0_1" BEL
         "coleco/inst_t80/u0/IR_4_1" BEL "coleco/inst_t80/u0/MCycle_2_1" BEL
-        "coleco/inst_t80/u0/IR_2_1" BEL "coleco/inst_t80/u0/IR_6_1" BEL
-        "coleco/inst_t80/u0/IR_7_1" BEL "coleco/inst_t80/u0/IR_3_1" BEL
-        "coleco/inst_t80/u0/ISet_1_1" BEL "coleco/inst_t80/u0/MCycle_1_2" BEL
-        "coleco/inst_t80/u0/MCycle_2_2" BEL "coleco/inst_t80/u0/ISet_0_1" BEL
-        "coleco/inst_t80/u0/IR_3_2" BEL "coleco/inst_t80/u0/IR_6_2" BEL
-        "coleco/inst_t80/u0/IR_0_2" BEL "coleco/inst_t80/u0/IR_5_2" BEL
-        "coleco/inst_t80/u0/IR_7_2" BEL "coleco/inst_t80/u0/IR_2_2" BEL
-        "coleco/inst_t80/u0/IR_1_2" BEL "coleco/inst_t80/u0/IntCycle_1" BEL
-        "coleco/inst_t80/u0/MCycle_1_3" BEL "coleco/inst_t80/u0/IR_1_3" BEL
+        "coleco/inst_t80/u0/IR_0_2" BEL "coleco/inst_t80/u0/MCycle_1_1" BEL
+        "coleco/inst_t80/u0/IR_5_2" BEL "coleco/inst_t80/u0/IR_1_1" BEL
+        "coleco/inst_t80/u0/IR_3_1" BEL "coleco/inst_t80/u0/IR_6_2" BEL
+        "coleco/inst_t80/u0/IR_2_2" BEL "coleco/inst_t80/u0/IR_7_2" BEL
         "coleco/inst_t80/u0/MCycle_0_2" BEL "coleco/inst_t80/u0/IR_4_2" BEL
-        "coleco/inst_t80/u0/IR_2_3" BEL "coleco/inst_t80/u0/IR_0_3" BEL
-        "coleco/inst_t80/u0/IR_6_3" BEL "coleco/inst_t80/u0/IR_7_3" BEL
-        "coleco/inst_t80/u0/IR_5_3" BEL "coleco/inst_t80/u0/F_0_1" BEL
-        "coleco/sgm_8k_en_r" BEL "ps2if_inst/ps2kbd_inst/PS2_Data_s" BEL
-        "ps2if_inst/ps2kbd_inst/PS2_Clk_State" BEL
-        "ps2if_inst/ps2kbd_inst/RX_Release" BEL "coleco/ctrl_b/p2_9cd/d_r" BEL
-        "coleco/ctrl_b/p1_9cd/d_r" BEL "coleco/inst_t80/u0/NMI_s" BEL
-        "coleco/inst_t80/u0/XY_Ind" BEL "coleco/inst_t80/u0/Alternate" BEL
-        "coleco/ym2149_audio_inst/tone_b_r" BEL
-        "coleco/ym2149_audio_inst/tone_a_r" BEL
-        "coleco/ym2149_audio_inst/tone_c_r" BEL
-        "coleco/ym2149_audio_inst/hold_ff_r" BEL
-        "coleco/ym2149_audio_inst/continue_ff_r" BEL
-        "coleco/ym2149_audio_inst/attack_ff_r" BEL "coleco/sdcard/clk_r" BEL
-        "coleco/sdcard/din_r" BEL "por_n_r" BEL "coleco/kbd_rd_r" BEL
-        "coleco/ext512/we_n_r" BEL
-        "coleco/inst_f18a/inst_counters/y_margin_reg" BEL
-        "coleco/inst_f18a/inst_vga_cont/vsync" BEL
-        "coleco/inst_f18a/inst_vga_cont/hsync" BEL
-        "coleco/inst_f18a/inst_vga_cont/blank_reg" BEL
-        "coleco/sn76489_audio_inst/ready_r" BEL
-        "coleco/sn76489_audio_inst/c_ff_r" BEL "tmds/dataenc/oddLine" BEL
-        "coleco/ext512/ram_st_r" BEL "coleco/ctrl_b/p1_1/d_r" BEL
-        "coleco/ctrl_b/p1_2/d_r" BEL "coleco/ctrl_b/p1_3/d_r" BEL
-        "coleco/ctrl_b/p1_4/d_r" BEL "coleco/ctrl_b/p1_6/d_r" BEL
-        "coleco/ctrl_b/p1_7/d_r" BEL "coleco/ctrl_b/p2_1/d_r" BEL
-        "coleco/ctrl_b/p2_2/d_r" BEL "coleco/ctrl_b/p2_3/d_r" BEL
-        "coleco/ctrl_b/p2_4/d_r" BEL "coleco/ctrl_b/p2_6/d_r" BEL
-        "coleco/ctrl_b/p2_7/d_r" BEL "coleco/ctrl_b/p2_9/d_r" BEL
-        "coleco/ctrl_b/p1_9/d_r" BEL
-        "coleco/inst_f18a/inst_counters/y_count_en" BEL
-        "tmds/dataenc/tercData" BEL "coleco/sn76489_audio_inst/noise_ff_r" BEL
-        "coleco/sn76489_audio_inst/noise_rst_r" BEL
-        "coleco/sn76489_audio_inst/tone_b_r" BEL
-        "coleco/sn76489_audio_inst/tone_a_r" BEL "coleco/inst_t80/u0/DO_7" BEL
+        "coleco/inst_t80/u0/MCycle_2_2" BEL "coleco/inst_t80/u0/MCycle_1_2"
+        BEL "coleco/inst_t80/u0/IR_3_2" BEL "coleco/inst_t80/u0/IR_6_3" BEL
+        "coleco/inst_t80/u0/IR_1_2" BEL "coleco/inst_t80/u0/IR_0_3" BEL
+        "coleco/inst_t80/u0/IR_7_3" BEL "coleco/inst_t80/u0/F_0_1" BEL
+        "coleco/inst_t80/u0/IntCycle_1" BEL "coleco/inst_t80/u0/TState_2_1"
+        BEL "coleco/inst_t80/u0/IR_0_4" BEL "coleco/inst_t80/u0/IR_4_3" BEL
+        "coleco/inst_t80/u0/IR_3_3" BEL "coleco/inst_t80/u0/IR_5_3" BEL
+        "coleco/inst_t80/u0/IR_5_4" BEL "coleco/inst_t80/u0/DO_7" BEL
         "coleco/inst_t80/u0/DO_6" BEL "coleco/inst_t80/u0/DO_5" BEL
         "coleco/inst_t80/u0/DO_4" BEL "coleco/inst_t80/u0/DO_3" BEL
         "coleco/inst_t80/u0/DO_2" BEL "coleco/inst_t80/u0/DO_1" BEL
@@ -1530,6 +1763,8 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "coleco/bios/Mram_ram_q3_pins<13>" PIN
         "coleco/bios/Mram_ram_q2_pins<13>" PIN
         "coleco/bios/Mram_ram_q1_pins<13>" PIN
+        "coleco/cache/Mram_c_lba_pins<16>" PIN
+        "coleco/cache/Mram_c_lba_pins<17>" PIN
         "coleco/Mram_cv_ram1k_r_pins<10>" PIN
         "coleco/loader/Mram_ram_C_pins<11>" PIN
         "coleco/loader/Mram_ram_A_pins<11>" PIN
@@ -1602,9 +1837,43 @@ TIMEGRP clock_system_clkout0 = BEL "clk_3m58_en_r" BEL "reset_r" BEL
         "tmds/delay_line/q_pipe_10_2" BEL "tmds/delay_line/Mshreg_q_pipe_10_1"
         BEL "tmds/delay_line/q_pipe_10_1" BEL
         "tmds/delay_line/Mshreg_q_pipe_10_0" BEL "tmds/delay_line/q_pipe_10_0"
-        BEL "coleco/Mram_kbd_fifo_r21/DP" BEL "coleco/Mram_kbd_fifo_r21/SP"
-        BEL "coleco/Mram_kbd_fifo_r22/DP" BEL "coleco/Mram_kbd_fifo_r22/SP"
-        BEL "coleco/inst_t80/u0/Regs/Mram_RegsH1/DP" BEL
+        BEL "coleco/cache/Mram_c_map12/SP" BEL "coleco/cache/Mram_c_map12/DP"
+        BEL "coleco/cache/Mram_c_map11/SP" BEL "coleco/cache/Mram_c_map11/DP"
+        BEL "coleco/cache/Mram_c_map10/SP" BEL "coleco/cache/Mram_c_map10/DP"
+        BEL "coleco/cache/Mram_c_map9/SP" BEL "coleco/cache/Mram_c_map9/DP"
+        BEL "coleco/cache/Mram_c_map1_RAMA" BEL
+        "coleco/cache/Mram_c_map1_RAMB" BEL "coleco/cache/Mram_c_map1_RAMC"
+        BEL "coleco/cache/Mram_c_map1_RAMD" BEL
+        "coleco/cache/Mram_c_map2_RAMA" BEL "coleco/cache/Mram_c_map2_RAMB"
+        BEL "coleco/cache/Mram_c_map2_RAMC" BEL
+        "coleco/cache/Mram_c_map2_RAMD" BEL "coleco/cache/Mram_c_map3_RAMA"
+        BEL "coleco/cache/Mram_c_map3_RAMB" BEL
+        "coleco/cache/Mram_c_map3_RAMC" BEL "coleco/cache/Mram_c_map3_RAMD"
+        BEL "coleco/cache/Mram_c_map4_RAMA" BEL
+        "coleco/cache/Mram_c_map4_RAMB" BEL "coleco/cache/Mram_c_map4_RAMC"
+        BEL "coleco/cache/Mram_c_map4_RAMD" BEL
+        "coleco/cache/Mram_c_map5_RAMA" BEL "coleco/cache/Mram_c_map5_RAMB"
+        BEL "coleco/cache/Mram_c_map5_RAMC" BEL
+        "coleco/cache/Mram_c_map5_RAMD" BEL "coleco/cache/Mram_c_map6_RAMA"
+        BEL "coleco/cache/Mram_c_map6_RAMB" BEL
+        "coleco/cache/Mram_c_map6_RAMC" BEL "coleco/cache/Mram_c_map6_RAMD"
+        BEL "coleco/cache/Mram_c_map7_RAMA" BEL
+        "coleco/cache/Mram_c_map7_RAMB" BEL "coleco/cache/Mram_c_map7_RAMC"
+        BEL "coleco/cache/Mram_c_map7_RAMD" BEL
+        "coleco/cache/Mram_c_map8_RAMA" BEL "coleco/cache/Mram_c_map8_RAMB"
+        BEL "coleco/cache/Mram_c_map8_RAMC" BEL
+        "coleco/cache/Mram_c_map8_RAMD" BEL "coleco/cache/Mram_c_rev1_RAMA"
+        BEL "coleco/cache/Mram_c_rev1_RAMB" BEL
+        "coleco/cache/Mram_c_rev1_RAMC" BEL "coleco/cache/Mram_c_rev1_RAMD"
+        BEL "coleco/cache/Mram_c_rev2_RAMA" BEL
+        "coleco/cache/Mram_c_rev2_RAMB" BEL "coleco/cache/Mram_c_rev2_RAMC"
+        BEL "coleco/cache/Mram_c_rev2_RAMD" BEL
+        "coleco/cache/Mram_c_rev3_RAMA" BEL "coleco/cache/Mram_c_rev3_RAMB"
+        BEL "coleco/cache/Mram_c_rev3_RAMC" BEL
+        "coleco/cache/Mram_c_rev3_RAMD" BEL "coleco/Mram_kbd_fifo_r21/DP" BEL
+        "coleco/Mram_kbd_fifo_r21/SP" BEL "coleco/Mram_kbd_fifo_r22/DP" BEL
+        "coleco/Mram_kbd_fifo_r22/SP" BEL
+        "coleco/inst_t80/u0/Regs/Mram_RegsH1/DP" BEL
         "coleco/inst_t80/u0/Regs/Mram_RegsH1/SP" BEL
         "coleco/inst_t80/u0/Regs/Mram_RegsH121/DP" BEL
         "coleco/inst_t80/u0/Regs/Mram_RegsH121/SP" BEL
@@ -1872,6 +2141,7 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_cpu/reg30sprtmax_2" BEL
         "coleco/inst_f18a/inst_cpu/reg30sprtmax_3" BEL
         "coleco/inst_f18a/inst_cpu/reg30sprtmax_4" BEL
+        "coleco/inst_f18a/inst_cpu/horz_last" BEL
         "coleco/inst_f18a/inst_cpu/pram_inc_en" BEL
         "coleco/inst_f18a/inst_cpu/cnt_milli_sr_0" BEL
         "coleco/inst_f18a/inst_cpu/cnt_milli_sr_1" BEL
@@ -1995,6 +2265,7 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_cpu/reg49tile2_en" BEL
         "coleco/inst_f18a/inst_cpu/reg49ecmt_0" BEL
         "coleco/inst_f18a/inst_cpu/reg49ecmt_1" BEL
+        "coleco/inst_f18a/inst_cpu/reg31bml_en" BEL
         "coleco/inst_f18a/inst_cpu/reg27horz_0" BEL
         "coleco/inst_f18a/inst_cpu/reg27horz_1" BEL
         "coleco/inst_f18a/inst_cpu/reg27horz_2" BEL
@@ -2152,6 +2423,8 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_cpu/gpu_pause_req" BEL
         "coleco/inst_f18a/inst_cpu/horz_ff" BEL
         "coleco/inst_f18a/inst_cpu/pram_load" BEL
+        "coleco/inst_f18a/inst_cpu/addr_ff" BEL
+        "coleco/inst_f18a/inst_cpu/reg57cnt" BEL
         "coleco/inst_f18a/inst_cpu/reg48inc_0" BEL
         "coleco/inst_f18a/inst_cpu/reg48inc_1" BEL
         "coleco/inst_f18a/inst_cpu/reg48inc_2" BEL
@@ -2168,6 +2441,12 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_cpu/cd_in_5" BEL
         "coleco/inst_f18a/inst_cpu/cd_in_6" BEL
         "coleco/inst_f18a/inst_cpu/cd_in_7" BEL
+        "coleco/inst_f18a/inst_cpu/csr" BEL "coleco/inst_f18a/inst_cpu/csw"
+        BEL "coleco/inst_f18a/inst_cpu/horz_en" BEL
+        "coleco/inst_f18a/inst_cpu/reg57unlock" BEL
+        "coleco/inst_f18a/inst_cpu/reg47dpm" BEL
+        "coleco/inst_f18a/inst_cpu/pram_ff" BEL
+        "coleco/inst_f18a/inst_cpu/gpu_pause" BEL
         "coleco/inst_f18a/inst_cpu/mode_r" BEL
         "coleco/inst_f18a/inst_cpu/csw_sync_0" BEL
         "coleco/inst_f18a/inst_cpu/csw_sync_1" BEL
@@ -2239,6 +2518,7 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/shift_cnt_1" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/shift_cnt_0" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/dma_r_FSM_FFd2" BEL
+        "coleco/inst_f18a/inst_cpu/inst_gpu/spi_state_FSM_FFd1" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/spi_state_FSM_FFd2" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/Mram_regfile16" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/Mram_regfile14" BEL
@@ -2469,6 +2749,11 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/alu_reg_13" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/alu_reg_14" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/alu_reg_15" BEL
+        "coleco/inst_f18a/inst_cpu/inst_gpu/OVFLW" BEL
+        "coleco/inst_f18a/inst_cpu/inst_gpu/shift_carry" BEL
+        "coleco/inst_f18a/inst_cpu/inst_gpu/PARITY" BEL
+        "coleco/inst_f18a/inst_cpu/inst_gpu/CARRY" BEL
+        "coleco/inst_f18a/inst_cpu/inst_gpu/EQUAL" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/LGT" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/AGT" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/shift_reg_0" BEL
@@ -2495,6 +2780,7 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/ws_dst_save_13" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/ws_dst_save_14" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/ws_dst_save_15" BEL
+        "coleco/inst_f18a/inst_cpu/inst_gpu/shift_msb" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/ws_we" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/dst_oper_0" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/dst_oper_1" BEL
@@ -2549,6 +2835,8 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/alu_ctrl_2" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/alu_ctrl_1" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/alu_ctrl_0" BEL
+        "coleco/inst_f18a/inst_cpu/inst_gpu/spi_done" BEL
+        "coleco/inst_f18a/inst_cpu/inst_gpu/alu_to_ws" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/format_2" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/format_1" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/format_0" BEL
@@ -2562,11 +2850,13 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/shift_ctrl_2" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/shift_ctrl_1" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/shift_ctrl_0" BEL
+        "coleco/inst_f18a/inst_cpu/inst_gpu/div_overflow" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/cpu_state_return_3" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/cpu_state_return_1" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/cpu_state_return_0" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/running_reg" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/mar_ctrl" BEL
+        "coleco/inst_f18a/inst_cpu/inst_gpu/dma_trig_r" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/alu_carry" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/swe_reg" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/dwe_r" BEL
@@ -2619,7 +2909,10 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/inst_divide/count_2" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/inst_divide/count_1" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/inst_divide/count_0" BEL
-        "coleco/inst_f18a/inst_cpu/inst_gpu/inst_divide/rh_0" BEL
+        "coleco/inst_f18a/inst_cpu/inst_gpu/inst_divide/div_state_FSM_FFd1"
+        BEL
+        "coleco/inst_f18a/inst_cpu/inst_gpu/inst_divide/div_state_FSM_FFd2"
+        BEL "coleco/inst_f18a/inst_cpu/inst_gpu/inst_divide/rh_0" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/inst_divide/rh_1" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/inst_divide/rh_2" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/inst_divide/rh_3" BEL
@@ -2669,7 +2962,9 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/inst_divide/d_13" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/inst_divide/d_14" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/inst_divide/d_15" BEL
+        "coleco/inst_f18a/inst_counters/sprt_cf_ff" BEL
         "coleco/inst_f18a/inst_counters/vga_clk_last" BEL
+        "coleco/inst_f18a/inst_counters/intr_ff" BEL
         "coleco/inst_f18a/inst_counters/valid_y_last" BEL
         "coleco/inst_f18a/inst_tiles/fifo_rd_cnt_r_0" BEL
         "coleco/inst_f18a/inst_tiles/fifo_rd_cnt_r_1" BEL
@@ -2812,6 +3107,7 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_tiles/ptrn_addr_r_11" BEL
         "coleco/inst_f18a/inst_tiles/ptrn_addr_r_12" BEL
         "coleco/inst_f18a/inst_tiles/ptrn_addr_r_13" BEL
+        "coleco/inst_f18a/inst_tiles/bml_cnt_en_r" BEL
         "coleco/inst_f18a/inst_tiles/p3_r_0" BEL
         "coleco/inst_f18a/inst_tiles/p3_r_1" BEL
         "coleco/inst_f18a/inst_tiles/p3_r_2" BEL
@@ -2880,6 +3176,7 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_tiles/vpo_r_0" BEL
         "coleco/inst_f18a/inst_tiles/vpo_r_1" BEL
         "coleco/inst_f18a/inst_tiles/vpo_r_2" BEL
+        "coleco/inst_f18a/inst_tiles/bml_in_y_r" BEL
         "coleco/inst_f18a/inst_tiles/ptrn1_r_0" BEL
         "coleco/inst_f18a/inst_tiles/ptrn1_r_1" BEL
         "coleco/inst_f18a/inst_tiles/ptrn1_r_2" BEL
@@ -2913,6 +3210,7 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_tiles/ptrn3_r_6" BEL
         "coleco/inst_f18a/inst_tiles/ptrn3_r_7" BEL
         "coleco/inst_f18a/inst_tiles/bml_en_r" BEL
+        "coleco/inst_f18a/inst_tiles/sprite_en_r" BEL
         "coleco/inst_f18a/inst_tiles/trig_start_r" BEL
         "coleco/inst_f18a/inst_tiles/t40_div6_r_0:9_16" BEL
         "coleco/inst_f18a/inst_tiles/t40_div6_r_0:9_15" BEL
@@ -2940,14 +3238,18 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_tiles/bml_yline_r_5" BEL
         "coleco/inst_f18a/inst_tiles/bml_yline_r_6" BEL
         "coleco/inst_f18a/inst_tiles/bml_yline_r_7" BEL
+        "coleco/inst_f18a/inst_tiles/mode256_r" BEL
         "coleco/inst_f18a/inst_tiles/pal_sel_r_0" BEL
         "coleco/inst_f18a/inst_tiles/pal_sel_r_1" BEL
         "coleco/inst_f18a/inst_tiles/pal_sel_r_2" BEL
         "coleco/inst_f18a/inst_tiles/pal_sel_r_3" BEL
         "coleco/inst_f18a/inst_tiles/trans_r" BEL
         "coleco/inst_f18a/inst_tiles/tile_pri_r" BEL
+        "coleco/inst_f18a/inst_tiles/x_expand_max_r_1" BEL
         "coleco/inst_f18a/inst_tiles/y_max_rows_r_3" BEL
+        "coleco/inst_f18a/inst_tiles/flip_x_r" BEL
         "coleco/inst_f18a/inst_tiles/fifo_re_r" BEL
+        "coleco/inst_f18a/inst_tiles/done_r" BEL
         "coleco/inst_f18a/inst_tiles/layer_sel_r" BEL
         "coleco/inst_f18a/inst_tiles/prescan_r" BEL
         "coleco/inst_f18a/inst_tiles/tile_en_r" BEL
@@ -3019,6 +3321,7 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_sprites/spgba_sel_3" BEL
         "coleco/inst_f18a/inst_sprites/spgba_sel_4" BEL
         "coleco/inst_f18a/inst_sprites/spgba_sel_5" BEL
+        "coleco/inst_f18a/inst_sprites/shift_en" BEL
         "coleco/inst_f18a/inst_sprites/ptrn2_0" BEL
         "coleco/inst_f18a/inst_sprites/ptrn2_1" BEL
         "coleco/inst_f18a/inst_sprites/ptrn2_2" BEL
@@ -3081,6 +3384,7 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_sprites/sp_x_7" BEL
         "coleco/inst_f18a/inst_sprites/sp_x_8" BEL
         "coleco/inst_f18a/inst_sprites/we" BEL
+        "coleco/inst_f18a/inst_sprites/report5th_r" BEL
         "coleco/inst_f18a/inst_sprites/y_range_0" BEL
         "coleco/inst_f18a/inst_sprites/y_range_1" BEL
         "coleco/inst_f18a/inst_sprites/y_range_2" BEL
@@ -3089,6 +3393,7 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_sprites/y_range_5" BEL
         "coleco/inst_f18a/inst_sprites/y_range_6" BEL
         "coleco/inst_f18a/inst_sprites/y_range_7" BEL
+        "coleco/inst_f18a/inst_sprites/sprt_5s_flag" BEL
         "coleco/inst_f18a/inst_sprites/clear_en" BEL
         "coleco/inst_f18a/inst_sprites/sp_x_9bit_0" BEL
         "coleco/inst_f18a/inst_sprites/sp_x_9bit_1" BEL
@@ -3098,6 +3403,7 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_sprites/sp_x_9bit_5" BEL
         "coleco/inst_f18a/inst_sprites/sp_x_9bit_6" BEL
         "coleco/inst_f18a/inst_sprites/sp_x_9bit_7" BEL
+        "coleco/inst_f18a/inst_sprites/mag_reg" BEL
         "coleco/inst_f18a/inst_sprites/sp_color_0" BEL
         "coleco/inst_f18a/inst_sprites/sp_color_1" BEL
         "coleco/inst_f18a/inst_sprites/sp_color_2" BEL
@@ -3146,44 +3452,7 @@ TIMEGRP clock_system_clkout1 = BEL "clock_system/clkout2_buf" BEL
         "coleco/inst_f18a/inst_cpu/gpu_trig_delay" BEL
         "coleco/inst_f18a/inst_cpu/power_on_trig" BEL
         "coleco/inst_f18a/inst_cpu/inst_gpu/shift_overflow" BEL
-        "coleco/inst_f18a/inst_version/display_r" BEL
-        "coleco/inst_f18a/inst_cpu/reg31bml_en" BEL
-        "coleco/inst_f18a/inst_cpu/addr_ff" BEL
-        "coleco/inst_f18a/inst_cpu/reg57cnt" BEL
-        "coleco/inst_f18a/inst_cpu/reg47dpm" BEL
-        "coleco/inst_f18a/inst_cpu/pram_ff" BEL
-        "coleco/inst_f18a/inst_cpu/inst_gpu/spi_done" BEL
-        "coleco/inst_f18a/inst_cpu/horz_last" BEL
-        "coleco/inst_f18a/inst_cpu/csr" BEL "coleco/inst_f18a/inst_cpu/csw"
-        BEL "coleco/inst_f18a/inst_cpu/horz_en" BEL
-        "coleco/inst_f18a/inst_cpu/gpu_pause" BEL
-        "coleco/inst_f18a/inst_cpu/inst_gpu/spi_state_FSM_FFd1" BEL
-        "coleco/inst_f18a/inst_cpu/inst_gpu/OVFLW" BEL
-        "coleco/inst_f18a/inst_cpu/inst_gpu/shift_carry" BEL
-        "coleco/inst_f18a/inst_cpu/inst_gpu/PARITY" BEL
-        "coleco/inst_f18a/inst_cpu/inst_gpu/CARRY" BEL
-        "coleco/inst_f18a/inst_cpu/inst_gpu/EQUAL" BEL
-        "coleco/inst_f18a/inst_cpu/inst_gpu/shift_msb" BEL
-        "coleco/inst_f18a/inst_cpu/inst_gpu/alu_to_ws" BEL
-        "coleco/inst_f18a/inst_cpu/inst_gpu/div_overflow" BEL
-        "coleco/inst_f18a/inst_cpu/inst_gpu/dma_trig_r" BEL
-        "coleco/inst_f18a/inst_cpu/inst_gpu/inst_divide/div_state_FSM_FFd1"
-        BEL
-        "coleco/inst_f18a/inst_cpu/inst_gpu/inst_divide/div_state_FSM_FFd2"
-        BEL "coleco/inst_f18a/inst_counters/sprt_cf_ff" BEL
-        "coleco/inst_f18a/inst_counters/intr_ff" BEL
-        "coleco/inst_f18a/inst_tiles/bml_cnt_en_r" BEL
-        "coleco/inst_f18a/inst_tiles/bml_in_y_r" BEL
-        "coleco/inst_f18a/inst_tiles/sprite_en_r" BEL
-        "coleco/inst_f18a/inst_tiles/mode256_r" BEL
-        "coleco/inst_f18a/inst_tiles/x_expand_max_r_1" BEL
-        "coleco/inst_f18a/inst_tiles/done_r" BEL
-        "coleco/inst_f18a/inst_sprites/shift_en" BEL
-        "coleco/inst_f18a/inst_sprites/mag_reg" BEL
-        "coleco/inst_f18a/inst_cpu/reg57unlock" BEL
-        "coleco/inst_f18a/inst_tiles/flip_x_r" BEL
-        "coleco/inst_f18a/inst_sprites/report5th_r" BEL
-        "coleco/inst_f18a/inst_sprites/sprt_5s_flag" PIN
+        "coleco/inst_f18a/inst_version/display_r" PIN
         "coleco/inst_f18a/inst_vram/inst_ram/Mram_ram8_pins<28>" PIN
         "coleco/inst_f18a/inst_vram/inst_ram/Mram_ram8_pins<29>" PIN
         "coleco/inst_f18a/inst_vram/inst_ram/Mram_ram7_pins<28>" PIN

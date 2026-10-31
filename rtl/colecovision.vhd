@@ -252,35 +252,88 @@ architecture rtl of colecovision is
    signal upmem_we_inhibit_s              : std_logic;
 
    -- MegaCart banking support
-   -- Page mask from port >59: 16K pages for MegaCart (5 bits used), 8K pages
-   -- for SGM (6 bits).
-   signal mc_mem_size_r                   : std_logic_vector( 5 downto 0) := "001111"; -- 256K
-   signal mc_mem_size_x                   : std_logic_vector( 5 downto 0);
-   signal mc_bank_r                       : std_logic_vector( 4 downto 0) := "11111";
-   signal mc_bank_x                       : std_logic_vector( 4 downto 0);
-   signal mc_addr_r                       : std_logic_vector( 4 downto 0) := "11111";
-   signal mc_addr_x                       : std_logic_vector( 4 downto 0);
+   -- Page mask from port >59: 16K pages for MegaCart (6 bits used, 1M), 8K
+   -- pages for SGM (8 bits, 2M).
+   signal mc_mem_size_r                   : std_logic_vector( 7 downto 0) := x"0F"; -- 256K
+   signal mc_mem_size_x                   : std_logic_vector( 7 downto 0);
+   signal mc_bank_r                       : std_logic_vector( 5 downto 0) := "111111";
+   signal mc_bank_x                       : std_logic_vector( 5 downto 0);
    signal mc_en_r                         : std_logic := '0';
    signal mc_en_x                         : std_logic;
 
    -- SGM banking support: 8K pages at >A000, >C000, >E000 (>8000 is page 0)
    signal sgmbk_en_r                      : std_logic := '0';
    signal sgmbk_en_x                      : std_logic;
-   signal sgmbk_a_r                       : std_logic_vector( 5 downto 0) := "000001";
-   signal sgmbk_a_x                       : std_logic_vector( 5 downto 0);
-   signal sgmbk_c_r                       : std_logic_vector( 5 downto 0) := "000010";
-   signal sgmbk_c_x                       : std_logic_vector( 5 downto 0);
-   signal sgmbk_e_r                       : std_logic_vector( 5 downto 0) := "000011";
-   signal sgmbk_e_x                       : std_logic_vector( 5 downto 0);
+   signal sgmbk_a_r                       : std_logic_vector( 7 downto 0) := x"01";
+   signal sgmbk_a_x                       : std_logic_vector( 7 downto 0);
+   signal sgmbk_c_r                       : std_logic_vector( 7 downto 0) := x"02";
+   signal sgmbk_c_x                       : std_logic_vector( 7 downto 0);
+   signal sgmbk_e_r                       : std_logic_vector( 7 downto 0) := x"03";
+   signal sgmbk_e_x                       : std_logic_vector( 7 downto 0);
    signal sgmbk_wr_a_s                    : std_logic;  -- CPU write to >FFFC
    signal sgmbk_wr_c_s                    : std_logic;  -- CPU write to >FFFD
    signal sgmbk_wr_e_s                    : std_logic;  -- CPU write to >FFFE
-   signal sgmbk_addr_s                    : std_logic_vector( 5 downto 0);
+
+   -- ROM cache (cv_cache.v): MegaCart and SGM images up to 2M, 480K in the
+   -- SRAM, the rest read from the SD card when the game needs it.
+   component cv_cache
+   port
+      ( clk          : in  std_logic
+      ; reset        : in  std_logic
+      ; active       : in  std_logic
+      ; start        : in  std_logic
+      ; n_pages      : in  std_logic_vector(8 downto 0)
+      ; rom_rd       : in  std_logic
+      ; rom_page     : in  std_logic_vector(7 downto 0)
+      ; c_hit        : out std_logic
+      ; c_line       : out std_logic_vector(5 downto 0)
+      ; cpu_wait_n   : out std_logic
+      ; sd_wr        : in  std_logic
+      ; cap_wr       : in  std_logic
+      ; chk_wr       : in  std_logic
+      ; end_wr       : in  std_logic
+      ; cpu_data     : in  std_logic_vector(7 downto 0)
+      ; frag         : out std_logic
+      ; ov_active    : out std_logic
+      ; ov_en        : out std_logic
+      ; ov_we_n      : out std_logic
+      ; ov_addr      : out std_logic_vector(18 downto 0)
+      ; ov_data      : out std_logic_vector(7 downto 0)
+      ; sd_cs_n      : out std_logic
+      ; sd_sclk      : out std_logic
+      ; sd_mosi      : out std_logic
+      ; sd_miso      : in  std_logic
+      ; led          : out std_logic
+      );
+   end component;
+
+   signal rom_page_s                      : std_logic_vector( 7 downto 0);  -- 8K ROM page of a banked read
+   signal cache_active_s                  : std_logic;
+   signal cache_start_r                   : std_logic := '0';
+   signal loader_en_d_r                   : std_logic := '1';
+   signal cache_n_pages_s                 : std_logic_vector( 8 downto 0);
+   signal cache_rom_rd_s                  : std_logic;
+   signal c_hit_s                         : std_logic;
+   signal c_line_s                        : std_logic_vector( 5 downto 0);
+   signal cache_wait_n_s                  : std_logic;
+   signal cache_frag_s                    : std_logic;
+   signal cache_led_s                     : std_logic;
+   signal io_wr_s                         : std_logic;  -- an I/O write cycle
+   signal io_wr_d_r                       : std_logic := '0';
+   signal sd_wr_p_s, cap_wr_p_s, chk_wr_p_s, end_wr_p_s : std_logic;
+   signal ov_active_s, ov_en_s, ov_we_n_s : std_logic;
+   signal ov_addr_s                       : std_logic_vector(18 downto 0);
+   signal ov_data_s                       : std_logic_vector( 7 downto 0);
+   signal ext512_addr_s                   : std_logic_vector(18 downto 0);
+   signal ext512_en_s, ext512_we_n_s      : std_logic;
+   signal ext512_data_s                   : std_logic_vector( 7 downto 0);
+   signal sdc_cs_n_s, sdc_sclk_s, sdc_mosi_s : std_logic;   -- the CPU's SD port
+   signal cc_cs_n_s, cc_sclk_s, cc_mosi_s    : std_logic;   -- the cache's
 
 begin
 
    -- Debug LED.
-   led_o <= rom_loader_en_r;
+   led_o <= rom_loader_en_r or cache_led_s;
 
    -- Active-low version of the soft reset.
    reset_n_s <= not reset_i;
@@ -324,7 +377,7 @@ begin
    -- real WAIT_n input to the CPU?  Is the T80 core WAIT_n broken?
    --
    -- Modified CPU clock enable based on slow devices or the wait state.
-   clk_en_cpu_s <= clk_3m58_en_i and sn489_ready_s and m1_wait_n_r and sd_wait_n_s;
+   clk_en_cpu_s <= clk_3m58_en_i and sn489_ready_s and m1_wait_n_r and sd_wait_n_s and cache_wait_n_s;
 
    -- CPU maskable interrupt input, currently only the controllers.
    int_n_s <= ctrl_int_n_s;
@@ -489,11 +542,16 @@ begin
    , data_i       => d_from_cpu_s
    , data_o       => d_from_sd_s
    -- SD card interface
-   , spi_cs_n_o   => sd_cs_n_o
-   , spi_sclk_o   => sd_sclk_o
-   , spi_mosi_o   => sd_mosi_o
+   , spi_cs_n_o   => sdc_cs_n_s
+   , spi_sclk_o   => sdc_sclk_s
+   , spi_mosi_o   => sdc_mosi_s
    , spi_miso_i   => sd_miso_i
    );
+
+   -- The ROM cache owns the card while a banked game runs.
+   sd_cs_n_o <= cc_cs_n_s when cache_active_s = '1' else sdc_cs_n_s;
+   sd_sclk_o <= cc_sclk_s when cache_active_s = '1' else sdc_sclk_s;
+   sd_mosi_o <= cc_mosi_s when cache_active_s = '1' else sdc_mosi_s;
 
 
    --
@@ -567,10 +625,10 @@ begin
    port map
    ( clk_i        => clk_25m0_i
    -- Z80 CPU
-   , cpu_addr_i   => ext_ram_addr_s
-   , cpu_en_i     => ext_ram_en_s   -- active high
-   , cpu_we_n_i   => ext_ram_we_n_s -- active low
-   , cpu_data_i   => d_from_cpu_s
+   , cpu_addr_i   => ext512_addr_s
+   , cpu_en_i     => ext512_en_s    -- active high
+   , cpu_we_n_i   => ext512_we_n_s  -- active low
+   , cpu_data_i   => ext512_data_s
    , cpu_data_o   => d_from_ext512_s
    -- External SRAM Interface
    , sram_addr_o  => sram_addr_o
@@ -578,6 +636,71 @@ begin
    , sram_ce_n_o  => sram_ce_n_o
    , sram_oe_n_o  => sram_oe_n_o
    , sram_we_n_o  => sram_we_n_o
+   );
+
+
+   -- The ROM cache writes the pages it reads (the CPU waits meanwhile).
+   ext512_addr_s <= ov_addr_s when ov_active_s = '1' else ext_ram_addr_s;
+   ext512_en_s   <= ov_en_s   when ov_active_s = '1' else ext_ram_en_s;
+   ext512_we_n_s <= ov_we_n_s when ov_active_s = '1' else ext_ram_we_n_s;
+   ext512_data_s <= ov_data_s when ov_active_s = '1' else d_from_cpu_s;
+
+
+   --
+   -- ROM cache
+   --
+   cache_active_s  <= (mc_en_r or sgmbk_en_r) and not rom_loader_en_r;
+   cache_rom_rd_s  <= '1' when mreq_n_s = '0' and rfsh_n_s = '1' and rd_n_s = '0' and
+                               cpu_addr_s(15) = '1' else '0';
+   -- Image size in 8K pages: MegaCart 2 x (mask + 1), SGM mask + 1
+   cache_n_pages_s <= std_logic_vector(unsigned("00" & mc_mem_size_r(5 downto 0) & '1') + 1) when mc_en_r = '1' else
+                      std_logic_vector(unsigned('0' & mc_mem_size_r) + 1);
+
+   -- One-clock pulses at the start of the CPU's I/O writes: port >57 (SD
+   -- data, for the cache's snooping) and the cache ports >5C, >5D, >5E.
+   io_wr_s    <= '1' when iorq_n_s = '0' and m1_n_s = '1' and wr_n_s = '0' else '0';
+   sd_wr_p_s  <= '1' when io_wr_s = '1' and io_wr_d_r = '0' and cpu_addr_s(7 downto 0) = x"57" else '0';
+   cap_wr_p_s <= '1' when io_wr_s = '1' and io_wr_d_r = '0' and cpu_addr_s(7 downto 0) = x"5C" else '0';
+   chk_wr_p_s <= '1' when io_wr_s = '1' and io_wr_d_r = '0' and cpu_addr_s(7 downto 0) = x"5D" else '0';
+   end_wr_p_s <= '1' when io_wr_s = '1' and io_wr_d_r = '0' and cpu_addr_s(7 downto 0) = x"5E" else '0';
+
+   process (clk_25m0_i)
+   begin
+   if rising_edge(clk_25m0_i) then
+      io_wr_d_r     <= io_wr_s;
+      loader_en_d_r <= rom_loader_en_r;
+      cache_start_r <= loader_en_d_r and not rom_loader_en_r;   -- a game starts
+   end if;
+   end process;
+
+   cache : cv_cache
+   port map
+   ( clk          => clk_25m0_i
+   , reset        => reset_i
+   , active       => cache_active_s
+   , start        => cache_start_r
+   , n_pages      => cache_n_pages_s
+   , rom_rd       => cache_rom_rd_s
+   , rom_page     => rom_page_s
+   , c_hit        => c_hit_s
+   , c_line       => c_line_s
+   , cpu_wait_n   => cache_wait_n_s
+   , sd_wr        => sd_wr_p_s
+   , cap_wr       => cap_wr_p_s
+   , chk_wr       => chk_wr_p_s
+   , end_wr       => end_wr_p_s
+   , cpu_data     => d_from_cpu_s
+   , frag         => cache_frag_s
+   , ov_active    => ov_active_s
+   , ov_en        => ov_en_s
+   , ov_we_n      => ov_we_n_s
+   , ov_addr      => ov_addr_s
+   , ov_data      => ov_data_s
+   , sd_cs_n      => cc_cs_n_s
+   , sd_sclk      => cc_sclk_s
+   , sd_mosi      => cc_mosi_s
+   , sd_miso      => sd_miso_i
+   , led          => cache_led_s
    );
 
 
@@ -734,7 +857,7 @@ begin
    , d_from_loader_s, d_from_bios_s, d_from_cv_ram1k_r, cart_data_io
    , d_from_ext512_s, sgm_en_r, sgm_8k_en_r
    , ext_ram_bank_r, rom_loader_en_r, real_cart_r, upmem_mode_r
-   , mc_bank_r, mc_addr_r, mc_en_r, sgmbk_en_r, sgmbk_addr_s
+   , mc_bank_r, mc_en_r, sgmbk_en_r, c_line_s
    , cart_en_80_n_s, cart_en_A0_n_s, upmem_we_inhibit_s
    ) begin
 
@@ -759,19 +882,10 @@ begin
          -- Address the SGM 32K at the fixed bank-0 in the 512K.
          ext_ram_addr_s <= "0000" & cpu_addr_s(14 downto 0);
       else
-         if mc_en_r = '1' then
-            -- Banking enabled and MegaCart enabled, check which half of the
-            -- upper 32K of memory is being addressed.
-            if cart_en_80_n_s = '0' or cart_en_A0_n_s = '0' then
-               -- Lower 16K of the upper 32K is *always* the fixed top page.
-               ext_ram_addr_s <= "11111" & cpu_addr_s(13 downto 0);
-            else
-               -- Upper 16K of the upper 32K, use the selected bank.
-               ext_ram_addr_s <= mc_addr_r & cpu_addr_s(13 downto 0);
-            end if;
-         elsif sgmbk_en_r = '1' then
-            -- SGM banking, 8K pages.
-            ext_ram_addr_s <= sgmbk_addr_s & cpu_addr_s(12 downto 0);
+         if mc_en_r = '1' or sgmbk_en_r = '1' then
+            -- MegaCart or SGM banking: the ROM cache's SRAM page for the
+            -- addressed 8K ROM page (rom_page_s).
+            ext_ram_addr_s <= c_line_s & cpu_addr_s(12 downto 0);
          else
             -- Use the 32K bank register.
             ext_ram_addr_s <= ext_ram_bank_r & cpu_addr_s(14 downto 0);
@@ -918,11 +1032,9 @@ begin
                ext_ram_we_n_s <= wr_n_s or upmem_we_inhibit_s;
             end if;
 
-            -- MegaCart bank register.  Since the Phoenix only has a 512K
-            -- external memory, the bank register is only 5-bits instead of
-            -- the original 6-bits.  Update on read or write.
+            -- MegaCart bank register (6 bits, 1M).  Update on read or write.
             if cpu_addr_s(12 downto 6) = "1111111" then
-               mc_bank_x <= cpu_addr_s(4 downto 0);
+               mc_bank_x <= cpu_addr_s(5 downto 0);
             end if;
 
             -- SGM bank registers, writes only.
@@ -941,36 +1053,33 @@ begin
    end process;
 
 
-   -- MegaCart memory size decode and address bank select formation.  The 512K
-   -- external memory needs to be masked to *appear* to be whatever size EPROM
-   -- image was loaded.  The mask is set by the loader and is used to ignore
-   -- address bits that would not exist on EPROMs less than 512K.  The address
-   -- is also created such that the top of the 512K is utilized since that is
-   -- where the ROM data is loaded.
-   megacart : process ( mc_mem_size_r, mc_bank_r )
+   -- The 8K ROM page of a banked read, masked to the image's size (the ROM
+   -- cache places it in the SRAM).
+   --  MegaCart: 16K banks; >8000 is the last bank (the mask), >C000 the
+   --            bank selected by an access to >FFC0+bank.
+   --  SGM:      8K pages; >8000 is page 0, >A000, >C000, >E000 the pages
+   --            written to >FFFC, >FFFD, >FFFE.
+   rom_page : process ( cpu_addr_s, mc_en_r, mc_bank_r, mc_mem_size_r
+                      , sgmbk_a_r, sgmbk_c_r, sgmbk_e_r )
+      variable bank_v : std_logic_vector(5 downto 0);
+      variable page_v : std_logic_vector(7 downto 0);
    begin
-      case ( mc_mem_size_r(4 downto 0) ) is
-      when "00001" => mc_addr_x <= "1111" & mc_bank_r(0);            -- >01 = 32K
-      when "00011" => mc_addr_x <= "111"  & mc_bank_r(1 downto 0);   -- >03 = 64K
-      when "00111" => mc_addr_x <= "11"   & mc_bank_r(2 downto 0);   -- >07 = 128K
-      when "01111" => mc_addr_x <= "1"    & mc_bank_r(3 downto 0);   -- >0F = 256K
-      when others  => mc_addr_x <=          mc_bank_r;               -- >1F = 512K
-      end case;
-   end process;
-
-
-   -- SGM 8K page for the addressed upper-memory window, masked to the ROM
-   -- size and placed at the top of the 512K.
-   sgm_banking : process ( cpu_addr_s, sgmbk_a_r, sgmbk_c_r, sgmbk_e_r, mc_mem_size_r )
-      variable page_v : std_logic_vector(5 downto 0);
-   begin
-      case cpu_addr_s(14 downto 13) is
-      when "00"   => page_v := "000000";   -- >8000 fixed page 0
-      when "01"   => page_v := sgmbk_a_r;  -- >A000
-      when "10"   => page_v := sgmbk_c_r;  -- >C000
-      when others => page_v := sgmbk_e_r;  -- >E000
-      end case;
-      sgmbk_addr_s <= (page_v and mc_mem_size_r) or (not mc_mem_size_r);
+      if mc_en_r = '1' then
+         if cpu_addr_s(14) = '0' then
+            bank_v := mc_mem_size_r(5 downto 0);
+         else
+            bank_v := mc_bank_r and mc_mem_size_r(5 downto 0);
+         end if;
+         rom_page_s <= '0' & bank_v & cpu_addr_s(13);
+      else
+         case cpu_addr_s(14 downto 13) is
+         when "00"   => page_v := x"00";       -- >8000 fixed page 0
+         when "01"   => page_v := sgmbk_a_r;   -- >A000
+         when "10"   => page_v := sgmbk_c_r;   -- >C000
+         when others => page_v := sgmbk_e_r;   -- >E000
+         end case;
+         rom_page_s <= page_v and mc_mem_size_r;
+      end if;
    end process;
 
 
@@ -1035,8 +1144,8 @@ begin
    --
    --  >54  xxxxWWWW (W) 32K RAM bank select, 0000 is ignored
    --       xxxxRRRR (R) current bank
-   --       xxWWWWWW (W) SGM banking active: 8K page at >A000 (as >FFFC)
-   --       00RRRRRR (R) SGM banking active: 8K page at >A000
+   --       WWWWWWWW (W) SGM banking active: 8K page at >A000 (as >FFFC)
+   --       RRRRRRRR (R) SGM banking active: 8K page at >A000
    --
    --  >55  xxxxxxxx (R) Loader disable, PoR re-enabled ROM loader
    --       xx__xxWW (W) Banking scheme
@@ -1059,19 +1168,25 @@ begin
    --
    --  >58  00001000 (R) Machine ID, Phoenix = 8
    --
-   --  >59  xxxWWWWW (W) MegaCart memory size
-   --          other     512K
-   --          11111     512K, 32 16K-banks
-   --          01111     256K, 16 16K-banks
-   --          00111     128K,  8 16K-banks
-   --          00011      64K,  4 16K-banks
-   --          00001      32K,  2 16K-banks (same as original cart)
-   --       xxWWWWWW (W) SGM page mask, 8K pages, e.g. 001111 = 128K, 111111 = 512K
+   --  >59  xxWWWWWW (W) MegaCart bank mask (16K banks - 1): 000001 = 32K,
+   --                    011111 = 512K, 111111 = 1M
+   --       WWWWWWWW (W) SGM page mask (8K pages - 1): 00001111 = 128K,
+   --                    11111111 = 2M
    --
-   --  >5A  xxWWWWWW (W) SGM 8K page at >C000 (as >FFFD)
-   --       00RRRRRR (R)
-   --  >5B  xxWWWWWW (W) SGM 8K page at >E000 (as >FFFE)
-   --       00RRRRRR (R)
+   --  >5A  WWWWWWWW (W) SGM 8K page at >C000 (as >FFFD)
+   --       RRRRRRRR (R)
+   --  >5B  WWWWWWWW (W) SGM 8K page at >E000 (as >FFFE)
+   --       RRRRRRRR (R)
+   --
+   --  ROM cache (cv_cache.v): MegaCart and SGM images up to 1M / 2M.  The
+   --  SRAM holds 480K of the image (above the SGM's 32K), loaded at the top
+   --  (a bigger image's last 480K); the cache reads other 8K pages from the
+   --  SD card when the game needs them, while the CPU waits.  The menu gives
+   --  it each page's SD sector by reading one byte of the page with FatFs:
+   --  >5C  WWWWWWWW (W) the page: the next CMD17s sent to >57 give its sector
+   --  >5D  WWWWWWWW (W) the page again: the next CMD17 must be its last sector
+   --  >5E  xxxxxxxx (W) end the above
+   --       0000000R (R) 1 = a page was not in consecutive sectors (or not read)
    --
    --  >7F  xxxxxxWx (W) 0 = 8K SGM RAM, 1 = 8K CV BIOS
    --
@@ -1083,7 +1198,7 @@ begin
    , real_cart_r, bank_mode_r, upmem_mode_r
    , mc_mem_size_r, mc_en_r, kbd_mode_r
    , sgmbk_en_r, sgmbk_a_r, sgmbk_c_r, sgmbk_e_r
-   , sgmbk_wr_a_s, sgmbk_wr_c_s, sgmbk_wr_e_s
+   , sgmbk_wr_a_s, sgmbk_wr_c_s, sgmbk_wr_e_s, cache_frag_s
    ) begin
       sgm_en_x          <= sgm_en_r;
       sgm_8k_en_x       <= sgm_8k_en_r;
@@ -1117,9 +1232,9 @@ begin
       sgmbk_a_x         <= sgmbk_a_r;
       sgmbk_c_x         <= sgmbk_c_r;
       sgmbk_e_x         <= sgmbk_e_r;
-      if sgmbk_wr_a_s = '1' then sgmbk_a_x <= d_from_cpu_s(5 downto 0); end if;
-      if sgmbk_wr_c_s = '1' then sgmbk_c_x <= d_from_cpu_s(5 downto 0); end if;
-      if sgmbk_wr_e_s = '1' then sgmbk_e_x <= d_from_cpu_s(5 downto 0); end if;
+      if sgmbk_wr_a_s = '1' then sgmbk_a_x <= d_from_cpu_s; end if;
+      if sgmbk_wr_c_s = '1' then sgmbk_c_x <= d_from_cpu_s; end if;
+      if sgmbk_wr_e_s = '1' then sgmbk_e_x <= d_from_cpu_s; end if;
 
 
       if iorq_n_s = '0' and m1_n_s = '1' then
@@ -1160,10 +1275,10 @@ begin
                if sgmbk_en_r = '1' then
                   -- SGM banking: the >A000 8K page register.
                   if rd_n_s = '0' then
-                     ex_data_mux_s  <= "00" & sgmbk_a_r;
+                     ex_data_mux_s  <= sgmbk_a_r;
                   end if;
                   if wr_n_s = '0' then
-                     sgmbk_a_x <= d_from_cpu_s(5 downto 0);
+                     sgmbk_a_x <= d_from_cpu_s;
                   end if;
                else
                   if rd_n_s = '0' then
@@ -1229,25 +1344,31 @@ begin
             when x"9" =>                  -- port >59 MegaCart / SGM page mask
 
                if wr_n_s = '0' then
-                  mc_mem_size_x  <= d_from_cpu_s(5 downto 0);
+                  mc_mem_size_x  <= d_from_cpu_s;
                end if;
 
             when x"A" =>                  -- port >5A SGM page at >C000
 
                if rd_n_s = '0' then
-                  ex_data_mux_s  <= "00" & sgmbk_c_r;
+                  ex_data_mux_s  <= sgmbk_c_r;
                end if;
                if wr_n_s = '0' then
-                  sgmbk_c_x      <= d_from_cpu_s(5 downto 0);
+                  sgmbk_c_x      <= d_from_cpu_s;
                end if;
 
             when x"B" =>                  -- port >5B SGM page at >E000
 
                if rd_n_s = '0' then
-                  ex_data_mux_s  <= "00" & sgmbk_e_r;
+                  ex_data_mux_s  <= sgmbk_e_r;
                end if;
                if wr_n_s = '0' then
-                  sgmbk_e_x      <= d_from_cpu_s(5 downto 0);
+                  sgmbk_e_x      <= d_from_cpu_s;
+               end if;
+
+            when x"E" =>                  -- port >5E ROM cache status
+
+               if rd_n_s = '0' then
+                  ex_data_mux_s  <= "0000000" & cache_frag_s;
                end if;
 
             when others => null;
@@ -1290,14 +1411,13 @@ begin
          real_cart_r       <= '1';           -- default to a real cartridge
          bank_mode_r       <= "00";          -- no banking
          upmem_mode_r      <= "00";          -- upper memory selection does not matter
-         mc_mem_size_r     <= "001111";      -- default to 256K
-         mc_bank_r         <= "11111";       -- default to top bank
-         mc_addr_r         <= "11111";       -- default to top of 512K memory
+         mc_mem_size_r     <= x"0F";         -- default to 256K
+         mc_bank_r         <= "111111";      -- default to top bank
          mc_en_r           <= '0';           -- disable MegaCart
          sgmbk_en_r        <= '0';           -- disable SGM banking
-         sgmbk_a_r         <= "000001";      -- SGM pages 1, 2, 3 (linear)
-         sgmbk_c_r         <= "000010";
-         sgmbk_e_r         <= "000011";
+         sgmbk_a_r         <= x"01";         -- SGM pages 1, 2, 3 (linear)
+         sgmbk_c_r         <= x"02";
+         sgmbk_e_r         <= x"03";
 
       elsif clk_3m58_en_i = '1' then
          sgm_en_r          <= sgm_en_x;
@@ -1313,7 +1433,6 @@ begin
          upmem_mode_r      <= upmem_mode_x;
          mc_mem_size_r     <= mc_mem_size_x;
          mc_bank_r         <= mc_bank_x;
-         mc_addr_r         <= mc_addr_x;
          mc_en_r           <= mc_en_x;
          sgmbk_en_r        <= sgmbk_en_x;
          sgmbk_a_r         <= sgmbk_a_x;

@@ -30,6 +30,10 @@ volatile __sfr __at 0x57 phSDData;            // SD card read/write data
 volatile __sfr __at 0x58 phMachineID;         // reads as 8 for Phoenix
 volatile __sfr __at 0x59 phCartMask;          // cartridge page mask for megacarts 0x01-1F
 
+volatile __sfr __at 0x5C phCachePage;         // ROM cache: the next CMD17s give this 8K page's sector
+volatile __sfr __at 0x5D phCacheCheck;        // ROM cache: the next CMD17 must be this page's last sector
+volatile __sfr __at 0x5E phCacheStatus;       // ROM cache: W ends the above, R bit 0 = file fragmented
+
 volatile __sfr __at 0x7f sgmBIOSMap;          // swaps RAM with the Coleco BIOS
 #define SGM_CFG_ENABLE_BIOS 0x02
 
