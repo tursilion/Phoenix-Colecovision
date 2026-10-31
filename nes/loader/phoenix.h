@@ -11,6 +11,11 @@
 #define PH_LED        (*(volatile unsigned char *)0x5005) /* W: bit 0 error LED */
 #define PH_FWD_LO     (*(volatile unsigned char *)0x5006) /* W: forward count, low byte */
 #define PH_FWD_HI     (*(volatile unsigned char *)0x5007) /* W: forward count, high byte, starts */
+#define PH_SLOTS      (*(volatile unsigned char *)0x5008) /* W: ROM cache: SRAM pages (8K) for the PRG */
+#define PH_PAGE       (*(volatile unsigned char *)0x5009) /* W: ROM cache: PRG page for PH_ARG */
+#define PH_ARG        ((volatile unsigned char *)0x500A)  /* W: its SD argument, low first; the 4th byte stores it */
+#define PH_SKIP_LO    (*(volatile unsigned char *)0x500E) /* W: bytes of a page's first sector before it, 7:0 */
+#define PH_SKIP_HI    (*(volatile unsigned char *)0x500F) /* W: bit 0: bit 8 */
 
 /* PH_CTRL write bits */
 #define PH_CTRL_SELECT   0x01  /* SD card selected */

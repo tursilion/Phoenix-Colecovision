@@ -70,6 +70,7 @@ static WORD count;
 #define ERR_BAD_HEADER  5
 #define ERR_TOO_BIG     6
 #define ERR_LOAD        7
+#define ERR_FRAGMENTED  8
 
 static const char *const errors[] = {
     "",
@@ -78,8 +79,9 @@ static const char *const errors[] = {
     "CANNOT READ THE FOLDER",
     "READ ERROR",
     "NOT AN INES FILE",
-    "TOO BIG (PRG+CHR OVER 512K)",
+    "TOO BIG (PRG>1M OR CHR>256K)",
     "THE CORE REJECTED THE FILE",
+    "FILE FRAGMENTED: COPY IT AGAIN",
 };
 
 static FATFS fs;
@@ -449,12 +451,33 @@ static WORD pow2_8k(WORD units8k)
     return n;
 }
 
-/* Load and start the game; returns an error code if it cannot. */
+BYTE disk_block_addr(void);
+
+static DWORD page_arg;
+
+/* pf_pages: PRG page n starts in SD sector sect */
+static void set_page(UINT n, DWORD sect)
+{
+    page_arg = disk_block_addr() ? sect : sect << 9;
+    PH_PAGE = (BYTE)n;
+    PH_ARG[0] = (BYTE)page_arg;
+    PH_ARG[1] = (BYTE)(page_arg >> 8);
+    PH_ARG[2] = (BYTE)(page_arg >> 16);
+    PH_ARG[3] = (BYTE)(page_arg >> 24);
+}
+
+/* Load and start the game; returns an error code if it cannot.
+ *
+ * SRAM: CHR (or 8K of CHR RAM) at the top, the PRG in the 8K pages below
+ * (64 minus the CHR's).  A bigger PRG plays from the core's ROM cache: the
+ * core keeps the first pages, and the loader gives it the SD sector of
+ * every page (each starts after the header, inside a sector). */
 static BYTE load_game(const char *file)
 {
     UINT br;
-    WORD prg8k, chr8k, n;
+    WORD prg8k, chr8k, n, data_ofs = 16;
     DWORD left;
+    BYTE slots;
 
     if (pf_open(file) != FR_OK)
         return ERR_READ;
@@ -471,6 +494,7 @@ static BYTE load_game(const char *file)
             if (pf_read(buf, sizeof(buf), &br) != FR_OK || br != sizeof(buf))
                 return ERR_READ;
         hdr[6] &= ~0x04;
+        data_ofs += 512;
     }
 
     /* Four-screen mirroring is not supported; the ROM loader rejects it.
@@ -484,9 +508,11 @@ static BYTE load_game(const char *file)
 
     prg8k = pow2_8k((WORD)hdr[4] * 2);
     chr8k = pow2_8k(hdr[5] ? hdr[5] : 1);   /* CHR RAM takes 8K */
-    if (prg8k + chr8k > 64)                 /* 64 x 8K = 512K */
+    if (prg8k > 128 || chr8k > 32)          /* 1M PRG, 256K CHR */
         return ERR_TOO_BIG;
+    slots = (BYTE)(64 - chr8k);
 
+    PH_SLOTS = slots;
     PH_LOAD_RESET = 0;
     for (n = 0; n < 16; ++n)
         PH_LOAD_DATA = hdr[n];
@@ -503,6 +529,24 @@ static BYTE load_game(const char *file)
         ;
     if ((PH_CTRL & (PH_STAT_DONE | PH_STAT_ERROR)) != PH_STAT_DONE)
         return ERR_LOAD;
+
+    /* PRG pages past the SRAM's: the cache reads them from the card */
+    if (prg8k > slots) {
+        status("MAPPING...");
+        PH_SKIP_LO = (BYTE)data_ofs;
+        PH_SKIP_HI = 0;
+        switch (pf_pages(data_ofs >> 9, (UINT)hdr[4] * 2, set_page)) {
+        case 1: return ERR_READ;
+        case 2: return ERR_FRAGMENTED;
+        }
+        for (n = (WORD)hdr[4] * 2; n < prg8k; ++n) {    /* (padding to a power of two) */
+            PH_PAGE = (BYTE)n;
+            PH_ARG[0] = (BYTE)page_arg;
+            PH_ARG[1] = (BYTE)(page_arg >> 8);
+            PH_ARG[2] = (BYTE)(page_arg >> 16);
+            PH_ARG[3] = (BYTE)(page_arg >> 24);
+        }
+    }
 
     screen_off();
     PH_START = 0;

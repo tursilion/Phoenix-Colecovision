@@ -146,6 +146,12 @@ DSTATUS disk_initialize(void)
 }
 
 /* Send CMD17 and wait for the data token. */
+/* The card takes sector numbers (SDHC), not byte offsets */
+BYTE disk_block_addr(void)
+{
+    return block_addr;
+}
+
 static BYTE start_read(DWORD sector)
 {
     WORD tmr;

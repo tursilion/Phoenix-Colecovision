@@ -1173,3 +1173,55 @@ FRESULT pf_readdir (
 
 #endif /* PF_USE_DIR */
 
+
+
+
+/*-----------------------------------------------------------------------*/
+/* Phoenix: the first sector of each 8K PRG page of the open file        */
+/*-----------------------------------------------------------------------*/
+/* For the core's ROM cache: calls page(p, sector) for the file sector
+   first + 16p of each page p < pages, walking the cluster chain once.  A
+   page takes 17 sectors (it starts inside its first one), so every
+   cluster boundary up to the last page's 17th sector must follow on.
+   Returns 0, 1 for a disk error, or 2 if the file is fragmented there. */
+
+BYTE pf_pages (
+	UINT first,
+	UINT pages,
+	void (*page)(UINT, DWORD)
+)
+{
+	FATFS *fs = FatFs;
+	CLUST clst, nxt;
+	DWORD n, s = 0, end, sect;
+	UINT p = 0;
+	BYTE j;
+
+	if (!fs || !(fs->flag & FA_OPENED)) return 1;
+	n = (fs->fsize + 511) >> 9;		/* sectors */
+	end = (DWORD)first + ((DWORD)pages << 4);	/* the last page's 17th sector */
+	if (end >= n) end = n - 1;
+	clst = fs->org_clust;
+	sect = clust2sect(clst);
+	if (!sect) return 1;
+	for (;;) {
+		for (j = 0; j < fs->csize && s <= end; j++, s++) {
+			if (s >= first && !((BYTE)(s - first) & 15) && p < pages) {
+				page(p, sect + j);
+				p++;
+			}
+		}
+		if (s > end) break;
+		nxt = get_fat(clst);
+		if (nxt <= 1) return 1;
+		if (nxt == clst + 1) {			/* the next cluster follows on */
+			sect += fs->csize;
+		} else {
+			if (s > first) return 2;	/* inside the PRG: fragmented */
+			sect = clust2sect(nxt);
+			if (!sect) return 1;
+		}
+		clst = nxt;
+	}
+	return 0;
+}

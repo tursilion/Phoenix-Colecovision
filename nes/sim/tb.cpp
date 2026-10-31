@@ -39,7 +39,14 @@ struct SdCard {
     bool idle = true, app = false;
     int acmd41_count = 0;
     int miso = 1;
-    long reads = 0;
+    long reads = 0, writes = 0, multi = 0;
+    // CMD18: streaming sectors from mblk until CMD12
+    bool streaming = false;
+    size_t mblk = 0;
+    // CMD24: 0 none, 1 waiting for the data token, 2 receiving
+    int wstate = 0;
+    size_t wbase = 0;
+    std::vector<uint8_t> wdata;
 
     bool load(const char *path) {
         FILE *f = fopen(path, "rb");
@@ -81,17 +88,60 @@ struct SdCard {
             out.push_back(0xFF);
             out.push_back(0xFE);
             size_t base = (size_t)arg * 512;
-            for (int i = 0; i < 512; ++i)
-                out.push_back(base + i < img.size() ? img[base + i] : 0);
-            out.push_back(0x12);
-            out.push_back(0x34);
+            uint16_t crc = 0;
+            for (int i = 0; i < 512; ++i) {
+                uint8_t d = base + i < img.size() ? img[base + i] : 0;
+                out.push_back(d);
+                crc ^= d << 8;
+                for (int k = 0; k < 8; ++k)
+                    crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
+            }
+            out.push_back(crc >> 8);
+            out.push_back(crc & 0xFF);
             break;
         }
+        case 18:
+            ++multi;
+            out.push_back(0x00);
+            streaming = true;
+            mblk = arg;
+            break;
+        case 12:
+            streaming = false;
+            out.clear();
+            out.push_back(0xFF);                    // stuff byte
+            out.push_back(0x00);                    // R1
+            out.push_back(0x00);                    // busy
+            out.push_back(0x00);
+            break;
+        case 24:
+            out.push_back(0x00);
+            wstate = 1;
+            wbase = (size_t)arg * 512;
+            wdata.clear();
+            break;
         default: out.push_back(0x04); break;        // illegal command
         }
     }
 
     void byte_received(uint8_t b) {
+        if (wstate == 1) {
+            if (b == 0xFE) wstate = 2;
+            return;
+        }
+        if (wstate == 2) {
+            wdata.push_back(b);
+            if (wdata.size() == 514) {              // data and CRC
+                if (wbase + 512 <= img.size())
+                    memcpy(&img[wbase], wdata.data(), 512);
+                ++writes;
+                wstate = 0;
+                out.clear();
+                out.push_back(0x05);                // accepted
+                for (int i = 0; i < 8; ++i) out.push_back(0x00);   // busy
+            }
+            return;
+        }
         if (cmd.empty() && (b & 0xC0) != 0x40)
             return;
         cmd.push_back(b);
@@ -102,10 +152,31 @@ struct SdCard {
         }
     }
 
+    // The next sector of a CMD18, when the card has sent the last.
+    void stream() {
+        if (!streaming || out.size() > 2) return;
+        out.push_back(0xFF);
+        out.push_back(0xFE);
+        size_t base = mblk * 512;
+        uint16_t crc = 0;
+        for (int i = 0; i < 512; ++i) {
+            uint8_t b = base + i < img.size() ? img[base + i] : 0;
+            out.push_back(b);
+            crc ^= b << 8;
+            for (int k = 0; k < 8; ++k)
+                crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
+        }
+        out.push_back(crc >> 8);
+        out.push_back(crc & 0xFF);
+        ++mblk;
+        ++reads;
+    }
+
     // Called once per clock with the current pins.
     void step(bool cs_n, bool sclk, bool mosi) {
+        stream();
         if (cs_n) {
-            if (!last_cs_n) { bit = 0; cmd.clear(); }
+            if (!last_cs_n) { bit = 0; cmd.clear(); wstate = 0; streaming = false; }
             miso = 1;
         } else {
             if (last_cs_n) {                        // selected: load first byte
@@ -191,6 +262,7 @@ int main(int argc, char **argv)
         }
     }
 
+    setvbuf(stdout, nullptr, _IOLBF, 0);
     Verilated::commandArgs(argc, argv);
     Vnes_phoenix *top = new Vnes_phoenix;
 
@@ -242,6 +314,16 @@ int main(int argc, char **argv)
         if (menu_reset_at >= 0 && clocks == menu_reset_at + 32) top->reset = 0;
 
         top->sram_din = sram[top->sram_addr];
+        {
+            // ROM cache holds and freezes
+            static int last = 0;
+            static long holds = 0, freezes = 0;
+            int d = top->cache_dbg;
+            if ((d & 2) && !(last & 2)) printf("cache freeze %ld at frame %d\n", ++freezes, frame);
+            if ((d & 1) && !(last & 1)) ++holds;
+            last = d;
+            (void)holds;
+        }
         top->sd_miso = sd.miso;
         top->clk = 1;
         top->eval();
@@ -250,7 +332,14 @@ int main(int argc, char **argv)
         ++clocks;
 
         if (!top->sram_we_n && top->sram_doe)
+        {
             sram[top->sram_addr] = top->sram_dout;
+            // A game's 8K-page writes below the CHR: the ROM cache filling a page
+            static int last_a = -1;
+            if (!top->boot_mode && (top->sram_addr & 0x1FFF) == 0 && (int)top->sram_addr != last_a)
+                printf("cache fill: SRAM page %d at frame %d\n", top->sram_addr >> 13, frame);
+            last_a = top->sram_addr;
+        }
         sd.step(top->sd_cs_n, top->sd_sclk, top->sd_mosi);
 
         if (start_after_sound >= 0 && sound_frame < 0 && frame >= sound_after) {
@@ -319,7 +408,7 @@ int main(int argc, char **argv)
         last_vsync_n = top->vid_vsync_n;
     }
 
-    printf("%d frames, %ld clocks, boot_mode=%d\n", frame, clocks, top->boot_mode);
+    printf("%d frames, %ld clocks, boot_mode=%d, %ld multi-block reads\n", frame, clocks, top->boot_mode, sd.multi);
     wav48.close();
     wavraw.close();
 

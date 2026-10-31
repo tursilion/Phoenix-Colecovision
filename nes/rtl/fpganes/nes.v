@@ -152,7 +152,11 @@ module NES(input clk, input reset, input ce,
            output [7:0] ext_dout,       // CPU/DMA bus write data
            output ext_write,            // one-clock strobe, write to ext_addr
            input ext_cs,                // ext_addr is in the external window
-           input [7:0] ext_din          // read data for the external window
+           input [7:0] ext_din,         // read data for the external window
+
+           // PHOENIX: ROM cache.
+           input cpu_hold,              // stop the CPU (as DMA does), not the PPU or APU
+           output dma_bus               // the PRG access is a DMA's (sprite or DMC)
            );
   reg [7:0] from_data_bus;
   wire [7:0] cpu_dout;
@@ -188,7 +192,8 @@ module NES(input clk, input reset, input ce,
   wire pause_cpu;
   reg apu_irq_delayed;
   reg mapper_irq_delayed;
-  CPU cpu(clk, apu_ce && !pause_cpu, reset, from_data_bus, apu_irq_delayed | mapper_irq_delayed, nmi_active, cpu_dout, cpu_addr, cpu_mr, cpu_mw);
+  // PHOENIX: cpu_hold (ROM cache).
+  CPU cpu(clk, apu_ce && !pause_cpu && !cpu_hold, reset, from_data_bus, apu_irq_delayed | mapper_irq_delayed, nmi_active, cpu_dout, cpu_addr, cpu_mr, cpu_mw);
 
   // -- DMA
   wire [15:0] dma_aout;
@@ -259,6 +264,9 @@ module NES(input clk, input reset, input ce,
           nmi,
           chr_read, chr_write, chr_addr, chr_to_ppu, chr_from_ppu,
           scanline, cycle, mapper_ppu_flags);
+
+  // PHOENIX: ROM cache.
+  assign dma_bus = dma_aout_enable;
 
   // PHOENIX: external I/O window.
   assign ext_addr = addr;

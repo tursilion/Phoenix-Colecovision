@@ -56,13 +56,21 @@ begin
       expect(n1, "00000000", "idle 1");
       expect(n2, "00000000", "idle 2");
 
-      -- Pad 1: up, both fires, key 2.  Pad 2: right, key 1.
-      dirs1 <= "1110"; fl1 <= '0'; fr1 <= '0'; key1 <= "1011";
-      dirs2 <= "0111"; key2 <= "0111";
+      -- Pad 1: up, both fires, #.  Pad 2: right, *.
+      dirs1 <= "1110"; fl1 <= '0'; fr1 <= '0'; key1 <= "1010";
+      dirs2 <= "0111"; key2 <= "0101";
       wait for 10 us;
       --         RLDUSsBA
       expect(n1, "00011011", "pad 1 up, A, B, Start");
       expect(n2, "10000100", "pad 2 right, Select");
+
+      -- Left fire alone is A, right fire alone is B.
+      fr1 <= '1';
+      wait for 10 us;
+      expect(n1, "00011001", "pad 1 up, left fire = A, Start");
+      fl1 <= '1'; fr1 <= '0';
+      wait for 10 us;
+      expect(n1, "00011010", "pad 1 up, right fire = B, Start");
 
       -- Release everything.
       dirs1 <= "1111"; fl1 <= '1'; fr1 <= '1'; key1 <= "1111";
@@ -71,10 +79,14 @@ begin
       expect(n1, "00000000", "released 1");
       expect(n2, "00000000", "released 2");
 
-      -- Other keys must not map to anything (key 3 = pins 0110).
+      -- Other keys must not map to anything (key 3 = pins 0110, key 1 =
+      -- 0111, the old Select).
       key1 <= "0110";
       wait for 10 us;
       expect(n1, "00000000", "key 3 ignored");
+      key1 <= "0111";
+      wait for 10 us;
+      expect(n1, "00000000", "key 1 ignored");
 
       report "cv_pads_tb done";
       done <= true;

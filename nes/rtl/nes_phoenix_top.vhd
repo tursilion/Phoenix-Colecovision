@@ -9,9 +9,9 @@
 -- Controls:
 --  - SNES pad:      D-pad, A/X = NES A, B/Y = NES B, Start, Select
 --  - ColecoVision controllers in ports 1 and 2 (players 1 and 2): stick,
---                   left fire = B, right fire = A, keypad 1 = Select,
---                   keypad 2 = Start
---  - PS/2 keyboard: arrows, X = A, Z = B, 1 = Start, 2 = Select,
+--                   left fire = A, right fire = B, * = Select,
+--                   # = Start
+--  - PS/2 keyboard: arrows, X = A, Z = B, Q (#) = Start, W (*) = Select,
 --                   ESC = reset the game (hold for the menu)
 --  - Reset button:  reset the game; hold for a second to return to the menu
 --
@@ -120,6 +120,7 @@ architecture rtl of nes_phoenix_top is
       ; audio        : out std_logic_vector(15 downto 0)
       ; boot_mode    : out std_logic
       ; led_err      : out std_logic
+      ; cache_dbg    : out std_logic_vector(1 downto 0)
       );
    end component;
 
@@ -276,6 +277,7 @@ begin
    , audio        => pcm16_s
    , boot_mode    => boot_mode_s
    , led_err      => led_err_s
+   , cache_dbg    => open
    );
 
    sram_data_io <= sram_dout_s when sram_doe_s = '1' else (others => 'Z');
@@ -385,8 +387,8 @@ begin
    -- SNES pad inputs are active low, the others active high.
    joy1_s(NES_A_c)      <= cv1_s(NES_A_c)      or not but_a_s(0) or not but_x_s(0) or ps2_keys_s(0);
    joy1_s(NES_B_c)      <= cv1_s(NES_B_c)      or not but_b_s(0) or not but_y_s(0) or ps2_joy_s(4);
-   joy1_s(NES_SELECT_c) <= cv1_s(NES_SELECT_c) or not but_sel_s(0)   or ps2_keys_s(7);
-   joy1_s(NES_START_c)  <= cv1_s(NES_START_c)  or not but_start_s(0) or ps2_keys_s(13);
+   joy1_s(NES_SELECT_c) <= cv1_s(NES_SELECT_c) or not but_sel_s(0)   or ps2_keys_s(9);   -- W (*)
+   joy1_s(NES_START_c)  <= cv1_s(NES_START_c)  or not but_start_s(0) or ps2_keys_s(6);   -- Q (#)
    joy1_s(NES_UP_c)     <= cv1_s(NES_UP_c)     or not but_up_s(0)    or ps2_joy_s(0);
    joy1_s(NES_DOWN_c)   <= cv1_s(NES_DOWN_c)   or not but_down_s(0)  or ps2_joy_s(1);
    joy1_s(NES_LEFT_c)   <= cv1_s(NES_LEFT_c)   or not but_left_s(0)  or ps2_joy_s(2);

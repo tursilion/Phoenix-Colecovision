@@ -349,41 +349,17 @@ void textouthalf(unsigned int vdp, const char *p) {
 	}
 }
 
-// fade in the PHOENIX text using F18A palette
-void fadeInTextF18A() {
-	unsigned char p = 0;
-	unsigned char i;
-
-	// first set the color for white to black, we'll fade it in
-	VDP_SET_REGISTER(0x2f, 0x8f);	// Reg 47, value: 1000 1111, DPM = 1, AUTO INC = 0, palreg 15.
-	VDPWD = 0;
-	VDPWD = 0;						// color is now black
-	//VDP_SET_REGISTER(0x2f, 0x00);	// Turn off the DPM mode
-
-	// now set the phoenix color sets (3-12) to white on transparent
-	vdpmemset(GCOLOR+3, 0xf0, 10);
-	
-	// now copy the characters into place
-	vdpmemcpy(GIMAGE+(18*32), MD0_PHOENIX, 4*32);
-
-	// now we can fade it in with normal interrupt polling
-	for (i=1; i<16; ++i) {
-	    // turn DPM back on (auto-off after one reg when there's no auto-inc)
-	    VDP_SET_REGISTER(0x2f, 0x8f);	// Reg 47, value: 1000 1111, DPM = 1, AUTO INC = 0, palreg 15.
-
-        // set the color register
-		VDPWD = i;	// red
-		VDPWD = i | (i<<4);	// green and blue
-		
-        waitVblanks(3);
-	}
-}
-
-// animate the Phoenix logo up
+// skip the boot animation - save some ROM space. Nobody cared about it
+// and most people's HDMI didn't sync before it was done anyway.
 void displayLogo() {
     unsigned char idx;
 	unsigned int off;
     unsigned char const *p;
+
+    // the default color palette should already be good, no changes needed
+
+	// now set the phoenix color sets (3-12) to white on transparent
+	vdpmemset(GCOLOR+3, 0xf0, 10);
 	
 	// set the logo color to dark red - logo color sets are 13-31
 	vdpmemset(GCOLOR+13, COLOR_DKRED<<4, 19);
@@ -396,12 +372,15 @@ void displayLogo() {
     p = MD0_LOGO;
 	for (idx = 16; idx > 0; --idx) {
         unsigned char len;
-        waitVblanks(2);
+        //waitVblanks(2);       // this doesn't really save much...
 		off = (idx-1)*32+(*(p++));
         len = *(p++);
 		vdpmemcpy(GIMAGE+off, p, len);
         p+=len;
 	}
+
+	// now copy the 'PHOENIX' characters into place
+	vdpmemcpy(GIMAGE+(18*32), MD0_PHOENIX, 4*32);
 }
 
 // center a string on the sprite output lines
@@ -924,7 +903,7 @@ void main() {
     // we were lied to, initialize the AY chip to avoid an error with software
     // that doesn't fully initialize the AY chip. We can just zero the registers,
     // that seems to be enough. (Just zeroing the volume registers fixes the observed
-    // bug in the test app)
+    // bug in the test app). (The core is now fixed, but you should always init your hardware.)
 	for (x=0; x<16; ++x) {
         AY_REGISTER=x;
         AY_DATA_WRITE=0;
@@ -950,7 +929,8 @@ void main() {
 	// set up 16 mag 3 sprites to give us two lines of bitmapped text at the bottom of the screen
     // this part won't work if the F18A isn't present, but I'm okay with that.
     // Why sprites? Oh, why not? Could use the BML but that's not implemented in Classic99
-    // Debug is easier this way.
+    // Debug is easier this way. I wonder how much code space this wastes now that we're tight?
+    // Oh well, worry about that another day.
     VDP_SET_ADDRESS_WRITE(GSPRITE);
     for (idx=0; idx<16; ++idx) {
         // F18A doesn't need delays between writes
@@ -986,7 +966,6 @@ void main() {
     }
 
 	// F18A available 
-	fadeInTextF18A();
     displayLogo();
 
     // Now that the fancy part is done, we can get to work on the real stuff.
@@ -1000,4 +979,3 @@ void main() {
     // call the menu - never returns
     menu();
 }
-

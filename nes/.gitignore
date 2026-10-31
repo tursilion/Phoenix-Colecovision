@@ -14,3 +14,6 @@ sim/oam_palette.txt
 # ISE build (everything but the Makefile)
 build/*
 !build/Makefile
+
+*.nes
+sim/out/

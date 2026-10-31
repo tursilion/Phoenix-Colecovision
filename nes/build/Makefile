@@ -17,7 +17,7 @@ PART         := xc6slx16-2-csg324
 TOP          := nes_phoenix_top
 CORE_FILE    ?= CORE04.PHX
 CORE_NAME    := NES
-CORE_ISSUE   ?= 0
+CORE_ISSUE   ?= 259
 
 REPO := ../..
 RTL  := $(REPO)/rtl

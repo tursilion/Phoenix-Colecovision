@@ -13,8 +13,9 @@
 -- twice in a row, since the code can glitch while a key is pressed or
 -- released.
 --
--- NES mapping: left fire = B, right fire = A (the NES layout, B on the
--- left), keypad 1 = Select, keypad 2 = Start.
+-- NES mapping, as in the other Phoenix cores (left fire is the first
+-- button, which opens a folder in the menus): left fire = A, right fire =
+-- B, * = Select, # = Start.
 --
 
 library ieee;
@@ -43,8 +44,8 @@ end entity;
 
 architecture rtl of cv_pads is
 
-   constant KEY_1_c     : std_logic_vector(3 downto 0) := "0111"; -- pins 4..1
-   constant KEY_2_c     : std_logic_vector(3 downto 0) := "1011";
+   constant KEY_STAR_c  : std_logic_vector(3 downto 0) := "0101"; -- pins 4..1
+   constant KEY_HASH_c  : std_logic_vector(3 downto 0) := "1010";
 
    type pad_t is record
       dirs     : std_logic_vector(3 downto 0); -- pins 4..1, active low
@@ -68,12 +69,12 @@ architecture rtl of cv_pads is
    function to_nes(p : pad_t) return std_logic_vector is
       variable n : std_logic_vector(7 downto 0);
    begin
-      n(0) := not p.fire_r;                                -- A
-      n(1) := not p.fire_l;                                -- B
+      n(0) := not p.fire_l;                                -- A
+      n(1) := not p.fire_r;                                -- B
       n(2) := '0';                                         -- Select
       n(3) := '0';                                         -- Start
-      if p.key = KEY_1_c then n(2) := '1'; end if;
-      if p.key = KEY_2_c then n(3) := '1'; end if;
+      if p.key = KEY_STAR_c then n(2) := '1'; end if;
+      if p.key = KEY_HASH_c then n(3) := '1'; end if;
       n(4) := not p.dirs(0);                               -- Up,    pin 1
       n(5) := not p.dirs(1);                               -- Down,  pin 2
       n(6) := not p.dirs(2);                               -- Left,  pin 3

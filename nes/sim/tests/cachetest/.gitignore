@@ -1,0 +1,4 @@
+*.o
+cachetest.bin
+cache.map
+CACHETST.NES
