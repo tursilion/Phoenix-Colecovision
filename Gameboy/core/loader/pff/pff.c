@@ -1173,3 +1173,46 @@ FRESULT pf_readdir (
 
 #endif /* PF_USE_DIR */
 
+
+
+
+/*-----------------------------------------------------------------------*/
+/* Phoenix: the first sector of each 8K page of the open file            */
+/*-----------------------------------------------------------------------*/
+/* For the core's ROM cache: calls page(n, sector) for each 8K page n of
+   the file, walking its cluster chain once.  Returns 0, 1 for a disk
+   error, or 2 if a page's sectors are not consecutive (the file is
+   fragmented inside a page). */
+
+BYTE pf_pages (
+	void (*page)(UINT, DWORD)
+)
+{
+	FATFS *fs = FatFs;
+	CLUST clst, nxt;
+	DWORD n, s = 0, sect;
+	BYTE j;
+
+	if (!fs || !(fs->flag & FA_OPENED)) return 1;
+	n = (fs->fsize + 511) >> 9;		/* sectors */
+	clst = fs->org_clust;
+	sect = clust2sect(clst);
+	if (!sect) return 1;
+	while (s < n) {
+		for (j = 0; j < fs->csize && s < n; j++, s++) {
+			if (!((BYTE)s & 15)) page((UINT)(s >> 4), sect + j);
+		}
+		if (s >= n) break;
+		nxt = get_fat(clst);
+		if (nxt <= 1) return 1;
+		if (nxt == clst + 1) {			/* the next cluster follows on */
+			sect += fs->csize;
+		} else {
+			if ((BYTE)s & 15) return 2;	/* a page across clusters that do not follow on */
+			sect = clust2sect(nxt);
+			if (!sect) return 1;
+		}
+		clst = nxt;
+	}
+	return 0;
+}

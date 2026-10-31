@@ -12,9 +12,10 @@
  * if it changed writes it back to the .SAV.  Petit FatFs cannot create or
  * grow files, so a game saves only to a .SAV that exists.
  *
- * Images over 256K (up to 512K) fill the SRAM, so they run on the original
- * Game Boy hardware (the GBC's extra work RAM is in the SRAM) and with at
- * most 8K of cartridge RAM (in block RAM).
+ * SRAM: cartridge RAM over 8K at the top, then the GBC's work RAM banks
+ * 2-7, and the ROM below them (45 to 64 8K pages).  A bigger image (up to
+ * 8M) plays from the core's ROM cache: the loader gives it the SD sector
+ * of every 8K page, so the file must not be fragmented.
  *
  * Controls: up/down move, left/right page, A (or Start) opens, B goes up a
  * folder (ColecoVision: left fire A, right fire B, # Start, * Select).
@@ -73,8 +74,7 @@ static WORD count;
 #define ERR_READ        4
 #define ERR_TOO_BIG     5
 #define ERR_MAPPER      6
-#define ERR_BIG_GBC     7
-#define ERR_BIG_RAM     8
+#define ERR_FRAGMENTED  7
 #define MSG_SAVED       9
 #define ERR_SAVE        10
 #define MSG_NO_SAV      11
@@ -85,10 +85,10 @@ static const char *const errors[] = {
     "CANNOT READ CARD",
     "CANNOT READ FOLDER",
     "READ ERROR",
-    "TOO BIG (MAX 512K)",
+    "TOO BIG (MAX 8M)",
     "UNKNOWN CART TYPE",
-    "OVER 256K: GB ONLY",
-    "OVER 256K: RAM>8K",
+    "FILE FRAGMENTED",
+    "",
     "GAME SAVED",
     "SAVE FAILED",
     "NOT SAVED: NO .SAV",
@@ -509,13 +509,52 @@ static BYTE mapper_of(BYTE t)
 /* 8K RAM banks for the RAM size byte (0: none) */
 static const BYTE ram_banks[] = { 0, 1, 1, 4, 16, 8 };
 
+BYTE disk_block_addr(void);
+
+static DWORD page_arg;
+
+/* pf_pages: page n of the file starts at SD sector sect */
+static void set_page(UINT n, DWORD sect)
+{
+    page_arg = disk_block_addr() ? sect : sect << 9;
+    PH_PAGE_LO = (BYTE)n;
+    PH_PAGE_HI = (BYTE)(n >> 8);
+    PH_ARG[0] = (BYTE)page_arg;
+    PH_ARG[1] = (BYTE)(page_arg >> 8);
+    PH_ARG[2] = (BYTE)(page_arg >> 16);
+    PH_ARG[3] = (BYTE)(page_arg >> 24);
+}
+
+/* Give the ROM cache the SD argument of each 8K page of the open file
+ * (pages past its end get its last page). */
+static BYTE map_pages(DWORD size, UINT pages)
+{
+    UINT n;
+
+    status("MAPPING...");
+    frame();
+    switch (pf_pages(set_page)) {
+    case 1: return ERR_READ;
+    case 2: return ERR_FRAGMENTED;
+    }
+    for (n = (UINT)((size + PAGE - 1) >> 13); n < pages; ++n) {
+        PH_PAGE_LO = (BYTE)n;
+        PH_PAGE_HI = (BYTE)(n >> 8);
+        PH_ARG[0] = (BYTE)page_arg;
+        PH_ARG[1] = (BYTE)(page_arg >> 8);
+        PH_ARG[2] = (BYTE)(page_arg >> 16);
+        PH_ARG[3] = (BYTE)(page_arg >> 24);
+    }
+    return 0;
+}
+
 /* Load and start the game in fname. */
 static BYTE load_game(void)
 {
     const char *file = fname;
-    UINT br;
-    DWORD size;
-    BYTE map, banks, rbanks, gbc, note = 0;
+    UINT br, banks, pages;
+    DWORD size, top, wram, cram = BRAM_CRAM, load;
+    BYTE map, rbanks, gbc, slots, r, note = 0;
     DWORD a;
     char *e;
 
@@ -530,19 +569,27 @@ static BYTE load_game(void)
     map = mapper_of(hdr[0x147]);
     if (map == 0xFF)
         return ERR_MAPPER;
-    banks = (BYTE)((size + 0x3FFF) >> 14);      /* 16K banks in the file */
-    if (hdr[0x148] <= 4 && (BYTE)(2 << hdr[0x148]) > banks)
+    banks = (UINT)((size + 0x3FFF) >> 14);      /* 16K banks in the file */
+    if (hdr[0x148] <= 8 && (UINT)(2 << hdr[0x148]) > banks)
         banks = 2 << hdr[0x148];
     rbanks = hdr[0x149] < sizeof(ram_banks) ? ram_banks[hdr[0x149]] : 0;
-
     gbc = hw_mode == HW_GBC || (hw_mode == HW_AUTO && (hdr[0x143] & 0x80));
-    if (size > ROM_GBC) {
-        if (hdr[0x143] == 0xC0 || hw_mode == HW_GBC)
-            return ERR_BIG_GBC;
-        if (rbanks > 1)
-            return ERR_BIG_RAM;
-        gbc = 0;
+
+    /* The SRAM from the top: cartridge RAM over 8K, the GBC's work RAM
+     * banks 2-7 (a 32K block, its first 8K unused), then the ROM */
+    top = SRAM_TOP;
+    if (rbanks > 1) {
+        cram = SRAM_TOP - ((DWORD)rbanks << 13);
+        top = cram;
     }
+    wram = top - 0x8000;
+    if (gbc)
+        top = wram + 0x2000;
+    slots = (BYTE)(top >> 13);
+    pages = banks << 1;
+    load = size;
+    if (load > (DWORD)slots << 13)
+        load = (DWORD)slots << 13;
 
     status("LOADING...");
     frame();
@@ -550,8 +597,13 @@ static BYTE load_game(void)
     if (pf_open(file) != FR_OK)
         return ERR_READ;
     sram_at(SRAM_ROM);
-    if (!forward_file(size))
+    if (!forward_file(load))
         return ERR_READ;
+    if (pages > slots) {
+        r = map_pages(size, pages);
+        if (r)
+            return r;
+    }
 
     /* NAME.SAV next to the image goes to the cartridge RAM */
     if (rbanks || map == MAP_MBC2) {
@@ -562,7 +614,7 @@ static BYTE load_game(void)
             size = fs.fsize;
             if (size > (DWORD)(rbanks ? rbanks : 1) << 13)
                 size = (DWORD)(rbanks ? rbanks : 1) << 13;
-            a = rbanks > 1 ? SRAM_CRAM : BRAM_CRAM;
+            a = cram;
             sram_at(a);
             PH_CRC_RESET = 1;
             if (!forward_file(size))
@@ -577,9 +629,12 @@ static BYTE load_game(void)
     PH_KEEP[KEEP_NOTE] = note;
 
     PH_MAPPER = map;
-    PH_ROM_MASK = banks - 1;
-    PH_ROM_MASK8 = 0;
+    PH_ROM_MASK = (BYTE)(banks - 1);
+    PH_ROM_MASK8 = (BYTE)((banks - 1) >> 8);
     PH_RAM = (rbanks ? 0x80 | (rbanks - 1) : 0) | (rbanks > 1 ? 0 : 0x40);
+    PH_SLOTS = slots;
+    PH_WRAM_BASE = (BYTE)(wram >> 15);
+    PH_CRAM_BASE = (BYTE)(cram >> 13);
     PH_MODE = gbc | (dmg_pal << 2);
     PH_START = 1;
     for (;;)

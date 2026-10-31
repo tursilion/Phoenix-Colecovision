@@ -9,22 +9,26 @@ The menu and SD card loader run on the Game Boy's own CPU.
 
 Status:
 
+- **Hardware:** done. GB and GBC games, the menu, saves and the ROM cache
+  for big images (up to 8M) work, and `CACHETST.GB` passes on both
+  hardware types.
 - **Simulation:** the menu works, and dmg-acid2 (on the original Game
   Boy hardware) and cgb-acid2 (on the GBC) show their test pictures
   correctly after the boot ROMs. The 512K test cartridge (`sim/tests/`)
-  passes: all 31 ROM banks, the 8K cartridge RAM and the work RAM.
-- **ISE:** 78% of the LUTs, 28 of 32 block RAMs, timing met.
-- **Hardware:** not tested yet.
+  passes, and so does the 2M ROM cache test (`CACHETST.GB`, see Building)
+  on both hardware types, with its GBC DMA reads.
+- **ISE:** 87% of the LUTs, 30 of 32 block RAMs, timing met.
 
 ## Using it
 
 1. Put `.GB` and `.GBC` (or `.CGB`) images on a FAT16 or FAT32 SD card, in
-   any folders. The menu shows 8.3 names. Images can be up to 512K:
-   - Up to 256K: any game, with up to 128K of cartridge RAM.
-   - Over 256K: the image fills the SRAM, so the game runs on the original
-     Game Boy hardware, with up to 8K of cartridge RAM. Games for both
-     Game Boys run without colour; Game Boy Color-only games of that size
-     do not run.
+   any folders. The menu shows 8.3 names. Images can be up to 8M, for
+   either Game Boy, with up to 128K of cartridge RAM. The SRAM holds the
+   first 360K-512K of the ROM (it depends on the hardware and the
+   cartridge RAM); a bigger image plays from the core's ROM cache, which
+   reads the rest from the card as the game needs it (see Limits). Such an
+   image must not be fragmented on the card ("FILE FRAGMENTED": copy it
+   again, or to a freshly formatted card).
 2. Install `build/CORE10.PHX` with the Phoenix boot loader.
 3. Power up with the card inserted and pick a game.
 
@@ -70,8 +74,21 @@ the menu shows "NOT SAVED: NO .SAV".
 
 ## Limits
 
-- Images up to 512K; over 256K only on the original Game Boy hardware and
-  with at most 8K of cartridge RAM.
+- Images up to 8M. The SRAM holds 488K of the ROM on the GBC hardware
+  and 512K on the original, less with over 8K of cartridge RAM (on the
+  GBC, 456K with 32K and 360K with 128K). When a game reads a part of a bigger ROM that
+  isn't in the SRAM, the core reads that 8K from the SD card, in place of
+  one not used lately. Meanwhile the CPU waits, as it does for the GBC's
+  HDMA, while the picture, sound and timers go on. A read takes about
+  10ms, so **the picture can flicker or jump for a frame during these
+  loads**: the game misses its interrupts while it waits. Most come at
+  scene changes; ROMs that fit in the SRAM never wait.
+- If one of the GBC's DMAs reads a part of the ROM that isn't there, the
+  whole Game Boy stops instead, and the lines it doesn't draw meanwhile
+  show black for a frame or two (rare: games usually copy from ROM with
+  DMA at scene changes).
+- The LED blinks if a ROM cache read fails its CRC check; the part is read
+  again. The SD card has to stay in while a big image is playing.
 - Saves are written only on the way back to the menu, and only to an
   existing `.SAV` file.
 - No MBC3 clock (it reads 0), no rumble, camera or other special
@@ -90,9 +107,20 @@ the menu shows "NOT SAVED: NO .SAV".
   buffer.
 - **Memory.** The video RAM, OAM, high RAM and boot ROMs are block RAM, and
   so are work RAM banks 0 and 1 (all of the original Game Boy's) and up to
-  8K of cartridge RAM. The ROM is in the SRAM from 00000, up to 512K. With
-  a ROM up to 256K the SRAM also holds the GBC's work RAM banks 2-7 (at
-  42000) and cartridge RAM over 8K (at 60000). The SRAM controller
+  8K of cartridge RAM. The loader fills the SRAM from the top: cartridge
+  RAM over 8K (aligned to its size), the GBC's work RAM banks 2-7 (a 32K
+  block, its first 8K unused), then as many 8K ROM pages as fit below.
+- **ROM cache.** A 1024-entry table maps each 8K ROM page (8M) to its SRAM
+  page, if it has one; a game starts with the pages that fit. On a miss
+  the cache picks an SRAM page by the clock algorithm, unmaps the ROM page
+  it held, reads the new one with one multi-sector read (CMD18 for 16
+  sectors, then CMD12) at 8.4MHz, checks each sector's CRC16 (a bad one
+  reads the page again), and maps it. A CPU read holds the CPU with the
+  core's HDMA stop (`cpu_hold` in `gb.v`); a DMA read stops the clock
+  enables instead (`freeze`), and the video output shows lines the Game
+  Boy didn't draw in time black (each line buffer line has its line
+  number). The loader gives the SD sector of each page, walking the file's
+  cluster chain once (`pf_pages`, added to Petit FatFs). The SRAM controller
   alternates reads between the cartridge and the work RAM every clock, so
   the data follows the address within a few clocks (`rtl/gb_phoenix.v`).
 - **Loader.** At power-on the Game Boy starts in CGB mode without its boot
@@ -113,7 +141,7 @@ the menu shows "NOT SAVED: NO .SAV".
 - `rtl/gb_phoenix_top.vhd`: the top level, with clocks, resets,
   controllers and HDMI. It uses the shared `rtl/phoenix.ucf`.
 - `rtl/gb_phoenix.v`: the frame lock, controller mapping, loader I/O, SPI,
-  the SRAM controller and the video output.
+  the ROM cache, the SRAM controller and the video output.
 - `rtl/gb_cart.v`: the cartridge mappers.
 - `rtl/gb/`: the MiSTer core's files.
   - `gb.v` has no savestates, cheats, Super Game Boy, MegaDuck or link
@@ -146,3 +174,12 @@ the menu shows "NOT SAVED: NO .SAV".
   3. Run it with `obj_dir/Vgb_phoenix --sd sd.img --frames 330 --pad 35:01,37:00 --ppm out/f --ppm-every 30`.
      The `--pad` script presses SNES A at frame 35 to start the first file.
      `--key frame:n` presses ColecoVision keypad key n.
+     `TB_CACHE=frame` logs the ROM cache's state changes from that frame.
+- **Cache test.** `make -C sim/tests/cachetest LOGO=any.gb` builds
+  `CACHETST.GB`, a 2M MBC5 cartridge for either Game Boy. It reads random
+  banks and then all of them, checks each 8K page's code and a 1K block
+  of its data (a different block each pass), and on the GBC copies from
+  random banks with DMA. It shows its counts, and for a bad page which
+  page's data it had (HAS) and how many bytes differ from that page
+  (DIFF: 0000 means a whole other page). It should show ALL OK and keep
+  counting.

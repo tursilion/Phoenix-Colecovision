@@ -48,15 +48,33 @@
 //  $15 R  SPI received byte, and start the next transfer (sending $FF)
 //  $16 R  byte at the load address (the SRAM, or the cartridge RAM block
 //         RAM with $0A bit 3), which then increments; added to the CRC
+//  $17 W  ROM cache: SRAM pages (8K) for the ROM, 1-64
+//  $18 W  ROM cache: ROM page (8K) for $1A-$1D, bits 7:0
+//  $19 W  bits 1:0: its bits 9:8
+//  $1A-$1D W  the SD read argument of that page's first sector (block
+//         number, or byte offset on an SD v1 card), bits 7:0 first; $1D
+//         writes it to the page table
+//  $1E W  bits 3:0: SRAM address bits 18:15 of the work RAM
+//  $1F W  bits 5:0: SRAM address bits 18:13 of the cartridge RAM (when it
+//         is in the SRAM: over 8K)
 //  $80-$FF R/W  128 bytes that resets keep (only power-on clears them):
 //         the loader's note of the game's save file
 //
-// Memory: ROM in the SRAM from 00000, up to 512K.  Work RAM banks 0 and 1
-// (all of the original Game Boy's) in block RAM, the GBC's banks 2-7 in the
-// SRAM at 42000-47FFF.  Cartridge RAM up to 8K in block RAM, more in the
-// SRAM at 60000-7FFFF.  So a 512K ROM fills the SRAM and leaves room for
-// neither the GBC's banks 2-7 nor more than 8K of cartridge RAM: the loader
-// runs such games on original Game Boy hardware.
+// Memory: work RAM banks 0 and 1 (all of the original Game Boy's) and up to
+// 8K of cartridge RAM are block RAM.  The loader places the rest in the
+// SRAM from the top: more cartridge RAM (aligned to its size), then the
+// GBC's work RAM banks 2-7 (a 32K block, its first 8K unused), and the
+// ROM gets the 8K pages below them (c_slots, 45-64).
+//
+// ROM cache: the ROM can be up to 8M.  A table maps each 8K ROM page to its
+// SRAM page, if it has one.  A game starts with ROM pages 0 to c_slots-1 in
+// the same SRAM pages, so a ROM that fits is all there and never waits.
+// When the Game Boy reads a ROM page that is not there, the cache reads it
+// from the SD card (at the argument the loader gave for the page) into an
+// SRAM page not used lately (clock algorithm), then maps it.  Meanwhile a
+// CPU read holds the CPU (as the GBC's HDMA does: video, sound and timers
+// go on); a DMA's read freezes the whole Game Boy (its clock enables), and
+// the HDMI side shows the lines it then misses black.
 
 `timescale 1ns / 1ps
 
@@ -107,6 +125,7 @@ module gb_phoenix
 
    , output reg        boot_mode
    , output reg        led_err
+   , output     [31:0] dbg         // the ROM cache's state (simulation)
    );
 
 // HDMI line on which a waiting Game Boy starts its next frame: twelve
@@ -168,7 +187,8 @@ wire g_reset = reset_s[2];
 
 reg       start_game = 0;
 reg [7:0] gb_rst_cnt = 8'hff;
-wire      gb_reset = (gb_rst_cnt != 0);
+reg       c_init = 0;          // the cache table is being set up
+wire      gb_reset = (gb_rst_cnt != 0) || c_init;
 
 initial boot_mode = 1;
 
@@ -185,14 +205,18 @@ always @(posedge clk_g) begin
 end
 
 // Clock enables (the MiSTer core's speedcontrol): ce at 4MHz, ce_n half a
-// period later, ce_2x at 8MHz for the GBC's double speed.
+// period later, ce_2x at 8MHz for the GBC's double speed.  The ROM cache
+// stops them all (freeze) while a DMA waits for a ROM page, as the MiSTer
+// core's speedcontrol does while it waits for its SDRAM.
 reg [2:0] clkdiv = 0;
 reg       ce = 0, ce_n = 0, ce_2x = 0;
+reg       freeze = 0;
 always @(posedge clk_g) begin
-  clkdiv <= clkdiv + 1;
-  ce     <= (clkdiv == 3'd0);
-  ce_n   <= (clkdiv == 3'd4);
-  ce_2x  <= (clkdiv[1:0] == 2'd0);
+  if (!freeze)
+    clkdiv <= clkdiv + 1;
+  ce     <= !freeze && (clkdiv == 3'd0);
+  ce_n   <= !freeze && (clkdiv == 3'd4);
+  ce_2x  <= !freeze && (clkdiv[1:0] == 2'd0);
 end
 
 // ---------------------------------------------------------------------------
@@ -259,6 +283,9 @@ reg   [8:0] rom_mask = 0;
 reg   [3:0] ram_mask = 0;
 reg         has_ram = 0;
 reg         cram_bram = 0;     // the cartridge RAM is the 8K block RAM
+reg   [5:0] cram_base = 6'h30; // SRAM address bits 18:13 of the cartridge RAM ($1F)
+reg   [3:0] wram_base = 4'h8;  // SRAM address bits 18:15 of the work RAM ($1E)
+reg   [6:0] c_slots = 7'd64;   // ROM cache: SRAM pages for the ROM ($17)
 
 wire        is_gbc = boot_mode | game_gbc;
 
@@ -278,7 +305,8 @@ wire [15:0] gb_audio_l, gb_audio_r;
 wire        lcd_clkena, lcd_on, lcd_vsync;
 wire [14:0] lcd_data;
 wire  [1:0] lcd_data_gb, lcd_mode;
-wire        speed, dma_on;
+wire        speed, dma_on, ext_dma;
+reg         cpu_hold = 0;
 
 gb gb
   ( .reset        (gb_reset)
@@ -313,12 +341,15 @@ gb gb
   , .joy_din      (joy_din)
   , .speed        (speed)
   , .DMA_on       (dma_on)
+  , .cpu_hold     (cpu_hold)
+  , .ext_dma      (ext_dma)
   );
 
 wire ce_cpu = speed ? ce_2x : ce;
 
 // The game's cartridge
 wire [18:0] cart_sram_addr;
+wire  [9:0] rom_page;
 wire        game_oe, cram_wr, rtc_sel, mbc2_ram, is_ram;
 
 gb_cart cart
@@ -329,6 +360,7 @@ gb_cart cart
   , .rom_mask  (rom_mask)
   , .ram_mask  (ram_mask)
   , .has_ram   (has_ram)
+  , .ram_base  (cram_base)
   , .addr      (ext_bus_addr)
   , .a15       (ext_bus_a15)
   , .cart_rd   (cart_rd)
@@ -336,12 +368,37 @@ gb_cart cart
   , .cart_di   (cart_di)
   , .nCS       (nCS)
   , .sram_addr (cart_sram_addr)
+  , .rom_page  (rom_page)
   , .is_ram    (is_ram)
   , .cart_oe   (game_oe)
   , .ram_wr    (cram_wr)
   , .rtc_sel   (rtc_sel)
   , .mbc2_ram  (mbc2_ram)
   );
+
+// ---------------------------------------------------------------------------
+// ROM cache (see the top)
+
+reg  [6:0] c_map [0:1023];      // ROM page -> {in the SRAM, SRAM page}
+reg  [9:0] c_rev [0:63];        // SRAM page -> ROM page
+reg [63:0] c_ref = 0;           // SRAM page used lately (clock algorithm)
+reg [31:0] c_lba [0:1023];      // ROM page -> SD argument of its first sector
+wire [6:0] c_map_q = c_map[rom_page];
+wire       c_hit   = c_map_q[6];
+wire [5:0] c_line  = c_map_q[5:0];
+reg  [2:0] c_settle = 0;        // clocks for the SRAM's data, after a page is mapped
+
+// A ROM read, by the CPU or a DMA, that has to wait for its page: the CPU
+// is held (the core's HDMA stop), a DMA freezes the whole Game Boy.  The
+// CPU and the DMAs take their data a few clocks after the address, so the
+// registered hold is in time.
+wire rom_rd   = !boot_mode && !c_init && cart_rd && !ext_bus_a15;
+wire rom_wait = rom_rd && (!c_hit || c_settle != 0);
+
+always @(posedge clk_g) begin
+  cpu_hold <= rom_wait && !ext_dma;
+  freeze   <= rom_wait && ext_dma;
+end
 
 // Loader ROM, 16K at $0000-$3FFF (mirrored at $4000)
 reg [7:0] loader_rom [0:16383];
@@ -401,6 +458,7 @@ reg  [2:0] spi_bit;
 reg  [6:0] spi_div = 0;
 reg        spi_sclk_r = 0;
 reg        spi_start = 0;
+reg        f_cs = 0;         // the cache's SD select (in a game)
 reg [15:0] fwd_count = 0;
 reg  [7:0] fwd_lo;
 reg        fwd_active = 0;
@@ -411,12 +469,13 @@ reg        fwd_feed_wait = 0;
 reg        ld_done = 0;      // SRAM write finished (from the controller)
 reg [31:0] crc = 32'hffffffff;
 
-assign sd_cs_n = !spi_sel;
+assign sd_cs_n = !(boot_mode ? spi_sel : f_cs);
 assign sd_sclk = spi_sclk_r;
 assign sd_mosi = spi_tx[7];
 
-// SPI half period: 2 clocks fast (8.4MHz SCLK), 64 clocks slow (264kHz).
-wire spi_tick = spi_slow ? (spi_div == 7'd63) : (spi_div[0] == 1'b1);
+// SPI half period: 2 clocks fast (8.4MHz SCLK), 64 clocks slow (264kHz);
+// always fast in a game (the cache).
+wire spi_tick = (spi_slow && boot_mode) ? (spi_div == 7'd63) : (spi_div[0] == 1'b1);
 
 always @(posedge clk_g) begin
   spi_div <= spi_tick ? 7'd0 : spi_div + 1;
@@ -489,6 +548,71 @@ always @(posedge clk_g)
 
 wire fwd_byte_ready = fwd_feed_wait && !spi_busy;
 
+// The cache's page reader: one 8K page, 16 sectors with one CMD18 (then
+// CMD12), each sector's CRC16 checked; a page with a bad sector is read
+// again (and the LED blinks).
+localparam F_IDLE = 5'd0,  F_VICT = 5'd1,  F_EVICT = 5'd2, F_CMD = 5'd3,
+           F_R1 = 5'd4,    F_R1C = 5'd5,   F_TOK = 5'd6,   F_TOKC = 5'd7,
+           F_DATA = 5'd8,  F_DATAC = 5'd9, F_CRC = 5'd10,  F_STOP = 5'd11,
+           F_STUFF = 5'd12, F_SR1 = 5'd13, F_SR1C = 5'd14, F_BUSY = 5'd15,
+           F_BUSYC = 5'd16, F_END = 5'd17, F_MAP = 5'd18,  F_WAIT = 5'd19,
+           F_ERR = 5'd20,  F_MAPW = 5'd21, F_CRCC = 5'd22;
+reg  [4:0] f_state = F_IDLE, f_next;
+reg  [9:0] f_page;
+reg  [5:0] f_line, f_hand = 0;
+reg [15:0] f_cnt;
+reg  [3:0] f_blk;
+reg  [8:0] f_byte;
+reg  [2:0] f_ci;              // command byte
+reg        f_stop;            // sending CMD12 (else CMD18)
+reg [31:0] f_arg;             // the page's first sector
+reg [23:0] led_time = 0;      // the LED blinks for an SD error
+reg [15:0] f_crc;             // CRC16 (CCITT, 0 start) of a block's data
+reg        f_bad;             // a block of the page had a bad CRC
+reg        f_retry = 0;       // an error's CMD12 has been sent
+
+function [15:0] crc16_byte(input [15:0] c, input [7:0] d);
+  integer i;
+  reg [15:0] r;
+  begin
+    r = c ^ {d, 8'd0};
+    for (i = 0; i < 8; i = i + 1)
+      r = r[15] ? (r << 1) ^ 16'h1021 : (r << 1);
+    crc16_byte = r;
+  end
+endfunction
+
+// One registered write port for each cache table (XST drops a second one)
+reg [10:0] c_init_i;
+reg        cm_we = 0;
+reg  [9:0] cm_a;
+reg  [6:0] cm_d;
+reg        cr_we = 0;
+reg  [5:0] cr_a;
+reg  [9:0] cr_d;
+
+always @(posedge clk_g) begin
+  if (cm_we)
+    c_map[cm_a] <= cm_d;
+  if (cr_we)
+    c_rev[cr_a] <= cr_d;
+end
+
+reg  [7:0] lba_page_lo;
+reg  [1:0] lba_page_hi;
+reg [23:0] lba_lo;
+
+always @(posedge clk_g)
+  f_arg <= c_lba[f_page];
+
+assign dbg = {f_state, cpu_hold, freeze, rom_rd, c_hit, ext_dma, cart_rd, ext_bus_a15,
+              c_init, f_cs, spi_busy, rom_page, 7'd0};   // 5+10+10+7
+
+wire [7:0] f_cmd_byte = f_ci == 3'd0 ? (f_stop ? 8'h4C : 8'h52) :   // CMD12, CMD18
+                        f_ci == 3'd5 ? 8'hFF : f_stop ? 8'h00 :
+                        f_ci == 3'd1 ? f_arg[31:24] : f_ci == 3'd2 ? f_arg[23:16] :
+                        f_ci == 3'd3 ? f_arg[15:8]  : f_arg[7:0];
+
 always @(posedge clk_g) begin
   spi_start  <= 0;
   start_game <= 0;
@@ -508,13 +632,199 @@ always @(posedge clk_g) begin
     crc     <= crc32_byte(crc, mem_q);
   end
 
+  // The cache's error blink (0.4s)
+  if (!boot_mode && led_time != 0) begin
+    led_time <= led_time - 1;
+    if (led_time == 1)
+      led_err <= 0;
+  end
+
+  // Cache tables: set up at the start of a game (ROM pages 0 to c_slots-1
+  // in SRAM pages 0 to c_slots-1, where the loader put them)
+  cm_we <= 0;
+  cr_we <= 0;
+  if (c_settle != 0)
+    c_settle <= c_settle - 1;
+  if (start_game) begin
+    c_init   <= 1;
+    c_init_i <= 0;
+  end else if (c_init) begin
+    cm_we <= 1;
+    cm_a  <= c_init_i[9:0];
+    cm_d  <= (c_init_i < {4'd0, c_slots}) ? {1'b1, c_init_i[5:0]} : 7'd0;
+    cr_we <= (c_init_i < 11'd64);
+    cr_a  <= c_init_i[5:0];
+    cr_d  <= c_init_i[9:0];
+    c_ref    <= 0;
+    f_hand   <= 0;
+    c_init_i <= c_init_i + 1;
+    if (c_init_i == 11'd1023)
+      c_init <= 0;
+  end
+
+  // ROM reads mark their SRAM page used
+  if (rom_rd && c_hit)
+    c_ref[c_line] <= 1;
+
+  if (boot_mode || c_init) begin
+    f_state <= F_IDLE;
+    f_cs    <= 0;
+  end else case (f_state)
+  F_IDLE:
+    if (rom_rd && !c_hit) begin
+      f_page  <= rom_page;
+      f_state <= F_VICT;
+    end
+  F_VICT:                            // clock hand: the first page not used lately
+    if (c_ref[f_hand]) begin
+      c_ref[f_hand] <= 0;
+      f_hand <= ({1'b0, f_hand} == c_slots - 7'd1) ? 6'd0 : f_hand + 6'd1;
+    end else begin
+      f_line  <= f_hand;
+      f_hand  <= ({1'b0, f_hand} == c_slots - 7'd1) ? 6'd0 : f_hand + 6'd1;
+      f_state <= F_EVICT;
+    end
+  F_EVICT: begin
+      cm_we <= 1;                    // unmap the page it had
+      cm_a  <= c_rev[f_line];
+      cm_d  <= 7'd0;
+      cr_we <= 1;
+      cr_a  <= f_line;
+      cr_d  <= f_page;
+      ld_addr <= {f_line, 13'd0};
+      f_cnt   <= 0;
+      f_blk   <= 0;
+      f_ci    <= 0;
+      f_stop  <= 0;
+      f_bad   <= 0;
+      f_cs    <= 1;
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_CMD;
+    end
+  F_CMD: begin                       // CMD18 or CMD12, 6 bytes
+      spi_txd <= f_cmd_byte; spi_start <= 1; f_state <= F_WAIT;
+      f_ci <= f_ci + 1;
+      f_next <= (f_ci != 3'd5) ? F_CMD : f_stop ? F_STUFF : F_R1;
+      f_cnt <= 0;
+    end
+  F_R1: begin
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_R1C;
+      f_cnt <= f_cnt + 1;
+    end
+  F_R1C:
+    if (spi_rx == 8'hFF)
+      f_state <= (f_cnt == 16) ? F_ERR : F_R1;
+    else
+      f_state <= (spi_rx == 8'h00) ? F_TOK : F_ERR;
+  F_TOK: begin
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_TOKC;
+      f_cnt <= f_cnt + 1;
+    end
+  F_TOKC:
+    if (spi_rx == 8'hFE) begin
+      f_byte  <= 0;
+      f_crc   <= 0;
+      f_state <= F_DATA;
+    end else
+      f_state <= (spi_rx != 8'hFF || f_cnt == 16'hFFFF) ? F_ERR : F_TOK;
+  F_DATA:
+    if (!ld_pend) begin
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_DATAC;
+    end
+  F_DATAC: if (!ld_pend) begin       // (the SRAM has the last byte)
+      ld_data <= spi_rx;
+      ld_pend <= 1;
+      f_crc   <= crc16_byte(f_crc, spi_rx);
+      f_byte  <= f_byte + 1;
+      f_cnt   <= 0;
+      f_state <= (f_byte == 9'd511) ? F_CRC : F_DATA;
+    end
+  F_CRC: begin                       // two CRC bytes (checked in F_CRCC)
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT;
+      f_cnt <= f_cnt + 1;
+      f_next <= F_CRCC;
+    end
+  F_CRCC: begin                      // the CRC byte just read
+      if (spi_rx != (f_cnt == 1 ? f_crc[15:8] : f_crc[7:0]))
+        f_bad <= 1;
+      if (f_cnt == 2) begin
+        f_blk   <= f_blk + 1;
+        f_cnt   <= 0;
+        f_state <= (f_blk == 4'd15) ? F_STOP : F_TOK;
+      end else
+        f_state <= F_CRC;
+    end
+  F_STOP: begin                      // 16 sectors: CMD12
+      f_ci    <= 0;
+      f_stop  <= 1;
+      f_state <= F_CMD;
+    end
+  F_STUFF: begin                     // the byte after CMD12 (discarded)
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_SR1;
+      f_cnt <= 0;
+    end
+  F_SR1: begin                       // CMD12's response
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_SR1C;
+      f_cnt <= f_cnt + 1;
+    end
+  F_SR1C:
+    if (spi_rx == 8'hFF && f_cnt != 16)
+      f_state <= F_SR1;
+    else begin
+      f_cnt   <= 0;
+      f_state <= F_BUSY;
+    end
+  F_BUSY: begin                      // the card is busy while it sends 0
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_BUSYC;
+      f_cnt <= f_cnt + 1;
+    end
+  F_BUSYC:
+    if (spi_rx == 8'hFF)
+      f_state <= F_END;
+    else
+      f_state <= (f_cnt == 16'hFFFF) ? F_ERR : F_BUSY;
+  F_END:
+    if (!ld_pend) begin
+      f_cs <= 0;
+      spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT;
+      f_next  <= f_bad ? F_ERR : F_MAP;    // a bad block: read the page again
+    end
+  F_MAP: begin
+      cm_we <= 1;
+      cm_a  <= f_page;
+      cm_d  <= {1'b1, f_line};
+      c_ref[f_line] <= 1;
+      f_state <= F_MAPW;
+    end
+  F_MAPW: begin                      // the table write lands; the data follows
+      c_settle <= 3'd7;
+      f_state  <= F_IDLE;
+    end
+  F_WAIT:                            // an SPI byte
+    if (!spi_start && !spi_busy)
+      f_state <= f_next;
+  F_ERR: begin                       // stop the read (CMD12), then start the page again
+      led_err  <= 1;
+      led_time <= 24'hFFFFFF;
+      if (!f_retry) begin
+        f_retry <= 1;
+        f_bad   <= 1;
+        f_state <= F_STOP;
+      end else if (!ld_pend) begin
+        f_retry <= 0;
+        f_cs    <= 0;
+        spi_txd <= 8'hFF; spi_start <= 1; f_state <= F_WAIT; f_next <= F_EVICT;
+      end
+    end
+  default: f_state <= F_IDLE;
+  endcase
+
   if (io_wr) begin
     case (io_a)
     8'h00: begin spi_txd <= io_d; spi_start <= 1; end
     8'h01: begin spi_sel <= io_d[0]; spi_slow <= io_d[1]; fwd_discard <= io_d[2]; end
     8'h02: begin ld_data <= io_d; ld_pend <= 1; end
     8'h03: crc        <= 32'hffffffff;
-    8'h04: start_game <= 1;
+    8'h04: begin start_game <= 1; ld_bram <= 0; end
     8'h05: led_err    <= io_d[0];
     8'h06: fwd_lo     <= io_d;
     8'h07: begin fwd_count <= {io_d, fwd_lo}; fwd_active <= 1; end
@@ -526,6 +836,15 @@ always @(posedge clk_g) begin
     8'h0D: rom_mask[8]   <= io_d[0];
     8'h0E: begin ram_mask <= io_d[3:0]; cram_bram <= io_d[6]; has_ram <= io_d[7]; end
     8'h0F: begin game_gbc <= io_d[0]; fast_boot <= io_d[1]; dmg_pal <= io_d[3:2]; end
+    8'h17: c_slots       <= io_d[6:0];
+    8'h18: lba_page_lo   <= io_d;
+    8'h19: lba_page_hi   <= io_d[1:0];
+    8'h1A: lba_lo[7:0]   <= io_d;
+    8'h1B: lba_lo[15:8]  <= io_d;
+    8'h1C: lba_lo[23:16] <= io_d;
+    8'h1D: c_lba[{lba_page_hi, lba_page_lo}] <= {io_d, lba_lo};
+    8'h1E: wram_base     <= io_d[3:0];
+    8'h1F: cram_base     <= io_d[5:0];
     default: ;
     endcase
   end
@@ -596,7 +915,6 @@ end
 // WE low, WE high, release the bus); the work RAM goes first, then the
 // cartridge RAM, then the loader.
 
-localparam [18:0] WRAM_BASE = 19'h40000;
 
 reg  [2:0] ws = 0;           // 0 reads, 1-3 write
 reg        rp = 0;           // port of the read being issued: 0 cartridge, 1 work RAM
@@ -608,7 +926,10 @@ reg [18:0] cram_wa;
 reg  [7:0] cram_wd;
 reg  [1:0] w_src;            // 0 work RAM, 1 cartridge RAM, 2 loader
 
-wire [18:0] cart_rd_addr = boot_mode ? ld_addr : cart_sram_addr;   // loader: $16
+// The cartridge's read: the loader's ($16), the cartridge RAM, or the ROM
+// byte in its cache page
+wire [18:0] cart_rd_addr = boot_mode ? ld_addr : is_ram ? cart_sram_addr :
+                           {c_line, ext_bus_addr[12:0]};
 
 initial begin
   sram_we_n = 1;
@@ -658,7 +979,7 @@ always @(posedge clk_g) begin
       sram_doe  <= 1;
       sram_oe_n <= 1;
       if (wram_pend) begin
-        sram_addr <= WRAM_BASE | wram_wa;
+        sram_addr <= {wram_base, wram_wa};
         sram_dout <= wram_wd;
         w_src     <= 2'd0;
         wram_pend <= wram_we && !wram_is_lo;   // a new write in this clock stays pending
@@ -674,7 +995,7 @@ always @(posedge clk_g) begin
       end
       ws <= 3'd1;
     end else begin
-      sram_addr <= rp ? (WRAM_BASE | wram_addr) : cart_rd_addr;
+      sram_addr <= rp ? {wram_base, wram_addr} : cart_rd_addr;
       rd_valid  <= 1;
       rd_port   <= rp;
       rp        <= !rp;
@@ -723,9 +1044,16 @@ always @(posedge clk_g) begin
   end
 end
 
+// Each buffer line's Game Boy line number: a line the Game Boy has not
+// drawn in time (a cache freeze, or the LCD just switched on) shows black.
+reg [7:0] lb_tag [0:7];
+
 always @(posedge clk_g)
-  if (pix_wr && py < 8'd144)
+  if (pix_wr && py < 8'd144) begin
     linebuf[{py[2:0], px}] <= is_gbc ? lcd_data : {13'd0, lcd_data_gb};
+    if (px == 8'd0)
+      lb_tag[py[2:0]] <= py;
+  end
 
 // Frame top: the LCD's vertical sync, or with the LCD off a frame time
 // (70224 dots) and a line after the last one.
@@ -785,8 +1113,11 @@ always @(posedge clk25) begin
 end
 
 reg [14:0] lb_q;
-always @(posedge clk25)
-  lb_q <= linebuf[{gy[2:0], gx}];
+reg        lb_ok;
+always @(posedge clk25) begin
+  lb_q  <= linebuf[{gy[2:0], gx}];
+  lb_ok <= (lb_tag[gy[2:0]] == gy);
+end
 
 function [23:0] dmg_rgb(input [1:0] pal, input [1:0] shade);
   case ({pal, shade})
@@ -812,6 +1143,8 @@ always @(posedge clk25) begin
   // stage 2: colour
   if (!show_on)
     g_rgb <= show_gbc ? 24'hFFFFFF : dmg_rgb(pal_s1[1:0], 2'd0);
+  else if (!lb_ok)
+    g_rgb <= 24'h000000;
   else if (show_gbc)
     g_rgb <= { lb_q[4:0], lb_q[4:2], lb_q[9:5], lb_q[9:7], lb_q[14:10], lb_q[14:12] };
   else

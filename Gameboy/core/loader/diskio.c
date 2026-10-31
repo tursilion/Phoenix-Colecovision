@@ -94,6 +94,12 @@ static BYTE send_cmd(BYTE cmd, DWORD arg)
     return r;
 }
 
+/* The card takes sector numbers (SDHC), not byte offsets */
+BYTE disk_block_addr(void)
+{
+    return block_addr;
+}
+
 DSTATUS disk_initialize(void)
 {
     BYTE n, ocr[4];

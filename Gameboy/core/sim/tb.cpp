@@ -42,7 +42,10 @@ struct SdCard {
     bool idle = true, app = false;
     int acmd41_count = 0;
     int miso = 1;
-    long reads = 0, writes = 0;
+    long reads = 0, writes = 0, multi = 0;
+    // CMD18: streaming sectors from mblk until CMD12
+    bool streaming = false;
+    size_t mblk = 0;
     // CMD24: 0 none, 1 waiting for the data token, 2 receiving
     int wstate = 0;
     size_t wbase = 0;
@@ -88,12 +91,32 @@ struct SdCard {
             out.push_back(0xFF);
             out.push_back(0xFE);
             size_t base = (size_t)arg * 512;
-            for (int i = 0; i < 512; ++i)
-                out.push_back(base + i < img.size() ? img[base + i] : 0);
-            out.push_back(0x12);
-            out.push_back(0x34);
+            uint16_t crc = 0;
+            for (int i = 0; i < 512; ++i) {
+                uint8_t d = base + i < img.size() ? img[base + i] : 0;
+                out.push_back(d);
+                crc ^= d << 8;
+                for (int k = 0; k < 8; ++k)
+                    crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
+            }
+            out.push_back(crc >> 8);
+            out.push_back(crc & 0xFF);
             break;
         }
+        case 18:
+            ++multi;
+            out.push_back(0x00);
+            streaming = true;
+            mblk = arg;
+            break;
+        case 12:
+            streaming = false;
+            out.clear();
+            out.push_back(0xFF);                    // stuff byte
+            out.push_back(0x00);                    // R1
+            out.push_back(0x00);                    // busy
+            out.push_back(0x00);
+            break;
         case 24:
             out.push_back(0x00);
             wstate = 1;
@@ -132,10 +155,31 @@ struct SdCard {
         }
     }
 
+    // The next sector of a CMD18, when the card has sent the last.
+    void stream() {
+        if (!streaming || out.size() > 2) return;
+        out.push_back(0xFF);
+        out.push_back(0xFE);
+        size_t base = mblk * 512;
+        uint16_t crc = 0;
+        for (int i = 0; i < 512; ++i) {
+            uint8_t b = base + i < img.size() ? img[base + i] : 0;
+            out.push_back(b);
+            crc ^= b << 8;
+            for (int k = 0; k < 8; ++k)
+                crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
+        }
+        out.push_back(crc >> 8);
+        out.push_back(crc & 0xFF);
+        ++mblk;
+        ++reads;
+    }
+
     // Called once per clock with the current pins.
     void step(bool cs_n, bool sclk, bool mosi) {
+        stream();
         if (cs_n) {
-            if (!last_cs_n) { bit = 0; cmd.clear(); wstate = 0; }
+            if (!last_cs_n) { bit = 0; cmd.clear(); wstate = 0; streaming = false; }
             miso = 1;
         } else {
             if (last_cs_n) {                        // selected: load first byte
@@ -222,6 +266,7 @@ int main(int argc, char **argv)
         }
     }
 
+    setvbuf(stdout, nullptr, _IOLBF, 0);
     Verilated::commandArgs(argc, argv);
     Vgb_phoenix *top = new Vgb_phoenix;
 
@@ -286,8 +331,35 @@ int main(int argc, char **argv)
 
         // SRAM: asynchronous
         if (!top->sram_we_n && top->sram_doe)
+        {
             sram[top->sram_addr] = top->sram_dout;
+            // A game's 8K-page writes: the ROM cache filling an SRAM page
+            static int last_a = -1;
+            if (!top->boot_mode && (top->sram_addr & 0x1FFF) == 0 && (int)top->sram_addr != last_a)
+                printf("sram write at %05X (cache fill?) frame %d\n", top->sram_addr, frame);
+            last_a = top->sram_addr;
+        }
         top->sram_din = top->sram_oe_n ? 0xFF : sram[top->sram_addr];
+        {
+            // TB_CACHE=frame: from that frame log each change of the cache's
+            // state, hold and freeze, and the misses' pages
+            static int cfrom = getenv("TB_CACHE") ? atoi(getenv("TB_CACHE")) : -1;
+            static uint32_t last = 0;
+            uint32_t d = top->dbg & 0xFE000000;     // f_state, hold, freeze
+            static int hi_reads = 0;
+            if (cfrom >= 0 && frame >= cfrom && !top->boot_mode && (top->dbg >> 24 & 1) &&
+                (top->dbg >> 7 & 1023) >= 120 && hi_reads < 20) {
+                ++hi_reads;
+                printf("frame %d: ROM read of page %d, hit %d, hold %d, f_state %d\n", frame,
+                       top->dbg >> 7 & 1023, top->dbg >> 23 & 1, top->dbg >> 26 & 1, top->dbg >> 27);
+            }
+            if (cfrom >= 0 && frame >= cfrom && d != last && !top->boot_mode) {
+                printf("frame %d: f_state %d hold %d freeze %d rom_rd %d hit %d dma %d init %d page %d\n",
+                       frame, top->dbg >> 27, top->dbg >> 26 & 1, top->dbg >> 25 & 1, top->dbg >> 24 & 1,
+                       top->dbg >> 23 & 1, top->dbg >> 22 & 1, top->dbg >> 19 & 1, top->dbg >> 7 & 1023);
+                last = d;
+            }
+        }
         sd.step(top->sd_cs_n, top->sd_sclk, top->sd_mosi);
         top->sd_miso = sd.miso;
         top->eval();
@@ -342,6 +414,8 @@ int main(int argc, char **argv)
                 printf("frame %d: %u lines\n", frame, y);
             }
             ++frame;
+            if (getenv("TB_SDLOG") && frame % 25 == 0)
+                printf("frame %d: %ld SD reads, %ld multi, boot_mode %d\n", frame, sd.reads, sd.multi, top->boot_mode);
             y = 0;
             x = 0;
             int pad = 0;
@@ -359,7 +433,7 @@ int main(int argc, char **argv)
         last_vsync_n = top->vid_vsync_n;
     }
 
-    printf("%d frames, %ld clocks, boot_mode=%d, %ld SD writes\n", frame, clocks, top->boot_mode, sd.writes);
+    printf("%d frames, %ld clocks, boot_mode=%d, %ld SD writes, %ld multi-block reads\n", frame, clocks, top->boot_mode, sd.writes, sd.multi);
     if (sd_out) {
         FILE *f = fopen(sd_out, "wb");
         fwrite(sd.img.data(), 1, sd.img.size(), f);

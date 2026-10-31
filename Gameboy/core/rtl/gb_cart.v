@@ -2,10 +2,10 @@
 // MBC5, with the ROM and the cartridge RAM in the SRAM.  The register logic
 // follows the MiSTer core's mappers (rtl/mappers/ in Gameboy_MiSTer).
 //
-// SRAM: ROM from 00000 (16K banks, up to 512K), cartridge RAM from 60000
-// (8K banks, up to 128K, with ROMs up to 256K).  The glue keeps up to 8K of
-// cartridge RAM in block RAM instead (sram_addr bits 12:0).  The MBC3 clock
-// registers read 0.
+// ROM: the 8K page of the access (up to 8M) and the address in it; the
+// glue's ROM cache puts the page in the SRAM.  Cartridge RAM: in the SRAM
+// from ram_base (8K banks, up to 128K), or up to 8K in the glue's block RAM
+// instead (sram_addr bits 12:0).  The MBC3 clock registers read 0.
 
 `timescale 1ns / 1ps
 
@@ -18,6 +18,7 @@ module gb_cart
    , input       [8:0] rom_mask    // 16K banks - 1
    , input       [3:0] ram_mask    // 8K banks - 1
    , input             has_ram
+   , input       [5:0] ram_base    // SRAM address bits 18:13 of the RAM, aligned to its size
 
    // gb.v cartridge bus
    , input      [14:0] addr
@@ -27,7 +28,8 @@ module gb_cart
    , input       [7:0] cart_di
    , input             nCS
 
-   , output     [18:0] sram_addr   // byte to read, or to write when ram_wr
+   , output     [18:0] sram_addr   // cartridge RAM byte to read, or to write when ram_wr
+   , output      [9:0] rom_page    // ROM: 8K page; the byte is addr[12:0]
    , output            is_ram      // the access is to the cartridge RAM
    , output            cart_oe
    , output            ram_wr      // level: a write to the cartridge RAM
@@ -117,9 +119,9 @@ assign mbc2_ram = (mapper == MAP_MBC2);
 wire [8:0] rom_b = rom_bank & rom_mask;
 wire [3:0] ram_b = ram_bank & ram_mask;
 
-assign sram_addr = !is_cram ? {rom_b[4:0], addr[13:0]} :
-                   mbc2_ram  ? {2'b11, 8'd0, addr[8:0]} :
-                               {2'b11, ram_b, addr[12:0]};
+assign rom_page  = {rom_b, addr[13]};
+assign sram_addr = mbc2_ram ? {ram_base, 4'd0, addr[8:0]} :
+                              {ram_base | {2'b00, ram_b}, addr[12:0]};
 
 wire ram_ok = ram_enable && (has_ram || mbc2_ram || rtc_sel);
 

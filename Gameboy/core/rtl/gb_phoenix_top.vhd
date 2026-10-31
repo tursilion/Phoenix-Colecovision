@@ -127,6 +127,7 @@ architecture rtl of gb_phoenix_top is
       ; audio_r       : out std_logic_vector(15 downto 0)
       ; boot_mode     : out std_logic
       ; led_err       : out std_logic
+      ; dbg           : out std_logic_vector(31 downto 0)
       );
    end component;
 
@@ -320,6 +321,7 @@ begin
    , audio_r       => pcm_r_s
    , boot_mode     => boot_mode_s
    , led_err       => led_err_s
+   , dbg           => open
    );
 
    sram_data_io <= sram_dout_s when sram_doe_s = '1' else (others => 'Z');

@@ -26,6 +26,12 @@
 #define PH_CRC        ((volatile unsigned char *)0xA011)  /* R: CRC-32, low first */
 #define PH_SPI_NEXT   IO(0x15)  /* R: received byte, starts the next transfer */
 #define PH_MEM        IO(0x16)  /* R: byte at the load address, address++ */
+#define PH_SLOTS      IO(0x17)  /* W: ROM cache: SRAM pages (8K) for the ROM */
+#define PH_PAGE_LO    IO(0x18)  /* W: ROM cache: ROM page for PH_ARG, bits 7:0 */
+#define PH_PAGE_HI    IO(0x19)  /* W: bits 9:8 */
+#define PH_ARG        ((volatile unsigned char *)0xA01A)  /* W: its SD argument, low first; the 4th byte stores it */
+#define PH_WRAM_BASE  IO(0x1E)  /* W: SRAM address bits 18:15 of the GBC work RAM */
+#define PH_CRAM_BASE  IO(0x1F)  /* W: SRAM address bits 18:13 of the cartridge RAM */
 #define PH_KEEP       ((unsigned char *)0xA080)  /* 128 bytes kept across resets */
 
 #define MAP_NONE 0
@@ -45,10 +51,10 @@
 
 /* Load addresses: the SRAM, and the 8K cartridge RAM block RAM */
 #define SRAM_ROM   0x00000UL
-#define SRAM_CRAM  0x60000UL
+#define SRAM_TOP   0x80000UL
 #define BRAM_CRAM  0x80000UL
-#define ROM_MAX    0x80000UL   /* 512K */
-#define ROM_GBC    0x40000UL   /* bigger needs the original Game Boy hardware */
+#define ROM_MAX    0x800000UL  /* 8M */
+#define PAGE       0x2000UL    /* ROM cache page */
 
 /* Game Boy registers */
 #define REG(a) (*(volatile unsigned char *)(a))

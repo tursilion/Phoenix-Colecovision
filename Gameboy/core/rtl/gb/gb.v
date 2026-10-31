@@ -39,6 +39,8 @@ module gb (
 	input [7:0] cart_do,
 	output [7:0] cart_di,
 	input  cart_oe,
+	input  cpu_hold,      // Phoenix ROM cache: stop the CPU (like HDMA does)
+	output ext_dma,       // the cartridge bus access is a DMA's, not the CPU's
 
 	// WRAM or Cart RAM CS
 	output nCS,
@@ -261,7 +263,7 @@ wire ce_cpu = cpu_speed ? ce_2x:ce;
 
 // when hdma is enabled stop CPU (GBC).
 wire hdma_cpu_stop = (isGBC & hdma_rd);
-wire cpu_clken = ~hdma_cpu_stop & ce_cpu;
+wire cpu_clken = ~hdma_cpu_stop & ~cpu_hold & ce_cpu;
 
 reg reset_r  = 1;
 wire reset_ss = reset_r;
@@ -982,5 +984,6 @@ assign cart_wr = cart_sel & ext_bus_wr;
 
 
 assign DMA_on = cart_sel & (hdma_rd | dma_rd);
+assign ext_dma = hdma_read_ext_bus | dma_read_ext_bus;
 
 endmodule
