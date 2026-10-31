@@ -155,94 +155,11 @@ _read_sector:
 ; Function main
 ; ---------------------------------
 _main::
-	push	ix
-	ld	ix,#0
-	add	ix,sp
-	push	af
-	push	af
 ;main.c:80: phBankingScheme = 0x01 | 0x00;      /* MegaCart, upper internal RAM */
 	ld	a, #0x01
 	out	(_phBankingScheme), a
-;main.c:103: do {
-	ld	c, #0x00
-00101$:
-;main.c:104: phCachePage = i;
-	ld	a, c
-	out	(_phCachePage), a
-;main.c:105: read_sector(IMG_SECT + (DWORD)i * 16, 0);
-	ld	l, c
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	h, #0x00
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	de, #0x0000
-	ld	b, #0x04
-00143$:
-	add	hl, hl
-	rl	e
-	rl	d
-	djnz	00143$
-	ld	-4 (ix), l
-	ld	a, h
-	add	a, #0x08
-	ld	-3 (ix), a
-	ld	a, e
-	adc	a, #0x00
-	ld	-2 (ix), a
-	ld	a, d
-	adc	a, #0x00
-	ld	-1 (ix), a
-	push	hl
-	push	bc
-	push	de
-	ld	hl, #0x0000
-	push	hl
-	ld	e, -4 (ix)
-	ld	d, -3 (ix)
-	ld	l, -2 (ix)
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	h, -1 (ix)
-;	spillPairReg hl
-;	spillPairReg hl
-	call	_read_sector
-	pop	de
-	pop	bc
-	pop	hl
-;main.c:106: phCacheCheck = i;
-	ld	a, c
-	out	(_phCacheCheck), a
-;main.c:107: read_sector(IMG_SECT + (DWORD)i * 16 + 15, 0);
-	push	de
-	ld	de, #0x080f
-	add	hl, de
-	pop	de
-	jr	NC, 00145$
-	inc	de
-00145$:
-	push	bc
-	ld	bc, #0x0000
-	push	bc
-	ex	de, hl
-	call	_read_sector
-	pop	bc
-;main.c:108: } while (++i != (BYTE)(IMG_BLOCKS * 2));
-	inc	c
-	ld	a, c
-;main.c:109: phCacheStatus = 0;
-	sub	a,#0x40
-	jr	NZ, 00101$
-	out	(_phCacheStatus), a
-;main.c:110: if (phCacheStatus & 1)
-	in	a, (_phCacheStatus)
-	rrca
-	jr	NC, 00108$
-00111$:
-	jr	00111$
-00108$:
 ;main.c:114: phCartMask = IMG_SGM ? IMG_BLOCKS * 2 - 1 : IMG_BLOCKS - 1;
-	ld	a, #0x1f
+	ld	a, #0x01
 	out	(_phCartMask), a
 ;main.c:115: phBankingScheme = IMG_SGM ? (0x02 | 0x10) : (0x01 | 0x10);
 	ld	a, #0x11
@@ -270,11 +187,8 @@ _main::
 	sub	a, #0x06
 	jr	C, 00112$
 ;main.c:120: ((void (*)(void))0x6000)();
-	call	0x6000
 ;main.c:121: }
-	ld	sp, ix
-	pop	ix
-	ret
+	jp	0x6000
 _start_code:
 	.db #0xdb	; 219
 	.db #0x55	; 85	'U'

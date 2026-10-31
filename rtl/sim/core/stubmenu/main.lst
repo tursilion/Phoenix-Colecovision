@@ -155,133 +155,47 @@
                                     155 ; Function main
                                     156 ; ---------------------------------
       00006A                        157 _main::
-      00006A DD E5            [15]  158 	push	ix
-      00006C DD 21 00 00      [14]  159 	ld	ix,#0
-      000070 DD 39            [15]  160 	add	ix,sp
-      000072 F5               [11]  161 	push	af
-      000073 F5               [11]  162 	push	af
-                                    163 ;main.c:80: phBankingScheme = 0x01 | 0x00;      /* MegaCart, upper internal RAM */
-      000074 3E 01            [ 7]  164 	ld	a, #0x01
-      000076 D3 55            [11]  165 	out	(_phBankingScheme), a
-                                    166 ;main.c:103: do {
-      000078 0E 00            [ 7]  167 	ld	c, #0x00
-      00007A                        168 00101$:
-                                    169 ;main.c:104: phCachePage = i;
-      00007A 79               [ 4]  170 	ld	a, c
-      00007B D3 5C            [11]  171 	out	(_phCachePage), a
-                                    172 ;main.c:105: read_sector(IMG_SECT + (DWORD)i * 16, 0);
-      00007D 69               [ 4]  173 	ld	l, c
-                                    174 ;	spillPairReg hl
-                                    175 ;	spillPairReg hl
-      00007E 26 00            [ 7]  176 	ld	h, #0x00
-                                    177 ;	spillPairReg hl
-                                    178 ;	spillPairReg hl
-      000080 11 00 00         [10]  179 	ld	de, #0x0000
-      000083 06 04            [ 7]  180 	ld	b, #0x04
-      000085                        181 00143$:
-      000085 29               [11]  182 	add	hl, hl
-      000086 CB 13            [ 8]  183 	rl	e
-      000088 CB 12            [ 8]  184 	rl	d
-      00008A 10 F9            [13]  185 	djnz	00143$
-      00008C DD 75 FC         [19]  186 	ld	-4 (ix), l
-      00008F 7C               [ 4]  187 	ld	a, h
-      000090 C6 08            [ 7]  188 	add	a, #0x08
-      000092 DD 77 FD         [19]  189 	ld	-3 (ix), a
-      000095 7B               [ 4]  190 	ld	a, e
-      000096 CE 00            [ 7]  191 	adc	a, #0x00
-      000098 DD 77 FE         [19]  192 	ld	-2 (ix), a
-      00009B 7A               [ 4]  193 	ld	a, d
-      00009C CE 00            [ 7]  194 	adc	a, #0x00
-      00009E DD 77 FF         [19]  195 	ld	-1 (ix), a
-      0000A1 E5               [11]  196 	push	hl
-      0000A2 C5               [11]  197 	push	bc
-      0000A3 D5               [11]  198 	push	de
-      0000A4 21 00 00         [10]  199 	ld	hl, #0x0000
-      0000A7 E5               [11]  200 	push	hl
-      0000A8 DD 5E FC         [19]  201 	ld	e, -4 (ix)
-      0000AB DD 56 FD         [19]  202 	ld	d, -3 (ix)
-      0000AE DD 6E FE         [19]  203 	ld	l, -2 (ix)
-                                    204 ;	spillPairReg hl
-                                    205 ;	spillPairReg hl
-      0000B1 DD 66 FF         [19]  206 	ld	h, -1 (ix)
-                                    207 ;	spillPairReg hl
-                                    208 ;	spillPairReg hl
-      0000B4 CDr05r00         [17]  209 	call	_read_sector
-      0000B7 D1               [10]  210 	pop	de
-      0000B8 C1               [10]  211 	pop	bc
-      0000B9 E1               [10]  212 	pop	hl
-                                    213 ;main.c:106: phCacheCheck = i;
-      0000BA 79               [ 4]  214 	ld	a, c
-      0000BB D3 5D            [11]  215 	out	(_phCacheCheck), a
-                                    216 ;main.c:107: read_sector(IMG_SECT + (DWORD)i * 16 + 15, 0);
-      0000BD D5               [11]  217 	push	de
-      0000BE 11 0F 08         [10]  218 	ld	de, #0x080f
-      0000C1 19               [11]  219 	add	hl, de
-      0000C2 D1               [10]  220 	pop	de
-      0000C3 30 01            [12]  221 	jr	NC, 00145$
-      0000C5 13               [ 6]  222 	inc	de
-      0000C6                        223 00145$:
-      0000C6 C5               [11]  224 	push	bc
-      0000C7 01 00 00         [10]  225 	ld	bc, #0x0000
-      0000CA C5               [11]  226 	push	bc
-      0000CB EB               [ 4]  227 	ex	de, hl
-      0000CC CDr05r00         [17]  228 	call	_read_sector
-      0000CF C1               [10]  229 	pop	bc
-                                    230 ;main.c:108: } while (++i != (BYTE)(IMG_BLOCKS * 2));
-      0000D0 0C               [ 4]  231 	inc	c
-      0000D1 79               [ 4]  232 	ld	a, c
-                                    233 ;main.c:109: phCacheStatus = 0;
-      0000D2 D6 40            [ 7]  234 	sub	a,#0x40
-      0000D4 20 A4            [12]  235 	jr	NZ, 00101$
-      0000D6 D3 5E            [11]  236 	out	(_phCacheStatus), a
-                                    237 ;main.c:110: if (phCacheStatus & 1)
-      0000D8 DB 5E            [11]  238 	in	a, (_phCacheStatus)
-      0000DA 0F               [ 4]  239 	rrca
-      0000DB 30 02            [12]  240 	jr	NC, 00108$
-      0000DD                        241 00111$:
-      0000DD 18 FE            [12]  242 	jr	00111$
-      0000DF                        243 00108$:
-                                    244 ;main.c:114: phCartMask = IMG_SGM ? IMG_BLOCKS * 2 - 1 : IMG_BLOCKS - 1;
-      0000DF 3E 1F            [ 7]  245 	ld	a, #0x1f
-      0000E1 D3 59            [11]  246 	out	(_phCartMask), a
-                                    247 ;main.c:115: phBankingScheme = IMG_SGM ? (0x02 | 0x10) : (0x01 | 0x10);
-      0000E3 3E 11            [ 7]  248 	ld	a, #0x11
-      0000E5 D3 55            [11]  249 	out	(_phBankingScheme), a
-                                    250 ;main.c:116: phRAMBankSelect = 1;
-      0000E7 3E 01            [ 7]  251 	ld	a, #0x01
-      0000E9 D3 54            [11]  252 	out	(_phRAMBankSelect), a
-                                    253 ;main.c:118: for (i = 0; i < sizeof(start_code); ++i)
-      0000EB 0E 00            [ 7]  254 	ld	c, #0x00
-      0000ED                        255 00112$:
-                                    256 ;main.c:119: MEM(0x6000 + i) = start_code[i];
-      0000ED 59               [ 4]  257 	ld	e, c
-      0000EE 16 00            [ 7]  258 	ld	d, #0x00
-      0000F0 21 00 60         [10]  259 	ld	hl, #0x6000
-      0000F3 19               [11]  260 	add	hl, de
-      0000F4 EB               [ 4]  261 	ex	de, hl
-      0000F5 21r0Br01         [10]  262 	ld	hl, #_start_code
-      0000F8 06 00            [ 7]  263 	ld	b, #0x00
-      0000FA 09               [11]  264 	add	hl, bc
-      0000FB 7E               [ 7]  265 	ld	a, (hl)
-      0000FC 12               [ 7]  266 	ld	(de), a
-                                    267 ;main.c:118: for (i = 0; i < sizeof(start_code); ++i)
-      0000FD 0C               [ 4]  268 	inc	c
-      0000FE 79               [ 4]  269 	ld	a, c
-      0000FF D6 06            [ 7]  270 	sub	a, #0x06
-      000101 38 EA            [12]  271 	jr	C, 00112$
-                                    272 ;main.c:120: ((void (*)(void))0x6000)();
-      000103 CD 00 60         [17]  273 	call	0x6000
-                                    274 ;main.c:121: }
-      000106 DD F9            [10]  275 	ld	sp, ix
-      000108 DD E1            [14]  276 	pop	ix
-      00010A C9               [10]  277 	ret
-      00010B                        278 _start_code:
-      00010B DB                     279 	.db #0xdb	; 219
-      00010C 55                     280 	.db #0x55	; 85	'U'
-      00010D 2A                     281 	.db #0x2a	; 42
-      00010E 0A                     282 	.db #0x0a	; 10
-      00010F 80                     283 	.db #0x80	; 128
-      000110 E9                     284 	.db #0xe9	; 233
-                                    285 	.area _CODE
-                                    286 	.area _INITIALIZER
-                                    287 	.area _CABS (ABS)
+                                    158 ;main.c:80: phBankingScheme = 0x01 | 0x00;      /* MegaCart, upper internal RAM */
+      00006A 3E 01            [ 7]  159 	ld	a, #0x01
+      00006C D3 55            [11]  160 	out	(_phBankingScheme), a
+                                    161 ;main.c:114: phCartMask = IMG_SGM ? IMG_BLOCKS * 2 - 1 : IMG_BLOCKS - 1;
+      00006E 3E 01            [ 7]  162 	ld	a, #0x01
+      000070 D3 59            [11]  163 	out	(_phCartMask), a
+                                    164 ;main.c:115: phBankingScheme = IMG_SGM ? (0x02 | 0x10) : (0x01 | 0x10);
+      000072 3E 11            [ 7]  165 	ld	a, #0x11
+      000074 D3 55            [11]  166 	out	(_phBankingScheme), a
+                                    167 ;main.c:116: phRAMBankSelect = 1;
+      000076 3E 01            [ 7]  168 	ld	a, #0x01
+      000078 D3 54            [11]  169 	out	(_phRAMBankSelect), a
+                                    170 ;main.c:118: for (i = 0; i < sizeof(start_code); ++i)
+      00007A 0E 00            [ 7]  171 	ld	c, #0x00
+      00007C                        172 00112$:
+                                    173 ;main.c:119: MEM(0x6000 + i) = start_code[i];
+      00007C 59               [ 4]  174 	ld	e, c
+      00007D 16 00            [ 7]  175 	ld	d, #0x00
+      00007F 21 00 60         [10]  176 	ld	hl, #0x6000
+      000082 19               [11]  177 	add	hl, de
+      000083 EB               [ 4]  178 	ex	de, hl
+      000084 21r95r00         [10]  179 	ld	hl, #_start_code
+      000087 06 00            [ 7]  180 	ld	b, #0x00
+      000089 09               [11]  181 	add	hl, bc
+      00008A 7E               [ 7]  182 	ld	a, (hl)
+      00008B 12               [ 7]  183 	ld	(de), a
+                                    184 ;main.c:118: for (i = 0; i < sizeof(start_code); ++i)
+      00008C 0C               [ 4]  185 	inc	c
+      00008D 79               [ 4]  186 	ld	a, c
+      00008E D6 06            [ 7]  187 	sub	a, #0x06
+      000090 38 EA            [12]  188 	jr	C, 00112$
+                                    189 ;main.c:120: ((void (*)(void))0x6000)();
+                                    190 ;main.c:121: }
+      000092 C3 00 60         [10]  191 	jp	0x6000
+      000095                        192 _start_code:
+      000095 DB                     193 	.db #0xdb	; 219
+      000096 55                     194 	.db #0x55	; 85	'U'
+      000097 2A                     195 	.db #0x2a	; 42
+      000098 0A                     196 	.db #0x0a	; 10
+      000099 80                     197 	.db #0x80	; 128
+      00009A E9                     198 	.db #0xe9	; 233
+                                    199 	.area _CODE
+                                    200 	.area _INITIALIZER
+                                    201 	.area _CABS (ABS)

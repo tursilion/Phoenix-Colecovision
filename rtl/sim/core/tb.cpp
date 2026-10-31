@@ -3,9 +3,11 @@
 // stand-in (vdp_spy.v), an SD card (SPI, FAT image) and the SRAM.
 //
 //   obj_dir/Vsim_top --sd image [--frames n] [--fire frame,...] [--screen-every n]
+//                    [--key frame:key,...]
 //
 // --fire presses the left fire button (the menu starts the highlighted
-// file) at each given frame, for a few frames.  The name table (Graphics
+// file) at each given frame, for a few frames; --key presses a keypad key
+// (0-9, * or #) on controller 1 the same way.  The name table (Graphics
 // I or the menu's text mode) is printed every --screen-every frames and at
 // the end.  Cache fills (SRAM writes at 8K boundaries above the SGM's 32K
 // in a game) are counted.
@@ -208,11 +210,15 @@ int main(int argc, char **argv)
     const char *sd_path = nullptr, *preload = nullptr;
     int frames = 300, screen_every = 0;
     std::vector<int> fires;
+    std::vector<std::pair<int, char>> keys;
     for (int i = 1; i < argc; ++i) {
         if (!strcmp(argv[i], "--sd") && i + 1 < argc) sd_path = argv[++i];
         else if (!strcmp(argv[i], "--frames") && i + 1 < argc) frames = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--screen-every") && i + 1 < argc) screen_every = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--preload") && i + 1 < argc) preload = argv[++i];
+        else if (!strcmp(argv[i], "--key") && i + 1 < argc)
+            for (char *t = strtok(argv[++i], ","); t; t = strtok(nullptr, ","))
+                if (char *c = strchr(t, ':')) keys.push_back({atoi(t), c[1]});
         else if (!strcmp(argv[i], "--fire") && i + 1 < argc)
             for (char *t = strtok(argv[++i], ","); t; t = strtok(nullptr, ",")) fires.push_back(atoi(t));
     }
@@ -272,6 +278,16 @@ int main(int argc, char **argv)
         for (int f : fires) if (frame >= f && frame < f + 6) fire = true;
         uint8_t stick = 3, key = 3;                      // active low, both ports
         t->p1 = t->p2 = t->p3 = t->p4 = 3;
+        // keypad half (pin 5 low): the key's code on pins 1-4 of port 1,
+        // port bits 3-0 = pins 3, 2, 4, 1
+        static const char codes[] = "?845?7#2?*09316?";   // code -> key
+        for (auto &k : keys)
+            if (!t->p5 && frame >= k.first && frame < k.first + 6)
+                for (int c = 0; c < 16; ++c)
+                    if (codes[c] == k.second) {
+                        t->p1 = 2 | (c & 1);  t->p4 = 2 | ((c >> 1) & 1);
+                        t->p2 = 2 | ((c >> 2) & 1); t->p3 = 2 | ((c >> 3) & 1);
+                    }
         t->p6 = (!t->p8 && fire) ? 2 : 3;                // port 1, pin 6 low
         t->p7 = 3; t->p9 = 3;
         (void)stick; (void)key;

@@ -1,0 +1,4 @@
+# everything here is build output except the Makefile
+*
+!.gitignore
+!Makefile

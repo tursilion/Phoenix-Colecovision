@@ -6,7 +6,7 @@ Loading device for application Rf_Device from file '6slx16.nph' in environment
 -2
 Opened constraints file phoenix_top.pcf.
 
-Sat Oct 31 10:15:42 2026
+Sat Oct 31 19:44:00 2026
 
 /opt/Xilinx/14.7/ISE_DS/ISE/bin/lin64/unwrapped/bitgen -w -g CRC:Enable -g DonePipe:Yes -g next_config_register_write:Enable -g SPI_buswidth:1 -g Binary:Yes -g ConfigRate:26 -g UnusedPin:Pullnone phoenix_top.ncd phoenix_top.bit phoenix_top.pcf 
 

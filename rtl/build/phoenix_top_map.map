@@ -9,7 +9,7 @@ Target Device  : xc6slx16
 Target Package : csg324
 Target Speed   : -2
 Mapper Version : spartan6 -- $Revision: 1.55 $
-Mapped Date    : Sat Oct 31 10:13:53 2026
+Mapped Date    : Sat Oct 31 19:42:20 2026
 
 Mapping design into LUTs...
 Writing file phoenix_top_map.ngm...
@@ -19,17 +19,17 @@ Updating timing models...
 INFO:Map:215 - The Interim Design Summary has been generated in the MAP Report
    (.mrp).
 Running timing-driven placement...
-Total REAL time at the beginning of Placer: 8 secs 
+Total REAL time at the beginning of Placer: 7 secs 
 Total CPU  time at the beginning of Placer: 7 secs 
 
 Phase 1.1  Initial Placement Analysis
 Phase 1.1  Initial Placement Analysis (Checksum:c6872e39) REAL time: 8 secs 
 
 Phase 2.7  Design Feasibility Check
-Phase 2.7  Design Feasibility Check (Checksum:c6872e39) REAL time: 9 secs 
+Phase 2.7  Design Feasibility Check (Checksum:c6872e39) REAL time: 8 secs 
 
 Phase 3.31  Local Placement Optimization
-Phase 3.31  Local Placement Optimization (Checksum:c6872e39) REAL time: 9 secs 
+Phase 3.31  Local Placement Optimization (Checksum:c6872e39) REAL time: 8 secs 
 
 Phase 4.2  Initial Placement for Architecture Specific Features
 
@@ -46,7 +46,7 @@ Phase 7.3  Local Placement Optimization
 Phase 7.3  Local Placement Optimization (Checksum:fecf4b05) REAL time: 12 secs 
 
 Phase 8.5  Local Placement Optimization
-Phase 8.5  Local Placement Optimization (Checksum:fecf4b05) REAL time: 13 secs 
+Phase 8.5  Local Placement Optimization (Checksum:fecf4b05) REAL time: 12 secs 
 
 Phase 9.8  Global Placement
 ...........................
@@ -54,22 +54,22 @@ Phase 9.8  Global Placement
 .....................................................................................................................................................
 .......................................................................................................................................................................................................
 .......................................................................................
-Phase 9.8  Global Placement (Checksum:c342eac5) REAL time: 57 secs 
+Phase 9.8  Global Placement (Checksum:c342eac5) REAL time: 53 secs 
 
 Phase 10.5  Local Placement Optimization
-Phase 10.5  Local Placement Optimization (Checksum:c342eac5) REAL time: 57 secs 
+Phase 10.5  Local Placement Optimization (Checksum:c342eac5) REAL time: 53 secs 
 
 Phase 11.18  Placement Optimization
-Phase 11.18  Placement Optimization (Checksum:373cd00) REAL time: 1 mins 3 secs 
+Phase 11.18  Placement Optimization (Checksum:373cd00) REAL time: 59 secs 
 
 Phase 12.5  Local Placement Optimization
-Phase 12.5  Local Placement Optimization (Checksum:373cd00) REAL time: 1 mins 3 secs 
+Phase 12.5  Local Placement Optimization (Checksum:373cd00) REAL time: 59 secs 
 
 Phase 13.34  Placement Validation
-Phase 13.34  Placement Validation (Checksum:29e90b8) REAL time: 1 mins 3 secs 
+Phase 13.34  Placement Validation (Checksum:29e90b8) REAL time: 59 secs 
 
-Total REAL time to Placer completion: 1 mins 3 secs 
-Total CPU  time to Placer completion: 1 mins 3 secs 
+Total REAL time to Placer completion: 1 mins 
+Total CPU  time to Placer completion: 59 secs 
 Running post-placement packing...
 Writing output files...
 WARNING:PhysDesignRules:367 - The signal <coleco/cache/Mram_c_rev1_RAMD_O> is
@@ -204,8 +204,8 @@ Specific Feature Utilization:
 Average Fanout of Non-Clock Nets:                4.20
 
 Peak Memory Usage:  840 MB
-Total REAL time to MAP completion:  1 mins 6 secs 
-Total CPU time to MAP completion:   1 mins 6 secs 
+Total REAL time to MAP completion:  1 mins 2 secs 
+Total CPU time to MAP completion:   1 mins 1 secs 
 
 Mapping completed.
 See MAP report file "phoenix_top_map.mrp" for details.

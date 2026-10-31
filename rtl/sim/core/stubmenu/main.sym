@@ -18,7 +18,7 @@ Symbol Table
     _phSDData                                                   =  000057 
   0 _read_sector                                                   000005 R
   0 _spi                                                           000000 R
-  0 _start_code                                                    00010B R
+  0 _start_code                                                    000095 R
 
 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180 / ZX-Next / eZ80), page 2.
@@ -26,7 +26,7 @@ Hexadecimal [24-Bits]
 
 Area Table
 
-   0 _CODE                                      size    111   flags    0
+   0 _CODE                                      size     9B   flags    0
    1 _DATA                                      size      0   flags    0
    2 _INITIALIZED                               size      0   flags    0
    3 _DABS                                      size      0   flags    8

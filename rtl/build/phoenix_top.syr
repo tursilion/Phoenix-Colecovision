@@ -5,14 +5,14 @@ Parameter TMPDIR set to xst_tmp
 
 
 Total REAL time to Xst completion: 0.00 secs
-Total CPU time to Xst completion: 0.02 secs
+Total CPU time to Xst completion: 0.03 secs
  
 --> 
 Parameter xsthdpdir set to xst_hdp
 
 
 Total REAL time to Xst completion: 0.00 secs
-Total CPU time to Xst completion: 0.02 secs
+Total CPU time to Xst completion: 0.03 secs
  
 --> 
 
@@ -4666,13 +4666,13 @@ clock_system/pll_base_inst/CLKOUT2|    1.250|         |         |         |
 =========================================================================
 
 
-Total REAL time to Xst completion: 41.00 secs
-Total CPU time to Xst completion: 37.94 secs
+Total REAL time to Xst completion: 38.00 secs
+Total CPU time to Xst completion: 34.92 secs
  
 --> 
 
 
-Total memory usage is 524484 kilobytes
+Total memory usage is 517436 kilobytes
 
 Number of errors   :    0 (   0 filtered)
 Number of warnings :  250 (   0 filtered)
