@@ -461,7 +461,7 @@ reg  [2:0] f_ci;              // command byte
 reg        f_stop;            // sending CMD12 (else CMD18)
 reg [31:0] f_arg;             // the page's first sector
 reg [31:0] f_sarg;            // its read argument
-reg        f_bytes = 0;       // SD v1: arguments are byte offsets ($1E)
+reg        f_bytes = 0;       // SD v1 byte offsets ($1E): unused since CMD18
 reg [23:0] led_time = 0;      // the LED blinks for an SD error
 reg [15:0] f_crc;             // CRC16 (CCITT, 0 start) of a block's data
 reg        f_bad;             // a block of the page had a bad CRC

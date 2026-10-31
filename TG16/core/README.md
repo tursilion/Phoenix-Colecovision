@@ -9,18 +9,22 @@ PC Engine's own CPU.
 
 Status:
 
-- **Hardware:** Dragon Spirit, Salamander, Jamanoid and homebrew run, with
-  sprites, text and sound. Dragon Spirit shows a little flicker halfway
-  across its top line.
-- **ISE:** 68% of the LUTs, 16 of 32 block RAMs (and 6 small ones),
-  timing met (15.8ns of 23.3ns).
+- **Hardware:** done. Dragon Spirit, Salamander, Jamanoid, Splatterhouse,
+  Parodius, Street Fighter II' and Strip Fighter II run, with sprites,
+  text and sound, and so does homebrew. Dragon Spirit shows a little
+  flicker halfway across its top line. HuCards over 448K play from a ROM
+  cache that reads from the SD card (see Limits).
+- **ISE:** 90% of the LUTs, 17 of 32 block RAMs (and 6 small ones),
+  timing met (19.4ns of 23.3ns).
 
 ## Using it
 
 1. Put `.PCE` HuCard images on a FAT16 or FAT32 SD card, in any folders.
-   The menu shows 8.3 names. Images can be up to 448K, with or without a
+   The menu shows 8.3 names. Images can be up to 4M, with or without a
    512-byte copier header. US images whose data bits are reversed are
-   found and played the right way round.
+   found and played the right way round. Images over 448K must not be
+   fragmented on the card (the menu says so): copy the file again, or to a
+   freshly formatted card.
 2. Install `build/CORE11.PHX` with the Phoenix boot loader.
 3. Power up with the card inserted and pick a game.
 
@@ -53,8 +57,19 @@ back to the menu. Power cycle to change cores.
 
 ## Limits
 
-- Images up to 448K: 512K and bigger HuCards (and Street Fighter II) don't
-  fit, because the video RAM shares the SRAM.
+- Only 448K of the ROM fits in the SRAM, because the video RAM shares it.
+  A bigger HuCard (up to 4M, including Street Fighter II's mapper) starts
+  with its first 448K loaded. When the game reads a ROM page (8K) that
+  isn't in the SRAM, the CPU waits while the core reads it from the SD
+  card, into the place of a page not used lately. A page takes a few
+  milliseconds, so **the picture can flicker or jump for a frame during
+  these loads**. The video keeps running, but the game misses its
+  interrupts (vertical blank, raster splits) while it waits. This can't be
+  hidden without a frame buffer, which doesn't fit and would add a frame of
+  lag. Most loads come at scene changes. HuCards up to 448K never wait.
+- The LED blinks if a cache read from the SD card fails its CRC check; the
+  page is read again.
+- The SD card has to stay in while a bigger HuCard is playing.
 - One player: no multitap.
 - No SuperGrafx, CD-ROM, Arcade Card, Populous RAM or backup RAM.
 - 16 sprites per line, like the real VDC (the MiSTer core's 64-sprite
@@ -75,13 +90,24 @@ back to the menu. Power cycle to change cores.
   A 4-line buffer is enough, since a PC Engine line is just shorter than
   two HDMI lines.
 - **Memory.** Work RAM (8K), the palette, the sprite table and the sprite
-  line buffers are block RAM. The SRAM has the ROM from 00000 (up to 448K)
-  and the VDC's 64K of video RAM at 70000. The VDC reads one 16-bit word
+  line buffers are block RAM. The SRAM has 56 ROM pages of 8K from 00000
+  (448K) and the VDC's 64K of video RAM at 70000. The VDC reads one 16-bit word
   per dot period (4, 6 or 8 clocks), and its address stays the same for the
   whole period, so the SRAM controller reads the two bytes in the period's
   clocks 2 and 3. The other clocks serve the VDC's writes (two clocks per
   byte, posted), the CPU's ROM reads (the CPU waits for them) and the
   loader. The SRAM pins come from I/O block registers (`rtl/tg16_phoenix.v`).
+- **ROM cache.** A 512-entry table maps each 8K ROM page to its SRAM page,
+  if it has one. A game starts with ROM pages 0-55 in SRAM pages 0-55. On
+  a miss the cache picks an SRAM page by the clock algorithm (each page has
+  a used bit, set by the CPU's reads), unmaps the ROM page it held, reads
+  the new page with one multi-sector read (CMD18 for 16 sectors, then
+  CMD12) at 10.7MHz, checks each sector's CRC16 (a bad one reads the page
+  again), and maps it. The loader gives the SD read address of every
+  page's first sector (`$1818`-`$181E`), after checking that the file's
+  pages are each in consecutive sectors. `sim/tests/cachetest/` builds
+  `CACHETST.PCE`, a 1M test HuCard that reads random and all banks,
+  checks their sums and code, and shows which bank's data a bad page had.
 - **Loader.** At power-on the CPU runs a 16K block RAM ROM in ROM banks 0
   and 1: the loader (`loader/`, cc65), with an I/O window at $1800 of the
   I/O page (the CD's place): the SD card's SPI port and a forward engine
@@ -95,6 +121,10 @@ back to the menu. Power cycle to change cores.
     the sprite frame grid (a debug view) is gone. The sprite line buffers
     are cleared through the drawing port, because XST dropped their second
     write port.
+  - XST silently drops one write of a RAM written from two places (it did
+    for the sprite line buffers and for the cache's SRAM page to ROM page
+    table, which gave stale pages only on hardware). Each RAM here has one
+    registered write port. Check the RAM port tables in the `.syr`.
   - PSG (`psg.vhd`): the 4096 x 24 volume ROM is a 128-entry table times
     the sample (`psg_vol.vhd`). The channel record is split by the process
     that writes it, for GHDL. A 4-bit XOR on the 5-bit LFO sample is now
@@ -106,7 +136,7 @@ back to the menu. Power cycle to change cores.
 - `rtl/tg16_phoenix_top.vhd`: the top level, with clocks, resets,
   controllers and HDMI. It uses the shared `rtl/phoenix.ucf`.
 - `rtl/tg16_phoenix.v`: the frame lock, controller mapping, loader I/O,
-  SPI, the SRAM controller and the video output.
+  SPI, the ROM cache, the SRAM controller and the video output.
 - `rtl/pce/`: the MiSTer core's files, changed as above, and `dpram.vhd`
   (block RAM for XST).
 - `loader/`: the menu and loader (cc65 for the HuC6280), with Petit FatFs
@@ -129,3 +159,6 @@ back to the menu. Power cycle to change cores.
   `pce_top` (`netgen -sim`) and Verilator models of the Spartan-6
   primitives it uses (`cells.v`), to run the netlist the way the FPGA does.
   It showed the sprites back after the line buffer fix.
+- **Cache test.** `make -C sim/tests/cachetest` builds `CACHETST.PCE`
+  (cc65). Run it on hardware or in the simulation; it should show ALL OK
+  and keep counting.
